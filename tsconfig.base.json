@@ -14,14 +14,7 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {
-      "@capstone-repo/shared/budgie-components": [
-        "shared/budgie-components/src/index.ts"
-      ],
-      "@capstone-repo/shared/budgie-components/server": [
-        "shared/budgie-components/src/server.ts"
-      ]
-    }
+    "paths": {}
   },
   "exclude": ["node_modules", "tmp"]
 }
