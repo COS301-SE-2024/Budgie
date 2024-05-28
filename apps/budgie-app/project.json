@@ -1,0 +1,9 @@
+{
+  "name": "budgie-app",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/budgie-app",
+  "projectType": "application",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project budgie-app --web",
+  "targets": {}
+}
