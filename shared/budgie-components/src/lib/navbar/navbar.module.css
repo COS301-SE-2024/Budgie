@@ -22,11 +22,26 @@
     height: 2rem;
 }
 
+.navItem:hover {
+    background-color: #e8ebf1;
+    transition:  0.3s ease,
+}
+
 .navItemLogout {
     position: fixed;
     bottom: 1rem;
+    width: 10rem;
     font-weight: bold;
     font-family: "Trip Sans", sans-serif;
+    display: flex;
+    align-items: center;
+    border-radius: .4rem;
+    height: 2rem;
+}
+
+.navItemLogout:hover {
+    background-color: #e8ebf1;
+    transition:  0.3s ease,
 }
 
 .navIcon {
