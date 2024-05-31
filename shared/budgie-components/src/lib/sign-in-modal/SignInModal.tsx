@@ -6,7 +6,7 @@ import styles from './SignInModal.module.css';
 export interface SignInModalProps {}
 
 export function SignInModal(props: SignInModalProps) {
-  return <div className="bg-indigo-500 p-4">Hello Tailwind test!</div>;
+  return <div className="bg-indigo-500 p-4">Hello a test!</div>;
 }
 
 export default SignInModal;
