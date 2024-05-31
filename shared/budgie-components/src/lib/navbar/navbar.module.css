@@ -38,7 +38,7 @@
 .navItemLogout {
     position: fixed;
     bottom: 1rem;
-    width: 10rem;
+    width: 13vw;
     font-weight: bold;
     font-family: "Trip Sans", sans-serif;
     display: flex;

@@ -41,9 +41,9 @@ export function Settings(props: SettingsProps) {
       </div>
       {currentOverlay === 'Account' && <AccountSettings onClose={closeOverlay} />}
       {currentOverlay === 'Display' && <DisplaySettings onClose={closeOverlay} />}
-      {currentOverlay === 'Notification' && <DisplaySettings onClose={closeOverlay} />}
-      {currentOverlay === 'General' && <DisplaySettings onClose={closeOverlay} />}
-      {currentOverlay === 'Support' && <DisplaySettings onClose={closeOverlay} />}
+      {/*{currentOverlay === 'Notification' && <NotificationSettings onClose={closeOverlay} />}
+      {currentOverlay === 'General' && <GeneralSettings onClose={closeOverlay} />}
+  {currentOverlay === 'Support' && <SupportSettings onClose={closeOverlay} />}*/}
     </div>
   );
 }
