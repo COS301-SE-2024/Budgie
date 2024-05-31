@@ -3,6 +3,7 @@ import styles from './settings.module.css';
 import "../../root.css";
 import React, { useState } from 'react';
 import DisplaySettings from '../display-settings/DisplaySettings';
+import AccountSettings from '../account-settings/AccountSettings';
 
 export interface SettingsProps {}
 
@@ -13,40 +14,8 @@ export function Settings(props: SettingsProps) {
     setCurrentOverlay(null);
   };
 
-  const [isPopupVisible, setPopupVisible] = useState(false);
-
-  const handleDeleteClick = () => {
-    setPopupVisible(true);
-  };
-
-  const handleClosePopup = () => {
-    setPopupVisible(false);
-  };
-  const handleConfirmDelete = () => {
-    // Add logic to delete the account here
-    alert('Account deleted!');
-    setPopupVisible(false);
-  };
-
-
   return (
     <div className='mainPage'>
-      {/*<button className={styles.deleteButton} onClick={handleDeleteClick}>
-        <div className={styles.settingsTitle}>Delete Account</div>
-      </button>
-      {isPopupVisible && (
-        <div className= {styles.popupOverlay}>
-          <div className={styles.popupContent}>
-            <p>Are you sure you want to delete your account?</p>
-            <button className={styles.confirmButton} onClick={handleConfirmDelete}>
-              Yes
-            </button>
-            <button className={styles.cancelButton} onClick={handleClosePopup}>
-              No
-            </button>
-          </div>
-        </div>
-      )}*/}
       <span className='pageTitle'>Settings</span>
       <div className={styles.settingsOptionsContainer}>
         <div className={styles.settingsOption} onClick={() => setCurrentOverlay('Account')}>
@@ -70,7 +39,7 @@ export function Settings(props: SettingsProps) {
           <p className={styles.settingDescription}>View the help centre or contact us.</p>
         </div>
       </div>
-      {currentOverlay === 'Account' && <DisplaySettings onClose={closeOverlay} />}
+      {currentOverlay === 'Account' && <AccountSettings onClose={closeOverlay} />}
       {currentOverlay === 'Display' && <DisplaySettings onClose={closeOverlay} />}
       {currentOverlay === 'Notification' && <DisplaySettings onClose={closeOverlay} />}
       {currentOverlay === 'General' && <DisplaySettings onClose={closeOverlay} />}
