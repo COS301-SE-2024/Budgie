@@ -2,7 +2,7 @@
 {
     font-family: "Trip Sans", sans-serif;
     font-weight: bold;
-    background-color: #771515;
+    background-color: #c63333;
     color: #F8F8F8;
     width: 10rem;
     border-radius: 0.3rem;
@@ -11,3 +11,41 @@
     align-items: center;
     justify-content: center;
 }
+
+.popupOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .popupContent {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+  }
+  
+  .confirmButton,
+  .cancelButton {
+    margin: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  .confirmButton {
+    background-color: #c63333;
+    color: white;
+    border: none;
+  }
+  
+  .cancelButton {
+    background-color: #95a5a6;
+    color: white;
+    border: none;
+  }
