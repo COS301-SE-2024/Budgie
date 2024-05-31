@@ -1,30 +1,50 @@
 'use client';
 
+import { useState } from 'react';
 import styles from './navbar.module.css';
-//import { makeStyles } from '@mui/styles';
-//import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
-import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import ExitToAppOutlinedIcon from '@mui/icons-material/ExitToAppOutlined';
+
 
 /* eslint-disable-next-line */
 export interface NavbarProps {}
 
 export function Navbar(props: NavbarProps) {
-    return <>
+    const [selectedItem, setSelectedItem] = useState(''); // State to keep track of the selected item
+
+    const handleItemClick = (itemName: string) => {
+        setSelectedItem(itemName); // Update the selected item when clicked
+    };
+
+   return (
     <div className={styles.sidebar}>
-            <ul className={styles.navList}>
-                <li className={styles.navItem}><HomeOutlinedIcon className={styles.navIcon}/>Home</li>
-                <li className={styles.navItem}><DashboardOutlinedIcon className={styles.navIcon}/>Dashboard</li>
-                <li className={styles.navItem}><PersonOutlinedIcon className={styles.navIcon}/>Profile</li>
-                <li className={styles.navItem}><SettingsOutlinedIcon className={styles.navIcon}/>Settings</li>
-                <li className={styles.navItemLogout}><ExitToAppOutlinedIcon className={styles.navIcon}/>Logout</li>
-                
-            </ul>
-        </div>
-    </>
+        <ul className={styles.navList}>
+            {/* Home item doesn't have an icon */}
+            <li className={`${styles.navItem} ${selectedItem === 'Home' ? styles.selected : ''}`} onClick={() => handleItemClick('Home')}>
+            <span className="material-symbols-outlined" style={{ marginRight: "0.5rem", marginLeft: "0.5rem",fontSize: "1.2rem",marginBottom: "0.2rem"}}>home</span>
+            Home
+            </li>
+            {/* Dashboard item */}
+            <li className={`${styles.navItem} ${selectedItem === 'Dashboard' ? styles.selected : ''}`} onClick={() => handleItemClick('Dashboard')}>
+            <span className="material-symbols-outlined" style={{ marginRight: "0.5rem", marginLeft: "0.5rem",fontSize: "1.2rem",marginBottom: "0.2rem"}}>dashboard</span>
+                Dashboard
+            </li>
+            {/* Profile item */}
+            <li className={`${styles.navItem} ${selectedItem === 'Profile' ? styles.selected : ''}`} onClick={() => handleItemClick('Profile')}>
+            <span className="material-symbols-outlined" style={{ marginRight: "0.5rem", marginLeft: "0.5rem",fontSize: "1.2rem",marginBottom: "0.2rem"}}>account_circle</span>
+                Profile
+            </li>
+            {/* Settings item */}
+            <li className={`${styles.navItem} ${selectedItem === 'Settings' ? styles.selected : ''}`} onClick={() => handleItemClick('Settings')}>
+            <span className="material-symbols-outlined" style={{ marginRight: "0.5rem", marginLeft: "0.5rem",fontSize: "1.2rem",marginBottom: "0.2rem"}}>settings</span>
+                Settings
+            </li>
+            {/* Logout item */}
+            <li className={styles.navItemLogout}>
+            <span className="material-symbols-outlined" style={{ marginRight: "0.5rem", marginLeft: "0.5rem",fontSize: "1.2rem"}}>logout</span>
+                Logout
+            </li>
+        </ul>
+    </div>
+);
 }
 
 export default Navbar;

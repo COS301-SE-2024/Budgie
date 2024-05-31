@@ -1,3 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=swap');
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+
+}
 
 .sidebar {
     background-color: white;
@@ -20,11 +31,7 @@
     align-items: center;
     border-radius: .4rem;
     height: 2rem;
-}
-
-.navItem:hover {
-    background-color: #e8ebf1;
-    transition:  0.3s ease,
+    cursor: pointer;
 }
 
 .navItemLogout {
@@ -37,11 +44,12 @@
     align-items: center;
     border-radius: .4rem;
     height: 2rem;
+    cursor: pointer;
 }
 
-.navItemLogout:hover {
+.navItem:hover, .navItemLogout:hover {
     background-color: #e8ebf1;
-    transition:  0.3s ease,
+    transition:  0.3s ease,    
 }
 
 .navIcon {
@@ -49,4 +57,14 @@
     margin-left: 0.5rem;
     font-size: 1.2rem;
     margin-bottom: 0.2rem;
+}
+
+.selected {
+    background-color: #293652;
+    color: #F8F8F8;
+}
+
+.selected:hover{
+    background-color: #293652;
+    color: #F8F8F8;
 }
