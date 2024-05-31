@@ -1,7 +1,13 @@
-/*
- * Replace this with your own classes
- *
- * e.g.
- * .container {
- * }
-*/
+.settingsTitle
+{
+    font-family: "Trip Sans", sans-serif;
+    font-weight: bold;
+    background-color: #771515;
+    color: #F8F8F8;
+    width: 10rem;
+    border-radius: 0.3rem;
+    height:3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
