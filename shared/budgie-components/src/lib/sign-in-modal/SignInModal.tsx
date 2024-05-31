@@ -1,3 +1,5 @@
+'use client';
+
 import styles from './SignInModal.module.css';
 
 /* eslint-disable-next-line */
