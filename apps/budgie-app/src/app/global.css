@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: 'TripSans';
+    font-weight: 300;
+    src: url('../../public/fonts/TripSans-Regular.woff2') format('woff2');
+  }
+}
