@@ -1,7 +1,37 @@
+
 .sidebar {
     background-color: white;
     width: 15vw;
     height: 100vw;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    padding-top: 1.5rem;
 }
 
+.navList {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.navItem {
+    margin-top: 1rem;
+    font-weight: bold;
+    font-family: "Trip Sans", sans-serif;
+    display: flex;
+    align-items: center;
+    border-radius: .4rem;
+    height: 2rem;
+}
+
+.navItemLogout {
+    position: fixed;
+    bottom: 1rem;
+    font-weight: bold;
+    font-family: "Trip Sans", sans-serif;
+}
+
+.navIcon {
+    margin-right: 0.5rem;
+    margin-left: 0.5rem;
+    font-size: 1.2rem;
+    margin-bottom: 0.2rem;
+}

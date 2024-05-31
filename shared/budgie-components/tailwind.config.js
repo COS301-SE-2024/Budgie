@@ -11,7 +11,15 @@ module.exports = {
     ...createGlobPatternsForDependencies(__dirname),
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        BudgieGreen1: '#8EE5A2',
+        BudgieGreen2: '#B4E5A2',
+        BudgieGreen3: '#71C194',
+        BudgieBlue: '#293652',
+        BudgieWhite: '#F8F8F8',
+      }
+    },
   },
   plugins: [],
 };
