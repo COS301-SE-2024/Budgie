@@ -30,18 +30,12 @@
 }
 
 :root[data-theme='dark']{
-    --background-color: #293652;
-    --text-color: #F8F8F8;
-    --hover-color: #424e68;
-    --selected-nav: #8EE5A2;
-    --selected-nav-text: #000000;
-
     --main-background: #1C2436;
     --block-background: #293652;
     --main-text: #FFFFFF;
     --accent-colour: #E8EFFF;
-    --hover: #e8ebf1;
-    --greyed-text:#BABABA;
+    --hover: rgb(52, 67, 100);
+    --greyed-text:#ececec;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=swap');
@@ -57,7 +51,7 @@
 }
 
 .mainPage {
-    background-color: var(--background-color);
+    background-color: var(--main-background);
     width: 85vw;
     height: 100vh;
     padding-left: 1.5rem;
@@ -70,7 +64,7 @@
 }
 
 .pageTitle{
-    color: var(--BudgieBlue);
+    color: var(--accent-colour);
     font-weight: 900;
     font-size: 1.5rem;
     display: flex;

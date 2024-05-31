@@ -10,7 +10,7 @@
 }
 
 .sidebar {
-    background-color: white;
+    background-color: var(--block-background);
     width: 15vw;
     height: 100vh;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -32,6 +32,7 @@
     border-radius: .4rem;
     height: 2rem;
     cursor: pointer;
+    color: var(--main-text);
 }
 
 .navItemLogout {
@@ -45,19 +46,20 @@
     border-radius: .4rem;
     height: 2rem;
     cursor: pointer;
+    color: var(--main-text);
 }
 
 .navItem:hover, .navItemLogout:hover {
-    background-color: #e8ebf1;
+    background-color: var(--hover);
     transition:  0.3s ease;
 }
 
 .selected {
-    background-color: #293652;
-    color: #F8F8F8;
+    background-color: var(--accent-colour);
+    color: var(--block-background);
 }
 
 .selected:hover{
-    background-color: #293652;
-    color: #F8F8F8;
+    background-color: var(--accent-colour);
+    color: var(--block-background);
 }

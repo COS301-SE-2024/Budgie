@@ -5,7 +5,7 @@
   .settingsOption { 
     width: 100%;
     padding: 0.6rem;
-    background-color: var(--BudgieWhite);
+    background-color: var(--block-background);
     border-radius: 0.2rem;
     margin-bottom: 0.5rem;
     transition:  0.2s ease;
@@ -15,7 +15,8 @@
   .settingTitle {
     font-size: 1rem;
     font-weight: bold;
-    color: var(--selected-nav);
+    color: var(--accent-colour);
+    margin-bottom: 1rem;
   }
 
   .settingDescription {
@@ -32,11 +33,13 @@
   .lightThemeOption {
     background-color: #E1E1E1;
     color: #293652;
+    border: 3px solid #293652;
   }
 
   .darkThemeOption {
     background-color: #293652;
     color: #F8F8F8;
+    border: 3px solid #F8F8F8;
   }
 
   .lightThemeOption, .darkThemeOption {
@@ -47,5 +50,4 @@
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
-    border: 3px solid var(--BudgieBlue);
   }

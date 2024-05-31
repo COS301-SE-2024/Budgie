@@ -51,7 +51,7 @@ export function Settings(props: SettingsProps) {
       <div className={styles.settingsOptionsContainer}>
         <div className={styles.settingsOption} onClick={() => setCurrentOverlay('Account')}>
           <p className={styles.settingTitle}>Account Settings</p>
-          <p className={styles.settingDescription}>Edit your profile information or change your password.</p>
+          <p className={styles.settingDescription}>Edit your profile information, change your password, or delete your account</p>
         </div>
         <div className={styles.settingsOption} onClick={() => setCurrentOverlay('Display')}>
           <p className={styles.settingTitle}>Display Settings</p>
