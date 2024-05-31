@@ -78,3 +78,14 @@
     font-size: 0.8rem;
     color: var(--greyed-text);
   }
+
+  .subPage {
+    z-index: 1000;
+    background-color: var(--background-color);
+    width: 85vw;
+    height: 100vh;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 1rem;
+    overflow-y: auto;
+  }

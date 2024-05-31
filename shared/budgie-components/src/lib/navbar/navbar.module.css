@@ -52,13 +52,6 @@
     transition:  0.3s ease;
 }
 
-.navIcon {
-    margin-right: 0.5rem;
-    margin-left: 0.5rem;
-    font-size: 1.2rem;
-    margin-bottom: 0.2rem;
-}
-
 .selected {
     background-color: #293652;
     color: #F8F8F8;

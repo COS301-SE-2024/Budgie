@@ -6,12 +6,12 @@
 }
 
 :root{
-    --background-color: #E1E1E1;
-    --text-color: #000000;
-    --hover-color: #e8ebf1;
-    --selected-nav: #293652;
-    --selected-nav-text: #F8F8F8;
-    --greyed-text:#7a7979;
+    --main-background: #E1E1E1;
+    --block-background: #F8F8F8;
+    --main-text: #000000;
+    --accent-colour: #293652;
+    --hover: #e8ebf1;
+    --greyed-text:#7D7D7D;
 
     --BudgieGreen1: #8EE5A2;
     --BudgieGreen2: #B4E5A2;
@@ -21,11 +21,12 @@
 }
 
 :root[data-theme='light'] {
-    --background-color: #E1E1E1;
-    --text-color: #000000;
-    --hover-color: #e8ebf1;
-    --selected-nav: #293652;
-    --selected-nav-text: #F8F8F8;
+    --main-background: #E1E1E1;
+    --block-background: #F8F8F8;
+    --main-text: #000000;
+    --accent-colour: #293652;
+    --hover: #e8ebf1;
+    --greyed-text:#7D7D7D;
 }
 
 :root[data-theme='dark']{
@@ -34,6 +35,25 @@
     --hover-color: #424e68;
     --selected-nav: #8EE5A2;
     --selected-nav-text: #000000;
+
+    --main-background: #1C2436;
+    --block-background: #293652;
+    --main-text: #FFFFFF;
+    --accent-colour: #E8EFFF;
+    --hover: #e8ebf1;
+    --greyed-text:#BABABA;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=swap');
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+    cursor: pointer;
 }
 
 .mainPage {
@@ -44,11 +64,15 @@
     padding-right: 1.5rem;
     padding-top: 1rem;
     overflow-y: auto;
+    position: fixed;
+    right: 0;
+    top: 0;
 }
 
 .pageTitle{
     color: var(--BudgieBlue);
     font-weight: 900;
     font-size: 1.5rem;
-    margin-top: 5rem;
+    display: flex;
+    align-items: center;
 }

@@ -11,7 +11,6 @@ export interface NavbarProps {
 }
 
 export function Navbar(props: NavbarProps) {
-
    return (
     <div className={styles.sidebar}>
         <ul className={styles.navList}>
