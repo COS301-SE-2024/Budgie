@@ -1,4 +1,7 @@
 .sidebar {
-    background-color: black;
-    height: 50vh;
+    background-color: white;
+    width: 15vw;
+    height: 100vw;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
+
