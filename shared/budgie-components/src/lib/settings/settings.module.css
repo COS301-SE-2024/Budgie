@@ -49,3 +49,33 @@
     color: white;
     border: none;
   }
+
+  .settingsOptionsContainer {
+    height: 100vh;
+    margin-top: 0.6rem;
+  }
+
+  .settingsOption { 
+    width: 100%;
+    padding: 0.6rem;
+    background-color: var(--BudgieWhite);
+    border-radius: 0.2rem;
+    margin-bottom: 0.5rem;
+    transition:  0.2s ease;
+    cursor: pointer;
+  }
+
+  .settingsOption:hover { 
+    background-color:  var(--hover-color);
+  }
+
+  .settingTitle {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--selected-nav);
+  }
+
+  .settingDescription {
+    font-size: 0.8rem;
+    color: var(--greyed-text);
+  }

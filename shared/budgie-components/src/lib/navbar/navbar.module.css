@@ -7,7 +7,6 @@
     'wght' 400,
     'GRAD' 0,
     'opsz' 24;
-
 }
 
 .sidebar {
@@ -49,7 +48,7 @@
 
 .navItem:hover, .navItemLogout:hover {
     background-color: #e8ebf1;
-    transition:  0.3s ease,    
+    transition:  0.3s ease;
 }
 
 .navIcon {

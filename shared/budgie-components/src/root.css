@@ -1,0 +1,53 @@
+@import url(https://db.onlinewebfonts.com/c/076abc8ba1bb38a0713dec3b63b880e4?family=Trip+Sans);
+
+
+* {
+    font-family: "Trip Sans", sans-serif;
+}
+
+:root{
+    --background-color: #E1E1E1;
+    --text-color: #000000;
+    --hover-color: #e8ebf1;
+    --selected-nav: #293652;
+    --selected-nav-text: #F8F8F8;
+    --greyed-text:#7a7979;
+
+    --BudgieGreen1: #8EE5A2;
+    --BudgieGreen2: #B4E5A2;
+    --BudgieGreen3: #71C194;
+    --BudgieBlue: #293652;
+    --BudgieWhite: #F8F8F8;
+}
+
+:root[data-theme='light'] {
+    --background-color: #E1E1E1;
+    --text-color: #000000;
+    --hover-color: #e8ebf1;
+    --selected-nav: #293652;
+    --selected-nav-text: #F8F8F8;
+}
+
+:root[data-theme='dark']{
+    --background-color: #293652;
+    --text-color: #F8F8F8;
+    --hover-color: #424e68;
+    --selected-nav: #8EE5A2;
+    --selected-nav-text: #000000;
+}
+
+.mainPage {
+    background-color: var(--background-color);
+    width: 85vw;
+    height: 100vw;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 1rem;
+}
+
+.pageTitle{
+    color: var(--BudgieBlue);
+    font-weight: 900;
+    font-size: 1.5rem;
+    margin-top: 5rem;
+}
