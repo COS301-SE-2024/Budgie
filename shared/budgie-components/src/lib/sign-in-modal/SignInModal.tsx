@@ -4,6 +4,7 @@ import './SignInModal.module.css';
 import { Fragment, useState } from 'react';
 import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
+import { useRouter } from 'next/router';
 
 /* eslint-disable-next-line */
 export interface SignInModalProps {
