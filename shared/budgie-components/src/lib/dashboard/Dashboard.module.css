@@ -1,7 +1,17 @@
-/*
- * Replace this with your own classes
- *
- * e.g.
- * .container {
- * }
-*/
+.uploadButton {
+    background-color: var(--accent-colour);
+    color: white;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 15rem;
+    height: 4rem;
+    border-radius: 0.4rem;
+    margin-bottom: 0.5rem;
+    transition:  0.2s ease;
+}
+
+.uploadButton:hover {
+    background-color: var(--accent-colour); 
+}
