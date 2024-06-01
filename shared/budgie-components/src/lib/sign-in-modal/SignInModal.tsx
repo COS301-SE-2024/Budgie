@@ -10,7 +10,6 @@ export interface SignInModalProps {
 
 export function SignInModal(props: SignInModalProps) {
   return <>
-    <div className="bg-indigo-500 p-4">Hello SignIn test!</div>
     <button onClick={props.onSignIn}>Sign In</button>
   </>
 }
