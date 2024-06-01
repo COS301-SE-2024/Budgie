@@ -12,13 +12,17 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        TripSans: 'TripSans',
+      },
       colors: {
         BudgieGreen1: '#8EE5A2',
         BudgieGreen2: '#B4E5A2',
         BudgieGreen3: '#71C194',
         BudgieBlue: '#293652',
         BudgieWhite: '#F8F8F8',
-      }
+        BudgieGrayLight: '#EAEAEA',
+      },
     },
   },
   plugins: [],

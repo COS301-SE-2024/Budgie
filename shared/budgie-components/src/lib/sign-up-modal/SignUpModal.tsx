@@ -1,19 +1,13 @@
 'use client';
 
-import './SignInModal.module.css';
+import './SignUpModal.module.css';
 import { Fragment, useState } from 'react';
 import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
-
 /* eslint-disable-next-line */
-export interface SignInModalProps {
-  onSignIn: () => void;
-}
+export interface SignUpModalProps {}
 
-export function SignInModal(props: SignInModalProps) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
+export function SignUpModal(props: SignUpModalProps) {
   return (
     <>
       <div className="bg-BudgieBlue w-[794px] h-[521px] rounded-[61px]">
@@ -41,34 +35,27 @@ export function SignInModal(props: SignInModalProps) {
                 placeholder="Password"
               ></input>
             </div>
+            <div className="pt-4 hidden">Date Picker?</div>
             <div className="flex flex-col justify-start pt-6 items-center">
               <button
                 className=" font-TripSans font-medium rounded-[25px] w-36 h-10 bg-BudgieBlue text-BudgieWhite"
                 type="button"
               >
-                Log In
+                Sign Up
               </button>
             </div>
             <div className="flex flex-col justify-start pt-3 items-center">
               <p className=" text-BudgieBlue font-TripSans font-medium  ">OR</p>
             </div>
             <div className="flex flex-col justify-start pt-3 items-center">
-              {/* google login */}Google login Placeholder
+              {/* google login */}Google sign up Placeholder
             </div>
-            <div className="flex flex-col justify-start pt-14 items-center">
-              <p className=" text-lg text-BudgieBlue font-TripSans font-medium  ">
-                Don't have an account?{' '}
-                <a className=" underline " href="#">
-                  Sign Up
-                </a>
-              </p>
-            </div>
-            <div className="flex flex-col justify-start pt-2 items-center">
+            <div className="flex flex-col justify-start pt-7 items-center">
               <a
                 className=" underline text-lg text-BudgieBlue font-TripSans font-medium  "
                 href="#"
               >
-                Forgot Password?
+                Already Have an Account?
               </a>
             </div>
           </form>
@@ -78,4 +65,4 @@ export function SignInModal(props: SignInModalProps) {
   );
 }
 
-export default SignInModal;
+export default SignUpModal;
