@@ -8,6 +8,8 @@
   },
   "files": [],
   "include": [],
+  "composite": true,
+  "declaration": true,
   "references": [
     {
       "path": "./tsconfig.lib.json"
