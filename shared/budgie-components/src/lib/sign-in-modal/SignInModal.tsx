@@ -6,7 +6,9 @@ import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
 
 /* eslint-disable-next-line */
-export interface SignInModalProps {}
+export interface SignInModalProps {
+  onSignIn: () => void;
+}
 
 export function SignInModal(props: SignInModalProps) {
   const [email, setEmail] = useState('');
