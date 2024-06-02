@@ -2,6 +2,11 @@
 
 #misc
 apps/budgie-app/.env.local
+#firebaseemulatorsuite
+functions/*
+database.rules.json
+firestore.indexes.json
+firestore.rules
 
 # compiled output
 dist
