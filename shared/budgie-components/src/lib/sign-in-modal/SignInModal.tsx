@@ -65,11 +65,6 @@ export function SignInModal(props: SignInModalProps) {
         email,
         password
       );
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
       const user = userCredential.user;
       console.log('User logged in:', user);
     } catch (error) {
