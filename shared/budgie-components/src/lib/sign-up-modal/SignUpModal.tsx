@@ -1,22 +1,13 @@
 'use client';
 import './SignUpModal.module.css';
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
-import {
-  createUserWithEmailAndPassword,
-  getAdditionalUserInfo,
-  getAuth,
-} from 'firebase/auth';
-import { auth } from '../../../../../apps/budgie-app/firebase/clientApp';
-import {
-  GoogleAuthProvider,
-  signInWithPopup,
-  AdditionalUserInfo,
-} from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth, db } from '../../../../../apps/budgie-app/firebase/clientApp';
+import { collection, addDoc } from 'firebase/firestore';
 import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
-import { time } from 'console';
 
 /* eslint-disable-next-line */
 export interface SignUpModalProps {}
@@ -40,7 +31,7 @@ export function SignUpModal(props: SignUpModalProps) {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       console.log('User information:', user);
-      console.log(user.providerData);
+
       try {
         const userRef = collection(db, 'Users');
         await addDoc(userRef, {
@@ -57,7 +48,7 @@ export function SignUpModal(props: SignUpModalProps) {
           surname: user.displayName,
         });
       } catch (error) {
-        console.log(error);
+        console.error('Error adding user to Firestore:', error);
       }
     } catch (error) {
       if (error instanceof FirebaseError) {
@@ -74,10 +65,12 @@ export function SignUpModal(props: SignUpModalProps) {
       }
     }
   };
-  const validateEmail = (email) => {
+
+  const validateEmail = (email: string): boolean => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
   };
+
   async function signup() {
     if (!email || !password) {
       setError(true);
@@ -94,12 +87,9 @@ export function SignUpModal(props: SignUpModalProps) {
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+
       try {
         const userRef = collection(db, 'Users');
         await addDoc(userRef, {
@@ -116,7 +106,7 @@ export function SignUpModal(props: SignUpModalProps) {
           surname: '',
         });
       } catch (error) {
-        console.log(error);
+        console.error('Error adding user to Firestore:', error);
       }
     } catch (err) {
       if (err instanceof FirebaseError) {
@@ -128,9 +118,7 @@ export function SignUpModal(props: SignUpModalProps) {
             setErrorMessage('The password is too weak.');
             break;
           case 'auth/email-already-in-use':
-            setErrorMessage(
-              'This email address is already in use by another account.'
-            );
+            setErrorMessage('This email address is already in use by another account.');
             break;
           case 'auth/invalid-email':
             setErrorMessage('This email address is invalid.');
