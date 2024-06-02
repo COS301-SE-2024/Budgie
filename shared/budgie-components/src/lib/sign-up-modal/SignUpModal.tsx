@@ -32,20 +32,21 @@ export function SignUpModal(props: SignUpModalProps) {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       console.log('User information:', user);
+      console.log(user.providerData);
       try {
-        const event = new Date(1993, 6, 28, 14, 39, 7);
         const userRef = collection(db, 'Users');
         await addDoc(userRef, {
-          OauthID: user.providerData,
-          OauthProvider: '',
-          ProfilePicture: '',
+          OauthID: user.providerData[0].uid,
+          OauthProvider: user.providerData[0].providerId,
+          ProfilePicture: user.photoURL,
           account: '',
-          bankStatements: '',
+          bankStatements: [],
           createdAt: new Date(),
           deleted: false,
           email: user.email,
-          name: '',
-          surname: '',
+          name: user.displayName,
+          password: 'Hashed_Password',
+          surname: user.displayName,
         });
       } catch (error) {
         console.log(error);
@@ -92,18 +93,18 @@ export function SignUpModal(props: SignUpModalProps) {
       );
       const user = userCredential.user;
       try {
-        const event = new Date(1993, 6, 28, 14, 39, 7);
         const userRef = collection(db, 'Users');
         await addDoc(userRef, {
           OauthID: '',
           OauthProvider: '',
           ProfilePicture: '',
           account: '',
-          bankStatements: '',
+          bankStatements: [],
           createdAt: new Date(),
           deleted: false,
           email: user.email,
           name: '',
+          password: 'Hashed_Password',
           surname: '',
         });
       } catch (error) {
