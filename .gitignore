@@ -1,7 +1,8 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
-#env variables
-.env.local
+#misc
+apps/budgie-app/.env.local
+
 # compiled output
 dist
 tmp
