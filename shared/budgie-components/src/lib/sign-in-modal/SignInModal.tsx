@@ -4,6 +4,7 @@ import './SignInModal.module.css';
 import { Fragment, useState } from 'react';
 import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
+import { useRouter } from 'next/router';
 
 /* eslint-disable-next-line */
 export interface SignInModalProps {
@@ -13,6 +14,16 @@ export interface SignInModalProps {
 export function SignInModal(props: SignInModalProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const handleEmailChange = (e: React.SyntheticEvent<HTMLInputElement>) => {
+    setEmail((e.target as HTMLInputElement).value);
+  };
+
+  const handlePasswordChange = (e: React.SyntheticEvent<HTMLInputElement>) => {
+    setPassword((e.target as HTMLInputElement).value);
+  };
+
+  const handleLoginClick = () => {};
 
   return (
     <>
@@ -31,20 +42,25 @@ export function SignInModal(props: SignInModalProps) {
                 id="email"
                 type="text"
                 placeholder="Email"
+                value={email}
+                onChange={handleEmailChange}
               ></input>
             </div>
             <div className="pt-4">
               <input
                 className="appearance-none text-lg w-72 h-10 font-TripSans font-normal pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow"
                 id="password"
-                type="text"
+                type="password"
                 placeholder="Password"
+                value={password}
+                onChange={handlePasswordChange}
               ></input>
             </div>
             <div className="flex flex-col justify-start pt-6 items-center">
               <button
                 className=" font-TripSans font-medium rounded-[25px] w-36 h-10 bg-BudgieBlue text-BudgieWhite"
                 type="button"
+                onClick={handleLoginClick}
               >
                 Log In
               </button>
