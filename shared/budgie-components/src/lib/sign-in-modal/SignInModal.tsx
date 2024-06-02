@@ -7,7 +7,6 @@ import logo from '../../../public/images/BudgieNoBG.png';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import {
-  getAuth,
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
@@ -34,6 +33,7 @@ export function SignInModal(props: SignInModalProps) {
   const signInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
+      provider.addScope('email');
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       console.log('User information:', user);
@@ -60,6 +60,11 @@ export function SignInModal(props: SignInModalProps) {
       return;
     }
     try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,

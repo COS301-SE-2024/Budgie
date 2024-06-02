@@ -3,10 +3,17 @@ import './SignUpModal.module.css';
 import { Fragment, useState } from 'react';
 import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
-import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
-import { auth, db } from '../../../../../apps/budgie-app/firebase/clientApp';
-import { collection, addDoc } from 'firebase/firestore';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  getAdditionalUserInfo,
+  getAuth,
+} from 'firebase/auth';
+import { auth } from '../../../../../apps/budgie-app/firebase/clientApp';
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  AdditionalUserInfo,
+} from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
 import { time } from 'console';
@@ -29,6 +36,7 @@ export function SignUpModal(props: SignUpModalProps) {
   const signInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
+      provider.addScope('email');
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       console.log('User information:', user);
