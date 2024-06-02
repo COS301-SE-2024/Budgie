@@ -7,9 +7,7 @@ import logo from '../../../public/images/BudgieNoBG.png';
 import { useRouter } from 'next/router';
 
 /* eslint-disable-next-line */
-export interface SignInModalProps {
-  onSignIn: () => void;
-}
+export interface SignInModalProps {}
 
 export function SignInModal(props: SignInModalProps) {
   const [email, setEmail] = useState('');
