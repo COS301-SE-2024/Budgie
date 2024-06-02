@@ -6,7 +6,12 @@ import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth';
 import { auth } from '../../../../../apps/budgie-app/firebase/clientApp';
 
 /* eslint-disable-next-line */
@@ -55,7 +60,11 @@ export function SignInModal(props: SignInModalProps) {
       return;
     }
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
       console.log('User logged in:', user);
     } catch (error) {
@@ -72,6 +81,9 @@ export function SignInModal(props: SignInModalProps) {
             break;
           case 'auth/invalid-email':
             setErrorMessage('This email address is invalid.');
+            break;
+          case 'auth/invalid-credential':
+            setErrorMessage('Invalid Email/Password.');
             break;
           default:
             setErrorMessage(errorMessage);
