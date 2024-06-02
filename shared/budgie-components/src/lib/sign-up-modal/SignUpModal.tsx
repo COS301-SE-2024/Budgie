@@ -45,7 +45,10 @@ export function SignUpModal(props: SignUpModalProps) {
       }
     }
   };
-
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  };
   async function signup() {
     if (!email || !password) {
       setError(true);
@@ -53,8 +56,20 @@ export function SignUpModal(props: SignUpModalProps) {
       console.log(errorMessage);
       return;
     }
+
+    if (!validateEmail(email)) {
+      setError(true);
+      setErrorMessage('Please enter a valid email address.');
+      console.log(errorMessage);
+      return;
+    }
+
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
     } catch (err) {
       if (err instanceof FirebaseError) {
@@ -66,7 +81,9 @@ export function SignUpModal(props: SignUpModalProps) {
             setErrorMessage('The password is too weak.');
             break;
           case 'auth/email-already-in-use':
-            setErrorMessage('This email address is already in use by another account.');
+            setErrorMessage(
+              'This email address is already in use by another account.'
+            );
             break;
           case 'auth/invalid-email':
             setErrorMessage('This email address is invalid.');
@@ -146,6 +163,11 @@ export function SignUpModal(props: SignUpModalProps) {
                 Sign Up with Google
               </button>
             </div>
+            {error && (
+              <div className="pt-2 text-red-600 font-TripSans font-medium">
+                {errorMessage}
+              </div>
+            )}
             <div className="flex flex-col justify-start pt-7 items-center">
               <Link
                 className=" underline text-lg text-BudgieBlue font-TripSans font-medium  "
