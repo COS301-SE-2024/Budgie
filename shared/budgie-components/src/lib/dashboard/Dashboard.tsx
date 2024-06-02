@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import UploadStatementCSV from '../upload-statement-csv/UploadStatementCSV';
 import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
-import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
-import { json } from 'stream/consumers';
+import { db, auth } from '../../../../../apps/budgie-app/firebase/clientApp';
+import { getAuth } from "firebase/auth";
 
 export interface DashboardProps {}
 
@@ -19,6 +19,12 @@ export function Dashboard(props: DashboardProps) {
   }
 
   useEffect(() => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user !== null) {
+      //setUserID(user.uid);
+    }
+
     const getBankStatementsByUserId = async (userId: string) => {
       try {
         const bankStatementsRef = collection(db, 'bankStatements');
