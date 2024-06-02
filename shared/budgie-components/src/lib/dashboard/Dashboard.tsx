@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import UploadStatementCSV from '../upload-statement-csv/UploadStatementCSV';
-import {doc, getDoc } from "firebase/firestore";
-import {db} from '../../../../../apps/budgie-app/firebase/clientApp'
-
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 
 export interface DashboardProps {}
 
@@ -15,34 +14,41 @@ export function Dashboard(props: DashboardProps) {
     amount: number;
     balance: number;
     description: string;
-  } 
+  }
 
   useEffect(() => {
-    const getUserById = async () => {
+    const getBankStatementsByUserId = async (userId: string) => {
       try {
-        const userDocRef = doc(db, 'bankStatements', '2YgQ8DFfrkWBNkjxU8HT');
-        const userDocSnapshot = await getDoc(userDocRef);
-        if (userDocSnapshot.exists()) {
-          const userData = userDocSnapshot.data();
-          setBalance(userData.Balance)
-          const transactionsData: Transaction[] = [];
+        const bankStatementsRef = collection(db, 'bankStatements');
+        const q = query(bankStatementsRef, where('userId', '==', userId));
+        const querySnapshot = await getDocs(q);
+        
+        const transactionsData: Transaction[] = [];
+        querySnapshot.forEach((doc) => {
+          const userData = doc.data();
           transactionsData.push({
-            date : userData.Date,
+            date: userData.Date,
             amount: parseFloat(userData.Amount),
             balance: parseFloat(userData.Balance),
-            description: userData.Description 
+            description: userData.Description
           });
-          setTransactions(transactionsData)
-          
-        } else {
-          console.log('User document does not exist');
+        });
+
+        // Sort transactions by date in descending order
+        transactionsData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+        if (transactionsData.length > 0) {
+          setBalance(transactionsData[0].balance); // Assuming the most recent balance is what you need
         }
+
+        setTransactions(transactionsData);
       } catch (error) {
-        console.log(error);
+        alert(error);
       }
     };
-  
-    getUserById();
+
+    const userId = "j1GNrQWu8jamNoOFhdrZ67"; 
+    getBankStatementsByUserId(userId);
   }, []);
 
   const handleFileUpload = (file: File) => {
@@ -64,7 +70,7 @@ export function Dashboard(props: DashboardProps) {
       // Find the line that contains the transaction headers
       const headerLine = lines.find(line => line.startsWith('Date'));
       if (headerLine) {
-        const transactionsData: Transaction[] = transactions;
+        const transactionsData: Transaction[] = [];
         for (let i = lines.indexOf(headerLine) + 1; i < lines.length; i++) {
           const line = lines[i];
           if (line.trim() === ',,,') {
@@ -78,7 +84,10 @@ export function Dashboard(props: DashboardProps) {
             description
           });
         }
+
+        // Sort transactions by date in descending order
         transactionsData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
         setTransactions(transactionsData);
       }
     };
