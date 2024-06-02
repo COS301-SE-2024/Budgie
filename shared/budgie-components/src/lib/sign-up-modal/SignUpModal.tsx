@@ -5,6 +5,7 @@ import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
 import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { auth } from '../../../../../apps/budgie-app/firebase/clientApp';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import Link from 'next/link';
 
 /* eslint-disable-next-line */
@@ -20,6 +21,25 @@ export function SignUpModal(props: SignUpModalProps) {
     if (name === 'email') setEmail(value);
     if (name === 'password') setPassword(value);
   };
+
+  const signInWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      console.log('User information:', user);
+    } catch (error) {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      const email = error.customData.email;
+      const credential = GoogleAuthProvider.credentialFromError(error);
+      console.error('Error code:', errorCode);
+      console.error('Error message:', errorMessage);
+      console.error('Email:', email);
+      console.error('Credential:', credential);
+    }
+  };
+
   async function signup() {
     if (!email || !password) {
       setError(true);
@@ -106,7 +126,13 @@ export function SignUpModal(props: SignUpModalProps) {
               <p className=" text-BudgieBlue font-TripSans font-medium  ">OR</p>
             </div>
             <div className="flex flex-col justify-start pt-3 items-center">
-              {/* google login */}Google sign up Placeholder
+              <button
+                className=" font-TripSans font-medium rounded-[25px] w-36 h-10 bg-BudgieBlue text-BudgieWhite"
+                type="button"
+                onClick={() => signInWithGoogle()}
+              >
+                Sign Up with Google
+              </button>
             </div>
             <div className="flex flex-col justify-start pt-7 items-center">
               <Link
