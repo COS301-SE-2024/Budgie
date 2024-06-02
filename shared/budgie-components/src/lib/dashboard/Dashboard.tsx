@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import UploadStatementCSV from '../upload-statement-csv/UploadStatementCSV';
+// @ts-ignore
+import { processFileContent } from './DashBoardHook.js';
 
 export interface DashboardProps {}
 
@@ -18,39 +20,11 @@ export function Dashboard(props: DashboardProps) {
     const reader = new FileReader();
     reader.onload = (event) => {
       const content = event.target?.result as string;
-      const lines = content.split('\n').map(line => line.trim()).filter(line => line);
-
-      // Find the line that contains the balance
-      const balanceLine = lines.find(line => line.startsWith('Balance:'));
-      if (balanceLine) {
-        const balanceValues = balanceLine.split(',').map(value => value.trim()).filter(value => value);
-        if (balanceValues.length > 1) {
-          const balance = parseFloat(balanceValues[1]);
-          setBalance(balance);
-        }
-      }
-
-      // Find the line that contains the transaction headers
-      const headerLine = lines.find(line => line.startsWith('Date'));
-      if (headerLine) {
-        const transactionsData: Transaction[] = [];
-        for (let i = lines.indexOf(headerLine) + 1; i < lines.length; i++) {
-          const line = lines[i];
-          if (line.trim() === ',,,') {
-            break; // Stop reading if encountered an empty line
-          }
-          const [date, amount, balance, description] = line.split(',');
-          transactionsData.push({
-            date,
-            amount: parseFloat(amount),
-            balance: parseFloat(balance),
-            description
-          });
-        }
-        setTransactions(transactionsData);
-      }
+      const { balance, transactionsData } = processFileContent(content);
+      setBalance(balance);
+      setTransactions(transactionsData);
     };
-
+  
     reader.readAsText(file);
   };
 
