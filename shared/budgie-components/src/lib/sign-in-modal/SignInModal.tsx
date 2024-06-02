@@ -5,6 +5,7 @@ import { Fragment, useState } from 'react';
 import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 /* eslint-disable-next-line */
 export interface SignInModalProps {}
@@ -72,18 +73,18 @@ export function SignInModal(props: SignInModalProps) {
             <div className="flex flex-col justify-start pt-14 items-center">
               <p className=" text-lg text-BudgieBlue font-TripSans font-medium  ">
                 Don't have an account?{' '}
-                <a className=" underline " href="#">
+                <Link href={'/signup'} className=" underline ">
                   Sign Up
-                </a>
+                </Link>
               </p>
             </div>
             <div className="flex flex-col justify-start pt-2 items-center">
-              <a
-                className=" underline text-lg text-BudgieBlue font-TripSans font-medium  "
-                href="#"
+              <Link
+                href={'#'}
+                className="underline text-lg text-BudgieBlue font-TripSans font-medium  "
               >
                 Forgot Password?
-              </a>
+              </Link>
             </div>
           </form>
         </div>

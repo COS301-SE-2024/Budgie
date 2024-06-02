@@ -4,6 +4,7 @@ import './SignUpModal.module.css';
 import { Fragment, useState } from 'react';
 import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
+import Link from 'next/link';
 /* eslint-disable-next-line */
 export interface SignUpModalProps {}
 
@@ -51,12 +52,12 @@ export function SignUpModal(props: SignUpModalProps) {
               {/* google login */}Google sign up Placeholder
             </div>
             <div className="flex flex-col justify-start pt-7 items-center">
-              <a
+              <Link
                 className=" underline text-lg text-BudgieBlue font-TripSans font-medium  "
-                href="#"
+                href="/"
               >
                 Already Have an Account?
-              </a>
+              </Link>
             </div>
           </form>
         </div>

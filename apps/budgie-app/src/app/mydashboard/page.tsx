@@ -8,7 +8,7 @@ import { Homepage } from '@capstone-repo/shared/budgie-components';
 import { Dashboard } from '@capstone-repo/shared/budgie-components';
 import { Profile } from '@capstone-repo/shared/budgie-components';
 
-export default function Index() {
+export default function MyDashboard() {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [currentPage, setCurrentPage] = useState<string>('Home');
   const [selectedItem, setSelectedItem] = useState<string>('Home');
