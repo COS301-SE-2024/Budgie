@@ -4,10 +4,12 @@ import { Fragment, useState } from 'react';
 import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
 import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
-import { auth } from '../../../../../apps/budgie-app/firebase/clientApp';
+import { auth, db } from '../../../../../apps/budgie-app/firebase/clientApp';
+import { collection, addDoc } from 'firebase/firestore';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
+import { time } from 'console';
 
 /* eslint-disable-next-line */
 export interface SignUpModalProps {}
@@ -30,6 +32,24 @@ export function SignUpModal(props: SignUpModalProps) {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       console.log('User information:', user);
+      try {
+        const event = new Date(1993, 6, 28, 14, 39, 7);
+        const userRef = collection(db, 'Users');
+        await addDoc(userRef, {
+          OauthID: user.providerData,
+          OauthProvider: '',
+          ProfilePicture: '',
+          account: '',
+          bankStatements: '',
+          createdAt: new Date(),
+          deleted: false,
+          email: user.email,
+          name: '',
+          surname: '',
+        });
+      } catch (error) {
+        console.log(error);
+      }
     } catch (error) {
       if (error instanceof FirebaseError) {
         const errorCode = error.code;
@@ -71,6 +91,24 @@ export function SignUpModal(props: SignUpModalProps) {
         password
       );
       const user = userCredential.user;
+      try {
+        const event = new Date(1993, 6, 28, 14, 39, 7);
+        const userRef = collection(db, 'Users');
+        await addDoc(userRef, {
+          OauthID: '',
+          OauthProvider: '',
+          ProfilePicture: '',
+          account: '',
+          bankStatements: '',
+          createdAt: new Date(),
+          deleted: false,
+          email: user.email,
+          name: '',
+          surname: '',
+        });
+      } catch (error) {
+        console.log(error);
+      }
     } catch (err) {
       if (err instanceof FirebaseError) {
         const errorMessage = err.message;
