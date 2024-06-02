@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import UploadStatementCSV from '../upload-statement-csv/UploadStatementCSV';
+import {doc, getDoc } from "firebase/firestore";
+import {db} from '../../../../../apps/budgie-app/firebase/clientApp'
+
 
 export interface DashboardProps {}
 
@@ -12,7 +15,27 @@ export function Dashboard(props: DashboardProps) {
     amount: number;
     balance: number;
     description: string;
-  }
+  } 
+
+  useEffect(() => {
+    const getUserById = async () => {
+      try {
+        const userDocRef = doc(db, 'Users', 'j1GNrQWu8jamNoOFhdrZ');
+        const userDocSnapshot = await getDoc(userDocRef);
+        if (userDocSnapshot.exists()) {
+          const userData = userDocSnapshot.data();
+          alert(JSON.stringify(userData));
+          // Here you can set the userData to state if needed
+        } else {
+          alert('User document does not exist');
+        }
+      } catch (error) {
+        alert(error);
+      }
+    };
+  
+    getUserById();
+  }, []);
 
   const handleFileUpload = (file: File) => {
     const reader = new FileReader();
