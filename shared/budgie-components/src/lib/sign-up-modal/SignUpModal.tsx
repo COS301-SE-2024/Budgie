@@ -6,6 +6,7 @@ import logo from '../../../public/images/BudgieNoBG.png';
 import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { auth } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
 
 /* eslint-disable-next-line */
@@ -16,7 +17,8 @@ export function SignUpModal(props: SignUpModalProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const handleChange = (e) => {
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === 'email') setEmail(value);
     if (name === 'password') setPassword(value);
@@ -29,14 +31,18 @@ export function SignUpModal(props: SignUpModalProps) {
       const user = result.user;
       console.log('User information:', user);
     } catch (error) {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      const email = error.customData.email;
-      const credential = GoogleAuthProvider.credentialFromError(error);
-      console.error('Error code:', errorCode);
-      console.error('Error message:', errorMessage);
-      console.error('Email:', email);
-      console.error('Credential:', credential);
+      if (error instanceof FirebaseError) {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const email = error.customData?.email;
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        console.error('Error code:', errorCode);
+        console.error('Error message:', errorMessage);
+        console.error('Email:', email);
+        console.error('Credential:', credential);
+      } else {
+        console.error('Unexpected error', error);
+      }
     }
   };
 
@@ -48,41 +54,40 @@ export function SignUpModal(props: SignUpModalProps) {
       return;
     }
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
     } catch (err) {
-      const errorMessage = err.message;
-      const errorCode = err.code;
-      setError(true);
-      switch (errorCode) {
-        case 'auth/weak-password':
-          setErrorMessage('The password is too weak.');
-          break;
-        case 'auth/email-already-in-use':
-          setErrorMessage(
-            'This email address is already in use by another account.'
-          );
-          break;
-        case 'auth/invalid-email':
-          setErrorMessage('This email address is invalid.');
-          break;
-        case 'auth/operation-not-allowed':
-          setErrorMessage('Email/password accounts are not enabled.');
-          break;
-        default:
-          setErrorMessage(errorMessage);
-          break;
-      }
-      if (error) {
-        console.log(errorCode);
-        console.log(errorMessage);
+      if (err instanceof FirebaseError) {
+        const errorMessage = err.message;
+        const errorCode = err.code;
+        setError(true);
+        switch (errorCode) {
+          case 'auth/weak-password':
+            setErrorMessage('The password is too weak.');
+            break;
+          case 'auth/email-already-in-use':
+            setErrorMessage('This email address is already in use by another account.');
+            break;
+          case 'auth/invalid-email':
+            setErrorMessage('This email address is invalid.');
+            break;
+          case 'auth/operation-not-allowed':
+            setErrorMessage('Email/password accounts are not enabled.');
+            break;
+          default:
+            setErrorMessage(errorMessage);
+            break;
+        }
+        if (error) {
+          console.log(errorCode);
+          console.log(errorMessage);
+        }
+      } else {
+        console.error('Unexpected error', err);
       }
     }
   }
+
   return (
     <>
       <div className="bg-BudgieBlue w-[794px] h-[521px] rounded-[61px]">
@@ -96,10 +101,11 @@ export function SignUpModal(props: SignUpModalProps) {
           <form className="pt-4">
             <div>
               <input
-                className="appearance-none  text-lg w-72 h-10 font-TripSans font-normal pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow"
+                className="appearance-none text-lg w-72 h-10 font-TripSans font-normal pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow"
                 id="email"
+                name="email"
                 type="text"
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleChange}
                 placeholder="Email"
               ></input>
             </div>
@@ -107,8 +113,9 @@ export function SignUpModal(props: SignUpModalProps) {
               <input
                 className="appearance-none text-lg w-72 h-10 font-TripSans font-normal pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow"
                 id="password"
+                name="password"
                 type="password"
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handleChange}
                 placeholder="Password"
               ></input>
             </div>
@@ -117,7 +124,7 @@ export function SignUpModal(props: SignUpModalProps) {
               <button
                 className=" font-TripSans font-medium rounded-[25px] w-36 h-10 bg-BudgieBlue text-BudgieWhite"
                 type="button"
-                onClick={() => signup()}
+                onClick={signup}
               >
                 Sign Up
               </button>
@@ -129,7 +136,7 @@ export function SignUpModal(props: SignUpModalProps) {
               <button
                 className=" font-TripSans font-medium rounded-[25px] w-36 h-10 bg-BudgieBlue text-BudgieWhite"
                 type="button"
-                onClick={() => signInWithGoogle()}
+                onClick={signInWithGoogle}
               >
                 Sign Up with Google
               </button>
