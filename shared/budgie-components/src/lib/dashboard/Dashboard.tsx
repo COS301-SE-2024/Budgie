@@ -20,17 +20,25 @@ export function Dashboard(props: DashboardProps) {
   useEffect(() => {
     const getUserById = async () => {
       try {
-        const userDocRef = doc(db, 'Users', 'j1GNrQWu8jamNoOFhdrZ');
+        const userDocRef = doc(db, 'bankStatements', '2YgQ8DFfrkWBNkjxU8HT');
         const userDocSnapshot = await getDoc(userDocRef);
         if (userDocSnapshot.exists()) {
           const userData = userDocSnapshot.data();
-          alert(JSON.stringify(userData));
-          // Here you can set the userData to state if needed
+          setBalance(userData.Balance)
+          const transactionsData: Transaction[] = [];
+          transactionsData.push({
+            date : userData.Date,
+            amount: parseFloat(userData.Amount),
+            balance: parseFloat(userData.Balance),
+            description: userData.Description 
+          });
+          setTransactions(transactionsData)
+          
         } else {
-          alert('User document does not exist');
+          console.log('User document does not exist');
         }
       } catch (error) {
-        alert(error);
+        console.log(error);
       }
     };
   
@@ -56,7 +64,7 @@ export function Dashboard(props: DashboardProps) {
       // Find the line that contains the transaction headers
       const headerLine = lines.find(line => line.startsWith('Date'));
       if (headerLine) {
-        const transactionsData: Transaction[] = [];
+        const transactionsData: Transaction[] = transactions;
         for (let i = lines.indexOf(headerLine) + 1; i < lines.length; i++) {
           const line = lines[i];
           if (line.trim() === ',,,') {
@@ -70,6 +78,7 @@ export function Dashboard(props: DashboardProps) {
             description
           });
         }
+        transactionsData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         setTransactions(transactionsData);
       }
     };
