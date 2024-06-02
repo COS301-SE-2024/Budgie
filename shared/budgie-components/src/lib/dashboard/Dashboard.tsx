@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import UploadStatementCSV from '../upload-statement-csv/UploadStatementCSV';
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
+import { json } from 'stream/consumers';
 
 export interface DashboardProps {}
 
 export function Dashboard(props: DashboardProps) {
   const [balance, setBalance] = useState<number | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [userID, setUserID] = useState<string | null>(null);
 
   interface Transaction {
     date: string;
@@ -47,13 +49,15 @@ export function Dashboard(props: DashboardProps) {
       }
     };
 
-    const userId = "j1GNrQWu8jamNoOFhdrZ67"; 
+    //add code to get userId logged in
+    const userId = 'j1GNrQWu8jamNoOFhdrZ'; // Replace with the actual user ID
+    setUserID(userId);
     getBankStatementsByUserId(userId);
   }, []);
 
-  const handleFileUpload = (file: File) => {
+  const handleFileUpload = async (file: File) => {
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       const content = event.target?.result as string;
       const lines = content.split('\n').map(line => line.trim()).filter(line => line);
 
@@ -70,25 +74,41 @@ export function Dashboard(props: DashboardProps) {
       // Find the line that contains the transaction headers
       const headerLine = lines.find(line => line.startsWith('Date'));
       if (headerLine) {
-        const transactionsData: Transaction[] = [];
+        const transactionsData: Transaction[] = transactions;
+        const addTransactions: Transaction[] = [];
         for (let i = lines.indexOf(headerLine) + 1; i < lines.length; i++) {
           const line = lines[i];
           if (line.trim() === ',,,') {
             break; // Stop reading if encountered an empty line
           }
           const [date, amount, balance, description] = line.split(',');
-          transactionsData.push({
+          const transaction: Transaction = {
             date,
             amount: parseFloat(amount),
             balance: parseFloat(balance),
             description
-          });
+          };
+          transactionsData.push(transaction);
+          addTransactions.push(transaction);
+
         }
-
-        // Sort transactions by date in descending order
         transactionsData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
         setTransactions(transactionsData);
+        for (let i = 0; i < transactions.length; i++) {
+          // Add the transaction to Firestore
+          try {
+            await addDoc(collection(db, 'bankStatements'), {
+              Amount: addTransactions[i].amount,
+              Balance: addTransactions[i].balance,
+              Date: addTransactions[i].date,
+              Description: addTransactions[i].description,
+              userId: userID // Add the userId to the document
+            });
+          } catch (error) {
+            console.error('Error adding document: ', error);
+          }
+        }
+        
       }
     };
 
