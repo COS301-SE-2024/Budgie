@@ -3,48 +3,41 @@ import styles from './AccountSettings.module.css';
 import "../../root.css";
 import React, { useState, useEffect } from 'react';
 import {doc, getDoc, updateDoc } from "firebase/firestore";
-import {db} from '../../../../../apps/budgie-app/firebase/clientApp'
+import {db, auth} from '../../../../../apps/budgie-app/firebase/clientApp'
 
 /* eslint-disable-next-line */
 export interface AccountSettingsProps {
   onClose: () => void;
 }
 
-interface User {
-  OauthID:string;
-  OauthProvider:string;
-  ProfilePicture:string;
-  account:string;
-  deleted:Boolean;
-  email:string;
-  name: string;
-  password: string;
-  surname: string;
-}
+const currentUser = auth.currentUser;
 
 export function AccountSettings(props: AccountSettingsProps) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any>(null);
+  const [userData, setUserData] = useState<any>(null);
   const [password, setPassword] = useState<string>('');
 
   useEffect(() => {
     const fetchUser = async () => {
-      try {
-        const docRef = doc(db, 'Users', 'E4DKvELGs9G6WB35IDOg');
+      if (currentUser) {
+        setUser(currentUser);
+        const docRef = doc(db, 'Users', currentUser.uid);
         const docSnap = await getDoc(docRef);
-
         if (docSnap.exists()) {
-          setUser(docSnap.data() as User);
+          setUserData(docSnap.data());
         } else {
           console.log('No such document!');
         }
-      } catch (error) {
-        console.error('Error fetching user:', error);
+      }
+      else {
+        setUser(null);
+        setUserData(null);
+        console.log("No user signed in.");
       }
     };
 
     fetchUser();
   }, []);
-
  
   const [isPopupVisible, setPopupVisible] = useState(false);
 
@@ -57,17 +50,12 @@ export function AccountSettings(props: AccountSettingsProps) {
   };
 
   const handleConfirmDelete = async (inputPassword: string) => {
-    const correctPassword = user?.password;
+    const correctPassword = userData.password;
     if (correctPassword===inputPassword)
     {
       try {
-        const docRef = doc(db, 'Users', 'E4DKvELGs9G6WB35IDOg');
-        await updateDoc(docRef, { name: 'Deleted' });
-        await updateDoc(docRef, { surname: 'Deleted' });
-        await updateDoc(docRef, { email: 'Deleted' });
-        await updateDoc(docRef, { ProfilePicture: '' });
-        await updateDoc(docRef, { OauthID: '' });
-        await updateDoc(docRef, { OauthProvider: '' });
+        const docRef = doc(db, 'Users', user.uid);
+        await updateDoc(docRef, { name: 'Deleted', surname: 'Deleted', email: 'Deleted', deleted: 'True', ProfilePicture: '', OauthID: '', OauthProvider: '' });
       } catch (error) {
         console.error('Error deleting user:', error);
       }
