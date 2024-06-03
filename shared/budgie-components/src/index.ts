@@ -8,3 +8,5 @@ export { Homepage } from './lib/homepage/Homepage';
 export { Dashboard } from './lib/dashboard/Dashboard';
 export { Profile } from './lib/profile/Profile';
 export { Landing } from './lib/Landing/Landing';
+export { SignUpPage } from './lib/sign-up-page/SignUpPage';
+export { UserProvider, UserContext } from './lib/hooks/UserProvider';
