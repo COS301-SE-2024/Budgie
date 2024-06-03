@@ -1,6 +1,6 @@
 .uploadButton {
     background-color: var(--accent-colour);
-    color: white;
+    color: var(--main-background);
     margin-top: 0.5rem;
     display: flex;
     align-items: center;
