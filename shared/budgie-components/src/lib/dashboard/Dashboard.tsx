@@ -20,12 +20,6 @@ export function Dashboard(props: DashboardProps) {
   }
 
   useEffect(() => {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (user !== null) {
-      alert(user.uid);
-      //setUserID(user.uid);
-    }
 
     const getBankStatementsByUserId = async (userId: string) => {
       try {
@@ -57,10 +51,13 @@ export function Dashboard(props: DashboardProps) {
       }
     };
 
-    //add code to get userId logged in
-    const userId = 'j1GNrQWu8jamNoOFhdrZ'; // Replace with the actual user ID
-    setUserID(userId);
-    getBankStatementsByUserId(userId);
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user !== null) {
+      setUserID(user.uid);
+      getBankStatementsByUserId(user.uid);
+    }
+    
   }, []);
 
   const handleFileUpload = async (file: File) => {
