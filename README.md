@@ -40,7 +40,7 @@ Budgie is a financial management tool designed to help users take control of the
     <a href="https://github.com/James-Fitzsimons"> 
         <img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white"/>
     </a> <br>
-    <a href="">
+    <a href="https://www.linkedin.com/in/james-fitzsimons-54956b301/">
         <img src="https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white"/>
     </a> 
 </div>
@@ -59,7 +59,7 @@ I am dedicated to contributing my expertise and enthusiasm to the success of thi
     <a href="https://github.com/kabeloChuene">
         <img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white"/>
     </a> <br>
-    <a href="">
+    <a href="https://www.linkedin.com/in/kabelo-chuene-08276b140/">
         <img src="https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white"/>
     </a> 
 </div>
@@ -92,7 +92,7 @@ What drives me is my relentless pursuit of knowledge and my attention to detail.
     <a href="https://github.com/Zviko-Tigere19">
         <img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white"/>
     </a> <br>
-    <a href="">
+    <a href="https://www.linkedin.com/in/zvikomborero-t-43a0752b7">
         <img src="https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white"/>
     </a> 
 </div>
@@ -110,7 +110,7 @@ I am eager to use my knowledge and skills on this project while also coming acro
     <a href="https://github.com/ashley2930">
         <img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white"/>
     </a> <br>
-    <a href="">
+    <a href="https://www.linkedin.com/in/ashley-tullis-503607281/">
         <img src="https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white"/>
     </a> 
 </div>
