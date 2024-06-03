@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect } from 'react';
 import UploadStatementCSV from '../upload-statement-csv/UploadStatementCSV';
 import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
@@ -22,6 +23,7 @@ export function Dashboard(props: DashboardProps) {
     const auth = getAuth();
     const user = auth.currentUser;
     if (user !== null) {
+      alert(user.uid);
       //setUserID(user.uid);
     }
 
