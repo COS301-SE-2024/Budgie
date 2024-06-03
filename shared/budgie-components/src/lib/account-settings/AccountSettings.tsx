@@ -4,41 +4,37 @@ import "../../root.css";
 import React, { useState, useEffect } from 'react';
 import {doc, getDoc, updateDoc } from "firebase/firestore";
 import {db, auth} from '../../../../../apps/budgie-app/firebase/clientApp'
+import { getAuth, reauthenticateWithCredential, EmailAuthProvider, deleteUser } from 'firebase/auth';
+
 
 /* eslint-disable-next-line */
 export interface AccountSettingsProps {
   onClose: () => void;
 }
 
-const currentUser = auth.currentUser;
-
 export function AccountSettings(props: AccountSettingsProps) {
-  const [user, setUser] = useState<any>(null);
-  const [userData, setUserData] = useState<any>(null);
+  const auth = getAuth();
+  const user = auth.currentUser;
   const [password, setPassword] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
+  const handleDeleteUser = async () => {
+    console.log("hi");
+    if (!user) {
+      setMessage('No user is signed in');
+      return;
+    }
+    const credential = EmailAuthProvider.credential(user.email || '', password);
+    try {
+      await reauthenticateWithCredential(user, credential);
+      await deleteUser(user);
+      auth.signOut();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      if (currentUser) {
-        setUser(currentUser);
-        const docRef = doc(db, 'Users', currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setUserData(docSnap.data());
-        } else {
-          console.log('No such document!');
-        }
-      }
-      else {
-        setUser(null);
-        setUserData(null);
-        console.log("No user signed in.");
-      }
-    };
-
-    fetchUser();
-  }, []);
- 
+      alert('User deleted.');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Failed to delete user: ' + (error as Error).message);
+    }
+  };
   const [isPopupVisible, setPopupVisible] = useState(false);
 
   const handleDeleteClick = () => {
@@ -47,25 +43,6 @@ export function AccountSettings(props: AccountSettingsProps) {
 
   const handleClosePopup = () => {
     setPopupVisible(false);
-  };
-
-  const handleConfirmDelete = async (inputPassword: string) => {
-    const correctPassword = userData.password;
-    if (correctPassword===inputPassword)
-    {
-      try {
-        const docRef = doc(db, 'Users', user.uid);
-        await updateDoc(docRef, { name: 'Deleted', surname: 'Deleted', email: 'Deleted', deleted: 'True', ProfilePicture: '', OauthID: '', OauthProvider: '' });
-      } catch (error) {
-        console.error('Error deleting user:', error);
-      }
-      alert('Account deleted!');
-      setPopupVisible(false);
-    }
-    else
-    {
-      alert('Incorrect Password.');
-    }
   };
 
   return <div className='mainPage'>
@@ -99,7 +76,7 @@ export function AccountSettings(props: AccountSettingsProps) {
               onChange={(e) => setPassword(e.target.value)}
               style={{paddingLeft: '0.5rem', borderRadius: '4px', border: '1px solid #ccc', height: '2.5rem', width: '70%'}}
             />
-            <button className={styles.confirmButton} onClick={()=>handleConfirmDelete(password)}>
+            <button className={styles.confirmButton} onClick={handleDeleteUser}>
               Confirm
             </button>
             <br></br>
