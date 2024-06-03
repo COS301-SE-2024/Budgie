@@ -141,11 +141,16 @@ export function SignInModal(props: SignInModalProps) {
             </div>
             <div className="flex flex-col justify-start pt-3 items-center">
               <button
-                className="font-TripSans font-medium rounded-[25px] w-36 h-10 bg-BudgieBlue text-BudgieWhite"
+                className="flex items-center justify-center font-TripSans font-medium rounded-[25px] w-48 h-10 bg-BudgieBlue text-BudgieWhite"
                 type="button"
                 onClick={signInWithGoogle}
               >
-                Log In with Google
+                <img
+                  className="w-6 h-6 mr-2"
+                  src="https://www.svgrepo.com/show/475656/google-color.svg"
+                  alt="Google logo"
+                />
+                Sign In with Google
               </button>
             </div>
             {error && (
