@@ -1,0 +1,40 @@
+
+  .settingsOptionsContainer {
+    margin-top: 0.6rem;
+  }
+
+  .settingsOption { 
+    width: 100%;
+    padding: 0.6rem;
+    background-color: var(--block-background);
+    border-radius: 0.2rem;
+    margin-bottom: 0.5rem;
+    transition:  0.2s ease;
+    cursor: pointer;
+  }
+
+  .settingsOption:hover { 
+    background-color:  var(--hover);
+  }
+
+  .settingTitle {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--accent-colour);
+  }
+
+  .settingDescription {
+    font-size: 0.8rem;
+    color: var( --greyed-text);
+  }
+
+  .subPage {
+    z-index: 1000;
+    background-color: var(--main-background);
+    width: 85vw;
+    height: 100vh;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 1rem;
+    overflow-y: auto;
+  }

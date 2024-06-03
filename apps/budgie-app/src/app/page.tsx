@@ -1,6 +1,24 @@
+'use client';
 import styles from './page.module.css';
-import { SignInModal } from '@capstone-repo/shared/budgie-components';
+import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
+
+import { Landing } from '@capstone-repo/shared/budgie-components';
+import { useRouter } from 'next/navigation';
+import { UserContext } from '@capstone-repo/shared/budgie-components';
+import router from 'next/navigation';
 
 export default function Index() {
-  return <SignInModal></SignInModal>;
+  const user = useContext(UserContext);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      router.push('/mydashboard');
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
+
+  return <>{!loading && <Landing></Landing>}</>;
 }

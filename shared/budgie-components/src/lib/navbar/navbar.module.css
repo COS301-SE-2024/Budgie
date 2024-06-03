@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=swap');
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+.sidebar {
+    background-color: var(--block-background);
+    width: 15vw;
+    height: 100vh;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    padding-top: 1.5rem;
+    z-index: 100;
+}
+
+.navList {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.navItem {
+    margin-top: 1rem;
+    font-weight: bold;
+    font-family: "Trip Sans", sans-serif;
+    display: flex;
+    align-items: center;
+    border-radius: .4rem;
+    height: 2rem;
+    cursor: pointer;
+    color: var(--main-text);
+}
+
+.navItemLogout {
+    position: fixed;
+    bottom: 1rem;
+    width: 13vw;
+    font-weight: bold;
+    font-family: "Trip Sans", sans-serif;
+    display: flex;
+    align-items: center;
+    border-radius: .4rem;
+    height: 2rem;
+    cursor: pointer;
+    color: var(--main-text);
+}
+
+.navItem:hover, .navItemLogout:hover {
+    background-color: var(--hover);
+    transition:  0.3s ease;
+}
+
+.selected {
+    background-color: var(--accent-colour);
+    color: var(--block-background);
+}
+
+.selected:hover{
+    background-color: var(--accent-colour);
+    color: var(--block-background);
+}

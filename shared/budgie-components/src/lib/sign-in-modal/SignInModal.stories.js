@@ -7,6 +7,6 @@ export default {
   },
 };
 
-export const DefaultNavBar = {
+export const SignIn = {
   render: () => <SignInModal />, // this function specifies how to render a variant
 };

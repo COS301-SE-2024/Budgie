@@ -1,0 +1,53 @@
+.settingsOptionsContainer {
+    margin-top: 0.6rem;
+  }
+
+  .settingsOption { 
+    width: 100%;
+    padding: 0.6rem;
+    background-color: var(--block-background);
+    border-radius: 0.2rem;
+    margin-bottom: 0.5rem;
+    transition:  0.2s ease;
+    cursor: pointer;
+  }
+
+  .settingTitle {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--accent-colour);
+    margin-bottom: 1rem;
+  }
+
+  .settingDescription {
+    font-size: 0.8rem;
+    color: var(--greyed-text);
+  }
+
+  .optionContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-right: 35rem;
+  }
+
+  .lightThemeOption {
+    background-color: #E1E1E1;
+    color: #293652;
+    border: 3px solid #293652;
+  }
+
+  .darkThemeOption {
+    background-color: #293652;
+    color: #F8F8F8;
+    border: 3px solid #F8F8F8;
+  }
+
+  .lightThemeOption, .darkThemeOption {
+    height: 6rem;
+    width: 20rem;
+    border-radius: 0.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+  }
