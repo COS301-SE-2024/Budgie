@@ -4,6 +4,8 @@ import UploadStatementCSV from '../upload-statement-csv/UploadStatementCSV';
 import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import { db, auth } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from "firebase/auth";
+import "../../root.css";
+import styles from './Dashboard.module.css';
 
 export interface DashboardProps {}
 
@@ -127,19 +129,19 @@ export function Dashboard(props: DashboardProps) {
       <UploadStatementCSV onFileUpload={handleFileUpload} />
       <br />
       {balance !== null && (
-        <div className="balanceDisplay">
+        <div className={styles.balance}>
           <h1>
             <strong>Current Balance:</strong> {balance}
           </h1>
           <br />
           {transactions.length > 0 && (
-            <div className="transactionHistory">
+            <div className={styles.transactions}>
               <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                 <thead>
                   <tr>
                     <th
                       style={{
-                        border: '1px solid black',
+                        border: '1px solid var(--main-text)',
                         padding: '8px',
                         textAlign: 'left',
                       }}
@@ -148,7 +150,7 @@ export function Dashboard(props: DashboardProps) {
                     </th>
                     <th
                       style={{
-                        border: '1px solid black',
+                        border: '1px solid var(--main-text)',
                         padding: '8px',
                         textAlign: 'left',
                       }}
@@ -157,7 +159,7 @@ export function Dashboard(props: DashboardProps) {
                     </th>
                     <th
                       style={{
-                        border: '1px solid black',
+                        border: '1px solid var(--main-text)',
                         padding: '8px',
                         textAlign: 'left',
                       }}
@@ -166,7 +168,7 @@ export function Dashboard(props: DashboardProps) {
                     </th>
                     <th
                       style={{
-                        border: '1px solid black',
+                        border: '1px solid var(--main-text)',
                         padding: '8px',
                         textAlign: 'left',
                       }}
@@ -178,16 +180,16 @@ export function Dashboard(props: DashboardProps) {
                 <tbody>
                   {transactions.map((transaction, index) => (
                     <tr key={index}>
-                      <td style={{ border: '1px solid black', padding: '8px' }}>
+                      <td style={{ border: '1px solid var(--main-text)', padding: '8px' }}>
                         {transaction.date}
                       </td>
-                      <td style={{ border: '1px solid black', padding: '8px' }}>
+                      <td style={{ border: '1px solid var(--main-text)', padding: '8px' }}>
                         {transaction.amount}
                       </td>
-                      <td style={{ border: '1px solid black', padding: '8px' }}>
+                      <td style={{ border: '1px solid var(--main-text)', padding: '8px' }}>
                         {transaction.balance}
                       </td>
-                      <td style={{ border: '1px solid black', padding: '8px' }}>
+                      <td style={{ border: '1px solid var(--main-text)', padding: '8px' }}>
                         {transaction.description}
                       </td>
                     </tr>
