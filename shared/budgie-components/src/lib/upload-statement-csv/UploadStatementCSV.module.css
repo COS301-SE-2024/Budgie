@@ -15,3 +15,23 @@
 .uploadButton:hover {
     background-color: var(--accent-colour); 
 }
+
+.popupOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+.popup {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.4rem;
+    text-align: center;
+}
+  

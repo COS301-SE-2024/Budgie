@@ -98,20 +98,7 @@ export function Dashboard(props: DashboardProps) {
         }
         transactionsData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         setTransactions(transactionsData);
-        for (let i = 0; i < transactions.length; i++) {
-          // Add the transaction to Firestore
-          try {
-            await addDoc(collection(db, 'bankStatements'), {
-              Amount: addTransactions[i].amount,
-              Balance: addTransactions[i].balance,
-              Date: addTransactions[i].date,
-              Description: addTransactions[i].description,
-              userId: userID // Add the userId to the document
-            });
-          } catch (error) {
-            console.error('Error adding document: ', error);
-          }
-        }
+        
       }
     };
     reader.readAsText(file);
