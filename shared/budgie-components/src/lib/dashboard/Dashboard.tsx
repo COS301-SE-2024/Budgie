@@ -22,7 +22,6 @@ export function Dashboard(props: DashboardProps) {
   }
 
   useEffect(() => {
-
     const getBankStatementsByUserId = async (userId: string) => {
       try {
         const bankStatementsRef = collection(db, 'bankStatements');
@@ -59,7 +58,6 @@ export function Dashboard(props: DashboardProps) {
       setUserID(user.uid);
       getBankStatementsByUserId(user.uid);
     }
-    
   }, []);
 
   const handleFileUpload = async (file: File) => {
@@ -97,7 +95,6 @@ export function Dashboard(props: DashboardProps) {
           };
           transactionsData.push(transaction);
           addTransactions.push(transaction);
-
         }
         transactionsData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         setTransactions(transactionsData);
@@ -115,11 +112,8 @@ export function Dashboard(props: DashboardProps) {
             console.error('Error adding document: ', error);
           }
         }
-        
       }
     };
-
-
     reader.readAsText(file);
   };
 
@@ -136,66 +130,19 @@ export function Dashboard(props: DashboardProps) {
           <br />
           {transactions.length > 0 && (
             <div className={styles.transactions}>
-              <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-                <thead>
-                  <tr>
-                    <th
-                      style={{
-                        border: '1px solid var(--main-text)',
-                        padding: '8px',
-                        textAlign: 'left',
-                      }}
-                    >
-                      Date
-                    </th>
-                    <th
-                      style={{
-                        border: '1px solid var(--main-text)',
-                        padding: '8px',
-                        textAlign: 'left',
-                      }}
-                    >
-                      Amount
-                    </th>
-                    <th
-                      style={{
-                        border: '1px solid var(--main-text)',
-                        padding: '8px',
-                        textAlign: 'left',
-                      }}
-                    >
-                      Balance
-                    </th>
-                    <th
-                      style={{
-                        border: '1px solid var(--main-text)',
-                        padding: '8px',
-                        textAlign: 'left',
-                      }}
-                    >
-                      Description
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transactions.map((transaction, index) => (
-                    <tr key={index}>
-                      <td style={{ border: '1px solid var(--main-text)', padding: '8px' }}>
-                        {transaction.date}
-                      </td>
-                      <td style={{ border: '1px solid var(--main-text)', padding: '8px' }}>
-                        {transaction.amount}
-                      </td>
-                      <td style={{ border: '1px solid var(--main-text)', padding: '8px' }}>
-                        {transaction.balance}
-                      </td>
-                      <td style={{ border: '1px solid var(--main-text)', padding: '8px' }}>
-                        {transaction.description}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            {transactions.map((transaction, index) => (
+              <div key={index} className={styles.transactionCard} style={{ borderLeft: transaction.amount >= 0 ? '10px solid #293652' : '10px solid #9e9e9e' }}>
+                <div className={styles.transactionItem}>
+                  <div className={styles.transactionContent}>
+                    <div className={styles.transactionDateTime}>
+                      <div className={styles.transactionDate}>{transaction.date}</div>
+                      <div className={styles.transactionDescription}>{transaction.description}</div>
+                    </div>
+                    <div className={styles.transactionAmount}>{transaction.amount}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
             </div>
           )}
         </div>

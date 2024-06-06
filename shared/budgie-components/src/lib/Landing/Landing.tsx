@@ -3,10 +3,6 @@ import { useRouter } from 'next/router';
 import styles from './Landing.module.css';
 import { Fragment, useState } from 'react';
 import SignInModal from '../sign-in-modal/SignInModal';
-import { TextEncoder, TextDecoder } from 'util';
-global.TextEncoder = TextEncoder;
-// @ts-expect-error
-global.TextDecoder = TextDecoder;
 
 /* eslint-disable-next-line */
 export interface LandingProps {}
