@@ -3,7 +3,12 @@ import './SignUpModal.module.css';
 import { useState } from 'react';
 import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
-import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth';
 import { auth, db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { collection, addDoc } from 'firebase/firestore';
 import { FirebaseError } from 'firebase/app';
@@ -87,7 +92,11 @@ export function SignUpModal(props: SignUpModalProps) {
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
 
       try {
@@ -118,7 +127,9 @@ export function SignUpModal(props: SignUpModalProps) {
             setErrorMessage('The password is too weak.');
             break;
           case 'auth/email-already-in-use':
-            setErrorMessage('This email address is already in use by another account.');
+            setErrorMessage(
+              'This email address is already in use by another account.'
+            );
             break;
           case 'auth/invalid-email':
             setErrorMessage('This email address is invalid.');
@@ -145,7 +156,7 @@ export function SignUpModal(props: SignUpModalProps) {
       <div className="bg-BudgieBlue w-[794px] h-[521px] rounded-[61px]">
         <div className="flex flex-col justify-start items-center bg-BudgieWhite w-[397px] h-[521px] rounded-[60px] rounded-tr-none rounded-br-none ">
           <div className=" pt-4 h-[55px] w-[55px]">
-            <Image src={logo} alt="Logo"></Image>
+            <Image src={logo} width={55} height={55} alt="Logo"></Image>
           </div>
           <p className="pt-5 font-TripSans font-medium text-3xl text-BudgieBlue">
             Welcome to Budgie
