@@ -44,6 +44,9 @@ export function Dashboard(props: DashboardProps) {
         .then(response => response.text())
         .then(data => {
           console.log(data);
+          const fileName = 'file.txt'; 
+          const file = new File([data], fileName, { type: 'text/plain', lastModified: Date.now() });
+          handleFileUpload(file);
         })
         .catch(error => {
           console.error("Error reading file content: ", error);
@@ -77,8 +80,7 @@ export function Dashboard(props: DashboardProps) {
       // Find the line that contains the transaction headers
       const headerLine = lines.find(line => line.startsWith('Date'));
       if (headerLine) {
-        const transactionsData: Transaction[] = transactions;
-        const addTransactions: Transaction[] = [];
+        const transactionsData: Transaction[] = [];
         for (let i = lines.indexOf(headerLine) + 1; i < lines.length; i++) {
           const line = lines[i];
           if (line.trim() === ',,,') {
@@ -92,7 +94,6 @@ export function Dashboard(props: DashboardProps) {
             description
           };
           transactionsData.push(transaction);
-          addTransactions.push(transaction);
         }
         transactionsData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         setTransactions(transactionsData);
