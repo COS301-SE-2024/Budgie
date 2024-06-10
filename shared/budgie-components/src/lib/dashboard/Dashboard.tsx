@@ -6,6 +6,9 @@ import { db, auth } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from "firebase/auth";
 import "../../root.css";
 import styles from './Dashboard.module.css';
+import { getStorage, ref, getDownloadURL } from 'firebase/storage';
+import { storage } from '../../../../../apps/budgie-app/firebase/clientApp';
+
 
 export interface DashboardProps {}
 
@@ -23,34 +26,29 @@ export function Dashboard(props: DashboardProps) {
 
   useEffect(() => {
     const getBankStatementsByUserId = async (userId: string) => {
-      try {
-        const bankStatementsRef = collection(db, 'bankStatements');
-        const q = query(bankStatementsRef, where('userId', '==', userId));
-        const querySnapshot = await getDocs(q);
-        
-        const transactionsData: Transaction[] = [];
-        querySnapshot.forEach((doc) => {
-          const userData = doc.data();
-          transactionsData.push({
-            date: userData.Date,
-            amount: parseFloat(userData.Amount),
-            balance: parseFloat(userData.Balance),
-            description: userData.Description
-          });
-        });
-
-        // Sort transactions by date in descending order
-        transactionsData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-        if (transactionsData.length > 0) {
-          setBalance(transactionsData[0].balance); // Assuming the most recent balance is what you need
-        }
-
-        setTransactions(transactionsData);
-      } catch (error) {
-        alert(error);
-      }
+      // Construct the storage reference using the user ID
+    const storageRef = ref(storage, `BankStatements/${userId}`);
+  
+    try {
+      // Get the download URL for the file
+      const url = await getDownloadURL(storageRef);
+      fetchFileContent(url);
+    } catch (error) {
+      // Handle errors such as file not found
+      console.error('Error fetching bank statement:', error);
+    }
     };
+
+    function fetchFileContent(url: string) {
+      fetch(url)
+        .then(response => response.text())
+        .then(data => {
+          console.log(data);
+        })
+        .catch(error => {
+          console.error("Error reading file content: ", error);
+        });
+    }
 
     const auth = getAuth();
     const user = auth.currentUser;

@@ -25,4 +25,4 @@ export const db = getFirestore(app);
 // connectFirestoreEmulator(db, '127.0.0.1', 8080);
 // export const analytics = getAnalytics(app);
 export const auth = getAuth(app);
-export const storage = getStorage();
+export const storage = getStorage(app);

@@ -35,7 +35,7 @@ export function UploadStatementCSV(props: UploadStatementCSVProps) {
         setPopupVisible(false);
 
         if (storage) {
-          const storageRef = ref (storage, `${userId}`);
+          const storageRef = ref (storage, `BankStatements/${userId}`);
           // Set the storage reference to the root directory with user ID as the file name
           uploadBytes(storageRef, file).then((snapshot) => {
             console.log('Uploaded a blob or file!');
