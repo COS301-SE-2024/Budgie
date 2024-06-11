@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  useState,
-  createContext,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-} from 'react';
+import { useState, createContext } from 'react';
 import { auth } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { onAuthStateChanged } from 'firebase/auth';
 

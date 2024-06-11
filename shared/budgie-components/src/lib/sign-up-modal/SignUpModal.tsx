@@ -5,7 +5,6 @@ import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
 import {
   createUserWithEmailAndPassword,
-  getAuth,
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
@@ -32,11 +31,14 @@ export function SignUpModal(props: SignUpModalProps) {
   const signInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
+      provider.addScope('profile');
+      provider.addScope('name');
       provider.addScope('email');
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       console.log('User information:', user);
 
+      //does not work
       try {
         const userRef = collection(db, 'Users');
         await addDoc(userRef, {
