@@ -1,10 +1,10 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import UploadStatementCSV from '../upload-statement-csv/UploadStatementCSV';
-import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 import { db, auth } from '../../../../../apps/budgie-app/firebase/clientApp';
-import { getAuth } from "firebase/auth";
-import "../../root.css";
+import { getAuth } from 'firebase/auth';
+import '../../root.css';
 import styles from './Dashboard.module.css';
 
 export interface DashboardProps {}
@@ -22,13 +22,12 @@ export function Dashboard(props: DashboardProps) {
   }
 
   useEffect(() => {
-
     const getBankStatementsByUserId = async (userId: string) => {
       try {
         const bankStatementsRef = collection(db, 'bankStatements');
         const q = query(bankStatementsRef, where('userId', '==', userId));
         const querySnapshot = await getDocs(q);
-        
+
         const transactionsData: Transaction[] = [];
         querySnapshot.forEach((doc) => {
           const userData = doc.data();
@@ -36,12 +35,14 @@ export function Dashboard(props: DashboardProps) {
             date: userData.Date,
             amount: parseFloat(userData.Amount),
             balance: parseFloat(userData.Balance),
-            description: userData.Description
+            description: userData.Description,
           });
         });
 
         // Sort transactions by date in descending order
-        transactionsData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        transactionsData.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
 
         if (transactionsData.length > 0) {
           setBalance(transactionsData[0].balance); // Assuming the most recent balance is what you need
@@ -54,24 +55,31 @@ export function Dashboard(props: DashboardProps) {
     };
 
     const auth = getAuth();
-    const user = auth.currentUser;
-    if (user !== null) {
-      setUserID(user.uid);
-      getBankStatementsByUserId(user.uid);
+    if (auth) {
+      const user = auth.currentUser;
+      if (user !== null) {
+        setUserID(user.uid);
+        getBankStatementsByUserId(user.uid);
+      }
     }
-    
   }, []);
 
   const handleFileUpload = async (file: File) => {
     const reader = new FileReader();
     reader.onload = async (event) => {
       const content = event.target?.result as string;
-      const lines = content.split('\n').map(line => line.trim()).filter(line => line);
+      const lines = content
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line);
 
       // Find the line that contains the balance
-      const balanceLine = lines.find(line => line.startsWith('Balance:'));
+      const balanceLine = lines.find((line) => line.startsWith('Balance:'));
       if (balanceLine) {
-        const balanceValues = balanceLine.split(',').map(value => value.trim()).filter(value => value);
+        const balanceValues = balanceLine
+          .split(',')
+          .map((value) => value.trim())
+          .filter((value) => value);
         if (balanceValues.length > 1) {
           const balance = parseFloat(balanceValues[1]);
           setBalance(balance);
@@ -79,7 +87,7 @@ export function Dashboard(props: DashboardProps) {
       }
 
       // Find the line that contains the transaction headers
-      const headerLine = lines.find(line => line.startsWith('Date'));
+      const headerLine = lines.find((line) => line.startsWith('Date'));
       if (headerLine) {
         const transactionsData: Transaction[] = transactions;
         const addTransactions: Transaction[] = [];
@@ -93,13 +101,14 @@ export function Dashboard(props: DashboardProps) {
             date,
             amount: parseFloat(amount),
             balance: parseFloat(balance),
-            description
+            description,
           };
           transactionsData.push(transaction);
           addTransactions.push(transaction);
-
         }
-        transactionsData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        transactionsData.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
         setTransactions(transactionsData);
         for (let i = 0; i < transactions.length; i++) {
           // Add the transaction to Firestore
@@ -109,16 +118,14 @@ export function Dashboard(props: DashboardProps) {
               Balance: addTransactions[i].balance,
               Date: addTransactions[i].date,
               Description: addTransactions[i].description,
-              userId: userID // Add the userId to the document
+              userId: userID, // Add the userId to the document
             });
           } catch (error) {
             console.error('Error adding document: ', error);
           }
         }
-        
       }
     };
-
 
     reader.readAsText(file);
   };
@@ -180,16 +187,36 @@ export function Dashboard(props: DashboardProps) {
                 <tbody>
                   {transactions.map((transaction, index) => (
                     <tr key={index}>
-                      <td style={{ border: '1px solid var(--main-text)', padding: '8px' }}>
+                      <td
+                        style={{
+                          border: '1px solid var(--main-text)',
+                          padding: '8px',
+                        }}
+                      >
                         {transaction.date}
                       </td>
-                      <td style={{ border: '1px solid var(--main-text)', padding: '8px' }}>
+                      <td
+                        style={{
+                          border: '1px solid var(--main-text)',
+                          padding: '8px',
+                        }}
+                      >
                         {transaction.amount}
                       </td>
-                      <td style={{ border: '1px solid var(--main-text)', padding: '8px' }}>
+                      <td
+                        style={{
+                          border: '1px solid var(--main-text)',
+                          padding: '8px',
+                        }}
+                      >
                         {transaction.balance}
                       </td>
-                      <td style={{ border: '1px solid var(--main-text)', padding: '8px' }}>
+                      <td
+                        style={{
+                          border: '1px solid var(--main-text)',
+                          padding: '8px',
+                        }}
+                      >
                         {transaction.description}
                       </td>
                     </tr>
