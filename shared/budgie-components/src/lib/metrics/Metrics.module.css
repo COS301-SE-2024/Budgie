@@ -1,9 +1,8 @@
 .metricsContainer {
   position: fixed;
-  top: 10%;
-  left: 10%;
-  right: 10%;
-  bottom: 10%;
+  top: 50%; /* Adjust as needed */
+  left: 50%; /* Adjust as needed */
+  transform: translate(-50%, -50%);
   background: white;
   z-index: 1000;
   padding: 20px;
@@ -12,6 +11,7 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   overflow: auto;
 }
+
 
 .closeButton {
   background: #ff4d4d;
