@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Tooltip, CartesianGrid, XAxis, YAxis, Legend, Cell } from 'recharts';
+import { BarChart, Bar, LineChart, Line, PieChart, Pie, Tooltip, CartesianGrid, XAxis, YAxis, Legend, Cell, AreaChart, Area } from 'recharts';
 import styles from './Metrics.module.css';
 
 export interface MetricsProps {
@@ -7,7 +7,6 @@ export interface MetricsProps {
 }
 
 const Metrics: React.FC<MetricsProps> = ({ onClose }) => {
-  // Mock data
   const monthlyBudget = 1000;
   const spendingData = [
     { name: 'Week 1', spending: 200 },
@@ -23,33 +22,42 @@ const Metrics: React.FC<MetricsProps> = ({ onClose }) => {
     { name: 'Utilities', value: 150 },
   ];
 
+  const monthlySpendingData = [
+    { name: 'January', spending: 800 },
+    { name: 'February', spending: 950 },
+    { name: 'March', spending: 700 },
+    { name: 'April', spending: 850 },
+  ];
+
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
   return (
     <div className={styles.metricsContainer}>
       <button onClick={onClose} className={styles.closeButton}>Close</button>
-      <h2>Metrics</h2>
+      <h2 className={styles.chartTitle}>Metrics</h2>
+
       <div className={styles.chart}>
-        <h3>Spending vs Budget</h3>
-        <BarChart width={600} height={300} data={spendingData}>
+        <h3 className={styles.chartTitle}>Spending vs Budget</h3>
+        <BarChart width={500} height={250} data={spendingData}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
+          <XAxis dataKey="name" tick={{ fill: 'white' }} />
+          <YAxis tick={{ fill: 'white' }} />
           <Tooltip />
           <Legend />
           <Bar dataKey="spending" fill="#8884d8" />
           <Line type="monotone" dataKey={() => monthlyBudget} stroke="red" />
         </BarChart>
       </div>
+
       <div className={styles.chart}>
-        <h3>Spending by Category</h3>
-        <PieChart width={400} height={400}>
+        <h3 className={styles.chartTitle}>Spending by Category</h3>
+        <PieChart width={400} height={350}>
           <Pie
             data={categoryData}
             cx={200}
             cy={200}
             labelLine={false}
-            outerRadius={80}
+            outerRadius={100}
             fill="#8884d8"
             dataKey="value"
           >
@@ -60,6 +68,18 @@ const Metrics: React.FC<MetricsProps> = ({ onClose }) => {
           <Tooltip />
           <Legend />
         </PieChart>
+      </div>
+
+      <div className={styles.chart}>
+        <h3 className={styles.chartTitle}>Spending Breakdown Over Time</h3>
+        <AreaChart width={600} height={200} data={monthlySpendingData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" tick={{ fill: 'white' }} />
+          <YAxis tick={{ fill: 'white' }} />
+          <Tooltip />
+          <Legend />
+          <Area type="monotone" dataKey="spending" stroke="#8884d8" fill="#8884d8" />
+        </AreaChart>
       </div>
     </div>
   );

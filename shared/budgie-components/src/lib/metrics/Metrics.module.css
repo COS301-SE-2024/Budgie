@@ -1,15 +1,17 @@
 .metricsContainer {
-  position: fixed;
+  position: absolute;
   top: 50%; /* Adjust as needed */
-  left: 50%; /* Adjust as needed */
+  left: 32%; /* Adjust as needed */
+  right:5%;
   transform: translate(-50%, -50%);
-  background: white;
+  background: rgb(2, 35, 58);
   z-index: 1000;
-  padding: 20px;
+  padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 10px;
+  border-radius: 0px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   overflow: auto;
+  color:white;
 }
 
 
@@ -26,5 +28,9 @@
 }
 
 .chart {
-  margin-bottom: 30px;
+  margin-bottom: 5px;
+}
+.chartTitle {
+  color: white;
+  margin-bottom: 5px;
 }
