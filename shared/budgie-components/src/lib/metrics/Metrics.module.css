@@ -1,9 +1,9 @@
 .metricsContainer {
   position: absolute;
-  top: 50%; /* Adjust as needed */
-  left: 32%; /* Adjust as needed */
-  right:5%;
-  transform: translate(-50%, -50%);
+  top: 0; /* Adjust as needed */
+  left: 0; /* Adjust as needed */
+  right:0;
+  bottom:0;
   background: rgb(2, 35, 58);
   z-index: 1000;
   padding: 10px;

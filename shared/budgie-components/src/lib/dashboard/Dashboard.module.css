@@ -1,3 +1,6 @@
+.mainPage{
+  position:relative;
+}
 .balance {
     color: var(--main-text);
 }
