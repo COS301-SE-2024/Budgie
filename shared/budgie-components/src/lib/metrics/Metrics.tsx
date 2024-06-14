@@ -1,6 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Tooltip, CartesianGrid, XAxis, YAxis, Legend, Cell, AreaChart, Area } from 'recharts';
 import styles from './Metrics.module.css';
+import RadialProgress from './RadialProgress';
 
 export interface MetricsProps {
   onClose: () => void;
@@ -28,6 +29,9 @@ const Metrics: React.FC<MetricsProps> = ({ onClose }) => {
     { name: 'March', spending: 700 },
     { name: 'April', spending: 850 },
   ];
+
+  const totalSpending = spendingData.reduce((sum, item) => sum + item.spending, 0);
+  const spendingPercentage = (totalSpending / monthlyBudget) * 100;
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
@@ -80,6 +84,11 @@ const Metrics: React.FC<MetricsProps> = ({ onClose }) => {
           <Legend />
           <Area type="monotone" dataKey="spending" stroke="#8884d8" fill="#8884d8" />
         </AreaChart>
+      </div>
+
+      <div className={styles.chart}>
+        <h3 className={styles.chartTitle}>Budget Utilization</h3>
+        <RadialProgress percentage={Math.round(spendingPercentage)} label="Budget Used :" />
       </div>
     </div>
   );
