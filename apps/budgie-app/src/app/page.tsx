@@ -5,7 +5,6 @@ import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
 import { Landing } from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
-import router from 'next/navigation';
 
 export default function Index() {
   const user = useContext(UserContext);
