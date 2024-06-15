@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Tooltip, CartesianGrid, XAxis, YAxis, Legend, Cell, AreaChart, Area } from 'recharts';
+import { BarChart, Bar, Line, PieChart, Pie, Tooltip, CartesianGrid, XAxis, YAxis, Legend, Cell, AreaChart, Area } from 'recharts';
 import styles from './Metrics.module.css';
 import RadialProgress from './RadialProgress';
 

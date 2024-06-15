@@ -12,6 +12,9 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   overflow: auto;
   color:white;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px; /* Adjust gap between grid items as needed */
 }
 
 
@@ -29,6 +32,8 @@
 
 .chart {
   margin-bottom: 5px;
+  padding: 10px;
+  border-radius: 10px; /* Optional: Add border radius to each chart */
 }
 .chartTitle {
   color: white;
