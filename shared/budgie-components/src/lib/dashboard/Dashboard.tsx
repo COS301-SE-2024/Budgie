@@ -1,70 +1,240 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { UserContext } from '@capstone-repo/shared/budgie-components';
 import UploadStatementCSV from '../upload-statement-csv/UploadStatementCSV';
-import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
-import { db, auth } from '../../../../../apps/budgie-app/firebase/clientApp';
-import { getAuth } from 'firebase/auth';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  addDoc,
+  setDoc,
+  updateDoc,
+} from 'firebase/firestore';
+import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import '../../root.css';
 import styles from './Dashboard.module.css';
+import { Merge } from '@mui/icons-material';
 
 export interface DashboardProps {}
 
 export function Dashboard(props: DashboardProps) {
   const [balance, setBalance] = useState<number | null>(null);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [userID, setUserID] = useState<string | null>(null);
+  const [displayTransactions, setDisplayTransactions] = useState<Transaction[]>(
+    []
+  );
+  const user = useContext(UserContext);
 
   interface Transaction {
     date: string;
     amount: number;
     balance: number;
     description: string;
+    category: string;
   }
 
-  useEffect(() => {
-    const getBankStatementsByUserId = async (userId: string) => {
-      try {
-        const bankStatementsRef = collection(db, 'bankStatements');
-        const q = query(bankStatementsRef, where('userId', '==', userId));
-        const querySnapshot = await getDocs(q);
+  function getUniqueYearMonths(DataLines: string[]): Record<string, string[]> {
+    const yearMonthsRecord: Record<string, Set<string>> = {};
 
-        const transactionsData: Transaction[] = [];
-        querySnapshot.forEach((doc) => {
-          const userData = doc.data();
-          transactionsData.push({
-            date: userData.Date,
-            amount: parseFloat(userData.Amount),
-            balance: parseFloat(userData.Balance),
-            description: userData.Description,
-          });
-        });
+    for (const line of DataLines) {
+      const [date] = line.split(',');
+      const [year, month] = date.split('/');
+      const yearMonth = `${year}/${month}`;
 
-        // Sort transactions by date in descending order
-        transactionsData.sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-        );
-
-        if (transactionsData.length > 0) {
-          setBalance(transactionsData[0].balance); // Assuming the most recent balance is what you need
-        }
-
-        setTransactions(transactionsData);
-      } catch (error) {
-        alert(error);
+      if (!yearMonthsRecord[year]) {
+        yearMonthsRecord[year] = new Set();
       }
-    };
 
-    const auth = getAuth();
-    if (auth) {
-      const user = auth.currentUser;
-      if (user !== null) {
-        setUserID(user.uid);
-        getBankStatementsByUserId(user.uid);
+      yearMonthsRecord[year].add(yearMonth);
+    }
+
+    const result: Record<string, string[]> = {};
+
+    for (const year in yearMonthsRecord) {
+      result[year] = Array.from(yearMonthsRecord[year]);
+    }
+
+    return result;
+  }
+
+  function getSeparateYearMonthsAsTransactionObjects(
+    DataLines: string[]
+  ): Record<string, Transaction[]> {
+    const linesByYearMonth: Record<string, Transaction[]> = {};
+
+    for (const line of DataLines) {
+      const [date, amountStr, balanceStr, description] = line
+        .split(',')
+        .map((part) => part.trim());
+      const [year, month] = date.split('/');
+      const yearMonth = `${year}/${month}`;
+      const amount: number = parseFloat(amountStr);
+      const balance: number = parseFloat(balanceStr);
+
+      const transaction: Transaction = {
+        date,
+        amount,
+        balance,
+        description,
+        category: '', // Initialize category as an empty string
+      };
+
+      if (!linesByYearMonth[yearMonth]) {
+        linesByYearMonth[yearMonth] = [];
+      }
+
+      linesByYearMonth[yearMonth].push(transaction);
+    }
+
+    return linesByYearMonth;
+  }
+
+  function getMonthName(month: string): string {
+    const monthNames = [
+      'january',
+      'february',
+      'march',
+      'april',
+      'may',
+      'june',
+      'july',
+      'august',
+      'september',
+      'october',
+      'november',
+      'december',
+    ];
+
+    const monthIndex = parseInt(month, 10) - 1; // Months are zero-based
+
+    if (monthIndex >= 0 && monthIndex < 12) {
+      return monthNames[monthIndex];
+    } else {
+      throw new Error('Invalid month value');
+    }
+  }
+
+  function isDuplicate(
+    transaction1: Transaction,
+    transaction2: Transaction
+  ): boolean {
+    return (
+      transaction1.date === transaction2.date &&
+      transaction1.amount === transaction2.amount &&
+      transaction1.balance === transaction2.balance &&
+      transaction1.description === transaction2.description
+    );
+  }
+
+  async function MergeTransactions(
+    YearMonthLinesRecord: Record<string, Transaction[]>,
+    UniqueYearMonths: Record<string, string[]>
+  ) {
+    //determine merged record
+    for (const Year in UniqueYearMonths) {
+      let Merged: Record<string, Transaction[]> = {};
+      const YearMonths: string[] = UniqueYearMonths[Year];
+
+      //check if doc exists for year by retrieving it
+      const docRef = doc(db, `transaction_data_${Year}`, `${user.uid}`);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        for (const YearMonth of YearMonths) {
+          let [Y, Month] = YearMonth.split('/');
+          Month = getMonthName(Month);
+          if (docSnap.data()[Month]) {
+            //month already contains data
+            const Incoming: Transaction[] = JSON.parse(docSnap.data()[Month]);
+            const Outgoing: Transaction[] = YearMonthLinesRecord[YearMonth];
+            //merge data duplicate removal
+            const filteredOutgoing = Outgoing.filter(
+              (outgoingTransaction) =>
+                !Incoming.some((incomingTransaction) =>
+                  isDuplicate(outgoingTransaction, incomingTransaction)
+                )
+            );
+
+            if (filteredOutgoing.length != 0) {
+              //there are some non duplicates merge and sort and update
+              const combinedTransactions = [...Incoming, ...filteredOutgoing];
+              combinedTransactions.sort((a, b) => {
+                const dateA = new Date(a.date);
+                const dateB = new Date(b.date);
+
+                return dateB.getTime() - dateA.getTime();
+              });
+              const TransactionString = JSON.stringify(combinedTransactions);
+              try {
+                const Ref = doc(db, `transaction_data_${Y}`, `${user.uid}`);
+                await updateDoc(Ref, {
+                  [Month]: TransactionString,
+                });
+              } catch (error) {
+                console.log(error);
+              }
+            }
+          } else {
+            //empty month can just merge
+            const Outgoing: Transaction[] = YearMonthLinesRecord[YearMonth];
+            Outgoing.sort((a, b) => {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+
+              return dateB.getTime() - dateA.getTime();
+            });
+            const TransactionString = JSON.stringify(Outgoing);
+            try {
+              const Ref = doc(db, `transaction_data_${Y}`, `${user.uid}`);
+              await updateDoc(Ref, {
+                [Month]: TransactionString,
+              });
+            } catch (error) {
+              console.log(error);
+            }
+          }
+        }
+      } else {
+        //documents do not exist for this year can safely add to merged
+        for (const YearMonth of YearMonths) {
+          Merged[YearMonth] = YearMonthLinesRecord[YearMonth];
+        }
+        // TODO: sort merged on date
+        for (const YearMonth in Merged) {
+          const MonthlyTransactions: Transaction[] = Merged[YearMonth];
+          MonthlyTransactions.sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+
+            return dateB.getTime() - dateA.getTime();
+          });
+        }
+        //upload merged!document does not exist must first set then update
+        let first = true;
+        for (const YearMonth in Merged) {
+          let [year, month] = YearMonth.split('/');
+          const TransactionString = JSON.stringify(Merged[YearMonth]);
+          const TransactionMonthString = getMonthName(month);
+          if (first) {
+            first = false;
+            await setDoc(doc(db, `transaction_data_${year}`, `${user.uid}`), {
+              [TransactionMonthString]: TransactionString,
+            });
+          } else {
+            try {
+              const Ref = doc(db, `transaction_data_${year}`, `${user.uid}`);
+              await updateDoc(Ref, {
+                [TransactionMonthString]: TransactionString,
+              });
+            } catch (error) {
+              console.log(error);
+            }
+          }
+        }
       }
     }
-  }, []);
+  }
 
-  const handleFileUpload = async (file: File) => {
+  const handleCSVUpload = async (file: File) => {
     const reader = new FileReader();
     reader.onload = async (event) => {
       const content = event.target?.result as string;
@@ -73,160 +243,34 @@ export function Dashboard(props: DashboardProps) {
         .map((line) => line.trim())
         .filter((line) => line);
 
-      // Find the line that contains the balance
-      const balanceLine = lines.find((line) => line.startsWith('Balance:'));
-      if (balanceLine) {
-        const balanceValues = balanceLine
-          .split(',')
-          .map((value) => value.trim())
-          .filter((value) => value);
-        if (balanceValues.length > 1) {
-          const balance = parseFloat(balanceValues[1]);
-          setBalance(balance);
-        }
-      }
-
-      // Find the line that contains the transaction headers
-      const headerLine = lines.find((line) => line.startsWith('Date'));
-      if (headerLine) {
-        const transactionsData: Transaction[] = transactions;
-        const addTransactions: Transaction[] = [];
-        for (let i = lines.indexOf(headerLine) + 1; i < lines.length; i++) {
-          const line = lines[i];
-          if (line.trim() === ',,,') {
-            break; // Stop reading if encountered an empty line
-          }
-          const [date, amount, balance, description] = line.split(',');
-          const transaction: Transaction = {
-            date,
-            amount: parseFloat(amount),
-            balance: parseFloat(balance),
-            description,
-          };
-          transactionsData.push(transaction);
-          addTransactions.push(transaction);
-        }
-        transactionsData.sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      //extract transaction lines
+      const HeaderLine = lines.find((line) => line.startsWith('Date'));
+      if (HeaderLine) {
+        const DataLines = lines.slice(
+          lines.indexOf(HeaderLine) + 1,
+          lines.length
         );
-        setTransactions(transactionsData);
-        for (let i = 0; i < transactions.length; i++) {
-          // Add the transaction to Firestore
-          try {
-            await addDoc(collection(db, 'bankStatements'), {
-              Amount: addTransactions[i].amount,
-              Balance: addTransactions[i].balance,
-              Date: addTransactions[i].date,
-              Description: addTransactions[i].description,
-              userId: userID, // Add the userId to the document
-            });
-          } catch (error) {
-            console.error('Error adding document: ', error);
-          }
-        }
+        const YearMonthLinesRecord: Record<string, Transaction[]> =
+          getSeparateYearMonthsAsTransactionObjects(DataLines);
+        const UniqueYearMonths: Record<string, string[]> =
+          getUniqueYearMonths(DataLines);
+        await MergeTransactions(YearMonthLinesRecord, UniqueYearMonths);
+      } else {
+        //error incorrect csv format
       }
     };
-
     reader.readAsText(file);
   };
+
+  useEffect(() => {
+    //get transactions for each month and display under dashboard
+  }, []);
 
   return (
     <div className="mainPage">
       <span className="pageTitle">Dashboard</span>
-      <UploadStatementCSV onFileUpload={handleFileUpload} />
+      <UploadStatementCSV onFileUpload={handleCSVUpload} />
       <br />
-      {balance !== null && (
-        <div className={styles.balance}>
-          <h1>
-            <strong>Current Balance:</strong> {balance}
-          </h1>
-          <br />
-          {transactions.length > 0 && (
-            <div className={styles.transactions}>
-              <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-                <thead>
-                  <tr>
-                    <th
-                      style={{
-                        border: '1px solid var(--main-text)',
-                        padding: '8px',
-                        textAlign: 'left',
-                      }}
-                    >
-                      Date
-                    </th>
-                    <th
-                      style={{
-                        border: '1px solid var(--main-text)',
-                        padding: '8px',
-                        textAlign: 'left',
-                      }}
-                    >
-                      Amount
-                    </th>
-                    <th
-                      style={{
-                        border: '1px solid var(--main-text)',
-                        padding: '8px',
-                        textAlign: 'left',
-                      }}
-                    >
-                      Balance
-                    </th>
-                    <th
-                      style={{
-                        border: '1px solid var(--main-text)',
-                        padding: '8px',
-                        textAlign: 'left',
-                      }}
-                    >
-                      Description
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transactions.map((transaction, index) => (
-                    <tr key={index}>
-                      <td
-                        style={{
-                          border: '1px solid var(--main-text)',
-                          padding: '8px',
-                        }}
-                      >
-                        {transaction.date}
-                      </td>
-                      <td
-                        style={{
-                          border: '1px solid var(--main-text)',
-                          padding: '8px',
-                        }}
-                      >
-                        {transaction.amount}
-                      </td>
-                      <td
-                        style={{
-                          border: '1px solid var(--main-text)',
-                          padding: '8px',
-                        }}
-                      >
-                        {transaction.balance}
-                      </td>
-                      <td
-                        style={{
-                          border: '1px solid var(--main-text)',
-                          padding: '8px',
-                        }}
-                      >
-                        {transaction.description}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }

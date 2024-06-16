@@ -1,6 +1,6 @@
 'use client';
 import styles from './page.module.css';
-import React, { useContext, useEffect, useLayoutEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { Landing } from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';

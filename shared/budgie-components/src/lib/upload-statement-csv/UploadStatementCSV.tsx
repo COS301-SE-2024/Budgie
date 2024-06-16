@@ -1,5 +1,5 @@
 'use client';
-import "../../root.css";
+import '../../root.css';
 import React, { useRef } from 'react';
 import styles from './UploadStatementCSV.module.css';
 
