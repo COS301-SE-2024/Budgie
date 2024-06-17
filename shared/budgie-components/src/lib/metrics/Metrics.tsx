@@ -25,10 +25,10 @@ export interface MetricsProps {
 const Metrics: React.FC<MetricsProps> = ({ onClose }) => {
   const monthlyBudget = 1000;
   const spendingData = [
-    { name: 'Week 1', spending: 200 },
-    { name: 'Week 2', spending: 300 },
-    { name: 'Week 3', spending: 150 },
-    { name: 'Week 4', spending: 400 },
+    { name: 'Month 1', spending: 200 },
+    { name: 'Month 2', spending: 300 },
+    { name: 'Month 3', spending: 150 },
+    { name: 'Month 4', spending: 400 },
   ];
 
   const categoryData = [
@@ -39,10 +39,10 @@ const Metrics: React.FC<MetricsProps> = ({ onClose }) => {
   ];
 
   const monthlySpendingData = [
-    { name: 'January', spending: 800 },
-    { name: 'February', spending: 950 },
-    { name: 'March', spending: 700 },
-    { name: 'April', spending: 850 },
+    { name: 'Month 1', spending: 800 },
+    { name: 'Month 2', spending: 950 },
+    { name: 'Month 3', spending: 700 },
+    { name: 'Month 4', spending: 850 },
   ];
 
   const spending = 400; // Current spending
