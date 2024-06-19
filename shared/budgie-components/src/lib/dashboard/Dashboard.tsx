@@ -12,18 +12,20 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
+import { getAuth } from "firebase/auth";
 import '../../root.css';
 import styles from './Dashboard.module.css';
 import { Merge } from '@mui/icons-material';
+import { json } from 'stream/consumers';
 
 export interface DashboardProps {}
 
 export function Dashboard(props: DashboardProps) {
-  const [balance, setBalance] = useState<number | null>(null);
-  const [displayTransactions, setDisplayTransactions] = useState<Transaction[]>(
-    []
-  );
+  const [balance, setBalance] = useState(0);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [currentYear, setCurrentYear] = useState(new Date());
+  const [Data, setData] = useState<any>(null);
   const user = useContext(UserContext);
 
   interface Transaction {
@@ -35,21 +37,26 @@ export function Dashboard(props: DashboardProps) {
   }
 
   const handleNextMonth = () => {
-    const today = new Date();
-    const nextMonth = new Date(currentMonth);
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
-    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 1);
-    if (nextMonth.getTime() <= startOfNextMonth.getTime()) {
-      setCurrentMonth(nextMonth);
-    }   
+    // const today = new Date();
+    // const nextMonth = new Date(currentMonth);
+    // nextMonth.setMonth(nextMonth.getMonth() + 1);
+    // const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 1);
+    // if (nextMonth.getTime() <= startOfNextMonth.getTime()) {
+    //   setCurrentMonth(nextMonth);
+    //   display();
+    // } 
+    setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)));
+    display(); 
+    
   };
 
   const handlePrevMonth = () => {
     setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)));
+    display();
   };
 
   const formatMonthYear = (date : any) => {
-    return date.toLocaleString('default', { month: 'short', year: 'numeric' });
+    return date.toLocaleString('default', { month: 'long', year: 'numeric' });
   };
 
   function getUniqueYearMonths(DataLines: string[]): Record<string, string[]> {
@@ -282,8 +289,52 @@ export function Dashboard(props: DashboardProps) {
   };
 
   useEffect(() => {
-    //get transactions for each month and display under dashboard
-  }, []);
+
+    const getBankStatementsByUserId = async (userId: string) => {
+      try {
+        const docRef = doc(db, 'transaction_data_2024', userId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          // Process the document data here
+          setData(data);          
+          
+        } else {
+          console.log('No such document!');
+        }
+      } catch (error) {
+        console.error('Error getting bank statement document:', error);
+      }
+    };
+
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user !== null) {
+      getBankStatementsByUserId(user.uid)
+    }  
+
+  },[currentYear] );
+
+  useEffect(() => {
+    if(Data!==null){
+      display()
+    }
+  }, [Data])
+
+
+  const display = async () => {
+    const month = currentMonth.toLocaleString('default', { month: 'long' }).toLocaleLowerCase();
+    if(Data[month]===undefined){
+      setTransactions([])
+      setBalance(0)
+    }
+    else{
+      setTransactions(JSON.parse(Data[month]));
+      setBalance((JSON.parse(Data[month]))[0].balance)
+    }
+  }
+
 
   return (
     <div className="mainPage">
@@ -307,9 +358,33 @@ export function Dashboard(props: DashboardProps) {
             arrow_forward_ios
           </span>
         </button>
-       
       </div>
       <br />
+            {balance !== null && (
+        <div className={styles.balance}>
+          <h1>
+            <strong>Balance:</strong> {balance}
+          </h1>
+          <br />
+          {transactions.length > 0 && (
+            <div className={styles.transactions}>
+            {transactions.map((transaction, index) => (
+              <div key={index} className={styles.transactionCard} style={{ borderLeft: transaction.amount >= 0 ? '10px solid #293652' : '10px solid #9e9e9e' }}>
+                <div className={styles.transactionItem}>
+                  <div className={styles.transactionContent}>
+                    <div className={styles.transactionDateTime}>
+                      <div className={styles.transactionDate}>{transaction.date}</div>
+                      <div className={styles.transactionDescription}>{transaction.description}</div>
+                    </div>
+                    <div className={styles.transactionAmount}>{transaction.amount}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );  
 }
