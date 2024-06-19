@@ -1,12 +1,10 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import UploadStatementCSV from '../upload-statement-csv/UploadStatementCSV';
-import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
-import { db, auth } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from "firebase/auth";
 import "../../root.css";
 import styles from './Dashboard.module.css';
-import { getStorage, ref, getDownloadURL } from 'firebase/storage';
+import { ref, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../../../../apps/budgie-app/firebase/clientApp';
 
 
@@ -15,7 +13,7 @@ export interface DashboardProps {}
 export function Dashboard(props: DashboardProps) {
   const [balance, setBalance] = useState<number | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [userID, setUserID] = useState<string | null>(null);
+
 
   interface Transaction {
     date: string;
@@ -56,7 +54,6 @@ export function Dashboard(props: DashboardProps) {
     const auth = getAuth();
     const user = auth.currentUser;
     if (user !== null) {
-      setUserID(user.uid);
       getBankStatementsByUserId(user.uid);
     }
   }, []);
