@@ -23,6 +23,7 @@ export function Dashboard(props: DashboardProps) {
   const [displayTransactions, setDisplayTransactions] = useState<Transaction[]>(
     []
   );
+  const [currentMonth, setCurrentMonth] = useState(new Date());
   const user = useContext(UserContext);
 
   interface Transaction {
@@ -32,6 +33,24 @@ export function Dashboard(props: DashboardProps) {
     description: string;
     category: string;
   }
+
+  const handleNextMonth = () => {
+    const today = new Date();
+    const nextMonth = new Date(currentMonth);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 1);
+    if (nextMonth.getTime() <= startOfNextMonth.getTime()) {
+      setCurrentMonth(nextMonth);
+    }   
+  };
+
+  const handlePrevMonth = () => {
+    setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)));
+  };
+
+  const formatMonthYear = (date : any) => {
+    return date.toLocaleString('default', { month: 'short', year: 'numeric' });
+  };
 
   function getUniqueYearMonths(DataLines: string[]): Record<string, string[]> {
     const yearMonthsRecord: Record<string, Set<string>> = {};
@@ -268,11 +287,31 @@ export function Dashboard(props: DashboardProps) {
 
   return (
     <div className="mainPage">
-      <span className="pageTitle">Dashboard</span>
-      <UploadStatementCSV onFileUpload={handleCSVUpload} />
+      <div className="header">
+        <span className="pageTitle">Dashboard</span>
+        <UploadStatementCSV onFileUpload={handleCSVUpload} />
+      </div>
+      <div className="monthNavigation">
+        <br/>
+        <button className="navButton" onClick={handlePrevMonth}>
+        <span 
+            className="material-symbols-outlined">
+            arrow_back_ios
+          </span> 
+        </button>
+        <span className="monthDisplay">{formatMonthYear(currentMonth)}</span>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" onClick={handleNextMonth}/>
+        <button className="navButton" onClick={handleNextMonth}>
+          <span 
+            className="material-symbols-outlined">
+            arrow_forward_ios
+          </span>
+        </button>
+       
+      </div>
       <br />
     </div>
-  );
+  );  
 }
 
 export default Dashboard;

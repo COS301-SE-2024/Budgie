@@ -1,3 +1,32 @@
-.balance {
-    color: var(--main-text);
-}
+.monthNavigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .navButton {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .navButton:hover {
+    background-color: #0056b3;
+  }
+  
+  .monthDisplay {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 12px;
+  }
+  
+  .material-icons-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-size: 24px; /* Adjust the size as needed */
+    vertical-align: middle;
+    margin-right: 4px; /* Adjust spacing between icon and text */
+  }
