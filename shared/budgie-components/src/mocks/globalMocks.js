@@ -12,3 +12,12 @@ export const mockNextImage = {
     return <img src={src} alt={alt} />;
   },
 };
+
+export const mockNextRouter = {
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    prefetch: jest.fn(),
+    // Add any other router methods you use
+  }),
+};
