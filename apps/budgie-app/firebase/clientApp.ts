@@ -1,11 +1,7 @@
 import { initializeApp } from 'firebase/app';
 // import { getAnalytics } from 'firebase/analytics';
-import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
-import {
-  connectAuthEmulator,
-  getAuth,
-  signInWithEmailAndPassword,
-} from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -21,6 +17,4 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
-// connectFirestoreEmulator(db, '127.0.0.1', 8080);
-// export const analytics = getAnalytics(app);
 export const auth = getAuth(app);

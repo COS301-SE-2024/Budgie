@@ -1,5 +1,5 @@
 'use client';
-import "../../root.css";
+import '../../root.css';
 import React, { useRef } from 'react';
 import styles from './UploadStatementCSV.module.css';
 
@@ -22,6 +22,7 @@ export function UploadStatementCSV(props: UploadStatementCSVProps) {
     if (files && files.length > 0) {
       const file = files[0];
       props.onFileUpload(file);
+      event.target.value = '';
     }
   };
 

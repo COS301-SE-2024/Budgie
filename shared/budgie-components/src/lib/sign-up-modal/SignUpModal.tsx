@@ -32,31 +32,10 @@ export function SignUpModal(props: SignUpModalProps) {
     try {
       const provider = new GoogleAuthProvider();
       provider.addScope('profile');
-      provider.addScope('name');
       provider.addScope('email');
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       console.log('User information:', user);
-
-      //does not work
-      try {
-        const userRef = collection(db, 'Users');
-        await addDoc(userRef, {
-          OauthID: user.providerData[0].uid,
-          OauthProvider: user.providerData[0].providerId,
-          ProfilePicture: user.photoURL,
-          account: '',
-          bankStatements: [],
-          createdAt: new Date(),
-          deleted: false,
-          email: user.email,
-          name: user.displayName,
-          password: 'Hashed_Password',
-          surname: user.displayName,
-        });
-      } catch (error) {
-        console.error('Error adding user to Firestore:', error);
-      }
     } catch (error) {
       if (error instanceof FirebaseError) {
         const errorCode = error.code;
@@ -100,25 +79,6 @@ export function SignUpModal(props: SignUpModalProps) {
         password
       );
       const user = userCredential.user;
-
-      try {
-        const userRef = collection(db, 'Users');
-        await addDoc(userRef, {
-          OauthID: '',
-          OauthProvider: '',
-          ProfilePicture: '',
-          account: '',
-          bankStatements: [],
-          createdAt: new Date(),
-          deleted: false,
-          email: user.email,
-          name: '',
-          password: 'Hashed_Password',
-          surname: '',
-        });
-      } catch (error) {
-        console.error('Error adding user to Firestore:', error);
-      }
     } catch (err) {
       if (err instanceof FirebaseError) {
         const errorMessage = err.message;
