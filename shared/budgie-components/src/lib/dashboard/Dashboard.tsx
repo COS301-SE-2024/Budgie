@@ -24,7 +24,7 @@ export function Dashboard(props: DashboardProps) {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [currentYear, setCurrentYear] = useState(new Date());
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [Data, setData] = useState<any>(null);
   const user = useContext(UserContext);
 
@@ -52,6 +52,9 @@ export function Dashboard(props: DashboardProps) {
 
   const handlePrevMonth = () => {
     setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)));
+    if(currentMonth.getFullYear()!=currentYear){
+      setCurrentYear(currentMonth.getFullYear())
+    }
     display();
   };
 
@@ -132,7 +135,6 @@ export function Dashboard(props: DashboardProps) {
     ];
 
     const monthIndex = parseInt(month, 10) - 1; // Months are zero-based
-
     if (monthIndex >= 0 && monthIndex < 12) {
       return monthNames[monthIndex];
     } else {
@@ -292,7 +294,8 @@ export function Dashboard(props: DashboardProps) {
 
     const getBankStatementsByUserId = async (userId: string) => {
       try {
-        const docRef = doc(db, 'transaction_data_2024', userId);
+        const collectionName = `transaction_data_${currentYear}`;
+        const docRef = doc(db, collectionName, userId);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
