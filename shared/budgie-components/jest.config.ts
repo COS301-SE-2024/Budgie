@@ -8,4 +8,5 @@ export default {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '../../coverage/shared/budgie-components',
+  setupFilesAfterEnv: ['./jest.setup.js'],
 };
