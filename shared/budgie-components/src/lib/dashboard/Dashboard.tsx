@@ -234,7 +234,33 @@ export function Dashboard(props: DashboardProps) {
     }
   }
 
+  async function GetData() {
+    //year we are trying to get for
+    const Year = '2024';
+    const MonthWithData = 'april';
+    const MonthWithoutData = 'january';
+    const docRef = doc(db, `transaction_data_${Year}`, `${user.uid}`);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      //there is data for the current year
+      console.log('Document data object:------------\n');
+      console.log(docSnap.data());
+      //can access data like this
+      console.log('Document april data string:------------\n');
+      console.log(docSnap.data()[MonthWithData]);
+      //no data member for that month
+      console.log(
+        'Document january data string(there is no data for this month):------------\n'
+      );
+      //will be undefined, can use this to test for presence of data for given month
+      console.log(docSnap.data()[MonthWithoutData]);
+    } else {
+      //there is no data for the current year
+    }
+  }
+
   const handleCSVUpload = async (file: File) => {
+    console.log('ran upload');
     const reader = new FileReader();
     reader.onload = async (event) => {
       const content = event.target?.result as string;
@@ -260,6 +286,7 @@ export function Dashboard(props: DashboardProps) {
       }
     };
     reader.readAsText(file);
+    await GetData();
   };
 
   useEffect(() => {
