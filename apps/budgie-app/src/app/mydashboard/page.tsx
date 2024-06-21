@@ -7,6 +7,7 @@ import { Settings } from '@capstone-repo/shared/budgie-components';
 import { Homepage } from '@capstone-repo/shared/budgie-components';
 import { Dashboard } from '@capstone-repo/shared/budgie-components';
 import { Profile } from '@capstone-repo/shared/budgie-components';
+import { Faq } from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';
 
 export default function MyDashboard() {
