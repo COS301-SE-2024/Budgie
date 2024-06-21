@@ -89,3 +89,13 @@
   .greyLeftStrip {
     border-left: 20px solid #9e9e9e; /* Grey border */
   }
+
+  .categoryDropdown {
+    border: 1px solid #ccc; /* Add a border around the dropdown */
+    padding: 5px; /* Add padding inside the dropdown */
+    border-radius: 4px; /* Optional: rounded corners */
+    width: 100%; /* Optional: full width */
+    box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+    font-weight: normal; /* Make text not bold */
+    font-size: 12px; /* Make the text smaller */
+  }

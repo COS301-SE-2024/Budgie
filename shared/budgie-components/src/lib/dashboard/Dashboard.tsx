@@ -37,19 +37,14 @@ export function Dashboard(props: DashboardProps) {
   }
 
   const handleNextMonth = () => {
-    // const today = new Date();
-    // const nextMonth = new Date(currentMonth);
-    // nextMonth.setMonth(nextMonth.getMonth() + 1);
-    // const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 1);
-    // if (nextMonth.getTime() <= startOfNextMonth.getTime()) {
-    //   setCurrentMonth(nextMonth);
-    //   display();
-    // } 
+    //change year
     if(currentMonth.getFullYear()!=currentYear){
       setCurrentYear(currentMonth.getFullYear())
     }
+    //cants go passed next month
     const Now = new Date()
     if(currentMonth.getMonth()!=(Now.getMonth()+1) || currentYear!=Now.getFullYear()){
+      //change the month
       setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)));
     }
     display(); 
@@ -385,7 +380,17 @@ export function Dashboard(props: DashboardProps) {
                       <div className={styles.transactionDate}>{transaction.date}</div>
                       <div className={styles.transactionDescription}>{transaction.description}</div>
                     </div>
-                    <div className={styles.transactionAmount}>{transaction.amount}</div>
+                    <div className={styles.transactionAmount}>
+                      {transaction.amount}
+                      <br />
+                      <select className={styles.categoryDropdown}>
+                        <option value="" disabled selected>Select a category</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="add category">add category</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
