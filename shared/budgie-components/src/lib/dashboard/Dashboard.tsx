@@ -45,7 +45,13 @@ export function Dashboard(props: DashboardProps) {
     //   setCurrentMonth(nextMonth);
     //   display();
     // } 
-    setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)));
+    if(currentMonth.getFullYear()!=currentYear){
+      setCurrentYear(currentMonth.getFullYear())
+    }
+    const Now = new Date()
+    if(currentMonth.getMonth()!=(Now.getMonth()+1) || currentYear!=Now.getFullYear()){
+      setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)));
+    }
     display(); 
     
   };
