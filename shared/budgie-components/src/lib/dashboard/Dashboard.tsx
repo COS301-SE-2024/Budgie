@@ -12,6 +12,7 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import '../../root.css';
 import styles from './Dashboard.module.css';
 import { Merge } from '@mui/icons-material';
@@ -230,6 +231,13 @@ export function Dashboard(props: DashboardProps) {
             }
           }
         }
+        //call categorize function
+        const functions = getFunctions();
+        const categoriseExpenses = httpsCallable(
+          functions,
+          'categoriseExpenses'
+        );
+        categoriseExpenses({ year: Year });
       }
     }
   }
