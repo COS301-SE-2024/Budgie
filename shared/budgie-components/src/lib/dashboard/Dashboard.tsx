@@ -15,8 +15,6 @@ import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from "firebase/auth";
 import '../../root.css';
 import styles from './Dashboard.module.css';
-import { Merge } from '@mui/icons-material';
-import { json } from 'stream/consumers';
 
 export interface DashboardProps {}
 
@@ -26,6 +24,7 @@ export function Dashboard(props: DashboardProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [Data, setData] = useState<any>(null);
+  const [category, setCategory] = useState([]);
   const user = useContext(UserContext);
 
   interface Transaction {
@@ -339,6 +338,19 @@ export function Dashboard(props: DashboardProps) {
     }
   }
 
+  const changeCategory = async (categoryName : string) => {
+    if(categoryName=="Add category"){
+      alert("added")
+    }
+    else{
+      alert(categoryName)
+    }
+  }
+
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    changeCategory(event.target.value);
+  };
+
 
   return (
     <div className="mainPage">
@@ -383,12 +395,20 @@ export function Dashboard(props: DashboardProps) {
                     <div className={styles.transactionAmount}>
                       {transaction.amount}
                       <br />
-                      <select className={styles.categoryDropdown}>
-                        <option value="" disabled selected>Select a category</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="add category">add category</option>
+                      <select className={styles.categoryDropdown} onChange={handleChange}>
+                      <option value=""></option>
+                        <option value="Income">Income</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Taxes">Taxes</option>
+                        <option value="Insurance">Insurance</option>
+                        <option value="Treats&Entertainment">Treats & Entertainment</option>
+                        <option value="Groceries">Groceries</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Savings">Savings</option>
+                        <option value="Education">Education</option>
+                        <option value="Miscellaneous">Miscellaneous</option>
+                        <option value="Add category">Add category</option>
                       </select>
                     </div>
                   </div>
