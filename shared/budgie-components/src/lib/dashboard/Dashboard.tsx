@@ -15,6 +15,7 @@ import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from "firebase/auth";
 import '../../root.css';
 import styles from './Dashboard.module.css';
+import Metrics from '../metrics/Metrics'; // Import the Metrics component
 import { json } from 'stream/consumers';
 
 export interface DashboardProps {}
@@ -22,6 +23,8 @@ export interface DashboardProps {}
 export function Dashboard(props: DashboardProps) {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [userID, setUserID] = useState<string | null>(null);
+  const [showMetrics, setShowMetrics] = useState(false); // State to control modal visibility
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [Data, setData] = useState<any>(null);
@@ -426,6 +429,10 @@ export function Dashboard(props: DashboardProps) {
           )}
         </div>
       )}
+      <button onClick={() => setShowMetrics(true)} className={styles.metricsButton}>
+        View Metrics
+      </button>
+      {showMetrics && <Metrics onClose={() => setShowMetrics(false)} />}
     </div>
   );  
 }
