@@ -15,6 +15,7 @@ import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from "firebase/auth";
 import '../../root.css';
 import styles from './Dashboard.module.css';
+import { json } from 'stream/consumers';
 
 export interface DashboardProps {}
 
@@ -24,7 +25,6 @@ export function Dashboard(props: DashboardProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [Data, setData] = useState<any>(null);
-  const [category, setCategory] = useState([]);
   const user = useContext(UserContext);
 
   interface Transaction {
@@ -338,25 +338,24 @@ export function Dashboard(props: DashboardProps) {
     }
   }
 
-  const changeCategory = async (categoryName : string, transaction: JSON) => {
-    if(categoryName=="Add category"){
+
+  const handleChange = async (event: React.ChangeEvent<HTMLSelectElement>, index: number) => {
+    const selectedCategory = event.target.value;
+    if(selectedCategory=="Add category"){
       alert("added")
     }
     else{
-      alert(categoryName)
-    }
-  }
-
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>, index: number) => {
-    const selectedCategory = event.target.value;
-    setTransactions((prevTransactions) =>
-      prevTransactions.map((transaction, i) =>
+      const updatedTransactions = transactions.map((transaction, i) =>
         i === index
           ? { ...transaction, category: selectedCategory }
           : transaction
-      )
-    );
-    alert(JSON.stringify(transactions))
+      );
+    
+      setTransactions(updatedTransactions);
+      await setDoc(doc(db, `transaction_data_${currentYear}`, `${user.uid}`), {
+        "june": JSON.stringify(updatedTransactions),
+      });
+    }
   };
 
 
@@ -412,9 +411,7 @@ export function Dashboard(props: DashboardProps) {
                         <option value="Treats&Entertainment">Treats & Entertainment</option>
                         <option value="Groceries">Groceries</option>
                         <option value="Transport">Transport</option>
-                        <option value="Healthcare">Healthcare</option>
                         <option value="Savings">Savings</option>
-                        <option value="Education">Education</option>
                         <option value="Miscellaneous">Miscellaneous</option>
                         <option value="Add category">Add category</option>
                       </select>
