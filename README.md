@@ -8,16 +8,17 @@ Budgie is a financial management tool designed to help users take control of the
 
 ## Documentation
 
-### Demo Video
+### Demo Videos
 - [Technocrats-Demo1](https://drive.google.com/file/d/1byWVsQ5Gkgf1HlpGd4o-jbyA2mhBc2FW/view?usp=sharing)
+- [Technocrats-Demo2]()
 
 ### Specifications
 - [Requirement Specification](https://docs.google.com/document/d/1IxhlKWYyOzyI6G7sqyuQpJhXvYi7qbDt/edit?usp=sharing&ouid=102754965567069782239&rtpof=true&sd=true)
-<!-- - [Architectural Design Specification](https://github.com/COS301-SE-2024/MiniProject9/blob/main/documentation/DesignArchitecture.md)
-- [Database Specification](https://github.com/COS301-SE-2024/MiniProject9/blob/main/documentation/Database_Specification.md)
-- [Testing Specification](https://drive.google.com/file/d/15VlpAF-Vl_ewo0Ho0JeAhOv5cQ3gxLuh/view?usp=drive_link)
-- [GitHub Specifications](https://drive.google.com/file/d/1L6cYGAOXgO-Z92GkEbuKGN_fjCHjqBRd/view?usp=drive_link)
-- [CI/CD](https://drive.google.com/file/d/1ac-6cUskOFfHHwxN_MXRkZrcYeGCJlpr/view?usp=drive_link) 
+- [Architectural Design Specification](https://docs.google.com/document/d/1A5sNDeYOo9q0-vpzERKpAOi2K3Yqm1Qy/edit?usp=drive_link&ouid=102754965567069782239&rtpof=true&sd=true)
+<!-- - [Database Specification]()
+- [Testing Specification]()
+- [GitHub Specifications]()
+- [CI/CD]() 
 
 ### User Manual
 
