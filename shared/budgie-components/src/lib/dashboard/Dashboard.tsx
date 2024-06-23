@@ -260,6 +260,7 @@ export function Dashboard(props: DashboardProps) {
         }
       }
     }
+    setTransactions([])
   }
 
   const handleCSVUpload = async (file: File) => {
@@ -317,7 +318,7 @@ export function Dashboard(props: DashboardProps) {
       getBankStatementsByUserId(user.uid)
     }  
 
-  },[currentYear] );
+  },[currentYear, transactions] );
 
   useEffect(() => {
     if(Data!==null){
@@ -352,7 +353,7 @@ export function Dashboard(props: DashboardProps) {
       );
     
       setTransactions(updatedTransactions);
-      await setDoc(doc(db, `transaction_data_${currentYear}`, `${user.uid}`), {
+      await updateDoc(doc(db, `transaction_data_${currentYear}`, `${user.uid}`), {
         "june": JSON.stringify(updatedTransactions),
       });
     }
@@ -405,14 +406,15 @@ export function Dashboard(props: DashboardProps) {
                       <select className={styles.categoryDropdown} onChange={(event) => handleChange(event, index)} value={transaction.category}>
                       <option value=""></option>
                         <option value="Income">Income</option>
-                        <option value="Utilities">Utilities</option>
-                        <option value="Taxes">Taxes</option>
-                        <option value="Insurance">Insurance</option>
-                        <option value="Treats&Entertainment">Treats & Entertainment</option>
-                        <option value="Groceries">Groceries</option>
                         <option value="Transport">Transport</option>
-                        <option value="Savings">Savings</option>
-                        <option value="Miscellaneous">Miscellaneous</option>
+                        <option value="Eating Out">Eating Out</option>
+                        <option value="Groceries">Groceries</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Insurance">Insurance</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Medical Aid">Medical Aid</option>
+                        <option value="Other">Other</option>
                         <option value="Add category">Add category</option>
                       </select>
                     </div>
