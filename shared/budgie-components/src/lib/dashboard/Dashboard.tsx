@@ -338,7 +338,7 @@ export function Dashboard(props: DashboardProps) {
     }
   }
 
-  const changeCategory = async (categoryName : string) => {
+  const changeCategory = async (categoryName : string, transaction: JSON) => {
     if(categoryName=="Add category"){
       alert("added")
     }
@@ -347,8 +347,16 @@ export function Dashboard(props: DashboardProps) {
     }
   }
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    changeCategory(event.target.value);
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>, index: number) => {
+    const selectedCategory = event.target.value;
+    setTransactions((prevTransactions) =>
+      prevTransactions.map((transaction, i) =>
+        i === index
+          ? { ...transaction, category: selectedCategory }
+          : transaction
+      )
+    );
+    alert(JSON.stringify(transactions))
   };
 
 
@@ -395,7 +403,7 @@ export function Dashboard(props: DashboardProps) {
                     <div className={styles.transactionAmount}>
                       {transaction.amount}
                       <br />
-                      <select className={styles.categoryDropdown} onChange={handleChange}>
+                      <select className={styles.categoryDropdown} onChange={(event) => handleChange(event, index)} value={transaction.category}>
                       <option value=""></option>
                         <option value="Income">Income</option>
                         <option value="Utilities">Utilities</option>
