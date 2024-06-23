@@ -118,22 +118,22 @@ export function Dashboard(props: DashboardProps) {
     return linesByYearMonth;
   }
 
-  function getMonthName(month: string): string {
-    const monthNames = [
-      'january',
-      'february',
-      'march',
-      'april',
-      'may',
-      'june',
-      'july',
-      'august',
-      'september',
-      'october',
-      'november',
-      'december',
-    ];
+  const monthNames = [
+    'january',
+    'february',
+    'march',
+    'april',
+    'may',
+    'june',
+    'july',
+    'august',
+    'september',
+    'october',
+    'november',
+    'december',
+  ];
 
+  function getMonthName(month: string): string {
     const monthIndex = parseInt(month, 10) - 1; // Months are zero-based
     if (monthIndex >= 0 && monthIndex < 12) {
       return monthNames[monthIndex];
@@ -354,7 +354,7 @@ export function Dashboard(props: DashboardProps) {
     
       setTransactions(updatedTransactions);
       await updateDoc(doc(db, `transaction_data_${currentYear}`, `${user.uid}`), {
-        "june": JSON.stringify(updatedTransactions),
+        [monthNames[currentMonth.getMonth()]]: JSON.stringify(updatedTransactions),
       });
     }
   };
