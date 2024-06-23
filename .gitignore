@@ -4,8 +4,9 @@
 apps/budgie-app/.env.local
 
 #firebaseemulatorsuite
-# .firebaserc
-# firebase.json
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
 
 # compiled output
 dist
@@ -34,7 +35,6 @@ node_modules
 # misc
 /.sass-cache
 /connect.lock
-/coverage
 /libpeerconnection.log
 npm-debug.log
 yarn-error.log
