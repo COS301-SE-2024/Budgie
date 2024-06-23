@@ -3,7 +3,6 @@ export const mockFirebaseAuth = {
   getAuth: jest.fn(),
   GoogleAuthProvider: jest.fn(),
   signInWithPopup: jest.fn(),
-  // Add any other methods you need to mock
 };
 
 export const mockFirebaseFunctions = {
@@ -12,7 +11,6 @@ export const mockFirebaseFunctions = {
 
 export const mockNextImage = {
   Image: ({ src, alt }) => {
-    // Implement a fallback component for testing purposes
     return <img src={src} alt={alt} />;
   },
 };
@@ -22,6 +20,5 @@ export const mockNextRouter = {
     push: jest.fn(),
     replace: jest.fn(),
     prefetch: jest.fn(),
-    // Add any other methods you use from next/navigation
   }),
 };
