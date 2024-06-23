@@ -15,19 +15,18 @@ import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from "firebase/auth";
 import '../../root.css';
 import styles from './Dashboard.module.css';
-import Metrics from '../metrics/Metrics'; // Import the Metrics component
 import { json } from 'stream/consumers';
+import Metrics from '../metrics/Metrics'; // Import the Metrics component
 
 export interface DashboardProps {}
 
 export function Dashboard(props: DashboardProps) {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [userID, setUserID] = useState<string | null>(null);
-  const [showMetrics, setShowMetrics] = useState(false); // State to control modal visibility
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [Data, setData] = useState<any>(null);
+  const [showMetrics, setShowMetrics] = useState(false); // State to control modal visibility
   const user = useContext(UserContext);
 
   interface Transaction {
@@ -346,7 +345,7 @@ export function Dashboard(props: DashboardProps) {
   const handleChange = async (event: React.ChangeEvent<HTMLSelectElement>, index: number) => {
     const selectedCategory = event.target.value;
     if(selectedCategory=="Add category"){
-      alert("added")
+      alert("under construction")
     }
     else{
       const updatedTransactions = transactions.map((transaction, i) =>
@@ -369,6 +368,13 @@ export function Dashboard(props: DashboardProps) {
         <span className="pageTitle">Dashboard</span>
         <UploadStatementCSV onFileUpload={handleCSVUpload} />
       </div>
+      <button onClick={() => setShowMetrics(true)} className={styles.metricsButton}>
+
+View Metrics
+
+</button>
+
+{showMetrics && <Metrics onClose={() => setShowMetrics(false)} />}
       <div className="monthNavigation">
         <br/>
         <button className="navButton" onClick={handlePrevMonth}>
@@ -429,10 +435,6 @@ export function Dashboard(props: DashboardProps) {
           )}
         </div>
       )}
-      <button onClick={() => setShowMetrics(true)} className={styles.metricsButton}>
-        View Metrics
-      </button>
-      {showMetrics && <Metrics onClose={() => setShowMetrics(false)} />}
     </div>
   );  
 }

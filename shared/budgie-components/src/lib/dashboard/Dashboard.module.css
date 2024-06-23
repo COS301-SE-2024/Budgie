@@ -1,116 +1,125 @@
 .monthNavigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .navButton {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .navButton:hover {
-    background-color: #0056b3;
-  }
-  
-  .monthDisplay {
-    font-size: 18px;
-    font-weight: bold;
-    margin: 0 12px;
-  }
-  
-  .balance {
-    font-size: 24px;
-    text-align: left;
-    margin-bottom: 5px;
-  }
-  
-  .transactions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .transactionCard {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.2s ease-in-out;
-  }
-  
-  .transactionCard:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  }
-  
-  .transactionItem {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* Align items to the left */
-  }
-  
-  .transactionContent {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-  }
-  
-  .transactionDate,
-  .transactionDescription {
-    margin-bottom: 5px;
-    font-size: 14px;
-  }
-  
-  .transactionDate {
-    font-weight: bold;
-    color: #333;
-  }
-  
-  .transactionAmount {
-    font-size: 16px;
-    font-weight: bold;
-    margin-left: auto;
-  }
-  
-  .transactionDescription {
-    text-align: left;
-    color: #555;
-  }
-  
-  .blueLeftStrip {
-    border-left: 20px solid #1976D2; /* Blue border */
-  }
-  
-  .greyLeftStrip {
-    border-left: 20px solid #9e9e9e; /* Grey border */
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-  .categoryDropdown {
-    border: 1px solid #ccc; /* Add a border around the dropdown */
-    padding: 5px; /* Add padding inside the dropdown */
-    border-radius: 4px; /* Optional: rounded corners */
-    width: 100%; /* Optional: full width */
-    box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
-    font-weight: normal; /* Make text not bold */
-    font-size: 12px; /* Make the text smaller */
-  }
+.navButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
 
-  metricsButton {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 5px;
-    border: none;
-  }
-  
+.navButton:hover {
+  background-color: #0056b3;
+}
+
+.monthDisplay {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0 12px;
+}
+
+.balance {
+  font-size: 24px;
+  text-align: left;
+  margin-bottom: 5px;
+}
+
+.transactions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.transactionCard {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.transactionCard:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.transactionItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align items to the left */
+}
+
+.transactionContent {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.transactionDate,
+.transactionDescription {
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.transactionDate {
+  font-weight: bold;
+  color: #333;
+}
+
+.transactionAmount {
+  font-size: 16px;
+  font-weight: bold;
+  margin-left: auto;
+}
+
+.transactionDescription {
+  text-align: left;
+  color: #555;
+}
+
+.blueLeftStrip {
+  border-left: 20px solid #1976D2; /* Blue border */
+}
+
+.greyLeftStrip {
+  border-left: 20px solid #9e9e9e; /* Grey border */
+}
+
+.categoryDropdown {
+  border: 1px solid #ccc; /* Add a border around the dropdown */
+  padding: 5px; /* Add padding inside the dropdown */
+  border-radius: 4px; /* Optional: rounded corners */
+  width: 100%; /* Optional: full width */
+  box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+  font-weight: normal; /* Make text not bold */
+  font-size: 12px; /* Make the text smaller */
+}
+
+.buttonContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Adjust the space between the buttons */
+}
+
+.metricsButton {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: none;
+}
+
+.uploadButton {
+  padding: 10px 20px; /* Ensure consistent padding */
+  font-size: 16px; /* Ensure consistent font size */
+}
