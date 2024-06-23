@@ -135,7 +135,12 @@ export function Dashboard(props: DashboardProps) {
   return (
     <div className="mainPage">
       <span className="pageTitle">Dashboard</span>
-      <UploadStatementCSV onFileUpload={handleFileUpload} />
+      <div className={styles.buttonContainer}>
+        <UploadStatementCSV className={styles.uploadButton} onFileUpload={handleFileUpload} />
+        <button onClick={() => setShowMetrics(true)} className={styles.metricsButton}>
+          View Metrics
+        </button>
+      </div>
       <br />
       {balance !== null && (
         <div className={styles.balance}>
@@ -229,9 +234,6 @@ export function Dashboard(props: DashboardProps) {
           )}
         </div>
       )}
-      <button onClick={() => setShowMetrics(true)} className={styles.metricsButton}>
-        View Metrics
-      </button>
       {showMetrics && <Metrics onClose={() => setShowMetrics(false)} />}
     </div>
   );

@@ -1,10 +1,9 @@
-.mainPage{
-  position:relative;
+.buttonContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Adjust the space between the buttons */
 }
-.balance {
-    color: var(--main-text);
-}
-/* Other styles */
+
 .metricsButton {
   background-color: #4CAF50;
   color: white;
@@ -13,8 +12,12 @@
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  margin: 4px 2px;
   cursor: pointer;
   border-radius: 5px;
   border: none;
+}
+
+.uploadButton {
+  padding: 10px 20px; /* Ensure consistent padding */
+  font-size: 16px; /* Ensure consistent font size */
 }
