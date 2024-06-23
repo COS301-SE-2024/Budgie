@@ -345,7 +345,7 @@ export function Dashboard(props: DashboardProps) {
   const handleChange = async (event: React.ChangeEvent<HTMLSelectElement>, index: number) => {
     const selectedCategory = event.target.value;
     if(selectedCategory=="Add category"){
-      alert("added")
+      alert("under construction")
     }
     else{
       const updatedTransactions = transactions.map((transaction, i) =>
