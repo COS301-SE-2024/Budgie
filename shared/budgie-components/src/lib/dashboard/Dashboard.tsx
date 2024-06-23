@@ -13,6 +13,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from "firebase/auth";
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import '../../root.css';
 import styles from './Dashboard.module.css';
 import { json } from 'stream/consumers';
@@ -223,6 +224,14 @@ export function Dashboard(props: DashboardProps) {
             }
           }
         }
+        //call categorize function
+        const functions = getFunctions();
+        const categoriseExpenses = httpsCallable(
+          functions,
+          'categoriseExpenses'
+        );
+        console.log('first run');
+        categoriseExpenses({ year: Year });
       } else {
         //documents do not exist for this year can safely add to merged
         for (const YearMonth of YearMonths) {
@@ -260,6 +269,14 @@ export function Dashboard(props: DashboardProps) {
             }
           }
         }
+        //call categorize function
+        const functions = getFunctions();
+        const categoriseExpenses = httpsCallable(
+          functions,
+          'categoriseExpenses'
+        );
+        console.log('first run');
+        categoriseExpenses({ year: Year });
       }
     }
     setTransactions([])

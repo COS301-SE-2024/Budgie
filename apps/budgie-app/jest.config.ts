@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { join } from 'path';
 export default {
   displayName: 'budgie-app',
   preset: '../../jest.preset.js',
@@ -8,4 +9,6 @@ export default {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '../../coverage/apps/budgie-app',
+  coverageReporters: ['text', 'lcov', 'clover', 'cobertura'],
+  setupFilesAfterEnv: [join(__dirname, 'jest.setup.js')],
 };

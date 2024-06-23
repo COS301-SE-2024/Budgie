@@ -8,5 +8,6 @@ export default {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '../../coverage/shared/budgie-components',
+  coverageReporters: ['text', 'lcov', 'clover', 'cobertura'],
   setupFilesAfterEnv: ['./jest.setup.js'],
 };

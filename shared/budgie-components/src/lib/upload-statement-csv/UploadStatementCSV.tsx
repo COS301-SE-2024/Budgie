@@ -22,6 +22,7 @@ export function UploadStatementCSV(props: UploadStatementCSVProps) {
     if (files && files.length > 0) {
       const file = files[0];
       props.onFileUpload(file);
+      event.target.value = '';
     }
   };
 
