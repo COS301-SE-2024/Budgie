@@ -5,6 +5,7 @@ on:
 
 jobs:
   build_app:
+    environment: Build
     permissions:
       contents: read
       actions: read
