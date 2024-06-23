@@ -12,7 +12,7 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
-import { getAuth } from "firebase/auth";
+import { getAuth } from 'firebase/auth';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import '../../root.css';
 import styles from './Dashboard.module.css';
@@ -40,28 +40,34 @@ export function Dashboard(props: DashboardProps) {
 
   const handleNextMonth = () => {
     //change year
-    if(currentMonth.getFullYear()!=currentYear){
-      setCurrentYear(currentMonth.getFullYear())
+    if (currentMonth.getFullYear() != currentYear) {
+      setCurrentYear(currentMonth.getFullYear());
     }
     //cants go passed next month
-    const Now = new Date()
-    if(currentMonth.getMonth()!=(Now.getMonth()+1) || currentYear!=Now.getFullYear()){
+    const Now = new Date();
+    if (
+      currentMonth.getMonth() != Now.getMonth() + 1 ||
+      currentYear != Now.getFullYear()
+    ) {
       //change the month
-      setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)));
-    }
-    display(); 
-    
-  };
-
-  const handlePrevMonth = () => {
-    setCurrentMonth(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)));
-    if(currentMonth.getFullYear()!=currentYear){
-      setCurrentYear(currentMonth.getFullYear())
+      setCurrentMonth(
+        new Date(currentMonth.setMonth(currentMonth.getMonth() + 1))
+      );
     }
     display();
   };
 
-  const formatMonthYear = (date : any) => {
+  const handlePrevMonth = () => {
+    setCurrentMonth(
+      new Date(currentMonth.setMonth(currentMonth.getMonth() - 1))
+    );
+    if (currentMonth.getFullYear() != currentYear) {
+      setCurrentYear(currentMonth.getFullYear());
+    }
+    display();
+  };
+
+  const formatMonthYear = (date: any) => {
     return date.toLocaleString('default', { month: 'long', year: 'numeric' });
   };
 
@@ -279,7 +285,7 @@ export function Dashboard(props: DashboardProps) {
         categoriseExpenses({ year: Year });
       }
     }
-    setTransactions([])
+    setTransactions([]);
   }
 
   const handleCSVUpload = async (file: File) => {
@@ -311,7 +317,6 @@ export function Dashboard(props: DashboardProps) {
   };
 
   useEffect(() => {
-
     const getBankStatementsByUserId = async (userId: string) => {
       try {
         const collectionName = `transaction_data_${currentYear}`;
@@ -321,8 +326,7 @@ export function Dashboard(props: DashboardProps) {
         if (docSnap.exists()) {
           const data = docSnap.data();
           // Process the document data here
-          setData(data);          
-          
+          setData(data);
         } else {
           console.log('No such document!');
         }
@@ -332,52 +336,57 @@ export function Dashboard(props: DashboardProps) {
     };
 
     const auth = getAuth();
-    const user = auth.currentUser;
-    if (user !== null) {
-      getBankStatementsByUserId(user.uid)
-    }  
-
-  },[currentYear, transactions] );
+    if (auth) {
+      const user = auth.currentUser;
+      if (user !== null) {
+        getBankStatementsByUserId(user.uid);
+      }
+    }
+  }, [currentYear, transactions]);
 
   useEffect(() => {
-    if(Data!==null){
-      display()
+    if (Data !== null) {
+      display();
     }
-  }, [Data])
-
+  }, [Data]);
 
   const display = async () => {
-    const month = currentMonth.toLocaleString('default', { month: 'long' }).toLocaleLowerCase();
-    if(Data[month]===undefined){
-      setTransactions([])
-      setBalance(0)
-    }
-    else{
+    const month = currentMonth
+      .toLocaleString('default', { month: 'long' })
+      .toLocaleLowerCase();
+    if (Data[month] === undefined) {
+      setTransactions([]);
+      setBalance(0);
+    } else {
       setTransactions(JSON.parse(Data[month]));
-      setBalance((JSON.parse(Data[month]))[0].balance)
+      setBalance(JSON.parse(Data[month])[0].balance);
     }
-  }
+  };
 
-
-  const handleChange = async (event: React.ChangeEvent<HTMLSelectElement>, index: number) => {
+  const handleChange = async (
+    event: React.ChangeEvent<HTMLSelectElement>,
+    index: number
+  ) => {
     const selectedCategory = event.target.value;
-    if(selectedCategory=="Add category"){
-      alert("under construction")
-    }
-    else{
+    if (selectedCategory == 'Add category') {
+      alert('under construction');
+    } else {
       const updatedTransactions = transactions.map((transaction, i) =>
         i === index
           ? { ...transaction, category: selectedCategory }
           : transaction
       );
-    
+
       setTransactions(updatedTransactions);
-      await updateDoc(doc(db, `transaction_data_${currentYear}`, `${user.uid}`), {
-        [monthNames[currentMonth.getMonth()]]: JSON.stringify(updatedTransactions),
-      });
+      await updateDoc(
+        doc(db, `transaction_data_${currentYear}`, `${user.uid}`),
+        {
+          [monthNames[currentMonth.getMonth()]]:
+            JSON.stringify(updatedTransactions),
+        }
+      );
     }
   };
-
 
   return (
     <div className="mainPage">
@@ -385,32 +394,31 @@ export function Dashboard(props: DashboardProps) {
         <span className="pageTitle">Dashboard</span>
         <UploadStatementCSV onFileUpload={handleCSVUpload} />
       </div>
-      <button onClick={() => setShowMetrics(true)} className={styles.metricsButton}>
+      <button
+        onClick={() => setShowMetrics(true)}
+        className={styles.metricsButton}
+      >
+        View Metrics
+      </button>
 
-View Metrics
-
-</button>
-
-{showMetrics && <Metrics onClose={() => setShowMetrics(false)} />}
+      {showMetrics && <Metrics onClose={() => setShowMetrics(false)} />}
       <div className="monthNavigation">
-        <br/>
+        <br />
         <button className="navButton" onClick={handlePrevMonth}>
-        <span 
-            className="material-symbols-outlined">
-            arrow_back_ios
-          </span> 
+          <span className="material-symbols-outlined">arrow_back_ios</span>
         </button>
         <span className="monthDisplay">{formatMonthYear(currentMonth)}</span>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" onClick={handleNextMonth}/>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+          onClick={handleNextMonth}
+        />
         <button className="navButton" onClick={handleNextMonth}>
-          <span 
-            className="material-symbols-outlined">
-            arrow_forward_ios
-          </span>
+          <span className="material-symbols-outlined">arrow_forward_ios</span>
         </button>
       </div>
       <br />
-            {balance !== null && (
+      {balance !== null && (
         <div className={styles.balance}>
           <h1>
             <strong>Balance:</strong> {balance}
@@ -418,42 +426,59 @@ View Metrics
           <br />
           {transactions.length > 0 && (
             <div className={styles.transactions}>
-            {transactions.map((transaction, index) => (
-              <div key={index} className={styles.transactionCard} style={{ borderLeft: transaction.amount >= 0 ? '10px solid #293652' : '10px solid #9e9e9e' }}>
-                <div className={styles.transactionItem}>
-                  <div className={styles.transactionContent}>
-                    <div className={styles.transactionDateTime}>
-                      <div className={styles.transactionDate}>{transaction.date}</div>
-                      <div className={styles.transactionDescription}>{transaction.description}</div>
-                    </div>
-                    <div className={styles.transactionAmount}>
-                      {transaction.amount}
-                      <br />
-                      <select className={styles.categoryDropdown} onChange={(event) => handleChange(event, index)} value={transaction.category}>
-                      <option value=""></option>
-                        <option value="Income">Income</option>
-                        <option value="Transport">Transport</option>
-                        <option value="Eating Out">Eating Out</option>
-                        <option value="Groceries">Groceries</option>
-                        <option value="Entertainment">Entertainment</option>
-                        <option value="Shopping">Shopping</option>
-                        <option value="Insurance">Insurance</option>
-                        <option value="Utilities">Utilities</option>
-                        <option value="Medical Aid">Medical Aid</option>
-                        <option value="Other">Other</option>
-                        <option value="Add category">Add category</option>
-                      </select>
+              {transactions.map((transaction, index) => (
+                <div
+                  key={index}
+                  className={styles.transactionCard}
+                  style={{
+                    borderLeft:
+                      transaction.amount >= 0
+                        ? '10px solid #293652'
+                        : '10px solid #9e9e9e',
+                  }}
+                >
+                  <div className={styles.transactionItem}>
+                    <div className={styles.transactionContent}>
+                      <div className={styles.transactionDateTime}>
+                        <div className={styles.transactionDate}>
+                          {transaction.date}
+                        </div>
+                        <div className={styles.transactionDescription}>
+                          {transaction.description}
+                        </div>
+                      </div>
+                      <div className={styles.transactionAmount}>
+                        {transaction.amount}
+                        <br />
+                        <select
+                          className={styles.categoryDropdown}
+                          onChange={(event) => handleChange(event, index)}
+                          value={transaction.category}
+                        >
+                          <option value=""></option>
+                          <option value="Income">Income</option>
+                          <option value="Transport">Transport</option>
+                          <option value="Eating Out">Eating Out</option>
+                          <option value="Groceries">Groceries</option>
+                          <option value="Entertainment">Entertainment</option>
+                          <option value="Shopping">Shopping</option>
+                          <option value="Insurance">Insurance</option>
+                          <option value="Utilities">Utilities</option>
+                          <option value="Medical Aid">Medical Aid</option>
+                          <option value="Other">Other</option>
+                          <option value="Add category">Add category</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
             </div>
           )}
         </div>
       )}
     </div>
-  );  
+  );
 }
 
 export default Dashboard;
