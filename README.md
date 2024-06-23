@@ -10,6 +10,8 @@ Budgie is a financial management tool designed to help users take control of the
 
 [![.github/workflows/build_app.yml](https://github.com/COS301-SE-2024/Budgie/actions/workflows/build_app.yml/badge.svg?branch=dev)](https://github.com/COS301-SE-2024/Budgie/actions/workflows/build_app.yml)
 
+[![.github/workflows/test_components.yml](https://github.com/COS301-SE-2024/Budgie/actions/workflows/test_components.yml/badge.svg?branch=dev)](https://github.com/COS301-SE-2024/Budgie/actions/workflows/test_components.yml)
+
 ### Demo Videos
 - [Technocrats-Demo1](https://drive.google.com/file/d/1byWVsQ5Gkgf1HlpGd4o-jbyA2mhBc2FW/view?usp=sharing)
 - [Technocrats-Demo2]()
