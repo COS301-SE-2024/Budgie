@@ -99,3 +99,27 @@
     font-weight: normal; /* Make text not bold */
     font-size: 12px; /* Make the text smaller */
   }
+
+  .buttonContainer {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adjust the space between the buttons */
+  }
+  
+  .metricsButton {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+  }
+  
+  .uploadButton {
+    padding: 10px 20px; /* Ensure consistent padding */
+    font-size: 16px; /* Ensure consistent font size */
+  }
