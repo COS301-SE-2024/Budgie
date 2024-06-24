@@ -59,7 +59,7 @@ export function AccountSettings(props: AccountSettingsProps) {
         <span
           className="material-symbols-outlined"
           onClick={props.onClose}
-          style={{ marginRight: '0.5rem', fontSize: '1.5rem' }}
+          style={{ marginRight: '0.8rem', fontSize: 'calc(1.5rem * var(--font-size-multiplier))' }}
         >
           arrow_back
         </span>

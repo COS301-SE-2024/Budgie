@@ -13,14 +13,14 @@
   }
 
   .settingTitle {
-    font-size: 1rem;
+    font-size: calc(1rem * var(--font-size-multiplier));
     font-weight: bold;
     color: var(--accent-colour);
     margin-bottom: 1rem;
   }
 
   .settingDescription {
-    font-size: 0.8rem;
+    font-size: calc(0.8rem * var(--font-size-multiplier));
     color: var(--greyed-text);
   }
 

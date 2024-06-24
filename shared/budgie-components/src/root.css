@@ -60,7 +60,7 @@ body {
     background-color: var(--main-background);
     width: 85vw;
     height: 100vh;
-    padding-left: 1.5rem;
+    padding-left: calc(1.5rem * var(--font-size-multiplier));
     padding-right: 1.5rem;
     padding-top: 1rem;
     overflow-y: auto;
@@ -75,4 +75,5 @@ body {
     font-size: 1.5rem;
     display: flex;
     align-items: center;
+    font-size: calc(1.5rem * var(--font-size-multiplier));
 }
