@@ -18,6 +18,12 @@
     --BudgieGreen3: #71C194;
     --BudgieBlue: #293652;
     --BudgieWhite: #F8F8F8;
+
+    --font-size-multiplier: 1;
+}
+
+body {
+    font-size: calc(1rem * var(--font-size-multiplier));
 }
 
 :root[data-theme='light'] {
