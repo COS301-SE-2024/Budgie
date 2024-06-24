@@ -51,3 +51,63 @@
     justify-content: center;
     font-size: 1.5rem;
   }
+
+  .circleContainer {
+    display: flex;
+  }
+
+  .blueCircle, .yellowCircle, .pinkCircle, .purpleCircle, .orangeCircle, .greenCircle {
+    width: calc(3rem * var(--font-size-multiplier));
+    height: calc(3rem * var(--font-size-multiplier));
+    margin-right: calc(3rem * var(--font-size-multiplier));
+    border-radius: calc(1.5rem * var(--font-size-multiplier));
+    transition:  0.2s ease;
+  }
+
+  .blueCircle {
+    background-color: var(--blue);
+  }
+
+  .yellowCircle {
+    background-color: var(--yellow);
+  }
+
+  .pinkCircle {
+    background-color: var(--pink);
+  }
+
+  .purpleCircle {
+    background-color: var(--purple);
+  }
+
+  .orangeCircle {
+    background-color: var(--orange);
+  }
+
+  .greenCircle {
+    background-color: var(--green);
+  }
+
+  .blueCircle:hover {
+    background-color: var(--blue-h);
+  }
+
+  .yellowCircle:hover {
+    background-color: var(--yellow-h);
+  }
+
+  .pinkCircle:hover {
+    background-color: var(--pink-h);
+  }
+
+  .purpleCircle:hover {
+    background-color: var(--purple-h);
+  }
+
+  .orangeCircle:hover {
+    background-color: var(--orange-h);
+  }
+
+  .greenCircle:hover {
+    background-color: var(--green-h);
+  }

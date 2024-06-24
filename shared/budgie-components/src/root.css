@@ -21,6 +21,20 @@
     --BudgieWhite: #F8F8F8;
 
     --font-size-multiplier: 1;
+    --primary-1: #07456F;
+    --primary-2: #83A2B7;
+    --blue: #07456F;
+    --yellow: #D49D02;
+    --pink: #960446;
+    --purple: #3F058D;
+    --orange: #B04700;
+    --green: #005438;
+    --blue-h: #83A2B7;
+    --yellow-h: #E9CE80;
+    --pink-h: #CA81A2;
+    --purple-h: #9F82C6;
+    --orange-h: #D7A37F;
+    --green-h: #7FA99B;
 }
 
 body {
@@ -36,6 +50,19 @@ body {
     --accent-hover: #576a94;
     --hover: #e8ebf1;
     --greyed-text:#7D7D7D;
+
+    --blue: #07456F;
+    --yellow: #D49D02;
+    --pink: #960446;
+    --purple: #3F058D;
+    --orange: #B04700;
+    --green: #005438;
+    --blue-h: #83A2B7;
+    --yellow-h: #E9CE80;
+    --pink-h: #CA81A2;
+    --purple-h: #9F82C6;
+    --orange-h: #D7A37F;
+    --green-h: #7FA99B;
 }
 
 :root[data-theme='dark']{
@@ -46,7 +73,82 @@ body {
     --accent-hover: #c8d1e6;
     --hover: rgb(52, 67, 100);
     --greyed-text:#ececec;
+
+    --blue: #1D9BF0;
+    --yellow: #F0B202;
+    --pink: #F91880;
+    --purple: #7856FF;
+    --orange: #FF7A00;
+    --green: #00BA7C;
+    --blue-h: #A9D9F9;
+    --yellow-h: #FEDB7A;
+    --pink-h: #FC80B8;
+    --purple-h: #B8A7FF;
+    --orange-h: #FFB36D;
+    --green-h: #B3FFE6;
 }
+
+:root[colour-theme='light-blue'] {
+    --primary-1: #07456F;
+    --primary-2: #83A2B7;
+}
+
+:root[colour-theme='light-yellow'] {
+    --primary-1: #D49D02;
+    --primary-2: #E9CE80;
+}
+
+:root[colour-theme='light-pink'] {
+    --primary-1: #960446;
+    --primary-2: #CA81A2;
+}
+
+:root[colour-theme='light-purple'] {
+    --primary-1: #3F058D;
+    --primary-2: #9F82C6;
+}
+
+:root[colour-theme='light-orange'] {
+    --primary-1: #B04700;
+    --primary-2: #D7A37F;
+}
+
+:root[colour-theme='light-green'] {
+    --primary-1: #005438;
+    --primary-2: #7FA99B;
+}
+
+:root[colour-theme='dark-blue'] {
+    --primary-1: #1D9BF0;
+    --primary-2: #A9D9F9;
+}
+
+:root[colour-theme='dark-yellow'] {
+    --primary-1: #F0B202;
+    --primary-2: #FEDB7A;
+}
+
+:root[colour-theme='dark-pink'] {
+    --primary-1: #F91880;
+    --primary-2: #FC80B8;
+}
+
+:root[colour-theme='dark-purple'] {
+    --primary-1: #7856FF;
+    --primary-2: #B8A7FF;
+}
+
+:root[colour-theme='dark-orange'] {
+    --primary-1: #FF7A00;
+    --primary-2: #FFB36D;
+}
+
+:root[colour-theme='dark-green'] {
+    --primary-1: #00BA7C;
+    --primary-2: #B3FFE6;
+}
+
+
 
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=swap');
 
@@ -74,7 +176,7 @@ body {
 }
 
 .pageTitle{
-    color: var(--accent-colour);
+    color: var(--primary-1);
     font-weight: 900;
     font-size: 1.5rem;
     display: flex;
