@@ -16,24 +16,24 @@
     font-size: calc(1rem * var(--font-size-multiplier));
     font-weight: bold;
     color: var(--accent-colour);
-    margin-bottom: 1rem;
+    margin-bottom: calc(0.5rem * var(--font-size-multiplier));
   }
 
   .settingDescription {
     font-size: calc(0.8rem * var(--font-size-multiplier));
     color: var(--greyed-text);
+    margin-top: calc(0.6rem * var(--font-size-multiplier));
   }
 
   .optionContainer {
     display: flex;
-    justify-content: space-between;
-    margin-right: 35rem;
   }
 
   .lightThemeOption {
     background-color: #E1E1E1;
     color: #293652;
     border: 3px solid #293652;
+    margin-right: calc(1rem * var(--font-size-multiplier));
   }
 
   .darkThemeOption {

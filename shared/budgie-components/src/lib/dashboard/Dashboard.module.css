@@ -32,6 +32,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  color: black;
 }
 
 .transactionCard {
@@ -95,7 +96,7 @@
   width: 100%; /* Optional: full width */
   box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
   font-weight: normal; /* Make text not bold */
-  font-size: 12px; /* Make the text smaller */
+  font-size: calc(16px * var(--font-size-multiplier));
 }
 
 .buttonContainer {

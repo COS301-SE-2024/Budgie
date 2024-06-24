@@ -4,11 +4,6 @@ import { useState } from 'react';
 import styles from './navbar.module.css';
 import { getAuth, signOut } from 'firebase/auth';
 
-//REMOVE
-import React, { useEffect } from 'react';
-import "../../root.css";
-//REMOVE
-
 /* eslint-disable-next-line */
 export interface NavbarProps {
   onNavigate: (page: string) => void;
@@ -27,29 +22,6 @@ function signout() {
 }
 
 export function Navbar(props: NavbarProps) {
-
-  //REMOVE
-
-  const [fontSizeMultiplier, setFontSizeMultiplier] = useState(1);
-
-  useEffect(() => {
-    const fontSlider = document.getElementById("fontSlider") as HTMLInputElement;
-
-    const handleSliderChange = () => {
-        const fontSizeValue = parseFloat(fontSlider.value);
-        setFontSizeMultiplier(fontSizeValue);
-        document.documentElement.style.setProperty('--font-size-multiplier', fontSizeValue.toString());
-    };
-
-    fontSlider.addEventListener("input", handleSliderChange);
-
-    return () => {
-        fontSlider.removeEventListener("input", handleSliderChange);
-    };
-}, []);
-  //REMOVE
-
-
   return (
     <div className={styles.sidebar}>
       <ul className={styles.navList}>
@@ -133,20 +105,6 @@ export function Navbar(props: NavbarProps) {
           </span>
           Settings
         </li>
-
-
-        {/*REMOVE*/}
-        
-        <div className={styles.sliderContainer}>
-                        <span style={{ marginRight: "0.5rem", fontSize: "1rem" }}>A</span>
-                        <input type="range" id="fontSlider" min="1" max="2" step="0.1" defaultValue="1"></input>
-                        <span style={{ marginLeft: "1rem", fontSize: "2rem" }}>A</span>
-                        <p className={styles.sliderValue}>{fontSizeMultiplier}</p>
-                    </div>
-        {/*REMOVE*/}
-
-
-
         {/* Logout item */}
         <li className={styles.navItemLogout} onClick={signout}>
           <span

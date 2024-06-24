@@ -25,6 +25,7 @@
 
 body {
     font-size: calc(1rem * var(--font-size-multiplier));
+    color: var(--main-text);
 }
 
 :root[data-theme='light'] {
