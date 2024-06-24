@@ -22,23 +22,22 @@ export function Faq(props: FaqProps) {
         <h1 className="text-2xl font-bold text-green-600 mb-6">
           Frequently Asked Questions
         </h1>
-        <div className="p-6 bg-white shadow-lg rounded-lg group">
-          <h2 className="text-xl font-semibold text-gray-900">
-            How do I use Budgie?
-          </h2>
-          <div className="mt-2 hidden group-hover:block">
-            <p className="text-gray-700">Click button for Tutorial</p>
-          </div>
-          <div className="mt-2 hidden group-hover:block flex flex-col justify-start pt-6 items-center">
-            <button
-              className=" font-TripSans font-medium rounded-[25px] w-36 h-10 bg-BudgieBlue text-BudgieWhite"
-              type="button"
-            >
-              Tutorial
-            </button>
-          </div>
-        </div>
         <div className="space-y-6">
+          <div className="p-6 bg-white shadow-lg rounded-lg group">
+            <h2 className="text-xl font-semibold text-gray-900">
+              How do I use budgie?
+            </h2>
+            <div className="mt-2 hidden group-hover:block">
+              <p className="text-gray-700">
+                <a
+                  className=" text-red-600"
+                  href="https://docs.google.com/document/d/1wD1tkLlVJexyeik-I8PiA0uGVXaGhgMb/edit?usp=drive_link&ouid=101664320262092732975&rtpof=true&sd=true"
+                >
+                  Tutorial
+                </a>
+              </p>
+            </div>
+          </div>
           <div className="p-6 bg-white shadow-lg rounded-lg group">
             <h2 className="text-xl font-semibold text-gray-900">
               What is this Budgie?
@@ -99,6 +98,7 @@ export function Faq(props: FaqProps) {
               </p>
             </div>
           </div>
+
           <div className="p-6 bg-white shadow-lg rounded-lg group">
             <h2 className="text-xl font-semibold text-gray-900">
               What if I have more questions?
