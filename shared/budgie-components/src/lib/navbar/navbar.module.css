@@ -11,11 +11,13 @@
 
 .sidebar {
     background-color: var(--block-background);
-    width: 15vw;
     height: 100vh;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     padding-top: 1.5rem;
     z-index: 100;
+    min-width: 15vw;
+    max-width: 16.5vw;
+    width: calc(15vw * var(--font-size-multiplier)-0.5);
 }
 
 .navList {
@@ -30,9 +32,10 @@
     display: flex;
     align-items: center;
     border-radius: .4rem;
-    height: 2rem;
     cursor: pointer;
     color: var(--main-text);
+    padding: calc(0.2rem * var(--font-size-multiplier));
+    font-size: min(2rem, (calc(1.2rem * var(--font-size-multiplier))));
 }
 
 .navItemLogout {
@@ -47,6 +50,8 @@
     height: 2rem;
     cursor: pointer;
     color: var(--main-text);
+    padding: calc(0.2rem * var(--font-size-multiplier));
+    font-size: min(2rem, (calc(1.2rem * var(--font-size-multiplier))));
 }
 
 .navItem:hover, .navItemLogout:hover {
@@ -55,11 +60,10 @@
 }
 
 .selected {
-    background-color: var(--accent-colour);
-    color: var(--block-background);
+    background-color: var(--primary-1);
+    color: var(--secondary-text);
 }
 
 .selected:hover{
-    background-color: var(--accent-colour);
-    color: var(--block-background);
+    background-color: var(--primary-1);
 }

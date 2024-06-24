@@ -29,7 +29,7 @@ export function UploadStatementCSV(props: UploadStatementCSVProps) {
   return (
     <div>
       <button className={styles.uploadButton} onClick={handleButtonClick}>
-        <div className={styles.uploadButton}>Upload Bank Statement (.csv)</div>
+        Upload Bank Statement (.csv)
       </button>
       <input
         type="file"

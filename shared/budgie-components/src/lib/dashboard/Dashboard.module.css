@@ -1,31 +1,29 @@
 .monthNavigation {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  margin-top: 5rem;
 }
 
 .navButton {
-  background-color: #007bff;
-  color: white;
+  color: var(--main-text);
   border: none;
-  padding: 8px 12px;
-  font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: 0.3s ease;
 }
 
 .navButton:hover {
-  background-color: #0056b3;
+  color: var(--primary-1);
 }
 
 .monthDisplay {
-  font-size: 18px;
+  font-size: calc(1.4rem * var(--font-size-multiplier));
   font-weight: bold;
   margin: 0 12px;
 }
 
 .balance {
-  font-size: 24px;
+  font-size: calc(1.2rem * var(--font-size-multiplier));
   text-align: left;
   margin-bottom: 5px;
 }
@@ -34,6 +32,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  color: black;
 }
 
 .transactionCard {
@@ -42,6 +41,7 @@
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.2s ease-in-out;
+  border-left: 10px solid var(--primary-1) !important;
 }
 
 .transactionCard:hover {
@@ -63,7 +63,7 @@
 .transactionDate,
 .transactionDescription {
   margin-bottom: 5px;
-  font-size: 14px;
+  font-size: calc(14px * var(--font-size-multiplier));
 }
 
 .transactionDate {
@@ -72,7 +72,7 @@
 }
 
 .transactionAmount {
-  font-size: 16px;
+  font-size: calc(16px * var(--font-size-multiplier));
   font-weight: bold;
   margin-left: auto;
 }
@@ -97,7 +97,7 @@
   width: 100%; /* Optional: full width */
   box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
   font-weight: normal; /* Make text not bold */
-  font-size: 12px; /* Make the text smaller */
+  font-size: calc(16px * var(--font-size-multiplier));
 }
 
 .buttonContainer {
@@ -107,19 +107,13 @@
 }
 
 .metricsButton {
-  background-color: #4CAF50;
+  background-color: var(--primary-1);
   color: white;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 5px;
-  border: none;
-}
-
-.uploadButton {
-  padding: 10px 20px; /* Ensure consistent padding */
-  font-size: 16px; /* Ensure consistent font size */
+  margin-top: calc(0.5rem * var(--font-size-multiplier));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.4rem;
+  transition:  0.2s ease;
+  padding: 0.5rem 1rem;
 }

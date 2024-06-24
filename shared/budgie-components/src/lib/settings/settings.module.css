@@ -5,10 +5,10 @@
 
   .settingsOption { 
     width: 100%;
-    padding: 0.6rem;
+    padding: calc(0.6rem * var(--font-size-multiplier));
     background-color: var(--block-background);
     border-radius: 0.2rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: calc(0.5rem * var(--font-size-multiplier));
     transition:  0.2s ease;
     cursor: pointer;
   }
@@ -18,13 +18,13 @@
   }
 
   .settingTitle {
-    font-size: 1rem;
+    font-size: calc(1rem * var(--font-size-multiplier));
     font-weight: bold;
     color: var(--accent-colour);
   }
 
   .settingDescription {
-    font-size: 0.8rem;
+    font-size: calc(0.8rem * var(--font-size-multiplier));
     color: var( --greyed-text);
   }
 
