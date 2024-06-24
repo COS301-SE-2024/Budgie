@@ -404,16 +404,28 @@ export function Dashboard(props: DashboardProps) {
       {showMetrics && <Metrics onClose={() => setShowMetrics(false)} />}
       <div className={styles.monthNavigation}>
         <button className={styles.navButton} onClick={handlePrevMonth}>
-          <span className="material-symbols-outlined" style={{fontSize: 'calc(1rem * var(--font-size-multiplier))'}}>arrow_back_ios</span>
+          <span
+            className="material-symbols-outlined"
+            style={{ fontSize: 'calc(1rem * var(--font-size-multiplier))' }}
+          >
+            arrow_back_ios
+          </span>
         </button>
-        <span className={styles.monthDisplay}>{formatMonthYear(currentMonth)}</span>
+        <span className={styles.monthDisplay}>
+          {formatMonthYear(currentMonth)}
+        </span>
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
           onClick={handleNextMonth}
         />
         <button className={styles.navButton} onClick={handleNextMonth}>
-          <span className="material-symbols-outlined" style={{fontSize: 'calc(1rem * var(--font-size-multiplier))'}}>arrow_forward_ios</span>
+          <span
+            className="material-symbols-outlined"
+            style={{ fontSize: 'calc(1rem * var(--font-size-multiplier))' }}
+          >
+            arrow_forward_ios
+          </span>
         </button>
       </div>
       <br />
@@ -465,7 +477,6 @@ export function Dashboard(props: DashboardProps) {
                           <option value="Utilities">Utilities</option>
                           <option value="Medical Aid">Medical Aid</option>
                           <option value="Other">Other</option>
-                          <option value="Add category">Add category</option>
                         </select>
                       </div>
                     </div>
