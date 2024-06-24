@@ -10,6 +10,7 @@
     --block-background: #F8F8F8;
     --main-text: #000000;
     --accent-colour: #293652;
+    --accent-hover: #45567c;
     --hover: #e8ebf1;
     --greyed-text:#7D7D7D;
 
@@ -31,6 +32,7 @@ body {
     --block-background: #F8F8F8;
     --main-text: #000000;
     --accent-colour: #293652;
+    --accent-hover: #45567c;
     --hover: #e8ebf1;
     --greyed-text:#7D7D7D;
 }
@@ -40,6 +42,7 @@ body {
     --block-background: #293652;
     --main-text: #FFFFFF;
     --accent-colour: #E8EFFF;
+    --accent-hover: #c8d1e6;
     --hover: rgb(52, 67, 100);
     --greyed-text:#ececec;
 }
