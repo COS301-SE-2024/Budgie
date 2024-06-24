@@ -16,7 +16,27 @@ export function DisplaySettings(props: DisplaySettingsProps) {
 
   useEffect(() => {
     setTheme('light');
+
     const rootStyles = getComputedStyle(document.documentElement);
+    const colourThemeValue = document.documentElement.getAttribute('colour-theme');
+    setTheme(document.documentElement.getAttribute('data-theme'));
+    let initialCircleIndex= 0
+    
+    if (colourThemeValue === 'dark-blue' || colourThemeValue === 'light-blue') {
+      initialCircleIndex = 0;
+    } else if (colourThemeValue === 'dark-yellow' || colourThemeValue === 'light-yellow') {
+      initialCircleIndex = 1;
+    } else if (colourThemeValue === 'dark-pink' || colourThemeValue === 'light-pink') {
+      initialCircleIndex = 2;
+    } else if (colourThemeValue === 'dark-purple' || colourThemeValue === 'light-purple') {
+      initialCircleIndex = 3;
+    } else if (colourThemeValue === 'dark-orange' || colourThemeValue === 'light-orange') {
+      initialCircleIndex = 4;
+    } else if (colourThemeValue === 'dark-green' || colourThemeValue === 'light-green') {
+      initialCircleIndex = 5;
+    }  
+    setSelectedCircle(initialCircleIndex);    
+    
     const fontSizeValue = parseFloat(rootStyles.getPropertyValue('--font-size-multiplier'));
 
     const fontSlider = document.getElementById("fontSlider") as HTMLInputElement;
@@ -29,33 +49,10 @@ export function DisplaySettings(props: DisplaySettingsProps) {
     fontSlider.addEventListener("input", handleSliderChange);
 
     return () => {
-        fontSlider.removeEventListener("input", handleSliderChange);
+      fontSlider.removeEventListener("input", handleSliderChange);
     };
 }, []);
 
-useEffect(() => {
-  const rootStyles = getComputedStyle(document.documentElement);
-  const colourThemeValue = rootStyles.getPropertyValue('--colour-theme').trim();
-
-  let initialCircleIndex = 0;
-  
-  if (colourThemeValue === 'dark-blue' || colourThemeValue === 'light-blue') {
-    initialCircleIndex = 0;
-  } else if (colourThemeValue === 'dark-yellow' || colourThemeValue === 'light-yellow') {
-    initialCircleIndex = 1;
-  } else if (colourThemeValue === 'dark-pink' || colourThemeValue === 'light-pink') {
-    initialCircleIndex = 2;
-  } else if (colourThemeValue === 'dark-purple' || colourThemeValue === 'light-purple') {
-    initialCircleIndex = 3;
-  } else if (colourThemeValue === 'dark-orange' || colourThemeValue === 'light-orange') {
-    initialCircleIndex = 4;
-  } else if (colourThemeValue === 'dark-green' || colourThemeValue === 'light-green') {
-    initialCircleIndex = 5;
-  }
-  
-  setSelectedCircle(initialCircleIndex);
-
-}, []);
 
     const setLight = () => {
       setTheme('light');
@@ -131,37 +128,37 @@ useEffect(() => {
 
     const setBlue = () => {
       const theme = document.documentElement.getAttribute('data-theme');
-      const color = theme == 'light'? 'light-blue' : 'dark-blue';
+      const color = theme == 'dark'? 'dark-blue' : 'light-blue';
       document.documentElement.setAttribute('colour-theme', color);
       setSelectedCircle(0);
     };
     const setYellow = () => {
       const theme = document.documentElement.getAttribute('data-theme');
-      const color = theme == 'light'? 'light-yellow' : 'dark-yellow';
+      const color = theme == 'dark'? 'dark-yellow' : 'light-yellow';
       document.documentElement.setAttribute('colour-theme', color);
       setSelectedCircle(1);
     };
     const setPink = () => {
       const theme = document.documentElement.getAttribute('data-theme');
-      const color = theme == 'light'? 'light-pink' : 'dark-pink';
+      const color = theme == 'dark'? 'dark-pink' : 'light-pink';
       document.documentElement.setAttribute('colour-theme', color);
       setSelectedCircle(2);
     };
     const setPurple = () => {
       const theme = document.documentElement.getAttribute('data-theme');
-      const color = theme == 'light'? 'light-purple' : 'dark-purple';
+      const color = theme == 'dark'? 'dark-purple' : 'light-purple';
       document.documentElement.setAttribute('colour-theme', color);
       setSelectedCircle(3);
     };
     const setOrange = () => {
       const theme = document.documentElement.getAttribute('data-theme');
-      const color = theme == 'light'? 'light-orange' : 'dark-orange';
+      const color = theme == 'dark'? 'dark-orange' : 'light-orange';
       document.documentElement.setAttribute('colour-theme', color);
       setSelectedCircle(4);
     };
     const setGreen = () => {
       const theme = document.documentElement.getAttribute('data-theme');
-      const color = theme == 'light'? 'light-green' : 'dark-green';
+      const color = theme == 'dark'? 'dark-green' : 'light-green';
       document.documentElement.setAttribute('colour-theme', color);
       setSelectedCircle(5);
     };
@@ -182,7 +179,7 @@ useEffect(() => {
           <p className={styles.settingTitle}>Font Size</p>        
           <div className={styles.sliderContainer}>
               <span style={{marginRight: "1rem", fontSize: "1rem" }}>A</span>
-              <input type="range" id="fontSlider" min="1" max="2" step="0.1" style ={{width: "15rem"}}></input>
+              <input type="range" id="fontSlider" min="1" max="2" step="0.1" className={styles.slider}></input>
               <span style={{ marginLeft: "1rem", fontSize: "2rem" }}>A</span>
           </div>
         </div>

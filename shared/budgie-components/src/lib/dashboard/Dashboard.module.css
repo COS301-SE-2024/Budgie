@@ -106,7 +106,7 @@
 }
 
 .metricsButton {
-  background-color: #4CAF50;
+  background-color: var(--primary-1);
   color: white;
   margin-top: calc(0.5rem * var(--font-size-multiplier));
   display: flex;

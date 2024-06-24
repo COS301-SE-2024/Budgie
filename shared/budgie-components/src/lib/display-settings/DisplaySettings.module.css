@@ -69,7 +69,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--secondary-text);
     font-size: calc(1.5rem * var(--font-size-multiplier));
   }
 
@@ -119,4 +119,9 @@
 
   .greenCircle:hover {
     background-color: var(--green-h);
+  }
+
+  .slider {
+    width: 15rem;
+    background: var(--primary-1);
   }

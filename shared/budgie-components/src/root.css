@@ -46,6 +46,7 @@ body {
     --main-background: #E1E1E1;
     --block-background: #F8F8F8;
     --main-text: #000000;
+    --secondary-text: white;
     --accent-colour: #293652;
     --accent-hover: #576a94;
     --hover: #e8ebf1;
@@ -69,6 +70,7 @@ body {
     --main-background: #1C2436;
     --block-background: #293652;
     --main-text: #FFFFFF;
+    --secondary-text: black;
     --accent-colour: #E8EFFF;
     --accent-hover: #c8d1e6;
     --hover: rgb(52, 67, 100);
