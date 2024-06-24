@@ -52,6 +52,10 @@
     font-size: 1.5rem;
   }
 
+  .selected {
+    border: 5px solid var(--primary-1);
+  }
+
   .circleContainer {
     display: flex;
   }
@@ -62,6 +66,11 @@
     margin-right: calc(3rem * var(--font-size-multiplier));
     border-radius: calc(1.5rem * var(--font-size-multiplier));
     transition:  0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: calc(1.5rem * var(--font-size-multiplier));
   }
 
   .blueCircle {
