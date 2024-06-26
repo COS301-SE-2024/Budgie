@@ -15,7 +15,7 @@ Budgie is a financial management tool designed to help users take control of the
 
 ### Demo Videos
 - [Technocrats-Demo1](https://drive.google.com/file/d/1byWVsQ5Gkgf1HlpGd4o-jbyA2mhBc2FW/view?usp=sharing)
-- [Technocrats-Demo2]()
+- [Technocrats-Demo2](https://drive.google.com/file/d/1vhJ2rwcY46LOmcU3YBV_-yX7N15ZLOqE/view?usp=sharing)
 
 ### Specifications
 - [Requirement Specification](https://docs.google.com/document/d/1IxhlKWYyOzyI6G7sqyuQpJhXvYi7qbDt/edit?usp=sharing&ouid=102754965567069782239&rtpof=true&sd=true)
