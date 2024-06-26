@@ -4,36 +4,36 @@
 
   .settingsOption { 
     width: 100%;
-    padding: 0.6rem;
+    padding: calc(0.6rem * var(--font-size-multiplier));
     background-color: var(--block-background);
     border-radius: 0.2rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: calc(0.5rem * var(--font-size-multiplier));
     transition:  0.2s ease;
     cursor: pointer;
   }
 
   .settingTitle {
-    font-size: 1rem;
+    font-size: calc(1rem * var(--font-size-multiplier));
     font-weight: bold;
     color: var(--accent-colour);
-    margin-bottom: 1rem;
+    margin-bottom: calc(0.5rem * var(--font-size-multiplier));
   }
 
   .settingDescription {
-    font-size: 0.8rem;
+    font-size: calc(0.8rem * var(--font-size-multiplier));
     color: var(--greyed-text);
+    margin-top: calc(0.6rem * var(--font-size-multiplier));
   }
 
   .optionContainer {
     display: flex;
-    justify-content: space-between;
-    margin-right: 35rem;
   }
 
   .lightThemeOption {
     background-color: #E1E1E1;
     color: #293652;
     border: 3px solid #293652;
+    margin-right: calc(1rem * var(--font-size-multiplier));
   }
 
   .darkThemeOption {
@@ -50,4 +50,78 @@
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
+  }
+
+  .selected {
+    border: 5px solid var(--primary-1);
+  }
+
+  .circleContainer {
+    display: flex;
+  }
+
+  .blueCircle, .yellowCircle, .pinkCircle, .purpleCircle, .orangeCircle, .greenCircle {
+    width: calc(3rem * var(--font-size-multiplier));
+    height: calc(3rem * var(--font-size-multiplier));
+    margin-right: calc(3rem * var(--font-size-multiplier));
+    border-radius: calc(1.5rem * var(--font-size-multiplier));
+    transition:  0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary-text);
+    font-size: calc(1.5rem * var(--font-size-multiplier));
+  }
+
+  .blueCircle {
+    background-color: var(--blue);
+  }
+
+  .yellowCircle {
+    background-color: var(--yellow);
+  }
+
+  .pinkCircle {
+    background-color: var(--pink);
+  }
+
+  .purpleCircle {
+    background-color: var(--purple);
+  }
+
+  .orangeCircle {
+    background-color: var(--orange);
+  }
+
+  .greenCircle {
+    background-color: var(--green);
+  }
+
+  .blueCircle:hover {
+    background-color: var(--blue-h);
+  }
+
+  .yellowCircle:hover {
+    background-color: var(--yellow-h);
+  }
+
+  .pinkCircle:hover {
+    background-color: var(--pink-h);
+  }
+
+  .purpleCircle:hover {
+    background-color: var(--purple-h);
+  }
+
+  .orangeCircle:hover {
+    background-color: var(--orange-h);
+  }
+
+  .greenCircle:hover {
+    background-color: var(--green-h);
+  }
+
+  .slider {
+    width: 15rem;
+    background: var(--primary-1);
   }

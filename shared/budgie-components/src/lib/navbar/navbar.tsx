@@ -35,10 +35,10 @@ export function Navbar(props: NavbarProps) {
           <span
             className="material-symbols-outlined"
             style={{
-              marginRight: '0.5rem',
-              marginLeft: '0.5rem',
-              fontSize: '1.2rem',
+              marginRight: '0.3rem',
+              marginLeft: '0.3rem',
               marginBottom: '0.2rem',
+              fontSize: 'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))'
             }}
           >
             home
@@ -55,10 +55,10 @@ export function Navbar(props: NavbarProps) {
           <span
             className="material-symbols-outlined"
             style={{
-              marginRight: '0.5rem',
-              marginLeft: '0.5rem',
-              fontSize: '1.2rem',
+              marginRight: '0.3rem',
+              marginLeft: '0.3rem',
               marginBottom: '0.2rem',
+              fontSize: 'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))'
             }}
           >
             dashboard
@@ -75,10 +75,10 @@ export function Navbar(props: NavbarProps) {
           <span
             className="material-symbols-outlined"
             style={{
-              marginRight: '0.5rem',
-              marginLeft: '0.5rem',
-              fontSize: '1.2rem',
+              marginRight: '0.3rem',
+              marginLeft: '0.3rem',
               marginBottom: '0.2rem',
+              fontSize: 'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))'
             }}
           >
             account_circle
@@ -95,10 +95,10 @@ export function Navbar(props: NavbarProps) {
           <span
             className="material-symbols-outlined"
             style={{
-              marginRight: '0.5rem',
-              marginLeft: '0.5rem',
-              fontSize: '1.2rem',
+              marginRight: '0.3rem',
+              marginLeft: '0.3rem',
               marginBottom: '0.2rem',
+              fontSize: 'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))'
             }}
           >
             settings
@@ -110,9 +110,10 @@ export function Navbar(props: NavbarProps) {
           <span
             className="material-symbols-outlined"
             style={{
-              marginRight: '0.5rem',
-              marginLeft: '0.5rem',
-              fontSize: '1.2rem',
+              marginRight: '0.3rem',
+              marginLeft: '0.3rem',
+              marginBottom: '0.2rem',
+              fontSize: 'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))'
             }}
           >
             logout

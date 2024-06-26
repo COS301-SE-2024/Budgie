@@ -7,12 +7,16 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@firebase/app": "^0.10.5",
+    "@firebase/firestore": "^4.6.3",
     "@mui/icons-material": "^5.15.19",
+    "@types/firebase": "^3.2.1",
     "firebase": "^10.12.2",
     "next": "14.2.3",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-router-dom": "^6.23.1",
+    "recharts": "^2.12.7",
     "tslib": "^2.3.0"
   },
   "devDependencies": {

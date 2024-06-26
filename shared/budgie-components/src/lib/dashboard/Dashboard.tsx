@@ -12,18 +12,22 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
+import { getAuth } from 'firebase/auth';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import '../../root.css';
 import styles from './Dashboard.module.css';
-import { Merge } from '@mui/icons-material';
+import { json } from 'stream/consumers';
+import Metrics from '../metrics/Metrics'; // Import the Metrics component
 
 export interface DashboardProps {}
 
 export function Dashboard(props: DashboardProps) {
-  const [balance, setBalance] = useState<number | null>(null);
-  const [displayTransactions, setDisplayTransactions] = useState<Transaction[]>(
-    []
-  );
+  const [balance, setBalance] = useState(0);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [Data, setData] = useState<any>(null);
+  const [showMetrics, setShowMetrics] = useState(false); // State to control modal visibility
   const user = useContext(UserContext);
 
   interface Transaction {
@@ -33,6 +37,39 @@ export function Dashboard(props: DashboardProps) {
     description: string;
     category: string;
   }
+
+  const handleNextMonth = () => {
+    //change year
+    if (currentMonth.getFullYear() != currentYear) {
+      setCurrentYear(currentMonth.getFullYear());
+    }
+    //cants go passed next month
+    const Now = new Date();
+    if (
+      currentMonth.getMonth() != Now.getMonth() + 1 ||
+      currentYear != Now.getFullYear()
+    ) {
+      //change the month
+      setCurrentMonth(
+        new Date(currentMonth.setMonth(currentMonth.getMonth() + 1))
+      );
+    }
+    display();
+  };
+
+  const handlePrevMonth = () => {
+    setCurrentMonth(
+      new Date(currentMonth.setMonth(currentMonth.getMonth() - 1))
+    );
+    if (currentMonth.getFullYear() != currentYear) {
+      setCurrentYear(currentMonth.getFullYear());
+    }
+    display();
+  };
+
+  const formatMonthYear = (date: any) => {
+    return date.toLocaleString('default', { month: 'long', year: 'numeric' });
+  };
 
   function getUniqueYearMonths(DataLines: string[]): Record<string, string[]> {
     const yearMonthsRecord: Record<string, Set<string>> = {};
@@ -90,24 +127,23 @@ export function Dashboard(props: DashboardProps) {
     return linesByYearMonth;
   }
 
+  const monthNames = [
+    'january',
+    'february',
+    'march',
+    'april',
+    'may',
+    'june',
+    'july',
+    'august',
+    'september',
+    'october',
+    'november',
+    'december',
+  ];
+
   function getMonthName(month: string): string {
-    const monthNames = [
-      'january',
-      'february',
-      'march',
-      'april',
-      'may',
-      'june',
-      'july',
-      'august',
-      'september',
-      'october',
-      'november',
-      'december',
-    ];
-
     const monthIndex = parseInt(month, 10) - 1; // Months are zero-based
-
     if (monthIndex >= 0 && monthIndex < 12) {
       return monthNames[monthIndex];
     } else {
@@ -249,6 +285,7 @@ export function Dashboard(props: DashboardProps) {
         categoriseExpenses({ year: Year });
       }
     }
+    setTransactions([]);
   }
 
   const handleCSVUpload = async (file: File) => {
@@ -280,14 +317,176 @@ export function Dashboard(props: DashboardProps) {
   };
 
   useEffect(() => {
-    //get transactions for each month and display under dashboard
-  }, []);
+    const getBankStatementsByUserId = async (userId: string) => {
+      try {
+        const collectionName = `transaction_data_${currentYear}`;
+        const docRef = doc(db, collectionName, userId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          // Process the document data here
+          setData(data);
+        } else {
+          console.log('No such document!');
+        }
+      } catch (error) {
+        console.error('Error getting bank statement document:', error);
+      }
+    };
+
+    const auth = getAuth();
+    if (auth) {
+      const user = auth.currentUser;
+      if (user !== null) {
+        getBankStatementsByUserId(user.uid);
+      }
+    }
+  }, [currentYear, transactions]);
+
+  useEffect(() => {
+    if (Data !== null) {
+      display();
+    }
+  }, [Data]);
+
+  const display = async () => {
+    const month = currentMonth
+      .toLocaleString('default', { month: 'long' })
+      .toLocaleLowerCase();
+    if (Data[month] === undefined) {
+      setTransactions([]);
+      setBalance(0);
+    } else {
+      setTransactions(JSON.parse(Data[month]));
+      setBalance(JSON.parse(Data[month])[0].balance);
+    }
+  };
+
+  const handleChange = async (
+    event: React.ChangeEvent<HTMLSelectElement>,
+    index: number
+  ) => {
+    const selectedCategory = event.target.value;
+    if (selectedCategory == 'Add category') {
+      alert('under construction');
+    } else {
+      const updatedTransactions = transactions.map((transaction, i) =>
+        i === index
+          ? { ...transaction, category: selectedCategory }
+          : transaction
+      );
+
+      setTransactions(updatedTransactions);
+      await updateDoc(
+        doc(db, `transaction_data_${currentYear}`, `${user.uid}`),
+        {
+          [monthNames[currentMonth.getMonth()]]:
+            JSON.stringify(updatedTransactions),
+        }
+      );
+    }
+  };
 
   return (
     <div className="mainPage">
-      <span className="pageTitle">Dashboard</span>
-      <UploadStatementCSV onFileUpload={handleCSVUpload} />
+      <div className="header">
+        <span className="pageTitle">Dashboard</span>
+        <UploadStatementCSV onFileUpload={handleCSVUpload} />
+      </div>
+      <button
+        onClick={() => setShowMetrics(true)}
+        className={styles.metricsButton}
+      >
+        View Metrics
+      </button>
+
+      {showMetrics && <Metrics onClose={() => setShowMetrics(false)} />}
+      <div className={styles.monthNavigation}>
+        <button className={styles.navButton} onClick={handlePrevMonth}>
+          <span
+            className="material-symbols-outlined"
+            style={{ fontSize: 'calc(1rem * var(--font-size-multiplier))' }}
+          >
+            arrow_back_ios
+          </span>
+        </button>
+        <span className={styles.monthDisplay}>
+          {formatMonthYear(currentMonth)}
+        </span>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+          onClick={handleNextMonth}
+        />
+        <button className={styles.navButton} onClick={handleNextMonth}>
+          <span
+            className="material-symbols-outlined"
+            style={{ fontSize: 'calc(1rem * var(--font-size-multiplier))' }}
+          >
+            arrow_forward_ios
+          </span>
+        </button>
+      </div>
       <br />
+      {balance !== null && (
+        <div className={styles.balance}>
+          <h1>
+            <strong>Balance:</strong> {balance}
+          </h1>
+          <br />
+          {transactions.length > 0 && (
+            <div className={styles.transactions}>
+              {transactions.map((transaction, index) => (
+                <div
+                  key={index}
+                  className={styles.transactionCard}
+                  style={{
+                    borderLeft:
+                      transaction.amount >= 0
+                        ? '10px solid #293652'
+                        : '10px solid #9e9e9e',
+                  }}
+                >
+                  <div className={styles.transactionItem}>
+                    <div className={styles.transactionContent}>
+                      <div className={styles.transactionDateTime}>
+                        <div className={styles.transactionDate}>
+                          {transaction.date}
+                        </div>
+                        <div className={styles.transactionDescription}>
+                          {transaction.description}
+                        </div>
+                      </div>
+                      <div className={styles.transactionAmount}>
+                        {transaction.amount}
+                        <br />
+                        <select
+                          className={styles.categoryDropdown}
+                          onChange={(event) => handleChange(event, index)}
+                          value={transaction.category}
+                        >
+                          <option value=""></option>
+                          <option value="Income">Income</option>
+                          <option value="Transport">Transport</option>
+                          <option value="Eating Out">Eating Out</option>
+                          <option value="Groceries">Groceries</option>
+                          <option value="Entertainment">Entertainment</option>
+                          <option value="Shopping">Shopping</option>
+                          <option value="Insurance">Insurance</option>
+                          <option value="Utilities">Utilities</option>
+                          <option value="Medical Aid">Medical Aid</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
