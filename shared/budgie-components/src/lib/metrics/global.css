@@ -1,0 +1,8 @@
+/* global.css */
+
+:root {
+  --background-color-dark: rgb(2, 35, 58);
+  --text-color-dark: white;
+  --background-color-light: white;
+  --text-color-light: black;
+}
