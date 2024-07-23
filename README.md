@@ -8,16 +8,22 @@ Budgie is a financial management tool designed to help users take control of the
 
 ## Documentation
 
-### Demo Video
+[![.github/workflows/build_app.yml](https://github.com/COS301-SE-2024/Budgie/actions/workflows/build_app.yml/badge.svg?branch=dev)](https://github.com/COS301-SE-2024/Budgie/actions/workflows/build_app.yml)
+[![.github/workflows/test_components.yml](https://github.com/COS301-SE-2024/Budgie/actions/workflows/test_components.yml/badge.svg?branch=dev)](https://github.com/COS301-SE-2024/Budgie/actions/workflows/test_components.yml)
+[![.github/workflows/Integration_tests.yml](https://github.com/COS301-SE-2024/Budgie/actions/workflows/Integration_tests.yml/badge.svg)](https://github.com/COS301-SE-2024/Budgie/actions/workflows/Integration_tests.yml)
+[![codecov](https://codecov.io/gh/COS301-SE-2024/Budgie/branch/dev/graph/badge.svg?token=AK71HN61B7)](https://codecov.io/gh/COS301-SE-2024/Budgie)
+
+### Demo Videos
 - [Technocrats-Demo1](https://drive.google.com/file/d/1byWVsQ5Gkgf1HlpGd4o-jbyA2mhBc2FW/view?usp=sharing)
+- [Technocrats-Demo2](https://drive.google.com/file/d/1vhJ2rwcY46LOmcU3YBV_-yX7N15ZLOqE/view?usp=sharing)
 
 ### Specifications
 - [Requirement Specification](https://docs.google.com/document/d/1IxhlKWYyOzyI6G7sqyuQpJhXvYi7qbDt/edit?usp=sharing&ouid=102754965567069782239&rtpof=true&sd=true)
-<!-- - [Architectural Design Specification](https://github.com/COS301-SE-2024/MiniProject9/blob/main/documentation/DesignArchitecture.md)
-- [Database Specification](https://github.com/COS301-SE-2024/MiniProject9/blob/main/documentation/Database_Specification.md)
-- [Testing Specification](https://drive.google.com/file/d/15VlpAF-Vl_ewo0Ho0JeAhOv5cQ3gxLuh/view?usp=drive_link)
-- [GitHub Specifications](https://drive.google.com/file/d/1L6cYGAOXgO-Z92GkEbuKGN_fjCHjqBRd/view?usp=drive_link)
-- [CI/CD](https://drive.google.com/file/d/1ac-6cUskOFfHHwxN_MXRkZrcYeGCJlpr/view?usp=drive_link) 
+- [Architectural Design Specification](https://docs.google.com/document/d/1A5sNDeYOo9q0-vpzERKpAOi2K3Yqm1Qy/edit?usp=drive_link&ouid=102754965567069782239&rtpof=true&sd=true)
+<!-- - [Database Specification]()
+- [Testing Specification]()
+- [GitHub Specifications]()
+- [CI/CD]() 
 
 ### User Manual
 
