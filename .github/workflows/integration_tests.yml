@@ -21,3 +21,7 @@ jobs:
         run: npm install
       - name: Run Tests
         run: npm exec nx run budgie-app:test
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
