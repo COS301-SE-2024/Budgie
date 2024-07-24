@@ -7,10 +7,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 /* eslint-disable-next-line */
-export interface NavbarProps {
-  // onNavigate: (page: string) => void;
-  // selectedItem: string;
-}
+export interface NavbarProps {}
 
 function signout() {
   const auth = getAuth();
@@ -71,7 +68,7 @@ export function NewNavbar(props: NavbarProps) {
                   'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))',
               }}
             >
-              dashboard
+              account_balance
             </span>
             Accounts
           </li>
@@ -94,7 +91,7 @@ export function NewNavbar(props: NavbarProps) {
                   'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))',
               }}
             >
-              account_circle
+              receipt_long
             </span>
             Transactions
           </li>
