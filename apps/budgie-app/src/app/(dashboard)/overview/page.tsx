@@ -1,23 +1,23 @@
 'use client';
 import styles from './page.module.css';
 import React, { useContext, useEffect, useState } from 'react';
-import {
-  SignUpPage,
-  UserContext,
-} from '@capstone-repo/shared/budgie-components';
+import { UserContext } from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';
+import { Homepage } from '@capstone-repo/shared/budgie-components';
 
-export default function SignUp() {
-  const user = useContext(UserContext);
-  const [loading, setLoading] = useState(true);
+export default function overview() {
   const router = useRouter();
 
+  const user = useContext(UserContext);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    if (user) {
-      router.push('/mydashboard');
+    if (!user) {
+      router.push('/');
     } else {
       setLoading(false);
     }
   }, [user]);
-  return <>{!loading && <SignUpPage></SignUpPage>}</>;
+
+  return <>{!loading && <Homepage></Homepage>}</>;
 }

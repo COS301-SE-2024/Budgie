@@ -3,6 +3,7 @@
 
 export { SignInModal } from './lib/sign-in-modal/SignInModal';
 export { Navbar } from './lib/navbar/navbar';
+export { NewNavbar } from './lib/new-navbar/new-navbar';
 export { Settings } from './lib/settings/settings';
 export { Homepage } from './lib/homepage/Homepage';
 export { Dashboard } from './lib/dashboard/Dashboard';
