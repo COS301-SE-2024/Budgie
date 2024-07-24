@@ -3,12 +3,14 @@ import { useRouter } from 'next/router';
 import styles from './Landing.module.css';
 import { Fragment, useState } from 'react';
 import SignInModal from '../sign-in-modal/SignInModal';
+import LearnModal from '../learn-more-modal/LearnMore';
 
 /* eslint-disable-next-line */
 export interface LandingProps {}
 
 export function Landing(props: LandingProps) {
   const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
+  const [showLearnMore, setShowLearnMore] = useState<boolean>(false);
   return (
     <>
       {showSignInModal && (
@@ -21,6 +23,19 @@ export function Landing(props: LandingProps) {
           ></div>
           <div className="absolute z-50 left-[calc(50vw-397px)] top-[calc(50vh-260px)]">
             <SignInModal></SignInModal>
+          </div>
+        </>
+      )}
+      {showLearnMore && (
+        <>
+          <div
+            onClick={() => {
+              setShowLearnMore(!showLearnMore);
+            }}
+            className="z-20 absolute w-screen h-screen"
+          ></div>
+          <div className="absolute z-50 left-[calc(50vw-395px)] top-[calc(50vh-260px)]">
+            <LearnModal onClose={() => setShowLearnMore(false)} />
           </div>
         </>
       )}
@@ -58,8 +73,13 @@ export function Landing(props: LandingProps) {
             </>
           )}
           <div className="absolute bottom-4 w-full text-center">
-            {!showSignInModal && (
-              <button className="text-blue-950 font-semibold flex items-center justify-center mx-auto">
+            {!showSignInModal && !showLearnMore && (
+              <button
+                onClick={() => {
+                  setShowLearnMore(true);
+                }}
+                className="text-blue-950 font-semibold flex items-center justify-center mx-auto"
+              >
                 <span className="text-xl font-TripSans font-bold ml-4 animate-bounce">
                   Learn More &darr;
                 </span>
