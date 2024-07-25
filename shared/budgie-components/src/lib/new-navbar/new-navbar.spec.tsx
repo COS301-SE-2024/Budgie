@@ -1,10 +1,10 @@
 import { render } from '@testing-library/react';
 
-import Profile from './Profile';
+import NewNavbar from './new-navbar';
 
-describe('Profile', () => {
+describe('NewNavbar', () => {
   it('should render successfully', () => {
-    const { baseElement } = render(<Profile />);
+    const { baseElement } = render(<NewNavbar />);
     expect(baseElement).toBeTruthy();
   });
 });
