@@ -3,11 +3,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import UploadStatementCSV from '../upload-statement-csv/UploadStatementCSV';
 import {
-  collection,
   doc,
   getDoc,
-  getDocs,
-  addDoc,
   setDoc,
   updateDoc,
 } from 'firebase/firestore';
@@ -16,12 +13,10 @@ import { getAuth } from 'firebase/auth';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import '../../root.css';
 import styles from './Dashboard.module.css';
-import { json } from 'stream/consumers';
 import Metrics from '../metrics/Metrics'; // Import the Metrics component
 
 export interface DashboardProps {}
 
-export function Dashboard(props: DashboardProps) {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -30,7 +25,21 @@ export function Dashboard(props: DashboardProps) {
   const [showMetrics, setShowMetrics] = useState(false); // State to control modal visibility
   const user = useContext(UserContext);
 
-  interface Transaction {
+export const formatMonthYear = (date: any) => {
+  return date.toLocaleString('default', { month: 'long', year: 'numeric' });
+};
+
+export const handlePrevMonth = () => {
+  setCurrentMonth(
+    new Date(currentMonth.setMonth(currentMonth.getMonth() - 1))
+  );
+  if (currentMonth.getFullYear() != currentYear) {
+    setCurrentYear(currentMonth.getFullYear());
+  }
+  //display();
+};
+
+  export interface Transaction {
     date: string;
     amount: number;
     balance: number;
@@ -43,7 +52,7 @@ export function Dashboard(props: DashboardProps) {
     if (currentMonth.getFullYear() != currentYear) {
       setCurrentYear(currentMonth.getFullYear());
     }
-    //cants go passed next month
+    //cants go past next month
     const Now = new Date();
     if (
       currentMonth.getMonth() != Now.getMonth() + 1 ||
@@ -55,20 +64,6 @@ export function Dashboard(props: DashboardProps) {
       );
     }
     display();
-  };
-
-  const handlePrevMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.setMonth(currentMonth.getMonth() - 1))
-    );
-    if (currentMonth.getFullYear() != currentYear) {
-      setCurrentYear(currentMonth.getFullYear());
-    }
-    display();
-  };
-
-  const formatMonthYear = (date: any) => {
-    return date.toLocaleString('default', { month: 'long', year: 'numeric' });
   };
 
   function getUniqueYearMonths(DataLines: string[]): Record<string, string[]> {
@@ -388,6 +383,8 @@ export function Dashboard(props: DashboardProps) {
     }
   };
 
+  export function Dashboard(props: DashboardProps) {
+
   return (
     <div className="mainPage">
       <div className="header">
@@ -403,7 +400,7 @@ export function Dashboard(props: DashboardProps) {
 
       {showMetrics && <Metrics onClose={() => setShowMetrics(false)} />}
       <div className={styles.monthNavigation}>
-        <button className={styles.navButton} onClick={handlePrevMonth}>
+        <button data-testid="prev-month-button" className={styles.navButton} onClick={handlePrevMonth}>
           <span
             className="material-symbols-outlined"
             style={{ fontSize: 'calc(1rem * var(--font-size-multiplier))' }}
