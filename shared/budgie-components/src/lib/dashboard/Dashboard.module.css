@@ -94,6 +94,8 @@
 
 .categoryDropdown option {
   text-align: left;
+  background-color: white;
+  color: black;
 }
 
 .buttonContainer {
@@ -112,4 +114,60 @@
   border-radius: 0.4rem;
   transition:  0.2s ease;
   padding: 0.5rem 1rem;
+}
+
+.income {
+  background-color: #76EE92;
+  border: none;
+}
+
+.transport {
+  background-color: #4EB5FF;
+  border: none;
+}
+
+.eatingOut {
+  background-color: #FFCD4E;
+  border: none;
+}
+
+.groceries {
+  background-color: #A98DFB;
+  border: none;
+}
+
+.entertainment {
+  background-color: #FD7575;
+  border: none;
+}
+
+.shopping {
+  background-color: #FB94F1;
+  border: none;
+}
+
+.insurance {
+  background-color: #72F1E2;
+  border: none;
+}
+
+.utilities {
+  background-color: #FDAD73;
+  border: none;
+}
+
+.medicalAid {
+  background-color: #C1C1C1;
+  border: none;
+}
+
+.other {
+  background-color: #000000;
+  color: white;
+  border: none;
+}
+
+.default {
+  background-color: white;
+  color: black;
 }

@@ -29,6 +29,7 @@ export function Dashboard(props: DashboardProps) {
   const [Data, setData] = useState<any>(null);
   const [showMetrics, setShowMetrics] = useState(false); // State to control modal visibility
   const user = useContext(UserContext);
+  const [selectedCategory, setSelectedCategory] = useState('');
 
   interface Transaction {
     date: string;
@@ -363,28 +364,50 @@ export function Dashboard(props: DashboardProps) {
     }
   };
 
-  const handleChange = async (
-    event: React.ChangeEvent<HTMLSelectElement>,
-    index: number
-  ) => {
+  const handleChange = async (event: React.ChangeEvent<HTMLSelectElement>, index: number) => {
     const selectedCategory = event.target.value;
-    if (selectedCategory == 'Add category') {
+    if (selectedCategory === 'Add category') {
       alert('under construction');
     } else {
       const updatedTransactions = transactions.map((transaction, i) =>
-        i === index
-          ? { ...transaction, category: selectedCategory }
-          : transaction
+        i === index ? { ...transaction, category: selectedCategory } : transaction
       );
-
+  
       setTransactions(updatedTransactions);
       await updateDoc(
         doc(db, `transaction_data_${currentYear}`, `${user.uid}`),
         {
-          [monthNames[currentMonth.getMonth()]]:
-            JSON.stringify(updatedTransactions),
+          [monthNames[currentMonth.getMonth()]]: JSON.stringify(updatedTransactions),
         }
       );
+    }
+  };
+  
+  // Function to determine the CSS class based on the category
+  const getCategoryStyle = (category: string) => {
+    switch (category) {
+      case 'Income':
+        return styles.income;
+      case 'Transport':
+        return styles.transport;
+      case 'Eating Out':
+        return styles.eatingOut;
+      case 'Groceries':
+        return styles.groceries;
+      case 'Entertainment':
+        return styles.entertainment;
+      case 'Shopping':
+        return styles.shopping;
+      case 'Insurance':
+        return styles.insurance;
+      case 'Utilities':
+        return styles.utilities;
+      case 'Medical Aid':
+        return styles.medicalAid;
+      case 'Other':
+        return styles.other;
+      default:
+        return styles.default;
     }
   };
 
@@ -459,7 +482,7 @@ export function Dashboard(props: DashboardProps) {
                         {transaction.amount}                        
                       </div>
                       <select
-                          className={styles.categoryDropdown}
+                          className={`${styles.categoryDropdown} ${getCategoryStyle(transaction.category)}`}
                           onChange={(event) => handleChange(event, index)}
                           value={transaction.category}
                         >
