@@ -7,6 +7,8 @@ apps/budgie-app/.env.local
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
+firebase.json
+.firebaserc
 
 # compiled output
 dist
