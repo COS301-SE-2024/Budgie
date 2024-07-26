@@ -3,6 +3,7 @@
   justify-content: center;
   background-color: var(--block-background);
   width: 85vw;
+  height: calc(6vh * var(--font-size-multiplier));
 }
 
 .button {
@@ -12,7 +13,7 @@
   font-weight: bold;
   padding: 5px 10px;
   padding-top: 10px;
-  margin: 0px 10px;
+  margin: 0px calc(10px * var(--font-size-multiplier));
   border-bottom: 5px solid var(--block-background);
 }
 

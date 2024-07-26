@@ -23,6 +23,8 @@ export interface MonthlyTransactionsViewProps {}
 
 export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   const [balance, setBalance] = useState(0);
+  const [moneyIn, setMoneyIn] = useState(0);
+  const [moneyOut, setMoneyOut] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -358,9 +360,23 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     if (Data[month] === undefined) {
       setTransactions([]);
       setBalance(0);
+      setMoneyIn(0);
+      setMoneyOut(0);
     } else {
-      setTransactions(JSON.parse(Data[month]));
+      const transactionsList = JSON.parse(Data[month]);
+      setTransactions(transactionsList);
       setBalance(JSON.parse(Data[month])[0].balance);
+      
+      const moneyInTotal = transactionsList
+        .filter((transaction: { amount: number; }) => transaction.amount > 0)
+        .reduce((acc: any, transaction: { amount: any; }) => acc + transaction.amount, 0);
+
+      const moneyOutTotal = transactionsList
+        .filter((transaction: { amount: number; }) => transaction.amount < 0)
+        .reduce((acc: any, transaction: { amount: any; }) => acc + transaction.amount, 0);
+
+      setMoneyIn(moneyInTotal);
+      setMoneyOut(Math.abs(moneyOutTotal)); // moneyOut should be positive for display
     }
   };
 
@@ -410,12 +426,28 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     }
   };
 
+  const formatCurrency = (value: number) => {
+    const formatter = new Intl.NumberFormat('en-ZA', {
+      style: 'currency',
+      currency: 'ZAR',
+      minimumFractionDigits: 2,
+    });
+    return formatter.format(value);
+  };
+
+  const formatTransactionValue = (value: number) => {
+    const formatter = new Intl.NumberFormat('en-ZA', {
+      style: 'decimal',
+      minimumFractionDigits: 2,
+    });
+    return formatter.format(value);
+  };
+  
+
   return (
     <div className={styles.mainPage}>
-      <div className="header">
-        <UploadStatementCSV onFileUpload={handleCSVUpload} />
-        <h1>Monthly</h1>
-      </div>
+      {/*}
+      <UploadStatementCSV onFileUpload={handleCSVUpload} />
       <button
         onClick={() => setShowMetrics(true)}
         className={styles.metricsButton}
@@ -423,40 +455,45 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         View Metrics
       </button>
 
-      {showMetrics && <Metrics onClose={() => setShowMetrics(false)} />}
-      <div className={styles.monthNavigation}>
-        <button className={styles.navButton} onClick={handlePrevMonth}>
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: 'calc(1rem * var(--font-size-multiplier))' }}
-          >
-            arrow_back_ios
+      {showMetrics && <Metrics onClose={() => setShowMetrics(false)} />}*/}
+
+
+      <div className={styles.header}>
+        <div className={styles.monthNavigation}>
+          <button className={styles.navButton} onClick={handlePrevMonth}>
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: 'calc(1.4rem * var(--font-size-multiplier))', alignContent:'center', display: 'flex'}}
+            >
+              arrow_back_ios
+            </span>
+          </button>
+          <span className={styles.monthDisplay}>
+            {formatMonthYear(currentMonth)}
           </span>
-        </button>
-        <span className={styles.monthDisplay}>
-          {formatMonthYear(currentMonth)}
-        </span>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-          onClick={handleNextMonth}
-        />
-        <button className={styles.navButton} onClick={handleNextMonth}>
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: 'calc(1rem * var(--font-size-multiplier))' }}
-          >
-            arrow_forward_ios
-          </span>
-        </button>
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+            onClick={handleNextMonth}
+          />
+          <button className={styles.navButton} onClick={handleNextMonth}>
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: 'calc(1.4rem * var(--font-size-multiplier))', alignContent:'center', display: 'flex'}}
+            >
+              arrow_forward_ios
+            </span>
+          </button>
+        </div>
+            <div className={styles.balanceInfo}>
+              Balance:  {formatCurrency(balance)}
+              <p className={styles.moneyInfo}>Money In:  {formatCurrency(moneyIn)}</p>
+              <p className={styles.moneyInfo}>Money Out:  {formatCurrency(moneyOut)}</p>
+            </div>  
       </div>
-      <br />
+
       {balance !== null && (
-        <div className={styles.balance}>
-          <h1>
-            <strong>Balance:</strong> {balance}
-          </h1>
-          <br />
+        <div className={styles.transactionsList}>
           {transactions.length > 0 && (
             <div className={styles.transactions}>
               {transactions.map((transaction, index) => (
@@ -478,7 +515,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
                           {transaction.description}
                         </div>
                       <div className={styles.transactionAmount}>
-                        {transaction.amount}                        
+                        {formatTransactionValue(transaction.amount)}                   
                       </div>
                       <select
                           className={`${styles.categoryDropdown} ${getCategoryStyle(transaction.category)}`}

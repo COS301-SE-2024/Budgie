@@ -1,8 +1,27 @@
-.monthNavigation {
+  
+  .header {
     display: flex;
-    justify-content: center;
+    align-items: flex-start;
+    justify-content: space-between;
+    height: calc(10vh * var(--font-size-multiplier));
+  }
+
+  .monthNavigation {
+    display: flex;
     align-items: center;
-    margin-top: 5rem;
+    padding: 5px;
+  }
+
+  .balanceInfo {
+    font-size: calc(1.4rem * var(--font-size-multiplier));
+    font-weight: bold;
+    text-align: left;
+  }
+
+  .moneyInfo {
+    font-size: calc(1rem * var(--font-size-multiplier));
+    font-weight: bold;
+    color: grey;
   }
   
   .navButton {
@@ -20,12 +39,16 @@
     font-size: calc(1.4rem * var(--font-size-multiplier));
     font-weight: bold;
     margin: 0 12px;
+    width: calc(12rem * var(--font-size-multiplier));
+    text-align: center;
   }
   
-  .balance {
+  .transactionsList {
     font-size: calc(1.2rem * var(--font-size-multiplier));
     text-align: left;
-    margin-bottom: 5px;
+    height: 30vh;
+    overflow-y: scroll;
+    height: calc(99vh - ((16vh * var(--font-size-multiplier))));
   }
   
   .transactions {
@@ -198,9 +221,9 @@
   .mainPage {
     background-color: var(--main-background);
     width: 85vw;
-    height: 100vh;
+    height: calc(100vh - (6vh * var(--font-size-multiplier)));
     padding-left: calc(1.5rem * var(--font-size-multiplier));
-    padding-right: 1.5rem;
-    padding-top: 1rem;
+    padding-right: 2rem;
+    padding-top: 1vh;
     overflow-y: auto;
   }
