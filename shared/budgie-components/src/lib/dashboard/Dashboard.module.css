@@ -41,34 +41,31 @@
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.2s ease-in-out;
-  border-left: 10px solid var(--primary-1) !important;
+  display: flex;
+  align-items: center;
+  height: calc(6vh * var(--font-size-multiplier));
 }
 
 .transactionCard:hover {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-.transactionItem {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* Align items to the left */
-}
-
 .transactionContent {
   display: flex;
   width: 100%;
-  justify-content: space-between;
+  align-items: center;
 }
 
 .transactionDate,
 .transactionDescription {
-  margin-bottom: 5px;
   font-size: calc(14px * var(--font-size-multiplier));
+  font-weight: bold;
 }
 
 .transactionDate {
   font-weight: bold;
-  color: #333;
+  color: var(--main-text);
+  margin-right: 1rem;
 }
 
 .transactionAmount {
@@ -79,25 +76,24 @@
 
 .transactionDescription {
   text-align: left;
-  color: #555;
-}
-
-.blueLeftStrip {
-  border-left: 20px solid #1976D2; /* Blue border */
-}
-
-.greyLeftStrip {
-  border-left: 20px solid #9e9e9e; /* Grey border */
+  color: #888888;
 }
 
 .categoryDropdown {
   border: 1px solid #ccc; /* Add a border around the dropdown */
   padding: 5px; /* Add padding inside the dropdown */
-  border-radius: 4px; /* Optional: rounded corners */
-  width: 100%; /* Optional: full width */
+  border-radius: 10px; /* Optional: rounded corners */
+  width: calc(10vw * var(--font-size-multiplier));
   box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
-  font-weight: normal; /* Make text not bold */
+  font-weight: bold;
   font-size: calc(16px * var(--font-size-multiplier));
+  margin-left: 2rem;
+  text-align: center;
+  text-align-last: center;
+}
+
+.categoryDropdown option {
+  text-align: left;
 }
 
 .buttonContainer {

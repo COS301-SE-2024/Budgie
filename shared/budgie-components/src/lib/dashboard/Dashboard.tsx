@@ -391,7 +391,7 @@ export function Dashboard(props: DashboardProps) {
   return (
     <div className="mainPage">
       <div className="header">
-        <span className="pageTitle">Dashboard</span>
+        <span className="pageTitle">Transactions</span>
         <UploadStatementCSV onFileUpload={handleCSVUpload} />
       </div>
       <button
@@ -445,23 +445,20 @@ export function Dashboard(props: DashboardProps) {
                     borderLeft:
                       transaction.amount >= 0
                         ? '10px solid #293652'
-                        : '10px solid #9e9e9e',
+                        : '10px solid #8EE5A2',
                   }}
                 >
-                  <div className={styles.transactionItem}>
                     <div className={styles.transactionContent}>
-                      <div className={styles.transactionDateTime}>
                         <div className={styles.transactionDate}>
                           {transaction.date}
                         </div>
                         <div className={styles.transactionDescription}>
                           {transaction.description}
                         </div>
-                      </div>
                       <div className={styles.transactionAmount}>
-                        {transaction.amount}
-                        <br />
-                        <select
+                        {transaction.amount}                        
+                      </div>
+                      <select
                           className={styles.categoryDropdown}
                           onChange={(event) => handleChange(event, index)}
                           value={transaction.category}
@@ -478,9 +475,7 @@ export function Dashboard(props: DashboardProps) {
                           <option value="Medical Aid">Medical Aid</option>
                           <option value="Other">Other</option>
                         </select>
-                      </div>
                     </div>
-                  </div>
                 </div>
               ))}
             </div>
