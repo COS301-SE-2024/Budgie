@@ -304,7 +304,6 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   };
 
   useEffect(() => {
- 
     const getBankStatementsByUserId = async (userId: string) => {
       try {
         const collectionName = `transaction_data_${currentYear}`;
@@ -341,7 +340,20 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   }, [Data]);
 
   const display = async () => {
-    alert(Data)
+    if(Data!=null){
+      const may = JSON.parse(Data["may"]);
+      const june = JSON.parse(Data["june"]);
+      const transactionsList = may.concat(june);
+      setTransactions(transactionsList);
+      setBalance(JSON.parse(Data["may"])[0].balance);
+      
+    }
+    else{
+      setTransactions([]);
+      setBalance(0);
+      setMoneyIn(0);
+      setMoneyOut(0);
+    }
   };
 
   const handleChange = async (event: React.ChangeEvent<HTMLSelectElement>, index: number) => {
