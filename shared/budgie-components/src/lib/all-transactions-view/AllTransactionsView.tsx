@@ -45,8 +45,8 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     const Now = new Date();
     if(Now.getFullYear()!=currentYear){
       setCurrentYear(currentYear+1)
+      display();
     }
-    display();
   };
 
   const handlePrevYear = () => {
@@ -318,6 +318,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
           console.log('No such document!');
           setData(null);
           setTransactions([])
+          setBalance(0)
         }
       } catch (error) {
         console.error('Error getting bank statement document:', error);
@@ -341,12 +342,20 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
 
   const display = async () => {
     if(Data!=null){
-      const may = JSON.parse(Data["may"]);
-      const june = JSON.parse(Data["june"]);
-      const transactionsList = may.concat(june);
+      let transactionsList: any[] = [];
+      for (let i = 0; i < 12; i++) {
+        if (Data[monthNames[i]]) {
+          const addMonth = JSON.parse(Data[monthNames[i]]);
+          transactionsList = transactionsList.concat(addMonth);
+          setBalance(JSON.parse(Data[monthNames[i]])[0].balance);
+        }
+      }
       setTransactions(transactionsList);
-      setBalance(JSON.parse(Data["may"])[0].balance);
-      
+      // const may = JSON.parse(Data["may"]);
+      // const june = JSON.parse(Data["june"]);
+      // const transactionsList = may.concat(june);
+      // setTransactions(transactionsList);
+      // setBalance(JSON.parse(Data["may"])[0].balance);
     }
     else{
       setTransactions([]);
