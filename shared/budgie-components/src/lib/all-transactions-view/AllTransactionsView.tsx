@@ -1,5 +1,5 @@
 'use client';
-import styles from './AllTransactionsView.module.css';
+import styles from '../all-transactions-view/AllTransactionsView.module.css';
 import React, { useState, useEffect, useContext } from 'react';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import UploadStatementCSV from '../upload-statement-csv/UploadStatementCSV';
@@ -23,12 +23,14 @@ export interface AllTransactionsViewProps {}
 
 export function AllTransactionsView(props: AllTransactionsViewProps) {
   const [balance, setBalance] = useState(0);
+  const [moneyIn, setMoneyIn] = useState(0);
+  const [moneyOut, setMoneyOut] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [Data, setData] = useState<any>(null);
   const [showMetrics, setShowMetrics] = useState(false); // State to control modal visibility
-  const [viewMode, setViewMode] = useState('monthly');
+  const [viewMode, setViewMode] = useState('all');
   const user = useContext(UserContext);
 
   interface Transaction {
@@ -39,33 +41,17 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     category: string;
   }
 
-  const handleNextMonth = () => {
-    //change year
-    if (currentMonth.getFullYear() != currentYear) {
-      setCurrentYear(currentMonth.getFullYear());
-    }
-    //cants go passed next month
+  const handleNextYear = () => {
     const Now = new Date();
-    if (
-      currentMonth.getMonth() != Now.getMonth() + 1 ||
-      currentYear != Now.getFullYear()
-    ) {
-      //change the month
-      setCurrentMonth(
-        new Date(currentMonth.setMonth(currentMonth.getMonth() + 1))
-      );
+    if(Now.getFullYear()!=currentYear){
+      setCurrentYear(currentYear+1)
     }
     display();
   };
 
-  const handlePrevMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.setMonth(currentMonth.getMonth() - 1))
-    );
-    if (currentMonth.getFullYear() != currentYear) {
-      setCurrentYear(currentMonth.getFullYear());
-    }
-    display();
+  const handlePrevYear = () => {
+   setCurrentYear(currentYear-1)
+   display();
   };
 
   const formatMonthYear = (date: any) => {
@@ -246,8 +232,8 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
         }
         // TODO: sort merged on date
         for (const YearMonth in Merged) {
-          const MonthlyTransactions: Transaction[] = Merged[YearMonth];
-          MonthlyTransactions.sort((a, b) => {
+          const AllTransactions: Transaction[] = Merged[YearMonth];
+          AllTransactions.sort((a, b) => {
             const dateA = new Date(a.date);
             const dateB = new Date(b.date);
 
@@ -318,6 +304,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   };
 
   useEffect(() => {
+ 
     const getBankStatementsByUserId = async (userId: string) => {
       try {
         const collectionName = `transaction_data_${currentYear}`;
@@ -330,6 +317,8 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
           setData(data);
         } else {
           console.log('No such document!');
+          setData(null);
+          setTransactions([])
         }
       } catch (error) {
         console.error('Error getting bank statement document:', error);
@@ -343,7 +332,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
         getBankStatementsByUserId(user.uid);
       }
     }
-  }, [currentYear, transactions]);
+  }, [currentYear]);
 
   useEffect(() => {
     if (Data !== null) {
@@ -352,16 +341,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   }, [Data]);
 
   const display = async () => {
-    const month = currentMonth
-      .toLocaleString('default', { month: 'long' })
-      .toLocaleLowerCase();
-    if (Data[month] === undefined) {
-      setTransactions([]);
-      setBalance(0);
-    } else {
-      setTransactions(JSON.parse(Data[month]));
-      setBalance(JSON.parse(Data[month])[0].balance);
-    }
+    alert(Data)
   };
 
   const handleChange = async (event: React.ChangeEvent<HTMLSelectElement>, index: number) => {
@@ -410,55 +390,79 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     }
   };
 
+  const formatCurrency = (value: number) => {
+    const formatter = new Intl.NumberFormat('en-ZA', {
+      style: 'currency',
+      currency: 'ZAR',
+      minimumFractionDigits: 2,
+    });
+    return formatter.format(value);
+  };
+
+  const formatTransactionValue = (value: number) => {
+    const formatter = new Intl.NumberFormat('en-ZA', {
+      style: 'decimal',
+      minimumFractionDigits: 2,
+    });
+    return formatter.format(value);
+  };
+  
+
   return (
     <div className={styles.mainPage}>
-      <div className="header">
-        <UploadStatementCSV onFileUpload={handleCSVUpload} />
-        <h1>All</h1>
-      </div>
-      <button
+      
+      {/* <button
         onClick={() => setShowMetrics(true)}
         className={styles.metricsButton}
       >
         View Metrics
       </button>
 
-      {showMetrics && <Metrics onClose={() => setShowMetrics(false)} />}
-      <div className={styles.monthNavigation}>
-        <button className={styles.navButton} onClick={handlePrevMonth}>
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: 'calc(1rem * var(--font-size-multiplier))' }}
-          >
-            arrow_back_ios
+      {showMetrics && <Metrics onClose={() => setShowMetrics(false)} />} */}
+
+
+      <div className={styles.header}>
+        <div className={styles.monthNavigation}>
+          <button className={styles.navButton} onClick={handlePrevYear}>
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: 'calc(1.4rem * var(--font-size-multiplier))', alignContent:'center', display: 'flex'}}
+            >
+              arrow_back_ios
+            </span>
+          </button>
+          <span className={styles.monthDisplay}>
+            {currentYear}
           </span>
-        </button>
-        <span className={styles.monthDisplay}>
-          {formatMonthYear(currentMonth)}
-        </span>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-          onClick={handleNextMonth}
-        />
-        <button className={styles.navButton} onClick={handleNextMonth}>
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: 'calc(1rem * var(--font-size-multiplier))' }}
-          >
-            arrow_forward_ios
-          </span>
-        </button>
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+            onClick={handleNextYear}
+          />
+          <button className={styles.navButton} onClick={handleNextYear}>
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: 'calc(1.4rem * var(--font-size-multiplier))', alignContent:'center', display: 'flex'}}
+            >
+              arrow_forward_ios
+            </span>
+          </button>
+        </div>
+
+        <UploadStatementCSV onFileUpload={handleCSVUpload} />
+
+            <div className={styles.balanceInfo}>
+              Balance:  {formatCurrency(balance)}
+              <p className={styles.moneyInfo}>Money In:  {formatCurrency(moneyIn)}</p>
+              <p className={styles.moneyInfo}>Money Out:  {formatCurrency(moneyOut)}</p>
+            </div>  
       </div>
-      <br />
+
       {balance !== null && (
-        <div className={styles.balance}>
-          <h1>
-            <strong>Balance:</strong> {balance}
-          </h1>
-          <br />
+        <div className={styles.transactionsList}>
           {transactions.length > 0 && (
             <div className={styles.transactions}>
+              <br/>
               {transactions.map((transaction, index) => (
                 <div
                   key={index}
@@ -478,7 +482,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
                           {transaction.description}
                         </div>
                       <div className={styles.transactionAmount}>
-                        {transaction.amount}                        
+                        {formatTransactionValue(transaction.amount)}                   
                       </div>
                       <select
                           className={`${styles.categoryDropdown} ${getCategoryStyle(transaction.category)}`}

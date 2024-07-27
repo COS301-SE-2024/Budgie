@@ -446,16 +446,15 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
 
   return (
     <div className={styles.mainPage}>
-      {/*}
-      <UploadStatementCSV onFileUpload={handleCSVUpload} />
-      <button
+      
+      {/* <button
         onClick={() => setShowMetrics(true)}
         className={styles.metricsButton}
       >
         View Metrics
       </button>
 
-      {showMetrics && <Metrics onClose={() => setShowMetrics(false)} />}*/}
+      {showMetrics && <Metrics onClose={() => setShowMetrics(false)} />} */}
 
 
       <div className={styles.header}>
@@ -485,6 +484,9 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
             </span>
           </button>
         </div>
+
+        <UploadStatementCSV onFileUpload={handleCSVUpload} />
+
             <div className={styles.balanceInfo}>
               Balance:  {formatCurrency(balance)}
               <p className={styles.moneyInfo}>Money In:  {formatCurrency(moneyIn)}</p>
@@ -496,6 +498,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         <div className={styles.transactionsList}>
           {transactions.length > 0 && (
             <div className={styles.transactions}>
+              <br/>
               {transactions.map((transaction, index) => (
                 <div
                   key={index}

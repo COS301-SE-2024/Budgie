@@ -3,7 +3,7 @@
   justify-content: center;
   background-color: var(--block-background);
   width: 85vw;
-  height: calc(6vh * var(--font-size-multiplier));
+  height: calc(7vh * var(--font-size-multiplier));
 }
 
 .button {
