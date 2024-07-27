@@ -351,11 +351,16 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
         }
       }
       setTransactions(transactionsList);
-      // const may = JSON.parse(Data["may"]);
-      // const june = JSON.parse(Data["june"]);
-      // const transactionsList = may.concat(june);
-      // setTransactions(transactionsList);
-      // setBalance(JSON.parse(Data["may"])[0].balance);
+      const moneyInTotal = transactionsList
+        .filter((transaction: { amount: number; }) => transaction.amount > 0)
+        .reduce((acc: any, transaction: { amount: any; }) => acc + transaction.amount, 0);
+
+      const moneyOutTotal = transactionsList
+        .filter((transaction: { amount: number; }) => transaction.amount < 0)
+        .reduce((acc: any, transaction: { amount: any; }) => acc + transaction.amount, 0);
+
+      setMoneyIn(moneyInTotal);
+      setMoneyOut(Math.abs(moneyOutTotal)); // moneyOut should be positive for display
     }
     else{
       setTransactions([]);
@@ -366,22 +371,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   };
 
   const handleChange = async (event: React.ChangeEvent<HTMLSelectElement>, index: number) => {
-    const selectedCategory = event.target.value;
-    if (selectedCategory === 'Add category') {
-      alert('under construction');
-    } else {
-      const updatedTransactions = transactions.map((transaction, i) =>
-        i === index ? { ...transaction, category: selectedCategory } : transaction
-      );
-  
-      setTransactions(updatedTransactions);
-      await updateDoc(
-        doc(db, `transaction_data_${currentYear}`, `${user.uid}`),
-        {
-          [monthNames[currentMonth.getMonth()]]: JSON.stringify(updatedTransactions),
-        }
-      );
-    }
+    
   };
   
   const getCategoryStyle = (category: string) => {
