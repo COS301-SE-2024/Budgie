@@ -1,7 +1,49 @@
-/*
- * Replace this with your own classes
- *
- * e.g.
- * .container {
- * }
-*/
+/* overview-page.module.css */
+
+.mainPage {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-gap: 20px;
+  padding: 40px;
+}
+
+.totalBalance,
+.spendingByCategory,
+.lastTransaction,
+.upcomingBills,
+.budgetStatus,
+.financialGoals,
+.currentAccounts {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.totalBalance h2,
+.currentAccounts h2,
+.spendingByCategory h2,
+.lastTransaction h2,
+.upcomingBills h2,
+.budgetStatus h2,
+.financialGoals h2 {
+  background: #e0e0e0; /* Different color for headings */
+  padding: 10px;
+  border-radius: 10px;
+  margin: -20px -20px 20px -20px; /* Ensure heading covers full width of box */
+  text-align: center; /* Center align text in heading */
+}
+
+.budgetBar {
+  background: #ddd;
+  height: 40px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.budgetFill {
+  background: green; /* This will change to red if over budget */
+  width: 50%; /* Adjust based on actual budget status */
+  height: 100%;
+}
