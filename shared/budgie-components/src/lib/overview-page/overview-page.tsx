@@ -56,22 +56,26 @@ export function OverviewPage(props: OverviewPageProps) {
       </button>
       <div className={styles.chartContainer}>
         <div className={styles.chartItem}>
-          <h3 className={styles.chartTitle}>Net worth Over Time</h3>
+          <div className={`${styles.gridTitleContainer} ${isDarkMode ? '' : styles.light}`}>
+            <h3 className={styles.gridTitle}>Net Worth Over Time</h3>
+          </div>
           <LineChart width={600} height={300} data={spendingData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" tick={{ fill: 'white' }} />
-            <YAxis tick={{ fill: 'white' }} />
+            <XAxis dataKey="name" tick={{ fill: isDarkMode ? 'white' : 'black' }} />
+            <YAxis tick={{ fill: isDarkMode ? 'white' : 'black' }} />
             <Tooltip />
             <Line type="monotone" dataKey="value" stroke="#8884d8" />
           </LineChart>
         </div>
         <div className={styles.chartItem}>
-          <h3 className={styles.chartTitle}>Spending by Category</h3>
+          <div className={`${styles.gridTitleContainer} ${isDarkMode ? '' : styles.light}`}>
+            <h3 className={styles.gridTitle}>Spending by Category</h3>
+          </div>
           <PieChart width={600} height={300}>
             <Pie
               data={categoryData}
-              cx={150}
-              cy={150}
+              cx={250}
+              cy={120}
               labelLine={false}
               outerRadius={100}
               fill="#8884d8"
