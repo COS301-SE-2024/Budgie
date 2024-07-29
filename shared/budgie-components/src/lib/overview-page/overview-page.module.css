@@ -1,41 +1,91 @@
 /* overview-page.module.css */
 
-.mainPage {
+.metricsContainer {
+  position: relative;
+  margin: 20px;
+  background: rgb(2, 35, 58);
+  z-index: 1000;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  overflow: auto;
+  color: white;
+  width: calc(100% - 40px);
+  height: calc(100% - 40px);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.metricsContainer.light {
+  background: white;
+  color: black;
+}
+
+.metricsContainer.dark {
+  background: rgb(2, 35, 58);
+  color: white;
+}
+
+.toggleButton {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.gridContainer {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  grid-gap: 20px;
-  padding: 40px;
+  gap: 20px;
+  width: 100%;
+  height: 100%;
 }
 
-.totalBalance,
-.spendingByCategory,
-.lastTransaction,
-.upcomingBills,
-.budgetStatus,
-.financialGoals,
-.currentAccounts {
-  background: #f9f9f9;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.totalBalance h2,
-.currentAccounts h2,
-.spendingByCategory h2,
-.lastTransaction h2,
-.upcomingBills h2,
-.budgetStatus h2,
-.financialGoals h2 {
-  background: #e0e0e0; /* Different color for headings */
+.gridItem {
+  background: rgba(255, 255, 255, 0.1);
   padding: 10px;
   border-radius: 10px;
-  margin: -20px -20px 20px -20px; /* Ensure heading covers full width of box */
-  text-align: center; /* Center align text in heading */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.gridItem.light {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.gridTitleContainer {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 5px 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  width: 100%;
+  text-align: center;
+  align-self: stretch; /* Ensure title container stretches across the width */
+}
+
+.gridTitleContainer.light {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.gridTitle {
+  font-weight: bold;
+  color: white;
+  margin: 0;
+}
+
+.light .gridTitle {
+  color: black;
 }
 
 .budgetBar {
-  background: #ddd;
+  background: #dddddd;
   height: 40px;
   border-radius: 10px;
   overflow: hidden;
@@ -43,7 +93,7 @@
 }
 
 .budgetFill {
-  background: green; /* This will change to red if over budget */
-  width: 50%; /* Adjust based on actual budget status */
+  background: green;
+  width: 50%;
   height: 100%;
 }
