@@ -1,5 +1,6 @@
-'use client';
-import { useState } from 'react';
+"use client";
+import React, { useState } from 'react';
+import { LineChart, Line, PieChart, Pie, Tooltip, CartesianGrid, XAxis, YAxis, Legend, Cell } from 'recharts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMoneyBill, faBank, faChartPie, faHistory, faCalendarAlt, faListUl, faBullseye } from '@fortawesome/free-solid-svg-icons';
 import styles from './overview-page.module.css';
@@ -24,18 +25,76 @@ export function OverviewPage(props: OverviewPageProps) {
       ? 'A bit far from your target'
       : 'Doing well towards your target';
 
+  // Sample data for charts
+  const spendingData = [
+    { name: 'Jan', value: 400 },
+    { name: 'Feb', value: 300 },
+    { name: 'Mar', value: 200 },
+    { name: 'Apr', value: 500 },
+    { name: 'May', value: 450 },
+    { name: 'Jun', value: 600 },
+  ];
+
+  const categoryData = [
+    { name: 'Groceries', value: 200 },
+    { name: 'Utilities', value: 100 },
+    { name: 'Entertainment', value: 200 },
+    { name: 'Transport', value: 150 },
+    { name: 'Insurance', value: 150 },
+    { name: 'Medical Aid', value: 150 },
+    { name: 'Eating Out', value: 150 },
+    { name: 'Shopping', value: 150 },
+    { name: 'Other', value: 150 },
+  ];
+
+  const CATEGORY_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
   return (
     <div className={`${styles.metricsContainer} ${isDarkMode ? styles.dark : styles.light}`}>
       <button className={styles.toggleButton} onClick={toggleTheme}>
         {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
       </button>
+      <div className={styles.chartContainer}>
+        <div className={styles.chartItem}>
+          <h3 className={styles.chartTitle}>Net worth Over Time</h3>
+          <LineChart width={600} height={300} data={spendingData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" tick={{ fill: 'white' }} />
+            <YAxis tick={{ fill: 'white' }} />
+            <Tooltip />
+            <Line type="monotone" dataKey="value" stroke="#8884d8" />
+          </LineChart>
+        </div>
+        <div className={styles.chartItem}>
+          <h3 className={styles.chartTitle}>Spending by Category</h3>
+          <PieChart width={600} height={300}>
+            <Pie
+              data={categoryData}
+              cx={150}
+              cy={150}
+              labelLine={false}
+              outerRadius={100}
+              fill="#8884d8"
+              dataKey="value"
+            >
+              {categoryData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </div>
+      </div>
       <div className={styles.gridContainer}>
+        {/* Rest of your grid items */}
         <div className={styles.gridItem}>
           <div className={`${styles.gridTitleContainer} ${isDarkMode ? '' : styles.light}`}>
             <FontAwesomeIcon icon={faMoneyBill} className={styles.icon} />
-            <h2 className={styles.gridTitle}>Total Balance</h2>
+            <h2 className={styles.gridTitle}>Total Balance for Year</h2>
           </div>
-          <p>R25 647.76</p>
+          <p>Total Money in: R25 647.76</p>
+          <p>Total Money out: R5 427.28</p>
         </div>
         <div className={styles.gridItem}>
           <div className={`${styles.gridTitleContainer} ${isDarkMode ? '' : styles.light}`}>
@@ -60,7 +119,9 @@ export function OverviewPage(props: OverviewPageProps) {
             <FontAwesomeIcon icon={faHistory} className={styles.icon} />
             <h2 className={styles.gridTitle}>Last Transaction</h2>
           </div>
-          <p>Transaction details here</p>
+          <p>PURCH Uber Eats 400738******4299</p>
+          <p>2024/06/22</p>
+          <p>Category: Eating Out</p>
         </div>
         <div className={styles.gridItem}>
           <div className={`${styles.gridTitleContainer} ${isDarkMode ? '' : styles.light}`}>
