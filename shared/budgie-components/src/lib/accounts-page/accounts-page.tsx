@@ -3,6 +3,7 @@
 import styles from './accounts-page.module.css';
 import '../../root.css';
 import { useEffect, useState } from 'react';
+import { UploadStatementCSV } from '@capstone-repo/shared/budgie-components';
 /* eslint-disable-next-line */
 export interface AccountsPageProps {}
 
@@ -24,7 +25,7 @@ function OnAddCustomClick() {
   alert('add custom');
 }
 
-//pages------------------------------------------
+//pages and modals------------------------------------------
 
 function NoAccountsPage() {
   return (
@@ -124,10 +125,76 @@ function AddAccountModal() {
   );
 }
 
+function UploadCSVModal() {
+  const handleChildElementClick = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    //exit modal
+  };
+
+  const handleUploadClick = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    //handle upload
+  };
+
+  return (
+    <div
+      onClick={() => {
+        alert('outer click');
+      }}
+      className={styles.mainPageBlurModal}
+    >
+      <div
+        className="flex flex-col items-center justify-center rounded-[3rem] w-96 h-96 bg-BudgieWhite "
+        onClick={(e) => handleChildElementClick(e)}
+      >
+        <span className="text-2xl text-center">
+          Upload your transaction history <br /> in the form of a CSV <br /> to
+          auto-detect account information.
+        </span>
+        <button className="mt-[3rem] text-BudgieWhite text-xl bg-BudgieBlue w-[12rem] h-[4rem] rounded-[3rem]">
+          Upload CSV
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function AccountInfoModal() {
+  const handleChildElementClick = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    //exit modal
+  };
+
+  const handleUploadClick = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+  };
+
+  return (
+    <div
+      onClick={() => {
+        alert('outer click');
+      }}
+      className={styles.mainPageBlurModal}
+    >
+      <div
+        className="flex flex-col items-center justify-center rounded-[3rem] w-[40%] h-3/4 bg-BudgieWhite "
+        onClick={(e) => handleChildElementClick(e)}
+      ></div>
+    </div>
+  );
+}
+
 export function AccountsPage(props: AccountsPageProps) {
   useEffect(() => {}, []);
 
-  return AddAccountModal();
+  return (
+    <>
+      {/* <NoAccountsPage></NoAccountsPage> */}
+      <AddAccountModal></AddAccountModal>
+      {/* <UploadCSVModal></UploadCSVModal> */}
+      <AccountInfoModal></AccountInfoModal>
+    </>
+  );
 }
 
 export default AccountsPage;
