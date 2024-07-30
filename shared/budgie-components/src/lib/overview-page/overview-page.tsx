@@ -56,10 +56,10 @@ export function OverviewPage(props: OverviewPageProps) {
       </button>
       <div className={styles.chartContainer}>
         <div className={styles.chartItem}>
-          <div className={`${styles.gridTitleContainer} ${isDarkMode ? '' : styles.light}`}>
-            <h3 className={styles.gridTitle}>Net Worth Over Time</h3>
+          <div className={styles.chartTitleContainer}>
+            <h3 className={styles.chartTitle}>Net Worth Over Time</h3>
           </div>
-          <LineChart width={600} height={300} data={spendingData}>
+          <LineChart width={650} height={300} data={spendingData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" tick={{ fill: isDarkMode ? 'white' : 'black' }} />
             <YAxis tick={{ fill: isDarkMode ? 'white' : 'black' }} />
@@ -68,8 +68,8 @@ export function OverviewPage(props: OverviewPageProps) {
           </LineChart>
         </div>
         <div className={styles.chartItem}>
-          <div className={`${styles.gridTitleContainer} ${isDarkMode ? '' : styles.light}`}>
-            <h3 className={styles.gridTitle}>Spending by Category</h3>
+          <div className={styles.chartTitleContainer}>
+            <h3 className={styles.chartTitle}>Spending by Category</h3>
           </div>
           <PieChart width={600} height={300}>
             <Pie
@@ -91,9 +91,8 @@ export function OverviewPage(props: OverviewPageProps) {
         </div>
       </div>
       <div className={styles.gridContainer}>
-        {/* Rest of your grid items */}
         <div className={styles.gridItem}>
-          <div className={`${styles.gridTitleContainer} ${isDarkMode ? '' : styles.light}`}>
+          <div className={styles.gridTitleContainer}>
             <FontAwesomeIcon icon={faMoneyBill} className={styles.icon} />
             <h2 className={styles.gridTitle}>Total Balance for Year</h2>
           </div>
@@ -101,7 +100,7 @@ export function OverviewPage(props: OverviewPageProps) {
           <p>Total Money out: R5 427.28</p>
         </div>
         <div className={styles.gridItem}>
-          <div className={`${styles.gridTitleContainer} ${isDarkMode ? '' : styles.light}`}>
+          <div className={styles.gridTitleContainer}>
             <FontAwesomeIcon icon={faBank} className={styles.icon} />
             <h2 className={styles.gridTitle}>Current Accounts</h2>
           </div>
@@ -112,14 +111,7 @@ export function OverviewPage(props: OverviewPageProps) {
           </ul>
         </div>
         <div className={styles.gridItem}>
-          <div className={`${styles.gridTitleContainer} ${isDarkMode ? '' : styles.light}`}>
-            <FontAwesomeIcon icon={faChartPie} className={styles.icon} />
-            <h2 className={styles.gridTitle}>Spending by Category</h2>
-          </div>
-          <p>Most spent on: Entertainment</p>
-        </div>
-        <div className={styles.gridItem}>
-          <div className={`${styles.gridTitleContainer} ${isDarkMode ? '' : styles.light}`}>
+          <div className={styles.gridTitleContainer}>
             <FontAwesomeIcon icon={faHistory} className={styles.icon} />
             <h2 className={styles.gridTitle}>Last Transaction</h2>
           </div>
@@ -128,7 +120,7 @@ export function OverviewPage(props: OverviewPageProps) {
           <p>Category: Eating Out</p>
         </div>
         <div className={styles.gridItem}>
-          <div className={`${styles.gridTitleContainer} ${isDarkMode ? '' : styles.light}`}>
+          <div className={styles.gridTitleContainer}>
             <FontAwesomeIcon icon={faCalendarAlt} className={styles.icon} />
             <h2 className={styles.gridTitle}>Upcoming Bills & Payments</h2>
           </div>
@@ -138,7 +130,7 @@ export function OverviewPage(props: OverviewPageProps) {
           </ul>
         </div>
         <div className={styles.gridItem}>
-          <div className={`${styles.gridTitleContainer} ${isDarkMode ? '' : styles.light}`}>
+          <div className={styles.gridTitleContainer}>
             <FontAwesomeIcon icon={faListUl} className={styles.icon} />
             <h2 className={styles.gridTitle}>Budget Status</h2>
           </div>
@@ -148,7 +140,7 @@ export function OverviewPage(props: OverviewPageProps) {
           </div>
         </div>
         <div className={styles.gridItem}>
-          <div className={`${styles.gridTitleContainer} ${isDarkMode ? '' : styles.light}`}>
+          <div className={styles.gridTitleContainer}>
             <FontAwesomeIcon icon={faBullseye} className={styles.icon} />
             <h2 className={styles.gridTitle}>Financial Goals Progress</h2>
           </div>
