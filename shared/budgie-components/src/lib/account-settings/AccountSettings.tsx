@@ -126,76 +126,58 @@ export function AccountSettings(props: AccountSettingsProps) {
             Edit your profile information.
           </p>
         </div>
-        <div className={styles.settingsOption}>
-          <p className={styles.settingTitle}>Password Management</p>
-          <p className={styles.settingDescription}>Change your password.</p>
+        <div className="p-4 bg-white shadow-md rounded-md">
+          <p className="text-lg font-semibold mb-2">Password Management</p>
+          <p className="text-sm text-gray-600 mb-4">Change your password.</p>
           <button
-            className={styles.deleteButton}
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
             onClick={handlePassChangeClick}
           >
-            <div className={styles.deleteButton}>Change password</div>
+            Change password
           </button>
           {isCPopupVisible && (
-            <div className={styles.popupOverlay}>
-              <div className={styles.popupContent}>
-                <p>Type in your old password:</p>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <div className="bg-white p-6 rounded-md shadow-md">
+                <p className="mb-2">Type in your old password:</p>
                 <input
                   type="password"
                   value={OldPassword}
                   placeholder="Enter your old password"
                   onChange={(e) => setOldPassword(e.target.value)}
-                  style={{
-                    paddingLeft: '0.5rem',
-                    borderRadius: '4px',
-                    border: '1px solid #ccc',
-                    height: '2.5rem',
-                    width: '70%',
-                  }}
+                  className="px-2 py-2 border border-gray-300 rounded w-3/4 mb-4"
                 />
-                <p>Type in your new password:</p>
+                <p className="mb-2">Type in your new password:</p>
                 <input
                   type="password"
                   value={newPassword}
                   placeholder="Enter your new password"
                   onChange={(e) => setNewPassword(e.target.value)}
-                  style={{
-                    paddingLeft: '0.5rem',
-                    borderRadius: '4px',
-                    border: '1px solid #ccc',
-                    height: '2.5rem',
-                    width: '70%',
-                  }}
+                  className="px-2 py-2 border border-gray-300 rounded w-3/4 mb-4"
                 />
-                <p>Confirm new password:</p>
+                <p className="mb-2">Confirm new password:</p>
                 <input
                   type="password"
                   value={ConPassword}
                   placeholder="Enter your new password"
                   onChange={(e) => setConPassword(e.target.value)}
-                  style={{
-                    paddingLeft: '0.5rem',
-                    borderRadius: '4px',
-                    border: '1px solid #ccc',
-                    height: '2.5rem',
-                    width: '70%',
-                  }}
+                  className="px-2 py-2 border border-gray-300 rounded w-3/4 mb-4"
                 />
-                <br></br>
-                <button
-                  className={styles.confirmButton}
-                  onClick={handleChangePassword}
-                >
-                  Confirm
-                </button>
-                <br></br>
-                <button
-                  className={styles.cancelButton}
-                  onClick={handlecClosePopup}
-                >
-                  Cancel
-                </button>
+                <div className="flex justify-between mt-4">
+                  <button
+                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                    onClick={handleChangePassword}
+                  >
+                    Confirm
+                  </button>
+                  <button
+                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                    onClick={handlecClosePopup}
+                  >
+                    Cancel
+                  </button>
+                </div>
                 {error && (
-                  <div className="pt-2 text-red-600 font-TripSans font-medium">
+                  <div className="pt-2 text-red-600 font-medium">
                     {errorMessage}
                   </div>
                 )}
