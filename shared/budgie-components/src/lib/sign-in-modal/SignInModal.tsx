@@ -10,7 +10,11 @@ import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
+  setPersistence,
+  browserSessionPersistence,
+  getAuth,
 } from 'firebase/auth';
+
 import { auth } from '../../../../../apps/budgie-app/firebase/clientApp';
 
 /* eslint-disable-next-line */
@@ -32,11 +36,12 @@ export function SignInModal(props: SignInModalProps) {
 
   const signInWithGoogle = async () => {
     try {
+      const auth = getAuth();
+      await setPersistence(auth, browserSessionPersistence);
       const provider = new GoogleAuthProvider();
       provider.addScope('email');
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      console.log('User information:', user);
     } catch (error) {
       if (error instanceof Error) {
         const errorCode = (error as any).code;
@@ -60,6 +65,8 @@ export function SignInModal(props: SignInModalProps) {
       return;
     }
     try {
+      const auth = getAuth();
+      await setPersistence(auth, browserSessionPersistence);
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
