@@ -129,8 +129,8 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     const handleChildElementClick = (e: { stopPropagation: () => void }) => {
-      e.stopPropagation();
       //ignore clicks
+      e.stopPropagation();
     };
 
     const handleCSVUpload = async (file: File) => {
@@ -148,9 +148,11 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         if (!InfoLine) {
           setError('fileformat');
         } else {
+          alert('');
         }
+        setCsvLoading(false);
       };
-      setCsvLoading(false);
+      reader.readAsText(file);
     };
 
     return (
@@ -172,7 +174,16 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               </div>
             </>
           )}
-          {csvLoading && <div>loading</div>}
+          {csvLoading && (
+            <span
+              className=" material-symbols-outlined animate-spin"
+              style={{
+                fontSize: '3rem',
+              }}
+            >
+              autorenew
+            </span>
+          )}
         </div>
       </div>
     );
