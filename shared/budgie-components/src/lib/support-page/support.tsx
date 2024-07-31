@@ -1,11 +1,13 @@
 'use client';
 
+import { Fragment, useState } from 'react';
 import styles from './support.module.css';
 export interface SupportProps {
   onClose: () => void;
 }
 
 export function Support(props: SupportProps) {
+  const [showContact, setShowContact] = useState<boolean>(false);
   return (
     <>
       <div className="mainPage">
@@ -70,9 +72,23 @@ export function Support(props: SupportProps) {
               <p className="text-gray-600 mb-4">
                 Budgie support contact information
               </p>
-              <button className=" bg-blue-950 BudgieBlue px-4 py-2 rounded-full shadow-lg">
-                Contacts
-              </button>
+              {!showContact && (
+                <button
+                  onClick={() => {
+                    setShowContact(!showContact);
+                  }}
+                  className=" bg-blue-950 BudgieBlue px-4 py-2 rounded-full shadow-lg"
+                >
+                  Contacts
+                </button>
+              )}
+              {showContact && (
+                <>
+                  <p className=" text-BudgieGreen1">
+                    email: Technocrats.301@gmail.com
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </section>
