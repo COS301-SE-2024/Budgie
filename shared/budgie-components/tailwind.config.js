@@ -23,6 +23,8 @@ module.exports = {
         BudgieWhite: '#F8F8F8',
         BudgieGray: '#E1E1E1',
         BudgieGrayLight: '#EAEAEA',
+        BudgieAccentHover: '#576A94',
+        BudgiePrimary2: '#83A2B7',
       },
     },
   },

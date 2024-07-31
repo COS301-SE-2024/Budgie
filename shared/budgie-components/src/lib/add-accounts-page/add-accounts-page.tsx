@@ -1,48 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './add-accounts-page.module.css';
 import { UploadStatementCSV } from '@capstone-repo/shared/budgie-components';
 
 /* eslint-disable-next-line */
 export interface AddAccountsPageProps {}
 
-//modals and pages
-
-interface AccountInfoModalProps {
-  name: string;
-  AccountNumber: string;
-}
-
-function AccountInfoModal(props: AccountInfoModalProps) {
-  const handleChildElementClick = (e: { stopPropagation: () => void }) => {
-    e.stopPropagation();
-    //exit modal
-  };
-
-  const handleUploadClick = (e: { stopPropagation: () => void }) => {
-    e.stopPropagation();
-  };
-
-  return (
-    <div
-      onClick={() => {
-        alert('outer click');
-      }}
-      className={styles.mainPageBlurModal}
-    >
-      <div
-        className="flex flex-col items-center justify-center rounded-[3rem] w-[40%] h-3/4 bg-BudgieWhite "
-        onClick={(e) => handleChildElementClick(e)}
-      ></div>
-    </div>
-  );
-}
-
 export function AddAccountsPage(props: AddAccountsPageProps) {
   const [showUploadCSVModal, setShowUploadCSVModal] = useState(false);
   const [showAccountInfoModal, setShowAccountInfoModal] = useState(false);
   const [accountType, setAccountType] = useState('');
+  const [accountName, setAccountName] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
+  const [csvFile, setCsvFile] = useState<File | null>(null);
   const [error, setError] = useState('');
 
   function AddAccountModal() {
@@ -122,8 +93,6 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
   }
 
   function UploadCSVModal() {
-    const [csvLoading, setCsvLoading] = useState(false);
-
     const handleExit = () => {
       setShowUploadCSVModal(!showUploadCSVModal);
     };
@@ -134,7 +103,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     const handleCSVUpload = async (file: File) => {
-      setCsvLoading(true);
+      setError('');
       const reader = new FileReader();
       reader.onload = async (event) => {
         const content = event.target?.result as string;
@@ -144,13 +113,17 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
           .filter((line) => line);
 
         //get account name and number
-        const InfoLine = lines.find((line) => line.startsWith('Date'));
+        const InfoLine = lines.find((line) => line.startsWith('Account'));
         if (!InfoLine) {
-          setError('fileformat');
+          setError('File formatting');
         } else {
-          alert('');
+          const InfoLineArray = InfoLine.split(',').map((item) => item.trim());
+          setAccountName(InfoLineArray[2].slice(1, -1));
+          setAccountNumber(InfoLineArray[1]);
+          setCsvFile(file);
+          setShowUploadCSVModal(!showUploadCSVModal);
+          setShowAccountInfoModal(!showAccountInfoModal);
         }
-        setCsvLoading(false);
       };
       reader.readAsText(file);
     };
@@ -158,32 +131,103 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     return (
       <div onClick={handleExit} className={styles.mainPageBlurModal}>
         <div
-          className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
+          className="flex flex-col items-center justify-start rounded-[2rem] w-96 h-96 bg-BudgieWhite "
           onClick={(e) => handleChildElementClick(e)}
         >
-          {!csvLoading && (
-            <>
-              <span className="text-2xl text-center">
-                Upload your transaction history <br /> in the form of a CSV{' '}
-                <br /> to auto-detect account information.
-              </span>
-              <div className="mt-7">
-                <UploadStatementCSV
-                  onFileUpload={handleCSVUpload}
-                ></UploadStatementCSV>
-              </div>
-            </>
-          )}
-          {csvLoading && (
-            <span
-              className=" material-symbols-outlined animate-spin"
-              style={{
-                fontSize: '3rem',
-              }}
-            >
-              autorenew
+          <span className="text-2xl text-center mt-[5rem]">
+            Upload your transaction history <br /> in the form of a CSV <br />{' '}
+            to auto-detect account information.
+          </span>
+          <div className="mt-7">
+            <UploadStatementCSV
+              onFileUpload={handleCSVUpload}
+            ></UploadStatementCSV>
+          </div>
+          {error != '' && (
+            <span className="font-TripSans mt-[1rem] font-medium text-red-500">
+              Error: {error}
             </span>
           )}
+        </div>
+      </div>
+    );
+  }
+
+  function AccountInfoModal() {
+    const [aliasError, setAliasError] = useState(false);
+    const [inputValue, setInputValue] = useState('');
+
+    const handleExit = () => {
+      setShowAccountInfoModal(!showAccountInfoModal);
+    };
+
+    const handleChildElementClick = (e: { stopPropagation: () => void }) => {
+      e.stopPropagation();
+      //do nothing prevents click
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setInputValue(e.target.value);
+    };
+
+    const handleAddAccountClick = () => {
+      //add account to database
+      //add financial data to db
+    };
+
+    return (
+      <div onClick={handleExit} className={styles.mainPageBlurModal}>
+        <div
+          className="flex flex-col items-center justify-start rounded-[3rem] w-[45%] h-4/6 bg-BudgieGray "
+          onClick={(e) => handleChildElementClick(e)}
+        >
+          <span className="mt-3 text-3xl font-TripSans font-medium">
+            Account Summary
+          </span>
+          <div className="bg-BudgieWhite shadow-lg mt-6 py-8 px-6 rounded-3xl flex flex-col items-start justify-center">
+            <div className="">
+              <span className="mr-3 text-2xl font-TripSans font-medium">
+                Type:
+              </span>
+              <span className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium">
+                {accountType}
+              </span>
+            </div>
+            <div className="mt-5">
+              <span className="mr-3 text-2xl font-TripSans font-medium">
+                Name:
+              </span>
+              <span className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium">
+                {accountName}
+              </span>
+            </div>
+            <div className="mt-5">
+              <span className="mr-3 text-2xl font-TripSans font-medium">
+                Account Number:
+              </span>
+              <span className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium">
+                {accountNumber}
+              </span>
+            </div>
+          </div>
+          <div className="flex justify-center items-baseline w-full mt-5">
+            <span className="mt-10 mr-4 text-3xl font-TripSans font-medium">
+              Alias:
+            </span>
+            <input
+              autoFocus
+              spellCheck="false"
+              onChange={handleChange}
+              className="bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-BudgiePrimary2 outline-none focus:border-2 focus:border-BudgieAccentHover"
+              type="text"
+            />
+          </div>
+          <button
+            onClick={handleAddAccountClick}
+            className="mt-12 text-BudgieWhite text-2xl p-3 rounded-3xl font-bold bg-BudgiePrimary2 hover:bg-BudgieAccentHover transition-colors ease-in"
+          >
+            Add Account
+          </button>
         </div>
       </div>
     );
@@ -193,6 +237,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     <>
       <AddAccountModal></AddAccountModal>
       {showUploadCSVModal && <UploadCSVModal></UploadCSVModal>}
+      {showAccountInfoModal && <AccountInfoModal></AccountInfoModal>}
     </>
   );
 }
