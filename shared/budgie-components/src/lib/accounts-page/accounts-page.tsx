@@ -13,11 +13,6 @@ interface NoAccountsPageProps {
   onAddClick: () => void;
 }
 
-interface AccountInfoModalProps {
-  name: string;
-  AccountNumber: string;
-}
-
 function NoAccountsPage(props: NoAccountsPageProps) {
   return (
     <div className="mainPage">
