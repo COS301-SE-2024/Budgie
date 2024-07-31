@@ -21,6 +21,7 @@ module.exports = {
         BudgieGreen3: '#71C194',
         BudgieBlue: '#293652',
         BudgieWhite: '#F8F8F8',
+        BudgieGrayLight: '#EAEAEA',
       },
     },
   },
