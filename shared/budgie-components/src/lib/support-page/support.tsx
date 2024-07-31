@@ -38,11 +38,11 @@ export function Support(props: SupportProps) {
               </div>
               <h3 className="text-xl font-semibold mb-2">Getting Started</h3>
               <p className="text-gray-600 mb-4">
-                Get your HelpScout account set up in just 6 simple steps.
+                Get your account set up in just a few simple steps.
               </p>
-              <a href="#" class="text-blue-600">
-                8 articles
-              </a>
+              <button className=" bg-blue-950 BudgieBlue px-4 py-2 rounded-full shadow-lg">
+                Started
+              </button>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="flex justify-center mb-4">
@@ -54,11 +54,11 @@ export function Support(props: SupportProps) {
               <p className="text-gray-600 mb-4">
                 Announcements from developers
               </p>
-              <a href="#" class="text-blue-600">
-                30 articles
-              </a>
+              <button className=" bg-blue-950 BudgieBlue px-4 py-2 rounded-full shadow-lg">
+                Announcements
+              </button>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-white p-6 rounded-lg shadow-md hover: ">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 bg-blue-500 text-white flex items-center justify-center rounded-full">
                   <span className="text-2xl font-bold">😕</span>
@@ -68,9 +68,9 @@ export function Support(props: SupportProps) {
               <p className="text-gray-600 mb-4">
                 Frequently asked questions from users of the website
               </p>
-              <a href="#" class="text-blue-600">
-                11 articles
-              </a>
+              <button className=" bg-blue-950 BudgieBlue px-4 py-2 rounded-full shadow-lg">
+                FAQs
+              </button>
             </div>
           </div>
         </section>
