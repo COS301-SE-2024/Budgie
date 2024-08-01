@@ -34,6 +34,8 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [uploadError, setUploadError] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showAccountAlreadyTracked, setShowAccountAlreadyTracked] =
+    useState(false);
   const user = useContext(UserContext);
 
   function AddAccountModal() {
@@ -462,7 +464,6 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     //helpers
-
     const AccountAlreadyTracked = async (
       uid: string,
       accNo: string
@@ -499,8 +500,11 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
       ) {
         let exists = await AccountAlreadyTracked(user.uid, accountNumber);
         if (exists) {
-          //TODO: failure modal for already tracked
-          alert('Account already tracked');
+          setShowAccountAlreadyTracked(true);
+          setShowAccountInfoModal(false);
+          setTimeout(() => {
+            setShowAccountAlreadyTracked(false);
+          }, 1500);
           return;
         } else {
           //add financial data to db
@@ -519,7 +523,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
           setShowAccountInfoModal(false);
           setTimeout(() => {
             setShowSuccessModal(false);
-          }, 2000);
+          }, 1500);
         }
       }
     };
@@ -619,12 +623,46 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     );
   }
 
+  function AlreadyTracked() {
+    const handleExit = () => {
+      setShowSuccessModal(false);
+    };
+
+    const handleChildElementClick = (e: { stopPropagation: () => void }) => {
+      //ignore clicks
+      e.stopPropagation();
+    };
+
+    return (
+      <div onClick={handleExit} className={styles.mainPageBlurModal}>
+        <div
+          className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
+          onClick={(e) => handleChildElementClick(e)}
+        >
+          <span className="text-center text-3xl font-TripSans font-bold">
+            Account already <br />
+            tracking
+          </span>
+          <span
+            className="mt-6 text-red-400 material-symbols-outlined"
+            style={{
+              fontSize: '9rem',
+            }}
+          >
+            close
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <AddAccountModal></AddAccountModal>
       {showUploadCSVModal && <UploadCSVModal></UploadCSVModal>}
       {showAccountInfoModal && <AccountInfoModal></AccountInfoModal>}
       {showSuccessModal && <SuccessModal></SuccessModal>}
+      {showAccountAlreadyTracked && <AlreadyTracked></AlreadyTracked>}
     </>
   );
 }
