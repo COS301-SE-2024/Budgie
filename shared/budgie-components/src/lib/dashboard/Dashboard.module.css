@@ -1,9 +1,9 @@
 .topBar {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   background-color: var(--block-background);
   width: 85vw;
-  height: calc(7vh * var(--font-size-multiplier));
+  height: calc(6vh * var(--font-size-multiplier));
 }
 
 .button {
@@ -23,4 +23,26 @@
 
 .activeButton {
   border-bottom: 5px solid var(--primary-1);
+}
+
+.accountDropdown {
+  background-color: var(--block-background);
+  padding: 5px;
+  box-sizing: border-box;
+  font-size: calc(1.2rem * var(--font-size-multiplier));
+  font-weight: bold;
+  margin-right: 2rem;
+  justify-self: end;
+  text-align: right;
+  text-align-last: right;
+}
+
+.accountDropdown option {
+  text-align: left;
+  background-color: white;
+  color: black;
+}
+
+.loadScreen {
+  background-color: brown;
 }
