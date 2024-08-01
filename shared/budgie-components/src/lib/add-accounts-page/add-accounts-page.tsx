@@ -282,6 +282,18 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
       }
     }
 
+    function isDuplicate(
+      transaction1: Transaction,
+      transaction2: Transaction
+    ): boolean {
+      return (
+        transaction1.date === transaction2.date &&
+        transaction1.amount === transaction2.amount &&
+        transaction1.balance === transaction2.balance &&
+        transaction1.description === transaction2.description
+      );
+    }
+
     async function MergeTransactions(
       YearMonthLinesRecord: Record<string, Transaction[]>,
       UniqueYearMonths: Record<string, string[]>
@@ -300,6 +312,66 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         if (!querySnapshot.empty) {
           let docSnap = querySnapshot.docs[0];
           alert('exists already');
+          for (const YearMonth of YearMonths) {
+            let [Y, Month] = YearMonth.split('/');
+            Month = getMonthName(Month);
+            if (docSnap.data()[Month]) {
+              //month already contains data
+              const Incoming: Transaction[] = JSON.parse(docSnap.data()[Month]);
+              const Outgoing: Transaction[] = YearMonthLinesRecord[YearMonth];
+              //merge data duplicate removal
+              const filteredOutgoing = Outgoing.filter(
+                (outgoingTransaction) =>
+                  !Incoming.some((incomingTransaction) =>
+                    isDuplicate(outgoingTransaction, incomingTransaction)
+                  )
+              );
+
+              if (filteredOutgoing.length != 0) {
+                //there are some non duplicates merge and sort and update
+                const combinedTransactions = [...Incoming, ...filteredOutgoing];
+                combinedTransactions.sort((a, b) => {
+                  const dateA = new Date(a.date);
+                  const dateB = new Date(b.date);
+
+                  return dateB.getTime() - dateA.getTime();
+                });
+                const TransactionString = JSON.stringify(combinedTransactions);
+                try {
+                  await updateDoc(docSnap.ref, {
+                    [Month]: TransactionString,
+                  });
+                } catch (error) {
+                  console.log(error);
+                }
+              }
+            } else {
+              //empty month can just merge
+              const Outgoing: Transaction[] = YearMonthLinesRecord[YearMonth];
+              Outgoing.sort((a, b) => {
+                const dateA = new Date(a.date);
+                const dateB = new Date(b.date);
+
+                return dateB.getTime() - dateA.getTime();
+              });
+              const TransactionString = JSON.stringify(Outgoing);
+              try {
+                await updateDoc(docSnap.ref, {
+                  [Month]: TransactionString,
+                });
+              } catch (error) {
+                console.log(error);
+              }
+            }
+          }
+          //call categorize function
+          // const functions = getFunctions();
+          // const categoriseExpenses = httpsCallable(
+          //   functions,
+          //   'categoriseExpenses'
+          // );
+          // console.log('first run');
+          // categoriseExpenses({ year: Year });
         } else {
           //documents do not exist for this year can safely add to merged
           for (const YearMonth of YearMonths) {
