@@ -79,11 +79,15 @@ export function Dashboard(props: DashboardProps) {
           <button
             className={`${styles.button} ${viewMode === 'all' ? styles.activeButton : ''}`}
             onClick={() => setViewMode('all')}
-          >All</button>
+          >
+              Yearly
+          </button>
           <button
             className={`${styles.button} ${viewMode === 'monthly' ? styles.activeButton : ''}`}
             onClick={() => setViewMode('monthly')}
-          >Monthly</button>
+          >
+            Monthly
+          </button>
         </div>
         <select 
           className={styles.accountDropdown}

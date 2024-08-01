@@ -49,7 +49,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     if (currentMonth.getFullYear() != currentYear) {
       setCurrentYear(currentMonth.getFullYear());
     }
-    //cants go passed next month
+    //can't go passed next month
     const Now = new Date();
     if (
       currentMonth.getMonth() != Now.getMonth() + 1 ||
@@ -122,7 +122,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   useEffect(() => {
     setData(props.data);
   }, []);
-
 
   const display = async () => {
     const month = currentMonth
@@ -262,8 +261,8 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
                   style={{
                     borderLeft:
                       transaction.amount >= 0
-                        ? '15px solid #293652'
-                        : '15px solid #8EE5A2',
+                        ? '15px solid #8EE5A2'
+                        : '15px solid var(--primary-1)',
                   }}
                 >
                     <div className={styles.transactionContent}>

@@ -51,6 +51,14 @@
   text-align: center;
 }
 
+.yearDisplay {
+  font-size: calc(1.4rem * var(--font-size-multiplier));
+  font-weight: bold;
+  margin: 0 12px;
+  width: calc(5rem * var(--font-size-multiplier));
+  text-align: center;
+}
+
 .transactionsList {
   font-size: calc(1.2rem * var(--font-size-multiplier));
   text-align: left;
@@ -68,7 +76,7 @@
 }
 
 .transactionCard {
-  background-color: white;
+  background-color: var(--block-background);
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -104,6 +112,7 @@
   font-size: calc(16px * var(--font-size-multiplier));
   font-weight: bold;
   margin-left: auto;
+  color: var(--main-text);
 }
 
 .transactionDescription {
