@@ -44,5 +44,7 @@
 }
 
 .loadScreen {
-  background-color: brown;
+  background-color: var(--main-background);
+  width: 85vw;
+  height: calc(100vh - (6vh * var(--font-size-multiplier)));
 }

@@ -111,15 +111,10 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         getYearlyTransactions();
       }
     }
-    //console.log("new");
   }, [currentYear]);
 
   useEffect(() => {
-    if (Data === null) {
-      //console.log("No");
-    }
-    else 
-    {
+    if (Data !== null) {
       display();
     }
   }, [Data]);
