@@ -2,14 +2,23 @@
 
 import { Fragment, useState } from 'react';
 import styles from './support.module.css';
+import { HelpModal } from '../help-modal/help-modal';
 export interface SupportProps {
   onClose: () => void;
 }
 
 export function Support(props: SupportProps) {
   const [showContact, setShowContact] = useState<boolean>(false);
+  const [showFaqModal, setFaqModal] = useState<boolean>(false);
+  const [showHelpModal, setHelpModal] = useState<boolean>(false);
+
   return (
     <>
+      {showHelpModal && (
+        <>
+          <HelpModal></HelpModal>
+        </>
+      )}
       <div className="mainPage">
         <div className="pageTitle">
           <span
@@ -42,7 +51,12 @@ export function Support(props: SupportProps) {
               <p className="text-gray-600 mb-4">
                 Get your account set up in just a few simple steps.
               </p>
-              <button className=" bg-blue-950 BudgieBlue px-4 py-2 rounded-full shadow-lg">
+              <button
+                className=" bg-blue-950 BudgieBlue px-4 py-2 rounded-full shadow-lg"
+                onClick={() => {
+                  setHelpModal(!showHelpModal);
+                }}
+              >
                 Help
               </button>
             </div>
@@ -58,7 +72,10 @@ export function Support(props: SupportProps) {
               <p className="text-gray-600 mb-4">
                 Frequently asked questions from users of the website
               </p>
-              <button className=" bg-blue-950 BudgieBlue px-4 py-2 rounded-full shadow-lg">
+              <button
+                className=" bg-blue-950 BudgieBlue px-4 py-2 rounded-full shadow-lg"
+                OnClick
+              >
                 FAQs
               </button>
             </div>
