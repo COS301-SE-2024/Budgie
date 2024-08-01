@@ -1,8 +1,26 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
+import {
+  doc,
+  setDoc,
+  addDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  DocumentSnapshot,
+  DocumentData,
+  QueryDocumentSnapshot,
+  DocumentReference,
+} from 'firebase/firestore';
 import styles from './add-accounts-page.module.css';
-import { UploadStatementCSV } from '@capstone-repo/shared/budgie-components';
+import {
+  UploadStatementCSV,
+  UserContext,
+} from '@capstone-repo/shared/budgie-components';
 
 /* eslint-disable-next-line */
 export interface AddAccountsPageProps {}
@@ -14,7 +32,8 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
   const [accountName, setAccountName] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [csvFile, setCsvFile] = useState<File | null>(null);
-  const [error, setError] = useState('');
+  const [uploadError, setUploadError] = useState('');
+  const user = useContext(UserContext);
 
   function AddAccountModal() {
     function OnAddAccountTypeClick(type: string) {
@@ -103,7 +122,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     const handleCSVUpload = async (file: File) => {
-      setError('');
+      setUploadError('');
       const reader = new FileReader();
       reader.onload = async (event) => {
         const content = event.target?.result as string;
@@ -115,7 +134,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         //get account name and number
         const InfoLine = lines.find((line) => line.startsWith('Account'));
         if (!InfoLine) {
-          setError('File formatting');
+          setUploadError('File formatting');
         } else {
           const InfoLineArray = InfoLine.split(',').map((item) => item.trim());
           setAccountName(InfoLineArray[2].slice(1, -1));
@@ -143,9 +162,9 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               onFileUpload={handleCSVUpload}
             ></UploadStatementCSV>
           </div>
-          {error != '' && (
+          {uploadError != '' && (
             <span className="font-TripSans mt-[1rem] font-medium text-red-500">
-              Error: {error}
+              Error: {uploadError}
             </span>
           )}
         </div>
@@ -167,12 +186,266 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setAliasError(false);
       setInputValue(e.target.value);
     };
 
-    const handleAddAccountClick = () => {
+    //uploadtransactions specific helpers---------------------------------
+
+    interface Transaction {
+      date: string;
+      amount: number;
+      balance: number;
+      description: string;
+      category: string;
+    }
+
+    function getSeparateYearMonthsAsTransactionObjects(
+      DataLines: string[]
+    ): Record<string, Transaction[]> {
+      const linesByYearMonth: Record<string, Transaction[]> = {};
+
+      for (const line of DataLines) {
+        const [date, amountStr, balanceStr, description] = line
+          .split(',')
+          .map((part) => part.trim());
+        const [year, month] = date.split('/');
+        const yearMonth = `${year}/${month}`;
+        const amount: number = parseFloat(amountStr);
+        const balance: number = parseFloat(balanceStr);
+
+        const transaction: Transaction = {
+          date,
+          amount,
+          balance,
+          description,
+          category: '', // Initialize category as an empty string
+        };
+
+        if (!linesByYearMonth[yearMonth]) {
+          linesByYearMonth[yearMonth] = [];
+        }
+
+        linesByYearMonth[yearMonth].push(transaction);
+      }
+
+      return linesByYearMonth;
+    }
+
+    function getUniqueYearMonths(
+      DataLines: string[]
+    ): Record<string, string[]> {
+      const yearMonthsRecord: Record<string, Set<string>> = {};
+
+      for (const line of DataLines) {
+        const [date] = line.split(',');
+        const [year, month] = date.split('/');
+        const yearMonth = `${year}/${month}`;
+
+        if (!yearMonthsRecord[year]) {
+          yearMonthsRecord[year] = new Set();
+        }
+
+        yearMonthsRecord[year].add(yearMonth);
+      }
+
+      const result: Record<string, string[]> = {};
+
+      for (const year in yearMonthsRecord) {
+        result[year] = Array.from(yearMonthsRecord[year]);
+      }
+
+      return result;
+    }
+
+    const monthNames = [
+      'january',
+      'february',
+      'march',
+      'april',
+      'may',
+      'june',
+      'july',
+      'august',
+      'september',
+      'october',
+      'november',
+      'december',
+    ];
+
+    function getMonthName(month: string): string {
+      const monthIndex = parseInt(month, 10) - 1; // Months are zero-based
+      if (monthIndex >= 0 && monthIndex < 12) {
+        return monthNames[monthIndex];
+      } else {
+        throw new Error('Invalid month value');
+      }
+    }
+
+    async function MergeTransactions(
+      YearMonthLinesRecord: Record<string, Transaction[]>,
+      UniqueYearMonths: Record<string, string[]>
+    ) {
+      //determine merged record
+      for (const Year in UniqueYearMonths) {
+        let Merged: Record<string, Transaction[]> = {};
+        const YearMonths: string[] = UniqueYearMonths[Year];
+        //check if exists
+        const q = query(
+          collection(db, `transaction_data_${Year}`),
+          where('uid', '==', user.uid),
+          where('account_number', '==', accountNumber)
+        );
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          let docSnap = querySnapshot.docs[0];
+          alert('exists already');
+        } else {
+          //documents do not exist for this year can safely add to merged
+          for (const YearMonth of YearMonths) {
+            Merged[YearMonth] = YearMonthLinesRecord[YearMonth];
+          }
+          // TODO: sort merged on date
+          for (const YearMonth in Merged) {
+            const MonthlyTransactions: Transaction[] = Merged[YearMonth];
+            MonthlyTransactions.sort((a, b) => {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+
+              return dateB.getTime() - dateA.getTime();
+            });
+          }
+          //upload merged!document does not exist must first set then update
+          let first = true;
+          let docRef: DocumentReference<DocumentData, DocumentData> | null =
+            null;
+          for (const YearMonth in Merged) {
+            let [year, month] = YearMonth.split('/');
+            const TransactionString = JSON.stringify(Merged[YearMonth]);
+            const TransactionMonthString = getMonthName(month);
+            console.log(TransactionMonthString);
+            console.log(TransactionString);
+            if (first) {
+              first = false;
+              //add to db
+              docRef = await addDoc(
+                collection(db, `transaction_data_${year}`),
+                {
+                  uid: user.uid,
+                  account_number: accountNumber,
+                  [TransactionMonthString]: TransactionString,
+                }
+              );
+            } else {
+              if (docRef != null) {
+                try {
+                  await updateDoc(docRef, {
+                    [TransactionMonthString]: TransactionString,
+                  });
+                } catch (error) {
+                  console.log(error);
+                }
+              }
+            }
+          }
+          //call categorize function
+          // const functions = getFunctions();
+          // const categoriseExpenses = httpsCallable(
+          //   functions,
+          //   'categoriseExpenses'
+          // );
+          // console.log('first run');
+          // categoriseExpenses({ year: Year });
+        }
+      }
+    }
+
+    const UploadTransactions = async (file: File) => {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const content = event.target?.result as string;
+        const lines = content
+          .split('\n')
+          .map((line) => line.trim())
+          .filter((line) => line);
+
+        //extract transaction lines
+        const HeaderLine = lines.find((line) => line.startsWith('Date'));
+        if (HeaderLine) {
+          const DataLines = lines.slice(
+            lines.indexOf(HeaderLine) + 1,
+            lines.length
+          );
+          const YearMonthLinesRecord: Record<string, Transaction[]> =
+            getSeparateYearMonthsAsTransactionObjects(DataLines);
+          const UniqueYearMonths: Record<string, string[]> =
+            getUniqueYearMonths(DataLines);
+          MergeTransactions(YearMonthLinesRecord, UniqueYearMonths);
+        } else {
+          //error incorrect csv format
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    //helpers
+
+    const AccountAlreadyTracked = async (
+      uid: string,
+      accNo: string
+    ): Promise<boolean> => {
+      const accRef = collection(db, 'accounts');
+      const q = query(
+        accRef,
+        where('account_number', '==', accNo),
+        where('uid', '==', uid)
+      );
+      const querySnapshot = await getDocs(q);
+      let flag = false;
+      querySnapshot.forEach((doc) => {
+        if (doc.exists()) {
+          flag = true;
+        }
+      });
+
+      return flag ? true : false;
+    };
+
+    const handleAddAccountClick = async () => {
+      if (inputValue == '') {
+        setAliasError(true);
+        return;
+      }
       //add account to database
-      //add financial data to db
+      if (
+        accountType != '' &&
+        accountName != '' &&
+        accountNumber != '' &&
+        inputValue != '' &&
+        csvFile != null
+      ) {
+        let exists = await AccountAlreadyTracked(user.uid, accountNumber);
+        if (exists) {
+          //TODO: failure modal for already tracked
+          alert('Account already tracked account and transactions not added');
+          return;
+        } else {
+          alert('continuing');
+          //add financial data to db
+          //TODO:implement this
+          UploadTransactions(csvFile);
+          //add account after incase of error
+          const docRef = await addDoc(collection(db, 'accounts'), {
+            uid: user.uid,
+            name: accountName,
+            account_number: accountNumber,
+            type: accountType,
+            alias: inputValue,
+          });
+          alert('success account and transactions added');
+          //TODO:success modal for upload success
+        }
+      }
     };
 
     return (
@@ -218,7 +491,11 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               autoFocus
               spellCheck="false"
               onChange={handleChange}
-              className="bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-BudgiePrimary2 outline-none focus:border-2 focus:border-BudgieAccentHover"
+              className={`${
+                !aliasError
+                  ? 'bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-BudgiePrimary2 outline-none focus:border-2 focus:border-BudgieAccentHover'
+                  : 'bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-red-400 outline-none focus:border-2 focus:border-red-400'
+              }`}
               type="text"
             />
           </div>
@@ -232,6 +509,8 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
       </div>
     );
   }
+
+  function SuccessModal() {}
 
   return (
     <>
