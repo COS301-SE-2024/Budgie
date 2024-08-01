@@ -33,6 +33,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
   const [accountNumber, setAccountNumber] = useState('');
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [uploadError, setUploadError] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const user = useContext(UserContext);
 
   function AddAccountModal() {
@@ -499,12 +500,11 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         let exists = await AccountAlreadyTracked(user.uid, accountNumber);
         if (exists) {
           //TODO: failure modal for already tracked
-          alert('Account already tracked account and transactions not added');
+          alert('Account already tracked');
           return;
         } else {
-          alert('continuing');
           //add financial data to db
-          //TODO:implement this
+          //const success = await
           UploadTransactions(csvFile);
           //add account after incase of error
           const docRef = await addDoc(collection(db, 'accounts'), {
@@ -514,8 +514,12 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
             type: accountType,
             alias: inputValue,
           });
-          alert('success account and transactions added');
           //TODO:success modal for upload success
+          setShowSuccessModal(true);
+          setShowAccountInfoModal(false);
+          setTimeout(() => {
+            setShowSuccessModal(false);
+          }, 2000);
         }
       }
     };
@@ -582,13 +586,45 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     );
   }
 
-  function SuccessModal() {}
+  function SuccessModal() {
+    const handleExit = () => {
+      setShowSuccessModal(false);
+    };
+
+    const handleChildElementClick = (e: { stopPropagation: () => void }) => {
+      //ignore clicks
+      e.stopPropagation();
+    };
+
+    return (
+      <div onClick={handleExit} className={styles.mainPageBlurModal}>
+        <div
+          className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
+          onClick={(e) => handleChildElementClick(e)}
+        >
+          <span className="text-center text-3xl font-TripSans font-bold">
+            Account and financial <br />
+            data added
+          </span>
+          <span
+            className="mt-6 text-BudgieGreen1 material-symbols-outlined"
+            style={{
+              fontSize: '9rem',
+            }}
+          >
+            verified
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
       <AddAccountModal></AddAccountModal>
       {showUploadCSVModal && <UploadCSVModal></UploadCSVModal>}
       {showAccountInfoModal && <AccountInfoModal></AccountInfoModal>}
+      {showSuccessModal && <SuccessModal></SuccessModal>}
     </>
   );
 }
