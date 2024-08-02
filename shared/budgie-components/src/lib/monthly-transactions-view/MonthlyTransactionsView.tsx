@@ -352,10 +352,20 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
               ))}
             </div>
           )}
-        </div>
-      )}
+          <div>
+          {balance === 0 ?
+          (
+            <div className={styles.idk}>There are no transactions to display for this month.</div>
+          )
+          : (<div></div>)
+          }
     </div>
-  );
+        </div>
+      )
+    }
+
+
+  </div>  );
 }
 
 export default MonthlyTransactionsView;

@@ -171,7 +171,8 @@ export function Dashboard(props: DashboardProps) {
           </div>)
         }
       </div>
-      </div>)}
+      </div>)
+      }
     </div>
   );
 }

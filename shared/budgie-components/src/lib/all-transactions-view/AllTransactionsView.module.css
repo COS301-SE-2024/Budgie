@@ -257,3 +257,10 @@
   color: var(--main-text);
 }
 
+.idk {
+  text-align: center;
+  margin-top: 30vh;
+  color: var(--greyed-text);
+  font-size: calc(1.4rem * var(--font-size-multiplier));
+}
+
