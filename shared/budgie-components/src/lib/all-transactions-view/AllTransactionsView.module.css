@@ -145,19 +145,7 @@
 .buttonContainer {
   display: flex;
   align-items: center;
-  gap: 10px; /* Adjust the space between the buttons */
-}
-
-.metricsButton {
-  background-color: var(--primary-1);
-  color: white;
-  margin-top: calc(0.5rem * var(--font-size-multiplier));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.4rem;
-  transition:  0.2s ease;
-  padding: 0.5rem 1rem;
+  gap: 10px;
 }
 
 .income {
@@ -244,5 +232,50 @@
   padding-right: 2rem;
   padding-top: 1vh;
   overflow-y: auto;
+}
+
+.dateDropdown {
+  background-color: var(--main-background);
+  cursor: pointer;
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide overflow if text is too long */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-align: center; 
+  text-align-last: center;
+  transition: background-color 0.2s ease;
+}
+
+
+.dateDropdown:hover {
+  background-color:var(--block-background);
+  cursor: pointer;
+}
+
+.dateDropdown option {
+  background-color: var(--block-background);
+  color: var(--main-text);
+}
+
+.yearDropdown {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-size: calc(1.4rem * var(--font-size-multiplier));
+  font-weight: bold;
+  background-color: var(--main-background);
+  transition: background-color 0.2s ease;
+  text-align: center;
+}
+
+.yearDropdown option {
+  background-color: var(--block-background);
+  color: var(--main-text);
+}
+
+.yearDropdown:hover {
+  background-color: lightgray;
+  cursor: pointer;
 }
 

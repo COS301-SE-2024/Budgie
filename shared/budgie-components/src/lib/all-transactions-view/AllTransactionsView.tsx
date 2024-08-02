@@ -197,17 +197,6 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
 
   return (
     <div className={styles.mainPage}>
-      
-      {/* <button
-        onClick={() => setShowMetrics(true)}
-        className={styles.metricsButton}
-      >
-        View Metrics
-      </button>
-
-      {showMetrics && <Metrics onClose={() => setShowMetrics(false)} />} */}
-
-
       <div className={styles.header}>
         <div className={styles.monthNavigation}>
           <button className={styles.navButton} onClick={handlePrevYear}>

@@ -1,6 +1,6 @@
 'use client';
 import styles from '../all-transactions-view/AllTransactionsView.module.css';
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import {
   collection,
@@ -28,6 +28,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [Data, setData] = useState<any>(null);
   const user = useContext(UserContext);
+  const dropdownRef = useRef<HTMLSelectElement>(null);
 
   interface Transaction {
     date: string;
@@ -64,10 +65,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
       setCurrentYear(currentMonth.getFullYear());
     }
     display();
-  };
-
-  const formatMonthYear = (date: any) => {
-    return date.toLocaleString('default', { month: 'long', year: 'numeric' });
   };
 
   const monthNames = [
@@ -161,12 +158,10 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
           [monthNames[currentMonth.getMonth()]]: JSON.stringify(updatedTransactions),
         });
 
-        const q2 = query(collection(db, `transaction_data_${currentYear}`), where('uid', '==', user.uid), where('account_number', '==', props.account));
         const querySnapshot2 = await getDocs(q);
         const transactionList = querySnapshot2.docs.map(doc => doc.data());
         setData(transactionList[0]);
       } 
-
       setTransactions(updatedTransactions);
     }
   };
@@ -215,6 +210,47 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     return formatter.format(value);
   };  
 
+  const monthOptions = [
+    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  
+  const yearOptions = [2020, 2021, 2022, 2023, 2024];
+  
+
+  useEffect(() => {
+    if (dropdownRef.current) {
+      const selectedOption = dropdownRef.current.options[dropdownRef.current.selectedIndex];
+      const size = getMonthWidth(selectedOption.text);
+      dropdownRef.current.style.width = `${size+20}px`;
+    }
+  }, [currentMonth]);
+
+  const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedMonth = event.target.value;
+    const monthIndex = monthOptions.indexOf(selectedMonth);
+    setCurrentMonth(new Date(currentMonth.setMonth(monthIndex)));
+    display();
+  };
+  
+  const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedYear = parseInt(event.target.value);
+    setCurrentYear(selectedYear);
+    setCurrentMonth(new Date(currentMonth.setFullYear(selectedYear)));
+    display();
+  };    
+
+  function getMonthWidth(text: string, font: string = 'calc(1.4rem * var(--font-size-multiplier)) Trip Sans'): number {
+    const span = document.createElement('span');
+    span.style.font = font;
+    span.style.visibility = 'hidden'; // Make it invisible
+    span.style.whiteSpace = 'nowrap'; // Prevent wrapping
+    span.textContent = text;
+    document.body.appendChild(span);
+    const width: number = span.offsetWidth;
+    document.body.removeChild(span);
+    return width;
+}
+
   return (
     <div className={styles.mainPage}>
       <div className={styles.header}>
@@ -227,14 +263,29 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
               arrow_back_ios
             </span>
           </button>
-          <span className={styles.monthDisplay}>
-            {formatMonthYear(currentMonth)}
+          <span className={styles.monthDisplay}>      
+            <select
+              ref={dropdownRef}
+              className={styles.dateDropdown}
+              value={monthOptions[currentMonth.getMonth()]}
+              onChange={handleMonthChange}
+            >
+              {monthOptions.map((month, index) => (
+                <option key={index} value={month}>{month}</option>
+              ))}
+            </select>
+            
+            <select
+              className={styles.dateDropdown}
+              value={currentYear}
+              onChange={handleYearChange}
+            >
+              {yearOptions.map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
           </span>
-          <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-            onClick={handleNextMonth}
-          />
+          
           <button className={styles.navButton} onClick={handleNextMonth}>
             <span
               className="material-symbols-outlined"
