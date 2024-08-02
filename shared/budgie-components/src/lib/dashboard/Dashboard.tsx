@@ -32,6 +32,8 @@ export function Dashboard(props: DashboardProps) {
   // Set of years for which user has transactions
   const [yearsWithData, setYearsWithData] = useState<number[]>([0]);
 
+  const [hasAccount, setHasAccount] = useState('No');
+
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
@@ -46,6 +48,10 @@ export function Dashboard(props: DashboardProps) {
         if (accountOptionsList.length > 0) {
           setSelectedAlias(accountOptionsList[0].alias);
           setCurrentAccountNumber(accountOptionsList[0].accountNumber);
+          setHasAccount("Yes");
+        }
+        else{
+          setHasAccount("No");
         }
       } catch (error) {
         console.error("Error fetching aliases: ", error);
@@ -107,7 +113,19 @@ export function Dashboard(props: DashboardProps) {
 
   return (
     <div>
-      <div className={styles.topBar}>
+      {hasAccount==="No" ? 
+          (<div className={styles.noAccountScreen}>
+            <div>
+              <div className={styles.noAccountText}>
+                You haven't added an account yet.
+              </div>
+              <div className={styles.noAccountText}>
+                Head to the Accounts page to add an account and upload a transaction statement.  
+              </div>   
+            </div>  
+          </div>)
+      
+      : (<div><div className={styles.topBar}>
         <div></div>{/*spacing div*/}
         <div>
           <button
@@ -139,21 +157,21 @@ export function Dashboard(props: DashboardProps) {
       </div>
 
       <div>
-        {viewMode === 'monthly' && Data && yearsWithData[0]!==0 ? 
-          (<MonthlyTransactionsView account={currentAccountNumber} data={Data} availableYears={yearsWithData}/>) 
+        {viewMode === 'monthly' && Data && yearsWithData[0]!==0  ? 
+        (<MonthlyTransactionsView account={currentAccountNumber} data={Data} availableYears={yearsWithData}/>) 
 
-        : viewMode === 'all' && Data && yearsWithData[0]!==0? 
+        : viewMode === 'all' && Data && yearsWithData[0]!==0  ? 
           (<AllTransactionsView account={currentAccountNumber} availableYears={yearsWithData}/>) 
 
         : (<div className={styles.loadScreen}>
             <div className={styles.loaderContainer}>
               <div className={styles.loader}></div>
             </div> 
-            <div className={styles.loaderText}>Loading...</div>
-            
+            <div className={styles.loaderText}>Loading...</div>            
           </div>)
         }
       </div>
+      </div>)}
     </div>
   );
 }
