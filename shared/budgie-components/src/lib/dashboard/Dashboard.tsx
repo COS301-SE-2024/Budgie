@@ -106,7 +106,7 @@ export function Dashboard(props: DashboardProps) {
         {viewMode === 'monthly' && Data ? 
           (<MonthlyTransactionsView account={currentAccountNumber} data={Data} />) : 
         viewMode === 'all' && Data ? 
-          (<AllTransactionsView />) : 
+          (<AllTransactionsView account={currentAccountNumber} />) : 
         (<div className={styles.loadScreen}>Loading...</div>)
       }
       </div>

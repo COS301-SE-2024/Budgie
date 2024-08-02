@@ -2,24 +2,17 @@
 import styles from '../all-transactions-view/AllTransactionsView.module.css';
 import React, { useState, useEffect, useContext } from 'react';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
-import UploadStatementCSV from '../upload-statement-csv/UploadStatementCSV';
 import {
   collection,
   doc,
-  getDoc,
   getDocs,
-  addDoc,
-  setDoc,
   updateDoc,
   query, 
   where
 } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from 'firebase/auth';
-import { getFunctions, httpsCallable } from 'firebase/functions';
 import '../../root.css';
-import { json } from 'stream/consumers';
-import Metrics from '../metrics/Metrics'; // Import the Metrics component
 
 export interface MonthlyTransactionsViewProps {
   account: string;
