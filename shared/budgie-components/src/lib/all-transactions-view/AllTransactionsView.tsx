@@ -13,7 +13,6 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from 'firebase/auth';
-import { getFunctions, httpsCallable } from 'firebase/functions';
 import '../../root.css';
 
 export interface AllTransactionsViewProps {
@@ -124,7 +123,37 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   };
 
   const handleChange = async (event: React.ChangeEvent<HTMLSelectElement>, index: number) => {
-    
+    const selectedCategory = event.target.value;
+    const transactionMonth = parseInt(event.target.id.substring(5,7), 10);
+    console.log(transactionMonth);
+    if (selectedCategory === 'Add category') {
+      alert('under construction');
+    } else {
+      const updatedTransactions = transactions.map((transaction, i) =>
+        i === index ? { ...transaction, category: selectedCategory } : transaction
+      );
+
+      const q = query(collection(db, `transaction_data_${currentYear}`), where('uid', '==', user.uid), where('account_number', '==', props.account));
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        const docRef = querySnapshot.docs[0].ref;
+        await updateDoc(docRef, {
+          [monthNames[transactionMonth]]: JSON.stringify(updatedTransactions),
+        });
+
+        //const q2 = query(collection(db, `transaction_data_${currentYear}`), where('uid', '==', user.uid), where('account_number', '==', props.account));
+        //const querySnapshot2 = await getDocs(q2);
+        //const transactionList = querySnapshot2.docs.map(doc => doc.data());
+        //setData(transactionList[0]);
+  
+        console.log('Success');
+      } else {
+        console.log('No matching document found!');
+      }
+
+      setTransactions(updatedTransactions);
+    }
   };
   
   const getCategoryStyle = (category: string) => {
@@ -248,6 +277,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
                       <select
                           className={`${styles.categoryDropdown} ${getCategoryStyle(transaction.category)}`}
                           onChange={(event) => handleChange(event, index)}
+                          id={`${transaction.date}-${transaction.description}`}
                           value={transaction.category}
                         >
                           <option value=""></option>
