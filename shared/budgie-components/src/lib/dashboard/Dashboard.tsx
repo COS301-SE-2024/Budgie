@@ -42,7 +42,7 @@ export function Dashboard(props: DashboardProps) {
     };
 
     fetchAliases();
-  }, [user.uid]);
+  }, []);
 
   useEffect(() => {
     const getYearlyTransactions = async () => {

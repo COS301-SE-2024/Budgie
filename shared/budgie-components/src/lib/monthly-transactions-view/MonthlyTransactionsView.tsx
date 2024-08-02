@@ -29,6 +29,8 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   const [Data, setData] = useState<any>(null);
   const user = useContext(UserContext);
   const dropdownRef = useRef<HTMLSelectElement>(null);
+  const [yearsWithData, setYearsWithData] = useState<number[]>([]);
+
 
   interface Transaction {
     date: string;
@@ -111,7 +113,30 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
 
   useEffect(() => {
     setData(props.data);
+    fetchAvailableYears();
   }, []);
+
+  const fetchAvailableYears = async () => {
+    try {
+      const currentYear = new Date().getFullYear();
+      const years: number[] = [];
+      
+      // Adjust this range based on your needs
+      for (let year = 2000; year <= currentYear; year++) {
+        const q = query(collection(db, `transaction_data_${year}`), where('uid', '==', user.uid), where('account_number', '==', props.account));
+        const querySnapshot = await getDocs(q);
+  
+        if (!querySnapshot.empty) {
+          years.push(year);
+        }
+      }
+  
+      setYearsWithData(years);
+    } catch (error) {
+      console.error('Error fetching years with data:', error);
+    }
+  }; 
+  
 
   const display = async () => {
     const month = currentMonth
@@ -212,10 +237,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
 
   const monthOptions = [
     'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-  
-  const yearOptions = [2020, 2021, 2022, 2023, 2024];
-  
+  ];  
 
   useEffect(() => {
     if (dropdownRef.current) {
@@ -242,8 +264,8 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   function getMonthWidth(text: string, font: string = 'calc(1.4rem * var(--font-size-multiplier)) Trip Sans'): number {
     const span = document.createElement('span');
     span.style.font = font;
-    span.style.visibility = 'hidden'; // Make it invisible
-    span.style.whiteSpace = 'nowrap'; // Prevent wrapping
+    span.style.visibility = 'hidden';
+    span.style.whiteSpace = 'nowrap';
     span.textContent = text;
     document.body.appendChild(span);
     const width: number = span.offsetWidth;
@@ -280,9 +302,9 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
               value={currentYear}
               onChange={handleYearChange}
             >
-              {yearOptions.map(year => (
-                <option key={year} value={year}>{year}</option>
-              ))}
+              {yearsWithData.map(year => (
+          <option key={year} value={year}>{year}</option>
+        ))}
             </select>
           </span>
           
