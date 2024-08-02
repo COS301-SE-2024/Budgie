@@ -3,7 +3,7 @@ import styles from './page.module.css';
 import React, { useContext, useEffect, useState } from 'react';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';
-import { AccountsPage } from '@capstone-repo/shared/budgie-components';
+import { AddAccountsPage } from '@capstone-repo/shared/budgie-components';
 
 export default function overview() {
   const router = useRouter();
@@ -19,5 +19,5 @@ export default function overview() {
     }
   }, [user]);
 
-  return <>{!loading && <AccountsPage></AccountsPage>}</>;
+  return <>{!loading && <AddAccountsPage></AddAccountsPage>}</>;
 }

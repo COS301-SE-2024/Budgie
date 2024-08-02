@@ -1,0 +1,206 @@
+.monthNavigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5rem;
+  }
+  
+  .navButton {
+    color: var(--main-text);
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+  
+  .navButton:hover {
+    color: var(--primary-1);
+  }
+  
+  .monthDisplay {
+    font-size: calc(1.4rem * var(--font-size-multiplier));
+    font-weight: bold;
+    margin: 0 12px;
+  }
+  
+  .balance {
+    font-size: calc(1.2rem * var(--font-size-multiplier));
+    text-align: left;
+    margin-bottom: 5px;
+  }
+  
+  .transactions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: black;
+  }
+  
+  .transactionCard {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    height: calc(6vh * var(--font-size-multiplier));
+  }
+  
+  .transactionCard:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .transactionContent {
+    display: flex;
+    width: 100%;
+    align-items: center;
+  }
+  
+  .transactionDate,
+  .transactionDescription {
+    font-size: calc(14px * var(--font-size-multiplier));
+    font-weight: bold;
+  }
+  
+  .transactionDate {
+    font-weight: bold;
+    color: var(--main-text);
+    margin-right: 1rem;
+  }
+  
+  .transactionAmount {
+    font-size: calc(16px * var(--font-size-multiplier));
+    font-weight: bold;
+    margin-left: auto;
+  }
+  
+  .transactionDescription {
+    text-align: left;
+    color: #888888;
+  }
+  
+  .categoryDropdown {
+    border: 1px solid #ccc; /* Add a border around the dropdown */
+    padding: 5px; /* Add padding inside the dropdown */
+    border-radius: 10px; /* Optional: rounded corners */
+    width: calc(9vw * var(--font-size-multiplier));
+    box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+    font-weight: bold;
+    font-size: calc(16px * var(--font-size-multiplier));
+    margin-left: 2rem;
+    text-align: center;
+    text-align-last: center;
+    appearance: none; /* Remove default arrow */
+    -webkit-appearance: none; /* Remove default arrow for Safari */
+    -moz-appearance: none; /* Remove default arrow for Firefox */
+  }
+  
+  .categoryDropdown option {
+    text-align: left;
+    background-color: white;
+    color: black;
+  }
+  
+  .buttonContainer {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adjust the space between the buttons */
+  }
+  
+  .metricsButton {
+    background-color: var(--primary-1);
+    color: white;
+    margin-top: calc(0.5rem * var(--font-size-multiplier));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.4rem;
+    transition:  0.2s ease;
+    padding: 0.5rem 1rem;
+  }
+  
+  .income {
+    background-color: #76EE92;
+    border: none;
+  }
+  
+  .transport {
+    background-color: #4EB5FF;
+    border: none;
+  }
+  
+  .eatingOut {
+    background-color: #FFCD4E;
+    border: none;
+  }
+  
+  .groceries {
+    background-color: #A98DFB;
+    border: none;
+  }
+  
+  .entertainment {
+    background-color: #FD7575;
+    border: none;
+  }
+  
+  .shopping {
+    background-color: #FB94F1;
+    border: none;
+  }
+  
+  .insurance {
+    background-color: #72F1E2;
+    border: none;
+  }
+  
+  .utilities {
+    background-color: #FDAD73;
+    border: none;
+  }
+  
+  .medicalAid {
+    background-color: #C1C1C1;
+    border: none;
+  }
+  
+  .other {
+    background-color: #000000;
+    color: white;
+    border: none;
+  }
+  
+  .default {
+    background-color: white;
+    color: black;
+  }
+  
+  .topBar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    background-color: #4EB5FF;
+    width: 100%;
+  }
+  
+  .button {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .button:hover {
+    background-color: lightgray;
+  }
+  
+  .mainPage {
+    background-color: var(--main-background);
+    width: 85vw;
+    height: 100vh;
+    padding-left: calc(1.5rem * var(--font-size-multiplier));
+    padding-right: 1.5rem;
+    padding-top: 1rem;
+    overflow-y: auto;
+  }

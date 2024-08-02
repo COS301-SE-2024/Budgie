@@ -20,9 +20,16 @@ function signout() {
     });
 }
 
+function getFirstSubstring(url: string) {
+  const parts = url.split('/').filter((part) => part !== '');
+  return parts.length > 0 ? parts[0] : '';
+}
+
 export function NewNavbar(props: NavbarProps) {
   const pathname = usePathname();
-  const [selectedItem, setSelectedItem] = useState<string>(pathname.slice(1));
+  const [selectedItem, setSelectedItem] = useState<string>(
+    getFirstSubstring(pathname)
+  );
 
   return (
     <div className={styles.sidebar}>
@@ -42,7 +49,8 @@ export function NewNavbar(props: NavbarProps) {
                 marginLeft: '0.3rem',
                 marginBottom: '0.2rem',
                 fontSize:
-                  'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))',
+                  'min(2rem, (calc(1.5rem * var(--font-size-multiplier))))',
+                fontWeight: 500,
               }}
             >
               home
@@ -65,7 +73,8 @@ export function NewNavbar(props: NavbarProps) {
                 marginLeft: '0.3rem',
                 marginBottom: '0.2rem',
                 fontSize:
-                  'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))',
+                  'min(2rem, (calc(1.5rem * var(--font-size-multiplier))))',
+                fontWeight: 500,
               }}
             >
               account_balance
@@ -88,7 +97,8 @@ export function NewNavbar(props: NavbarProps) {
                 marginLeft: '0.3rem',
                 marginBottom: '0.2rem',
                 fontSize:
-                  'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))',
+                  'min(2rem, (calc(1.5rem * var(--font-size-multiplier))))',
+                fontWeight: 500,
               }}
             >
               receipt_long
@@ -111,7 +121,8 @@ export function NewNavbar(props: NavbarProps) {
                 marginLeft: '0.3rem',
                 marginBottom: '0.2rem',
                 fontSize:
-                  'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))',
+                  'min(2rem, (calc(1.5rem * var(--font-size-multiplier))))',
+                fontWeight: 500,
               }}
             >
               settings

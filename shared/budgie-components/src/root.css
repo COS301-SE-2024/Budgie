@@ -1,187 +1,193 @@
 @import url(https://db.onlinewebfonts.com/c/076abc8ba1bb38a0713dec3b63b880e4?family=Trip+Sans);
 
-
 * {
-    font-family: "Trip Sans", sans-serif;
+  font-family: 'Trip Sans', sans-serif;
 }
 
-:root{
-    --main-background: #E1E1E1;
-    --block-background: #F8F8F8;
-    --main-text: #000000;
-    --accent-colour: #293652;
-    --accent-hover: #576a94;
-    --hover: #e8ebf1;
-    --greyed-text:#7D7D7D;
+:root {
+  --main-background: #e1e1e1;
+  --block-background: #f8f8f8;
+  --main-text: #000000;
+  --accent-colour: #293652;
+  --accent-hover: #576a94;
+  --hover: #e8ebf1;
+  --greyed-text: #7d7d7d;
 
-    --BudgieGreen1: #8EE5A2;
-    --BudgieGreen2: #B4E5A2;
-    --BudgieGreen3: #71C194;
-    --BudgieBlue: #293652;
-    --BudgieWhite: #F8F8F8;
+  --BudgieGreen1: #8ee5a2;
+  --BudgieGreen2: #b4e5a2;
+  --BudgieGreen3: #71c194;
+  --BudgieBlue: #293652;
+  --BudgieWhite: #f8f8f8;
 
-    --font-size-multiplier: 1;
-    --primary-1: #07456F;
-    --primary-2: #83A2B7;
-    --blue: #07456F;
-    --yellow: #D49D02;
-    --pink: #960446;
-    --purple: #3F058D;
-    --orange: #B04700;
-    --green: #005438;
-    --blue-h: #83A2B7;
-    --yellow-h: #E9CE80;
-    --pink-h: #CA81A2;
-    --purple-h: #9F82C6;
-    --orange-h: #D7A37F;
-    --green-h: #7FA99B;
+  --font-size-multiplier: 1;
+  --primary-1: #07456f;
+  --primary-2: #83a2b7;
+  --blue: #07456f;
+  --yellow: #d49d02;
+  --pink: #960446;
+  --purple: #3f058d;
+  --orange: #b04700;
+  --green: #005438;
+  --blue-h: #83a2b7;
+  --yellow-h: #e9ce80;
+  --pink-h: #ca81a2;
+  --purple-h: #9f82c6;
+  --orange-h: #d7a37f;
+  --green-h: #7fa99b;
 }
 
 body {
-    font-size: calc(1rem * var(--font-size-multiplier));
-    color: var(--main-text);
+  font-size: calc(1rem * var(--font-size-multiplier));
+  color: var(--main-text);
 }
 
 :root[data-theme='light'] {
-    --main-background: #E1E1E1;
-    --block-background: #F8F8F8;
-    --main-text: #000000;
-    --secondary-text: white;
-    --accent-colour: #293652;
-    --accent-hover: #576a94;
-    --hover: #e8ebf1;
-    --greyed-text:#7D7D7D;
+  --main-background: #e1e1e1;
+  --block-background: #f8f8f8;
+  --main-text: #000000;
+  --secondary-text: white;
+  --accent-colour: #293652;
+  --accent-hover: #576a94;
+  --hover: #e8ebf1;
+  --greyed-text: #7d7d7d;
 
-    --blue: #07456F;
-    --yellow: #D49D02;
-    --pink: #960446;
-    --purple: #3F058D;
-    --orange: #B04700;
-    --green: #005438;
-    --blue-h: #83A2B7;
-    --yellow-h: #E9CE80;
-    --pink-h: #CA81A2;
-    --purple-h: #9F82C6;
-    --orange-h: #D7A37F;
-    --green-h: #7FA99B;
+  --blue: #07456f;
+  --yellow: #d49d02;
+  --pink: #960446;
+  --purple: #3f058d;
+  --orange: #b04700;
+  --green: #005438;
+  --blue-h: #83a2b7;
+  --yellow-h: #e9ce80;
+  --pink-h: #ca81a2;
+  --purple-h: #9f82c6;
+  --orange-h: #d7a37f;
+  --green-h: #7fa99b;
 }
 
-:root[data-theme='dark']{
-    --main-background: #1C2436;
-    --block-background: #293652;
-    --main-text: #FFFFFF;
-    --secondary-text: black;
-    --accent-colour: #E8EFFF;
-    --accent-hover: #c8d1e6;
-    --hover: rgb(52, 67, 100);
-    --greyed-text:#ececec;
+:root[data-theme='dark'] {
+  --main-background: #1c2436;
+  --block-background: #293652;
+  --main-text: #ffffff;
+  --secondary-text: black;
+  --accent-colour: #e8efff;
+  --accent-hover: #c8d1e6;
+  --hover: rgb(52, 67, 100);
+  --greyed-text: #ececec;
 
-    --blue: #1D9BF0;
-    --yellow: #F0B202;
-    --pink: #F91880;
-    --purple: #7856FF;
-    --orange: #FF7A00;
-    --green: #00BA7C;
-    --blue-h: #A9D9F9;
-    --yellow-h: #FEDB7A;
-    --pink-h: #FC80B8;
-    --purple-h: #B8A7FF;
-    --orange-h: #FFB36D;
-    --green-h: #B3FFE6;
+  --blue: #1d9bf0;
+  --yellow: #f0b202;
+  --pink: #f91880;
+  --purple: #7856ff;
+  --orange: #ff7a00;
+  --green: #00ba7c;
+  --blue-h: #a9d9f9;
+  --yellow-h: #fedb7a;
+  --pink-h: #fc80b8;
+  --purple-h: #b8a7ff;
+  --orange-h: #ffb36d;
+  --green-h: #b3ffe6;
 }
 
 :root[colour-theme='light-blue'] {
-    --primary-1: #07456F;
-    --primary-2: #83A2B7;
+  --primary-1: #07456f;
+  --primary-2: #83a2b7;
+  --secondary-text: white;
+  --complementary: #b04700;
 }
 
 :root[colour-theme='light-yellow'] {
-    --primary-1: #D49D02;
-    --primary-2: #E9CE80;
+  --primary-1: #d49d02;
+  --primary-2: #e9ce80;
+  --complementary: #3f058d;
 }
 
 :root[colour-theme='light-pink'] {
-    --primary-1: #960446;
-    --primary-2: #CA81A2;
+  --primary-1: #960446;
+  --primary-2: #ca81a2;
+  --complementary: #005438;
 }
 
 :root[colour-theme='light-purple'] {
-    --primary-1: #3F058D;
-    --primary-2: #9F82C6;
+  --primary-1: #3f058d;
+  --primary-2: #9f82c6;
+  --complementary: #d49d02;
 }
 
 :root[colour-theme='light-orange'] {
-    --primary-1: #B04700;
-    --primary-2: #D7A37F;
+  --primary-1: #b04700;
+  --primary-2: #d7a37f;
+  --complementary: #07456f;
 }
 
 :root[colour-theme='light-green'] {
-    --primary-1: #005438;
-    --primary-2: #7FA99B;
+  --primary-1: #005438;
+  --primary-2: #7fa99b;
+  --complementary: #960446;
 }
 
 :root[colour-theme='dark-blue'] {
-    --primary-1: #1D9BF0;
-    --primary-2: #A9D9F9;
+  --primary-1: #1d9bf0;
+  --primary-2: #a9d9f9;
+  --complementary: #ff7a00;
 }
 
 :root[colour-theme='dark-yellow'] {
-    --primary-1: #F0B202;
-    --primary-2: #FEDB7A;
+  --primary-1: #f0b202;
+  --primary-2: #fedb7a;
+  --complementary: #7856ff;
 }
 
 :root[colour-theme='dark-pink'] {
-    --primary-1: #F91880;
-    --primary-2: #FC80B8;
+  --primary-1: #f91880;
+  --primary-2: #fc80b8;
+  --complementary: #00ba7c;
 }
 
 :root[colour-theme='dark-purple'] {
-    --primary-1: #7856FF;
-    --primary-2: #B8A7FF;
+  --primary-1: #7856ff;
+  --primary-2: #b8a7ff;
+  --complementary: #f0b202;
 }
 
 :root[colour-theme='dark-orange'] {
-    --primary-1: #FF7A00;
-    --primary-2: #FFB36D;
+  --primary-1: #ff7a00;
+  --primary-2: #ffb36d;
+  --complementary: #1d9bf0;
 }
 
 :root[colour-theme='dark-green'] {
-    --primary-1: #00BA7C;
-    --primary-2: #B3FFE6;
+  --primary-1: #00ba7c;
+  --primary-2: #b3ffe6;
+  --complementary: #f91880;
 }
-
-
 
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=swap');
 
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined';
-  font-variation-settings:
-    'FILL' 0,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24;
-    cursor: pointer;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  cursor: pointer;
 }
 
 .mainPage {
-    background-color: var(--main-background);
-    width: 85vw;
-    height: 100vh;
-    padding-left: calc(1.5rem * var(--font-size-multiplier));
-    padding-right: 1.5rem;
-    padding-top: 1rem;
-    overflow-y: auto;
-    position: fixed;
-    right: 0;
-    top: 0;
+  background-color: var(--main-background);
+  width: 85vw;
+  height: 100vh;
+  padding-left: calc(1.5rem * var(--font-size-multiplier));
+  padding-right: 1.5rem;
+  padding-top: 1rem;
+  overflow-y: auto;
+  position: fixed;
+  right: 0;
+  top: 0;
 }
 
-.pageTitle{
-    color: var(--primary-1);
-    font-weight: 900;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    font-size: calc(1.5rem * var(--font-size-multiplier));
+.pageTitle {
+  color: var(--primary-1);
+  font-weight: 900;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  font-size: calc(1.5rem * var(--font-size-multiplier));
 }
