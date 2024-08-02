@@ -54,4 +54,42 @@
   background-color: var(--main-background);
   width: 85vw;
   height: calc(100vh - (6vh * var(--font-size-multiplier)));
+  padding-top: 40vh;
 }
+
+.loaderContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.loader {
+  width: 7rem;
+  height: 4rem;
+  --g1:conic-gradient(from  90deg at left   3px top   3px,#0000 90deg,var(--primary-1) 0);
+  --g2:conic-gradient(from -90deg at bottom 3px right 3px,#0000 90deg,var(--primary-1) 0);
+  background: var(--g1),var(--g1),var(--g1), var(--g2),var(--g2),var(--g2);
+  background-position: left,center,right;
+  background-repeat: no-repeat;
+  animation: l10 1s infinite alternate;
+}
+@keyframes l10 {
+  0%,
+  2%   {background-size:2rem 50% ,2rem 50% ,2rem 50%}
+  20%  {background-size:2rem 25% ,2rem 50% ,2rem 50%}
+  40%  {background-size:2rem 100%,2rem 25% ,2rem 50%}
+  60%  {background-size:2rem 50% ,2rem 100%,2rem 25%}
+  80%  {background-size:2rem 50% ,2rem 50% ,2rem 100%}
+  98%,
+  100% {background-size:2rem 50% ,2rem 50% ,2rem 50%}
+}
+
+.loaderText {
+  font-size: 1.5rem;
+  width: 100%;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+
+
+
