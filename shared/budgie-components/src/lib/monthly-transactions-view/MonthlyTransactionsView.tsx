@@ -303,8 +303,8 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
               onChange={handleYearChange}
             >
               {yearsWithData.map(year => (
-          <option key={year} value={year}>{year}</option>
-        ))}
+                <option key={year} value={year}>{year}</option>
+              ))}
             </select>
           </span>
           

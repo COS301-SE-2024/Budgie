@@ -26,6 +26,8 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [Data, setData] = useState<any>(null);
   const user = useContext(UserContext);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [yearsWithData, setYearsWithData] = useState<number[]>([]);
 
   interface Transaction {
     date: string;
@@ -89,6 +91,10 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
       display();
     }
   }, [Data]);
+
+  useEffect(() => {
+    fetchAvailableYears();
+  }, []);
 
   const display = async () => {
     if(Data!=null){
@@ -193,6 +199,34 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     });
     return formatter.format(value);
   };
+
+  const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedYear = parseInt(event.target.value);
+    setCurrentYear(selectedYear);
+    setCurrentMonth(new Date(currentMonth.setFullYear(selectedYear)));
+    display();
+  }; 
+
+  const fetchAvailableYears = async () => {
+    try {
+      const currentYear = new Date().getFullYear();
+      const years: number[] = [];
+      
+      // Adjust this range based on your needs
+      for (let year = 2000; year <= currentYear; year++) {
+        const q = query(collection(db, `transaction_data_${year}`), where('uid', '==', user.uid), where('account_number', '==', props.account));
+        const querySnapshot = await getDocs(q);
+  
+        if (!querySnapshot.empty) {
+          years.push(year);
+        }
+      }
+  
+      setYearsWithData(years);
+    } catch (error) {
+      console.error('Error fetching years with data:', error);
+    }
+  }; 
   
 
   return (
@@ -208,7 +242,15 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
             </span>
           </button>
           <span className={styles.yearDisplay}>
-            {currentYear}
+          <select
+              className={styles.dateDropdown}
+              value={currentYear}
+              onChange={handleYearChange}
+            >
+              {yearsWithData.map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
           </span>
           <link
             rel="stylesheet"
