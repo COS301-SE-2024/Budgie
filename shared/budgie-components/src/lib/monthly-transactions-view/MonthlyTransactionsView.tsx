@@ -22,7 +22,7 @@ export interface MonthlyTransactionsViewProps {
 
 export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   const [balance, setBalance] = useState(0);
-  const [moneyIn, setMoneyIn] = useState(0);
+  const [moneyIn, setMoneyIn] = useState(1);
   const [moneyOut, setMoneyOut] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -296,16 +296,21 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
             </span>
           </button>
         </div>
-            <div className={styles.balanceInfo}>
-              Balance:  {formatCurrency(balance)}
-              <p className={styles.moneyInfo}>Money In:  {formatCurrency(moneyIn)}</p>
-              <p className={styles.moneyInfo}>Money Out:  {formatCurrency(moneyOut)}</p>
-            </div>  
+          <div className={styles.balanceInfo}>
+            Balance:  {formatCurrency(balance)}
+            <p className={styles.moneyInfo}>Money In:  {formatCurrency(moneyIn)}</p>
+            <p className={styles.moneyInfo}>Money Out:  {formatCurrency(moneyOut)}</p>
+          </div>  
       </div>
 
-      {balance !== null && (
         <div className={styles.transactionsList}>
-          {transactions.length > 0 && (
+          {moneyIn === 0 && moneyOut === 0?
+          (
+            <div className={styles.noTransactionsMessage}>There are no transactions to display for this month.</div>
+          )
+          : 
+          
+          (
             <div className={styles.transactions}>
               <br/>
               {transactions.map((transaction, index) => (
@@ -352,17 +357,9 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
               ))}
             </div>
           )}
-          <div>
-          {balance === 0 ?
-          (
-            <div className={styles.idk}>There are no transactions to display for this month.</div>
-          )
-          : (<div></div>)
-          }
+        <div>
     </div>
-        </div>
-      )
-    }
+  </div>
 
 
   </div>  );

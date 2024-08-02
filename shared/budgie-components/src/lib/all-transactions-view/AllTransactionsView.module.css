@@ -117,7 +117,7 @@
 
 .transactionDescription {
   text-align: left;
-  color: #888888;
+  color: var(--greyed-text);
 }
 
 .categoryDropdown {
@@ -134,12 +134,13 @@
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
+  background-color: var(--main-background);
 }
 
 .categoryDropdown option {
   text-align: left;
-  background-color: white;
-  color: black;
+  background-color: var(--main-background);
+  color: var(--main-text);
 }
 
 .buttonContainer {
@@ -200,7 +201,7 @@
 }
 
 .default {
-  background-color: white;
+  background-color: var(--main-background);
   color: black;
 }
 
@@ -257,7 +258,7 @@
   color: var(--main-text);
 }
 
-.idk {
+.noTransactionsMessage {
   text-align: center;
   margin-top: 30vh;
   color: var(--greyed-text);
