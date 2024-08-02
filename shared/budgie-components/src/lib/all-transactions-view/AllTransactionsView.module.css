@@ -242,11 +242,10 @@
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  text-align: center; 
-  text-align-last: center;
-  transition: background-color 0.2s ease;
+  text-align: left; 
+  transition: 0.2s ease;
+  padding: 0 5px;
 }
-
 
 .dateDropdown:hover {
   background-color:var(--block-background);
@@ -256,26 +255,5 @@
 .dateDropdown option {
   background-color: var(--block-background);
   color: var(--main-text);
-}
-
-.yearDropdown {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  font-size: calc(1.4rem * var(--font-size-multiplier));
-  font-weight: bold;
-  background-color: var(--main-background);
-  transition: background-color 0.2s ease;
-  text-align: center;
-}
-
-.yearDropdown option {
-  background-color: var(--block-background);
-  color: var(--main-text);
-}
-
-.yearDropdown:hover {
-  background-color: lightgray;
-  cursor: pointer;
 }
 

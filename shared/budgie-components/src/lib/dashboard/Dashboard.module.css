@@ -36,12 +36,18 @@
   justify-self: end;
   text-align: right;
   text-align-last: right;
+  transition: 0.2s ease;
 }
 
 .accountDropdown option {
   text-align: left;
   background-color: white;
   color: black;
+}
+
+.accountDropdown:hover {
+  background-color:var(--main-background);
+  cursor: pointer;
 }
 
 .loadScreen {

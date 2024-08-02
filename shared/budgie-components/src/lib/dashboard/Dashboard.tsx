@@ -20,6 +20,7 @@ export function Dashboard(props: DashboardProps) {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [Data, setData] = useState<any>(null);
   const [selectedAlias, setSelectedAlias] = useState<string>('');
+  const [yearsWithData, setYearsWithData] = useState<number[]>([0]);
 
   useEffect(() => {
     const fetchAliases = async () => {
@@ -60,6 +61,30 @@ export function Dashboard(props: DashboardProps) {
 
     getYearlyTransactions();
   }, [currentYear, currentAccountNumber, user.uid]);
+
+  useEffect(() => {
+    const fetchAvailableYears = async () => {
+      try {
+        const currentYear = new Date().getFullYear();
+        const years: number[] = [];
+        
+        for (let year = 2000; year <= currentYear; year++) {
+          const q = query(collection(db, `transaction_data_${year}`), where('uid', '==', user.uid), where('account_number', '==', currentAccountNumber));
+          const querySnapshot = await getDocs(q);
+          
+          if (!querySnapshot.empty) {
+            years.push(year);
+          }
+        }  
+        setYearsWithData(years);
+        
+      } catch (error) {
+        console.error('Error fetching years with data:', error);
+      }
+    }; 
+
+    fetchAvailableYears();
+  }, [currentAccountNumber]);
 
   const handleDropdownChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = event.target.value;
@@ -103,10 +128,10 @@ export function Dashboard(props: DashboardProps) {
       </div>
 
       <div>
-        {viewMode === 'monthly' && Data ? 
-          (<MonthlyTransactionsView account={currentAccountNumber} data={Data} />) : 
-        viewMode === 'all' && Data ? 
-          (<AllTransactionsView account={currentAccountNumber} />) : 
+        {viewMode === 'monthly' && Data && yearsWithData[0]!==0 ? 
+          (<MonthlyTransactionsView account={currentAccountNumber} data={Data} availableYears={yearsWithData}/>) : 
+        viewMode === 'all' && Data && yearsWithData[0]!==0? 
+          (<AllTransactionsView account={currentAccountNumber} availableYears={yearsWithData}/>) : 
         (<div className={styles.loadScreen}>Loading...</div>)
         }
       </div>

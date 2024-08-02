@@ -17,6 +17,7 @@ import '../../root.css';
 export interface MonthlyTransactionsViewProps {
   account: string;
   data: any;
+  availableYears: number[];
 }
 
 export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
@@ -29,7 +30,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   const [Data, setData] = useState<any>(null);
   const user = useContext(UserContext);
   const dropdownRef = useRef<HTMLSelectElement>(null);
-  const [yearsWithData, setYearsWithData] = useState<number[]>([]);
+  
 
 
   interface Transaction {
@@ -48,7 +49,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     //can't go passed next month
     const Now = new Date();
     if (
-      currentMonth.getMonth() != Now.getMonth() + 1 ||
+      currentMonth.getMonth() != Now.getMonth()  ||
       currentYear != Now.getFullYear()
     ) {
       //change the month
@@ -113,31 +114,9 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
 
   useEffect(() => {
     setData(props.data);
-    fetchAvailableYears();
   }, []);
 
-  const fetchAvailableYears = async () => {
-    try {
-      const currentYear = new Date().getFullYear();
-      const years: number[] = [];
-      
-      // Adjust this range based on your needs
-      for (let year = 2000; year <= currentYear; year++) {
-        const q = query(collection(db, `transaction_data_${year}`), where('uid', '==', user.uid), where('account_number', '==', props.account));
-        const querySnapshot = await getDocs(q);
   
-        if (!querySnapshot.empty) {
-          years.push(year);
-        }
-      }
-  
-      setYearsWithData(years);
-    } catch (error) {
-      console.error('Error fetching years with data:', error);
-    }
-  }; 
-  
-
   const display = async () => {
     const month = currentMonth
       .toLocaleString('default', { month: 'long' })
@@ -243,7 +222,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     if (dropdownRef.current) {
       const selectedOption = dropdownRef.current.options[dropdownRef.current.selectedIndex];
       const size = getMonthWidth(selectedOption.text);
-      dropdownRef.current.style.width = `${size+20}px`;
+      dropdownRef.current.style.width = `${size+12}px`;
     }
   }, [currentMonth]);
 
@@ -302,7 +281,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
               value={currentYear}
               onChange={handleYearChange}
             >
-              {yearsWithData.map(year => (
+              {props.availableYears.map(year => (
                 <option key={year} value={year}>{year}</option>
               ))}
             </select>
