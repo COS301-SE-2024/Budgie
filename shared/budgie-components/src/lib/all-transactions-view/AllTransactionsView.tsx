@@ -2,7 +2,6 @@
 import styles from '../all-transactions-view/AllTransactionsView.module.css';
 import React, { useState, useEffect, useContext } from 'react';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
-import UploadStatementCSV from '../upload-statement-csv/UploadStatementCSV';
 import {
   collection,
   doc,
@@ -24,7 +23,6 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   const [moneyIn, setMoneyIn] = useState(0);
   const [moneyOut, setMoneyOut] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [Data, setData] = useState<any>(null);
   const user = useContext(UserContext);

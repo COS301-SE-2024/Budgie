@@ -165,11 +165,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         const querySnapshot2 = await getDocs(q);
         const transactionList = querySnapshot2.docs.map(doc => doc.data());
         setData(transactionList[0]);
-  
-        console.log('Document successfully updated!');
-      } else {
-        console.log('No matching document found!');
-      }
+      } 
 
       setTransactions(updatedTransactions);
     }

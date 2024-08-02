@@ -108,7 +108,7 @@ export function Dashboard(props: DashboardProps) {
         viewMode === 'all' && Data ? 
           (<AllTransactionsView account={currentAccountNumber} />) : 
         (<div className={styles.loadScreen}>Loading...</div>)
-      }
+        }
       </div>
     </div>
   );
