@@ -42,7 +42,7 @@ export function Dashboard(props: DashboardProps) {
     };
 
     fetchAliases();
-  }, []);
+  }, [user.uid]);
 
   useEffect(() => {
     const getYearlyTransactions = async () => {
@@ -106,9 +106,9 @@ export function Dashboard(props: DashboardProps) {
         {viewMode === 'monthly' && Data ? 
           (<MonthlyTransactionsView account={currentAccountNumber} data={Data} />) : 
         viewMode === 'all' && Data ? 
-          (<AllTransactionsView account={currentAccountNumber} />) : 
-        (<div className={styles.loadScreen}>Loading...</div>)
-        }
+          (<AllTransactionsView account={currentAccountNumber} data={Data}/>) : 
+        (<div className={styles.loadScreen}></div>)
+      }
       </div>
     </div>
   );
