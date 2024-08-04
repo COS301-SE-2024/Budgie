@@ -3,6 +3,7 @@
 import { Fragment, useState } from 'react';
 import styles from './support.module.css';
 import { HelpModal } from '../help-modal/help-modal';
+import { FaqModal } from '../faq-modal/faq-modal';
 export interface SupportProps {
   onClose: () => void;
 }
@@ -14,16 +15,10 @@ export function Support(props: SupportProps) {
 
   return (
     <>
-      {showHelpModal && (
-        <>
-          <HelpModal></HelpModal>
-        </>
-      )}
       <div className="mainPage">
         <div className="pageTitle">
           <span
             className="material-symbols-outlined cursor-pointer"
-            onClick={props.onClose}
             style={{ marginRight: '0.5rem', fontSize: '1.5rem' }}
           >
             arrow_back
@@ -59,6 +54,7 @@ export function Support(props: SupportProps) {
               >
                 Help
               </button>
+              {showHelpModal && <HelpModal></HelpModal>}
             </div>
             <div className="bg-white p-6 rounded-lg shadow-md hover: ">
               <div className="flex justify-center mb-4">
@@ -74,10 +70,13 @@ export function Support(props: SupportProps) {
               </p>
               <button
                 className=" bg-blue-950 BudgieBlue px-4 py-2 rounded-full shadow-lg"
-                OnClick
+                onClick={() => {
+                  setFaqModal(!showFaqModal);
+                }}
               >
                 FAQs
               </button>
+              {showFaqModal && <FaqModal></FaqModal>}
             </div>
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="flex justify-center mb-4">
