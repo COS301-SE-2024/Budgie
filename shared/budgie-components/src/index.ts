@@ -11,3 +11,4 @@ export { SignUpPage } from './lib/sign-up-page/SignUpPage';
 export { UserProvider, UserContext } from './lib/hooks/UserProvider';
 export { OverviewPage } from './lib/overview-page/overview-page';
 export { Support } from './lib/support-page/support';
+export { ForgotPassword } from './lib/forgot-password/forgot-password';
