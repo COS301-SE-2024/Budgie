@@ -125,3 +125,18 @@
   width: 50%;
   height: 100%;
 }
+
+.centeredMessage {
+  color:rgba(50, 50, 50, 0.2);
+  font-size: 25px;
+  background-color: rgba(214, 214, 214, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center vertically */
+  align-items: center;     /* Center horizontally */
+  height: 100vh;           /* Full viewport height */
+  width: 90vw;            /* Full viewport width */
+  text-align: center;      /* Center text horizontally */
+  margin: 0;               /* Remove default margin */
+  box-sizing: border-box;
+}

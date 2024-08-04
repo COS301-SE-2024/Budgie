@@ -12,18 +12,28 @@ export interface OverviewPageProps {}
 export function OverviewPage(props: OverviewPageProps) {
 
   const [showData, setShowData] = useState(false);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+
+  interface Account {
+    account_number: string;
+    alias: string;
+    name: string;
+    type: string;
+    uid: string;
+  }
 
   useEffect(() => {
-
+    alert("alert")
     async function someFunction() {
-      const accounts = await getAccounts();
-      if(accounts.length>0){
+      const account = await getAccounts();
+      if(account.length>0){
+        setAccounts(account);
         setShowData(true);
       }
     }
 
     someFunction();
-  })
+  }, [showData])
  
 
 
@@ -132,9 +142,9 @@ export function OverviewPage(props: OverviewPageProps) {
                         <h2 className={styles.gridTitle}>Current Accounts</h2>
                       </div>
                       <ul>
-                        <li>Savings Account</li>
-                        <li>Cheque Account</li>
-                        <li>Other Account</li>
+                      {accounts.map(account => (
+                        <li>{account.alias}</li>
+                      ))}
                       </ul>
                     </div>
                     <div className={styles.gridItem}>
@@ -177,115 +187,18 @@ export function OverviewPage(props: OverviewPageProps) {
                   </div>
                 </div>
                 ) : (
-                    <p>You have no accounts<br/>
-                        Go to the accounts page to add an account</p>
+                <div className={styles.centeredMessage}>
+                    <p>You have not created<br/>
+                    any accounts <br/><br/>
+                    Head to the accounts<br/>
+                    section to create your first account</p>
+                </div>
                     
                 )}
             </div>
         </div>
     );
 
-  // return (
-  //   <div className={`${styles.metricsContainer} ${isDarkMode ? styles.dark : styles.light}`}>
-  //     <button className={styles.toggleButton} onClick={toggleTheme}>
-  //       {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-  //     </button>
-  //     <div className={styles.chartContainer}>
-  //       <div className={styles.chartItem}>
-  //         <div className={styles.chartTitleContainer}>
-  //           <h3 className={styles.chartTitle}>Net Worth Over Time</h3>
-  //         </div>
-  //         <LineChart width={650} height={300} data={spendingData}>
-  //           <CartesianGrid strokeDasharray="3 3" />
-  //           <XAxis dataKey="name" tick={{ fill: isDarkMode ? 'white' : 'black' }} />
-  //           <YAxis tick={{ fill: isDarkMode ? 'white' : 'black' }} />
-  //           <Tooltip />
-  //           <Line type="monotone" dataKey="value" stroke="#8884d8" />
-  //         </LineChart>
-  //       </div>
-  //       <div className={styles.chartItem}>
-  //         <div className={styles.chartTitleContainer}>
-  //           <h3 className={styles.chartTitle}>Spending by Category</h3>
-  //         </div>
-  //         <PieChart width={600} height={300}>
-  //           <Pie
-  //             data={categoryData}
-  //             cx={250}
-  //             cy={120}
-  //             labelLine={false}
-  //             outerRadius={100}
-  //             fill="#8884d8"
-  //             dataKey="value"
-  //           >
-  //             {categoryData.map((entry, index) => (
-  //               <Cell key={`cell-${index}`} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
-  //             ))}
-  //           </Pie>
-  //           <Tooltip />
-  //           <Legend />
-  //         </PieChart>
-  //       </div>
-  //     </div>
-  //     <div className={styles.gridContainer}>
-  //       <div className={styles.gridItem}>
-  //         <div className={styles.gridTitleContainer}>
-  //           <FontAwesomeIcon icon={faMoneyBill} className={styles.icon} />
-  //           <h2 className={styles.gridTitle}>Total Balance for Year</h2>
-  //         </div>
-  //         <p>Total Money in: R25 647.76</p>
-  //         <p>Total Money out: R5 427.28</p>
-  //       </div>
-  //       <div className={styles.gridItem}>
-  //         <div className={styles.gridTitleContainer}>
-  //           <FontAwesomeIcon icon={faBank} className={styles.icon} />
-  //           <h2 className={styles.gridTitle}>Current Accounts</h2>
-  //         </div>
-  //         <ul>
-  //           <li>Savings Account</li>
-  //           <li>Cheque Account</li>
-  //           <li>Other Account</li>
-  //         </ul>
-  //       </div>
-  //       <div className={styles.gridItem}>
-  //         <div className={styles.gridTitleContainer}>
-  //           <FontAwesomeIcon icon={faHistory} className={styles.icon} />
-  //           <h2 className={styles.gridTitle}>Last Transaction</h2>
-  //         </div>
-  //         <p>PURCH Uber Eats 400738******4299</p>
-  //         <p>2024/06/22</p>
-  //         <p>Category: Eating Out</p>
-  //       </div>
-  //       <div className={styles.gridItem}>
-  //         <div className={styles.gridTitleContainer}>
-  //           <FontAwesomeIcon icon={faCalendarAlt} className={styles.icon} />
-  //           <h2 className={styles.gridTitle}>Upcoming Bills & Payments</h2>
-  //         </div>
-  //         <ul>
-  //           <li>Car Instalment - Due in 15 days</li>
-  //           <li>Bond Payment - Due in 27 days</li>
-  //         </ul>
-  //       </div>
-  //       <div className={styles.gridItem}>
-  //         <div className={styles.gridTitleContainer}>
-  //           <FontAwesomeIcon icon={faListUl} className={styles.icon} />
-  //           <h2 className={styles.gridTitle}>Budget Status</h2>
-  //         </div>
-  //         <p>Amount: R10 000.00</p>
-  //         <div className={styles.budgetBar}>
-  //           <div className={styles.budgetFill}></div>
-  //         </div>
-  //       </div>
-  //       <div className={styles.gridItem}>
-  //         <div className={styles.gridTitleContainer}>
-  //           <FontAwesomeIcon icon={faBullseye} className={styles.icon} />
-  //           <h2 className={styles.gridTitle}>Financial Goals Progress</h2>
-  //         </div>
-  //         <p>{progressMessage}</p>
-  //         <HealthBar progress={financialGoalsProgress} />
-  //       </div>
-  //     </div>
-  //   </div>
-  // );
 }
 
 export default OverviewPage;
