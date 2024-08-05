@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import firebase_admin from 'firebase-admin';
 import styles from './forgot-password.module.css';
 import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
@@ -31,21 +30,6 @@ export function ForgotPassword(props: ForgotPasswordProps) {
       setError(true);
       setErrorMessage('Please enter a valid email address.');
       return;
-    }
-    const auth = getAuth();
-    const actionCodeSettings = {
-      url: 'http://localhost',
-      handleCodeInApp: false,
-    };
-    try {
-      auth.generatePasswordResetLink(email, actionCodeSettings).then((link) => {
-        return sendPasswordResetEmail(email, '', link);
-      });
-      setSent(true);
-      setError(false);
-    } catch (e) {
-      setError(true);
-      setErrorMessage('Error: email link not sent');
     }
   }
 
