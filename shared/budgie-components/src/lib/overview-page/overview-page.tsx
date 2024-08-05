@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { LineChart, Line, PieChart, Pie, Tooltip, CartesianGrid, XAxis, YAxis, Legend, Cell } from 'recharts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMoneyBill, faBank, faChartPie, faHistory, faCalendarAlt, faListUl, faBullseye } from '@fortawesome/free-solid-svg-icons';
@@ -10,17 +10,13 @@ import {
   getAccounts,
   getTransactions,
   getMoneyIn,
-  getMoneyOut
+  getMoneyOut,
+  getLastTransaction
  } from "../overview-page/overviewServices";
 
 export interface OverviewPageProps {}
 
 export function OverviewPage(props: OverviewPageProps) {
-  const [showData, setShowData] = useState(false);
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [selectedAccountType, setSelectedAccountType] = useState('Current');
-  const [moneyIn, setMoneyIn] = useState(0);
-  const [moneyOut, setMoneyOut] = useState(0);
 
   interface Account {
     account_number: string;
@@ -37,6 +33,22 @@ export function OverviewPage(props: OverviewPageProps) {
     description: string;
     category: string;
   }
+  
+  const defaultTransaction: Transaction = {
+    date: '',
+    amount: 0,
+    balance: 0,
+    description: '',
+    category: '',
+  }
+
+  const [showData, setShowData] = useState(false);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [selectedAccountType, setSelectedAccountType] = useState('Current');
+  const [moneyIn, setMoneyIn] = useState(0);
+  const [moneyOut, setMoneyOut] = useState(0);
+  const [lastTransaction, setLastTransaction] = useState<Transaction>(defaultTransaction);
+
 
   const getData = async (number:string) => {
     const transaction = await getTransactions(number);
@@ -44,6 +56,8 @@ export function OverviewPage(props: OverviewPageProps) {
     setMoneyIn(moneyI);
     const moneyO = await getMoneyOut(transaction);
     setMoneyOut(moneyO);
+    const lastT = await getLastTransaction(transaction);
+    setLastTransaction(lastT);
 }
 
   useEffect(() => {
@@ -169,8 +183,8 @@ export function OverviewPage(props: OverviewPageProps) {
                   <FontAwesomeIcon icon={faMoneyBill} className={styles.icon} />
                   <h2 className={styles.gridTitle}>Total Balance for Year</h2>
                 </div>
-                <p>Total Money in: {moneyIn}</p>
-                <p>Total Money out: {moneyOut}</p>
+                <p>Total Money in: R {moneyIn}</p>
+                <p>Total Money out: R {moneyOut}</p>
               </div>
 
               <div className={styles.gridItem}>
@@ -178,9 +192,10 @@ export function OverviewPage(props: OverviewPageProps) {
                   <FontAwesomeIcon icon={faHistory} className={styles.icon} />
                   <h2 className={styles.gridTitle}>Last Transaction</h2>
                 </div>
-                <p>PURCH Uber Eats 400738******4299</p>
-                <p>2024/06/22</p>
-                <p>Category: Eating Out</p>
+                <p>Date: {lastTransaction.date}</p>
+                <p>Amount: R {lastTransaction.amount}</p>
+                <p>Description: {lastTransaction.description}</p>
+                <p>Category: {lastTransaction.category}</p>
               </div>
               <div className={styles.gridItem}>
                 <div className={styles.gridTitleContainer}>
