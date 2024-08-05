@@ -7,12 +7,13 @@ import styles from './overview-page.module.css';
 import HealthBar from './HealthBar';
 import '../../root.css';
 import { getAccounts } from "../overview-page/overviewServices";
+
 export interface OverviewPageProps {}
 
 export function OverviewPage(props: OverviewPageProps) {
-
   const [showData, setShowData] = useState(false);
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [selectedAccountType, setSelectedAccountType] = useState('Current');
 
   interface Account {
     account_number: string;
@@ -23,7 +24,6 @@ export function OverviewPage(props: OverviewPageProps) {
   }
 
   useEffect(() => {
-    alert("alert")
     async function someFunction() {
       const account = await getAccounts();
       if (account.length > 0) {
@@ -31,9 +31,8 @@ export function OverviewPage(props: OverviewPageProps) {
         setShowData(true);
       }
     }
-
     someFunction();
-  }, [showData])
+  }, [showData]);
 
   const [isDarkMode, setIsDarkMode] = useState(true);
 
@@ -72,14 +71,35 @@ export function OverviewPage(props: OverviewPageProps) {
     { name: 'Other', value: 150 },
   ];
 
-  const CATEGORY_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  const CATEGORY_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042','#FFBB','#00C4', '#FFB', '#FFAACC'];
 
   const hasAccounts = showData;
+
+  const filteredAccounts = accounts.filter(account => account.type === selectedAccountType);
 
   return (
     <div className={styles.mainPage}>
       <div className={styles.header}>
-        {/* Your header content here */}
+        <div className={styles.accountTypeButtons}>
+          <button
+            className={`${styles.accountTypeButton} ${selectedAccountType === 'Current' ? styles.active : ''}`}
+            onClick={() => setSelectedAccountType('Current')}
+          >
+            Current
+          </button>
+          <button
+            className={`${styles.accountTypeButton} ${selectedAccountType === 'Savings' ? styles.active : ''}`}
+            onClick={() => setSelectedAccountType('Savings')}
+          >
+            Savings
+          </button>
+          <button
+            className={`${styles.accountTypeButton} ${selectedAccountType === 'Custom' ? styles.active : ''}`}
+            onClick={() => setSelectedAccountType('Custom')}
+          >
+            Custom
+          </button>
+        </div>
       </div>
 
       <div className={styles.accountStatus}>
@@ -93,39 +113,35 @@ export function OverviewPage(props: OverviewPageProps) {
                 <div className={styles.chartTitleContainer}>
                   <h3 className={styles.chartTitle}>Net Worth Over Time</h3>
                 </div>
-                <div className={styles.chartContent}>
-                  <LineChart width={650} height={300} data={spendingData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" tick={{ fill: isDarkMode ? 'white' : 'black' }} />
-                    <YAxis tick={{ fill: isDarkMode ? 'white' : 'black' }} />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="value" stroke="#8884d8" />
-                  </LineChart>
-                </div>
+                <LineChart width={650} height={300} data={spendingData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" tick={{ fill: isDarkMode ? 'white' : 'black' }} />
+                  <YAxis tick={{ fill: isDarkMode ? 'white' : 'black' }} />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="value" stroke="#8884d8" />
+                </LineChart>
               </div>
               <div className={styles.chartItem}>
                 <div className={styles.chartTitleContainer}>
                   <h3 className={styles.chartTitle}>Spending by Category</h3>
                 </div>
-                <div className={styles.chartContent}>
-                  <PieChart width={600} height={300}>
-                    <Pie
-                      data={categoryData}
-                      cx={250}
-                      cy={120}
-                      labelLine={false}
-                      outerRadius={100}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </div>
+                <PieChart width={600} height={300}>
+                  <Pie
+                    data={categoryData}
+                    cx={250}
+                    cy={120}
+                    labelLine={false}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {categoryData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
               </div>
             </div>
             <div className={styles.gridContainer}>
@@ -143,7 +159,7 @@ export function OverviewPage(props: OverviewPageProps) {
                   <h2 className={styles.gridTitle}>Current Accounts</h2>
                 </div>
                 <ul>
-                  {accounts.map(account => (
+                  {filteredAccounts.map(account => (
                     <li key={account.uid}>{account.alias}</li>
                   ))}
                 </ul>
@@ -172,10 +188,9 @@ export function OverviewPage(props: OverviewPageProps) {
                   <FontAwesomeIcon icon={faListUl} className={styles.icon} />
                   <h2 className={styles.gridTitle}>Budget Status</h2>
                 </div>
-                <p>Amount: R10 000.00</p>
-                <div className={styles.budgetBar}>
-                  <div className={styles.budgetFill}></div>
-                </div>
+                <p>Amount Targeted: R5000.00</p>
+                <p>Amount Spent: R3000.00</p>
+                <HealthBar progress={60} />
               </div>
               <div className={styles.gridItem}>
                 <div className={styles.gridTitleContainer}>
@@ -188,12 +203,7 @@ export function OverviewPage(props: OverviewPageProps) {
             </div>
           </div>
         ) : (
-          <div className={styles.centeredMessage}>
-            <p>You have not created<br />
-              any accounts <br /><br />
-              Head to the accounts<br />
-              section to create your first account</p>
-          </div>
+          <p>There are no accounts available to display.</p>
         )}
       </div>
     </div>
