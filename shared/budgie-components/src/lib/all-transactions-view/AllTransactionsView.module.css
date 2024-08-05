@@ -14,12 +14,6 @@
   font-weight: bold;
 }
 
-.monthNavigation {
-  display: flex;
-  align-items: center;
-  padding: 5px;
-}
-
 .balanceInfo {
   font-size: calc(1.4rem * var(--font-size-multiplier));
   font-weight: bold;
@@ -41,14 +35,6 @@
 
 .navButton:hover {
   color: var(--primary-1);
-}
-
-.monthDisplay {
-  font-size: calc(1.4rem * var(--font-size-multiplier));
-  font-weight: bold;
-  margin: 0 12px;
-  width: calc(12rem * var(--font-size-multiplier));
-  text-align: center;
 }
 
 .yearDisplay {
@@ -117,7 +103,7 @@
 
 .transactionDescription {
   text-align: left;
-  color: #888888;
+  color: var(--greyed-text);
 }
 
 .categoryDropdown {
@@ -134,12 +120,14 @@
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
+  background-color: var(--main-background);
+  border: none;
 }
 
 .categoryDropdown option {
   text-align: left;
-  background-color: white;
-  color: black;
+  background-color: var(--main-background);
+  color: var(--main-text);
 }
 
 .buttonContainer {
@@ -200,7 +188,7 @@
 }
 
 .default {
-  background-color: white;
+  background-color: var(--main-background);
   color: black;
 }
 
@@ -234,19 +222,34 @@
   overflow-y: auto;
 }
 
+.monthNavigation {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+}
+
+.monthDisplay {
+  font-size: calc(1.4rem * var(--font-size-multiplier));
+  font-weight: bold;
+  margin: 0 12px;
+  width: calc(12rem * var(--font-size-multiplier));
+  text-align: center;
+}
+
 .dateDropdown {
   background-color: var(--main-background);
   cursor: pointer;
   white-space: nowrap; /* Prevent text from wrapping */
   overflow: hidden; /* Hide overflow if text is too long */
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  text-align: center; 
-  text-align-last: center;
-  transition: background-color 0.2s ease;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  text-align: left; 
+  transition: 0.2s ease;
+  padding: 0 5px;
+  border: none;
+  font-size: calc(1.4rem * var(--font-size-multiplier));
 }
-
 
 .dateDropdown:hover {
   background-color:var(--block-background);
@@ -258,24 +261,10 @@
   color: var(--main-text);
 }
 
-.yearDropdown {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  font-size: calc(1.4rem * var(--font-size-multiplier));
-  font-weight: bold;
-  background-color: var(--main-background);
-  transition: background-color 0.2s ease;
+.noTransactionsMessage {
   text-align: center;
-}
-
-.yearDropdown option {
-  background-color: var(--block-background);
-  color: var(--main-text);
-}
-
-.yearDropdown:hover {
-  background-color: lightgray;
-  cursor: pointer;
+  margin-top: 30vh;
+  color: var(--greyed-text);
+  font-size: calc(1.4rem * var(--font-size-multiplier));
 }
 

@@ -16,6 +16,7 @@ import '../../root.css';
 
 export interface AllTransactionsViewProps {
   account: string;
+  availableYears: number[];
 }
 
 export function AllTransactionsView(props: AllTransactionsViewProps) {
@@ -247,16 +248,12 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
               value={currentYear}
               onChange={handleYearChange}
             >
-              {yearsWithData.map(year => (
+              {props.availableYears.map(year => (
                 <option key={year} value={year}>{year}</option>
               ))}
             </select>
           </span>
-          <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-            onClick={handleNextYear}
-          />
+
           <button className={styles.navButton} onClick={handleNextYear}>
             <span
               className="material-symbols-outlined"
@@ -329,4 +326,3 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
 }
 
 export default AllTransactionsView;
-
