@@ -9,8 +9,8 @@
   width: 85vw;
   height: 100vh;
   /* padding-left: calc(1.5rem * var(--font-size-multiplier));
-  padding-right: 1.5rem;
-  padding-top: 1rem; */
+    padding-right: 1.5rem;
+    padding-top: 1rem; */
   overflow-y: auto;
   position: fixed;
   right: 0;

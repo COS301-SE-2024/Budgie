@@ -1,0 +1,29 @@
+/* HealthBar.module.css */
+
+.healthBarContainer {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.label {
+  color: inherit;
+  font-weight: bold;
+  margin: 0 10px;
+}
+
+.bar {
+  flex-grow: 1;
+  background: #ddd;
+  height: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.fill {
+  background: green; /* Can change color based on progress */
+  height: 100%;
+  transition: width 0.3s ease;
+}

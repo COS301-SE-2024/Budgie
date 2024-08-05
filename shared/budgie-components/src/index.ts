@@ -12,3 +12,7 @@ export { UserProvider, UserContext } from './lib/hooks/UserProvider';
 export { OverviewPage } from './lib/overview-page/overview-page';
 export { Support } from './lib/support-page/support';
 export { ForgotPassword } from './lib/forgot-password/forgot-password';
+export { AccountsPage } from './lib/accounts-page/accounts-page';
+export { UploadStatementCSV } from './lib/upload-statement-csv/UploadStatementCSV';
+export { AddAccountsPage } from './lib/add-accounts-page/add-accounts-page';
+export { SpecificAccountPage } from './lib/specific-account-page/specific-account-page';
