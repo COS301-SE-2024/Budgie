@@ -9,6 +9,21 @@ import {
   where
 } from 'firebase/firestore';
 
+const monthNames = [
+  'january',
+  'february',
+  'march',
+  'april',
+  'may',
+  'june',
+  'july',
+  'august',
+  'september',
+  'october',
+  'november',
+  'december',
+];
+
 
 //get logged in users user id
 export function getUser(){
@@ -34,17 +49,62 @@ export async function getAccounts() {
 }
 
 //get all transaction for this year for an account
-export async function getTransactions(number:string){
+export async function getTransactions(accountNumber:string) {
   let uid = getUser();
   const now = new Date();
   let transactions:any = [];
 
-  const a = query(collection(db, `transaction_data_${now.getFullYear()}`), where('uid', '==', uid), where('account_number', '==', number));
-  const result = await getDocs(a);
+  const q = query(
+    collection(db, `transaction_data_${now.getFullYear()}`),
+    where('uid', '==', uid),
+    where('account_number', '==', accountNumber)
+  );
+  const result = await getDocs(q);
 
   result.forEach(doc => {
-    transactions.push(doc.data());
+    const data = doc.data();
+    for (let key in data) {
+      if (typeof data[key] === 'string') {
+        try {
+          const monthlyTransactions = JSON.parse(data[key]);
+          if (Array.isArray(monthlyTransactions)) {
+            transactions = transactions.concat(monthlyTransactions);
+          }
+        } catch (e) {
+          console.error('Error parsing JSON for key:', key, e);
+        }
+      } else if (Array.isArray(data[key])) {
+        transactions = transactions.concat(data[key]);
+      }
+    }
   });
 
   return transactions;
+}
+
+//calculate total money in for the year 
+export async function getMoneyIn(transactions:any){
+  let amount = 0;
+  for(let i=0; i<transactions.length; i++){
+      if(transactions[i].amount>0){
+        amount += transactions[i].amount;
+      }
+  }
+  return amount;
+}
+
+//calculate total money out for the year 
+export async function getMoneyOut(transactions:any){
+  let amount = 0;
+  for(let i=0; i<transactions.length; i++){
+      if(transactions[i].amount<0){
+        amount += transactions[i].amount;
+      }
+  }
+  return amount*-1;
+}
+
+//get the last transaction
+export async function getLastTransaction(transactions:any){
+  return transactions[0];
 }
