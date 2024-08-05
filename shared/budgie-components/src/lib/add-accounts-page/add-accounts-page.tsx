@@ -21,6 +21,7 @@ import {
   UploadStatementCSV,
   UserContext,
 } from '@capstone-repo/shared/budgie-components';
+import { useRouter } from 'next/navigation';
 
 /* eslint-disable-next-line */
 export interface AddAccountsPageProps {}
@@ -33,7 +34,12 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
   const [accountNumber, setAccountNumber] = useState('');
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [uploadError, setUploadError] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showAccountAlreadyTracked, setShowAccountAlreadyTracked] =
+    useState(false);
+  const [loader, setLoader] = useState(false);
   const user = useContext(UserContext);
+  const router = useRouter();
 
   function AddAccountModal() {
     function OnAddAccountTypeClick(type: string) {
@@ -191,7 +197,6 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     //uploadtransactions specific helpers---------------------------------
-
     interface Transaction {
       date: string;
       amount: number;
@@ -452,16 +457,16 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
             getSeparateYearMonthsAsTransactionObjects(DataLines);
           const UniqueYearMonths: Record<string, string[]> =
             getUniqueYearMonths(DataLines);
-          MergeTransactions(YearMonthLinesRecord, UniqueYearMonths);
+          await MergeTransactions(YearMonthLinesRecord, UniqueYearMonths);
         } else {
           //error incorrect csv format
+          alert('Incorrect formatting of CSV');
         }
       };
       reader.readAsText(file);
     };
 
     //helpers
-
     const AccountAlreadyTracked = async (
       uid: string,
       accNo: string
@@ -483,12 +488,18 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
       return flag ? true : false;
     };
 
+    const delay = (ms: number | undefined) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
+
     const handleAddAccountClick = async () => {
       if (inputValue == '') {
         setAliasError(true);
         return;
       }
       //add account to database
+      //set spinner
+      setShowAccountInfoModal(false);
+      setLoader(true);
       if (
         accountType != '' &&
         accountName != '' &&
@@ -498,15 +509,17 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
       ) {
         let exists = await AccountAlreadyTracked(user.uid, accountNumber);
         if (exists) {
-          //TODO: failure modal for already tracked
-          alert('Account already tracked account and transactions not added');
+          await delay(1000);
+          setLoader(false);
+          setShowAccountAlreadyTracked(true);
+          setTimeout(() => {
+            setShowAccountAlreadyTracked(false);
+          }, 1500);
           return;
         } else {
-          alert('continuing');
           //add financial data to db
-          //TODO:implement this
-          UploadTransactions(csvFile);
-          //add account after incase of error
+          await UploadTransactions(csvFile);
+          //add account after
           const docRef = await addDoc(collection(db, 'accounts'), {
             uid: user.uid,
             name: accountName,
@@ -514,10 +527,17 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
             type: accountType,
             alias: inputValue,
           });
-          alert('success account and transactions added');
           //TODO:success modal for upload success
+          await delay(1000);
+          setLoader(false);
+          setShowSuccessModal(true);
+          setTimeout(() => {
+            setShowSuccessModal(false);
+            router.push('/accounts');
+          }, 2000);
         }
       }
+      //stop spinner
     };
 
     return (
@@ -582,13 +602,118 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     );
   }
 
-  function SuccessModal() {}
+  function SuccessModal() {
+    const handleExit = () => {
+      setShowSuccessModal(false);
+    };
+
+    const handleChildElementClick = (e: { stopPropagation: () => void }) => {
+      //ignore clicks
+      e.stopPropagation();
+    };
+
+    return (
+      <div onClick={handleExit} className={styles.mainPageBlurModal}>
+        <div
+          className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
+          onClick={(e) => handleChildElementClick(e)}
+        >
+          <span className="text-center text-3xl font-TripSans font-bold">
+            Account and financial <br />
+            data added
+          </span>
+          <span
+            className="mt-6 text-BudgieGreen1 material-symbols-outlined"
+            style={{
+              fontSize: '9rem',
+            }}
+          >
+            verified
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  function AlreadyTracked() {
+    const handleExit = () => {
+      setShowAccountAlreadyTracked(false);
+    };
+
+    const handleChildElementClick = (e: { stopPropagation: () => void }) => {
+      //ignore clicks
+      e.stopPropagation();
+    };
+
+    return (
+      <div onClick={handleExit} className={styles.mainPageBlurModal}>
+        <div
+          className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
+          onClick={(e) => handleChildElementClick(e)}
+        >
+          <span className="text-center text-3xl font-TripSans font-bold">
+            Account already <br />
+            tracking
+          </span>
+          <span
+            className="mt-6 text-red-400 material-symbols-outlined"
+            style={{
+              fontSize: '9rem',
+            }}
+          >
+            close
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  function SpinnerLoader() {
+    const handleExit = () => {};
+
+    const handleChildElementClick = (e: { stopPropagation: () => void }) => {
+      //ignore clicks
+      e.stopPropagation();
+    };
+
+    return (
+      <div onClick={handleExit} className={styles.mainPageBlurModal}>
+        <div
+          className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
+          onClick={(e) => handleChildElementClick(e)}
+        >
+          <div role="status">
+            <svg
+              aria-hidden="true"
+              className="w-12 h-12 text-gray-200 animate-spin dark:text-gray-400 fill-BudgieAccentHover"
+              viewBox="0 0 100 101"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                fill="currentColor"
+              />
+              <path
+                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                fill="currentFill"
+              />
+            </svg>
+            <span className="sr-only">Loading...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
       <AddAccountModal></AddAccountModal>
       {showUploadCSVModal && <UploadCSVModal></UploadCSVModal>}
       {showAccountInfoModal && <AccountInfoModal></AccountInfoModal>}
+      {showSuccessModal && <SuccessModal></SuccessModal>}
+      {showAccountAlreadyTracked && <AlreadyTracked></AlreadyTracked>}
+      {loader && <SpinnerLoader></SpinnerLoader>}
     </>
   );
 }

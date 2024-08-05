@@ -13,3 +13,4 @@ export { OverviewPage } from './lib/overview-page/overview-page';
 export { AccountsPage } from './lib/accounts-page/accounts-page';
 export { UploadStatementCSV } from './lib/upload-statement-csv/UploadStatementCSV';
 export { AddAccountsPage } from './lib/add-accounts-page/add-accounts-page';
+export { SpecificAccountPage } from './lib/specific-account-page/specific-account-page';
