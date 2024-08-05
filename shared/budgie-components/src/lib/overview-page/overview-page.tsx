@@ -134,9 +134,10 @@ export function OverviewPage(props: OverviewPageProps) {
           ))}
         </div>
       </div>
-
+      {hasAccounts ? (
       <div className={styles.accountStatus}>
-        {hasAccounts ? (
+        
+        {moneyIn>0 ? (
           <div className={`${styles.metricsContainer} ${isDarkMode ? styles.dark : styles.light}`}>
             <button className={styles.toggleButton} onClick={toggleTheme}>
               {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
@@ -221,14 +222,23 @@ export function OverviewPage(props: OverviewPageProps) {
         ) : (
           <div className={styles.bodyText}>
           <p>You have not uploaded <br/>
+              any transactions for this year. <br/><br/>
+              Head to the accounts <br/>
+              section to upload your transactions.
+          </p>
+          </div>
+        )}
+      </div>
+    ) : (
+        <div className={styles.bodyText}>
+          <p>You have not uploaded <br/>
               any transactions. <br/><br/>
               Head to the accounts <br/>
               section to upload your first <br/>
               transaction history.
           </p>
-      </div>
-        )}
-      </div>
+        </div>
+    )}
     </div>
   );
 }
