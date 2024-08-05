@@ -9,13 +9,6 @@ import {
   where
 } from 'firebase/firestore';
 
-// interface Account {
-//   account_number: string;
-//   alias: string;
-//   name: string;
-//   type: string;
-//   uid: string;
-// }
 
 //get logged in users user id
 export function getUser(){
@@ -27,13 +20,15 @@ export function getUser(){
 }
 
 //get all accounts for user
-export async function getAccounts(){
-    let uid = getUser();
-    const accounts: any = []
-    const a = query(collection(db, `accounts`), where('uid', '==', uid));
-    const result = await getDocs(a);
-    result.forEach(doc => {
-      accounts.push(doc.data());
-    });
-    return accounts;
+export async function getAccounts() {
+  let uid = getUser();
+  const accounts:any = [];
+  const a = query(collection(db, `accounts`), where('uid', '==', uid));
+  const result = await getDocs(a);
+  
+  result.forEach(doc => {
+    accounts.push(doc.data());
+  });
+
+  return accounts.reverse();
 }

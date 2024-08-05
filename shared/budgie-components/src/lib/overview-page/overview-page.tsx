@@ -29,6 +29,7 @@ export function OverviewPage(props: OverviewPageProps) {
       if (account.length > 0) {
         setAccounts(account);
         setShowData(true);
+        setSelectedAccountType(account[0].alias);
       }
     }
     someFunction();
@@ -81,24 +82,15 @@ export function OverviewPage(props: OverviewPageProps) {
     <div className={styles.mainPage}>
       <div className={styles.header}>
         <div className={styles.accountTypeButtons}>
-          <button
-            className={`${styles.accountTypeButton} ${selectedAccountType === 'Current' ? styles.active : ''}`}
-            onClick={() => setSelectedAccountType('Current')}
-          >
-            Current
-          </button>
-          <button
-            className={`${styles.accountTypeButton} ${selectedAccountType === 'Savings' ? styles.active : ''}`}
-            onClick={() => setSelectedAccountType('Savings')}
-          >
-            Savings
-          </button>
-          <button
-            className={`${styles.accountTypeButton} ${selectedAccountType === 'Custom' ? styles.active : ''}`}
-            onClick={() => setSelectedAccountType('Custom')}
-          >
-            Custom
-          </button>
+          {accounts.map(account => (
+            <button
+              key={account.alias}
+              className={`${styles.accountTypeButton} ${selectedAccountType === account.alias ? styles.active : ''}`}
+              onClick={() => setSelectedAccountType(account.alias)}
+            >
+              {account.alias}
+            </button>
+          ))}
         </div>
       </div>
 
