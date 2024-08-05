@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 
-import Page from '../src/app/signup/page';
+import Page from '../src/app/(auth)/signup/page';
 
 describe('Page', () => {
   it('should render successfully', () => {

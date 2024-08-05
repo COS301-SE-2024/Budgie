@@ -1,12 +1,13 @@
 'use client';
 import styles from './page.module.css';
 import React, { useContext, useEffect, useState } from 'react';
-
-import { Landing } from '@capstone-repo/shared/budgie-components';
+import {
+  SignUpPage,
+  UserContext,
+} from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';
-import { UserContext } from '@capstone-repo/shared/budgie-components';
 
-export default function Index() {
+export default function SignUp() {
   const user = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -18,6 +19,5 @@ export default function Index() {
       setLoading(false);
     }
   }, [user]);
-
-  return <>{!loading && <Landing></Landing>}</>;
+  return <>{!loading && <SignUpPage></SignUpPage>}</>;
 }
