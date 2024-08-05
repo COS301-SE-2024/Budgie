@@ -19,12 +19,15 @@ interface BalanceChartProps {
 function BalanceChart(props: BalanceChartProps) {
   return (
     <AreaChart
-      className="h-[25rem]"
+      className=" w-[90%] h-[23rem] "
       data={props.dataset}
       index="yearmonth"
       categories={['balance']}
-      colors={['blue']}
+      colors={['emerald']}
       yAxisWidth={60}
+      showGridLines={false}
+      showLegend={false}
+      showAnimation={true}
     />
   );
 }
@@ -65,7 +68,22 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
 
   return (
     <div className="mainPage">
-      <BalanceChart dataset={dataset}></BalanceChart>
+      <div className="w-full h-2/3 bg-BudgieWhite rounded-3xl flex flex-col items-center justify-center shadow-2xl ">
+        <div className="w-full h-28 flex items-start justify-around">
+          <div className="flex flex-col items-start justify-start">
+            <span className="font-TripSans font-bold text-4xl">
+              FNBy Next Transact Account
+            </span>
+            <span className="font-TripSans text-3xl">July 2024</span>
+          </div>
+          <div className="flex flex-col items-start justify-start">
+            <span className="font-TripSans font-bold text-3xl">
+              Total Balance: R1432.00
+            </span>
+          </div>
+        </div>
+        <BalanceChart dataset={dataset}></BalanceChart>
+      </div>
     </div>
   );
 }
