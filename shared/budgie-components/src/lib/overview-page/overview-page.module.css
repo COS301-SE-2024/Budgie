@@ -1,3 +1,16 @@
+.mainPage {
+  width: 100%; /* Ensure the main page covers the full width */
+  padding: 20px; /* Add padding for overall spacing */
+}
+
+.header {
+  /* Your header styles */
+}
+
+.accountStatus {
+  width: 100%; /* Ensure accountStatus covers the full width */
+}
+
 .metricsContainer {
   position: relative;
   margin: 20px;
@@ -7,9 +20,9 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  overflow-y: auto; /* Enables vertical scrolling */
+  overflow-y: auto;
   color: white;
-  width: calc(100% - 40px);
+  width: calc(100% - 40px); /* Ensure it fits within the viewport width */
   height: calc(100vh - 40px); /* Adjust height to fit within viewport */
   transition: background 0.3s ease, color 0.3s ease;
 }
@@ -49,8 +62,9 @@
   padding: 20px;
   flex: 1; /* Ensures flex items are of equal width */
 }
+
 .chartContent {
-  margin-top: 20px; /* Adjust this value to create more space */
+  margin-top: 40px; /* Adjust this value to create more space between the heading and the graph */
 }
 
 .chartTitleContainer {
@@ -127,16 +141,16 @@
 }
 
 .centeredMessage {
-  color:rgba(50, 50, 50, 0.2);
+  color: rgba(50, 50, 50, 0.2);
   font-size: 25px;
   background-color: rgba(214, 214, 214, 0.7);
   display: flex;
   flex-direction: column;
   justify-content: center; /* Center vertically */
-  align-items: center;     /* Center horizontally */
-  height: 100vh;           /* Full viewport height */
-  width: 90vw;            /* Full viewport width */
-  text-align: center;      /* Center text horizontally */
-  margin: 0;               /* Remove default margin */
+  align-items: center; /* Center horizontally */
+  height: 100vh; /* Full viewport height */
+  width: 90vw; /* Full viewport width */
+  text-align: center; /* Center text horizontally */
+  margin: 0; /* Remove default margin */
   box-sizing: border-box;
 }
