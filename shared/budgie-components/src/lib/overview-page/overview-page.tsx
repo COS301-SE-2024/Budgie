@@ -8,7 +8,9 @@ import HealthBar from './HealthBar';
 import '../../root.css';
 import { 
   getAccounts,
-  getTransactions
+  getTransactions,
+  getMoneyIn,
+  getMoneyOut
  } from "../overview-page/overviewServices";
 
 export interface OverviewPageProps {}
@@ -16,8 +18,9 @@ export interface OverviewPageProps {}
 export function OverviewPage(props: OverviewPageProps) {
   const [showData, setShowData] = useState(false);
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [selectedAccountType, setSelectedAccountType] = useState('Current');
+  const [moneyIn, setMoneyIn] = useState(0);
+  const [moneyOut, setMoneyOut] = useState(0);
 
   interface Account {
     account_number: string;
@@ -35,6 +38,14 @@ export function OverviewPage(props: OverviewPageProps) {
     category: string;
   }
 
+  const getData = async (number:string) => {
+    const transaction = await getTransactions(number);
+    const moneyI = await getMoneyIn(transaction);
+    setMoneyIn(moneyI);
+    const moneyO = await getMoneyOut(transaction);
+    setMoneyOut(moneyO);
+}
+
   useEffect(() => {
     async function someFunction() {
       const account = await getAccounts();
@@ -42,6 +53,7 @@ export function OverviewPage(props: OverviewPageProps) {
         setAccounts(account);
         setShowData(true);
         setSelectedAccountType(account[0].alias);
+        getData(account[0].account_number);
       }
     }
     someFunction();
@@ -90,14 +102,6 @@ export function OverviewPage(props: OverviewPageProps) {
 
   const filteredAccounts = accounts.filter(account => account.type === selectedAccountType);
 
-  const handleChange = async (number:string) => {
-      const transaction = await getTransactions(number);
-      if(transaction.length>0){
-        setTransactions(transaction);
-      }
-      alert(JSON.stringify(transaction))
-  }
-
   return (
     <div className={styles.mainPage}>
       <div className={styles.header}>
@@ -108,7 +112,7 @@ export function OverviewPage(props: OverviewPageProps) {
               className={`${styles.accountTypeButton} ${selectedAccountType === account.alias ? styles.active : ''}`}
               onClick={() => {
                 setSelectedAccountType(account.alias);
-                handleChange(account.account_number);
+                getData(account.account_number);
               }}
             >
               {account.alias}
@@ -165,20 +169,10 @@ export function OverviewPage(props: OverviewPageProps) {
                   <FontAwesomeIcon icon={faMoneyBill} className={styles.icon} />
                   <h2 className={styles.gridTitle}>Total Balance for Year</h2>
                 </div>
-                <p>Total Money in: R25 647.76</p>
-                <p>Total Money out: R5 427.28</p>
+                <p>Total Money in: {moneyIn}</p>
+                <p>Total Money out: {moneyOut}</p>
               </div>
-              <div className={styles.gridItem}>
-                <div className={styles.gridTitleContainer}>
-                  <FontAwesomeIcon icon={faBank} className={styles.icon} />
-                  <h2 className={styles.gridTitle}>Current Accounts</h2>
-                </div>
-                <ul>
-                  {filteredAccounts.map(account => (
-                    <li key={account.uid}>{account.alias}</li>
-                  ))}
-                </ul>
-              </div>
+
               <div className={styles.gridItem}>
                 <div className={styles.gridTitleContainer}>
                   <FontAwesomeIcon icon={faHistory} className={styles.icon} />
@@ -206,14 +200,6 @@ export function OverviewPage(props: OverviewPageProps) {
                 <p>Amount Targeted: R5000.00</p>
                 <p>Amount Spent: R3000.00</p>
                 <HealthBar progress={60} />
-              </div>
-              <div className={styles.gridItem}>
-                <div className={styles.gridTitleContainer}>
-                  <FontAwesomeIcon icon={faBullseye} className={styles.icon} />
-                  <h2 className={styles.gridTitle}>Financial Goals Progress</h2>
-                </div>
-                <p>{progressMessage}</p>
-                <HealthBar progress={financialGoalsProgress} />
               </div>
             </div>
           </div>
