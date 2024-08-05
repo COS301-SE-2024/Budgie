@@ -34,6 +34,10 @@
   margin-right: 2rem;
   transition: 0.2s ease;
   border: none;
+  justify-self: end;
+  text-align: right;
+  text-align-last: right;
+  transition: 0.2s ease;
 }
 
 .accountDropdown option {

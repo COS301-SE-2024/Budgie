@@ -189,7 +189,7 @@ export function AccountSettings(props: AccountSettingsProps) {
           <p className={styles.settingTitle}>Delete Account</p>
           <p className={styles.settingDescription}>
             Click the button below to start deleting your account. Learn about
-            out deletion policy here.
+            our deletion policy here.
           </p>
           <button className={styles.deleteButton} onClick={handleDeleteClick}>
             <div className={styles.deleteButton}>Delete Account</div>
