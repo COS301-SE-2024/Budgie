@@ -32,3 +32,19 @@ export async function getAccounts() {
 
   return accounts.reverse();
 }
+
+//get all transaction for this year for an account
+export async function getTransactions(number:string){
+  let uid = getUser();
+  const now = new Date();
+  let transactions:any = [];
+
+  const a = query(collection(db, `transaction_data_${now.getFullYear()}`), where('uid', '==', uid), where('account_number', '==', number));
+  const result = await getDocs(a);
+
+  result.forEach(doc => {
+    transactions.push(doc.data());
+  });
+
+  return transactions;
+}

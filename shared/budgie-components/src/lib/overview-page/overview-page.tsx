@@ -6,13 +6,17 @@ import { faMoneyBill, faBank, faChartPie, faHistory, faCalendarAlt, faListUl, fa
 import styles from './overview-page.module.css';
 import HealthBar from './HealthBar';
 import '../../root.css';
-import { getAccounts } from "../overview-page/overviewServices";
+import { 
+  getAccounts,
+  getTransactions
+ } from "../overview-page/overviewServices";
 
 export interface OverviewPageProps {}
 
 export function OverviewPage(props: OverviewPageProps) {
   const [showData, setShowData] = useState(false);
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [selectedAccountType, setSelectedAccountType] = useState('Current');
 
   interface Account {
@@ -21,6 +25,14 @@ export function OverviewPage(props: OverviewPageProps) {
     name: string;
     type: string;
     uid: string;
+  }
+
+  interface Transaction {
+    date: string;
+    amount: number;
+    balance: number;
+    description: string;
+    category: string;
   }
 
   useEffect(() => {
@@ -78,6 +90,14 @@ export function OverviewPage(props: OverviewPageProps) {
 
   const filteredAccounts = accounts.filter(account => account.type === selectedAccountType);
 
+  const handleChange = async (number:string) => {
+      const transaction = await getTransactions(number);
+      if(transaction.length>0){
+        setTransactions(transaction);
+      }
+      alert(JSON.stringify(transaction))
+  }
+
   return (
     <div className={styles.mainPage}>
       <div className={styles.header}>
@@ -86,7 +106,10 @@ export function OverviewPage(props: OverviewPageProps) {
             <button
               key={account.alias}
               className={`${styles.accountTypeButton} ${selectedAccountType === account.alias ? styles.active : ''}`}
-              onClick={() => setSelectedAccountType(account.alias)}
+              onClick={() => {
+                setSelectedAccountType(account.alias);
+                handleChange(account.account_number);
+              }}
             >
               {account.alias}
             </button>
