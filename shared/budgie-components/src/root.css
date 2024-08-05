@@ -93,61 +93,73 @@ body {
   --primary-1: #07456f;
   --primary-2: #83a2b7;
   --secondary-text: white;
+  --complementary: #b04700;
 }
 
 :root[colour-theme='light-yellow'] {
   --primary-1: #d49d02;
   --primary-2: #e9ce80;
+  --complementary: #3f058d;
 }
 
 :root[colour-theme='light-pink'] {
   --primary-1: #960446;
   --primary-2: #ca81a2;
+  --complementary: #005438;
 }
 
 :root[colour-theme='light-purple'] {
   --primary-1: #3f058d;
   --primary-2: #9f82c6;
+  --complementary: #d49d02;
 }
 
 :root[colour-theme='light-orange'] {
   --primary-1: #b04700;
   --primary-2: #d7a37f;
+  --complementary: #07456f;
 }
 
 :root[colour-theme='light-green'] {
   --primary-1: #005438;
   --primary-2: #7fa99b;
+  --complementary: #960446;
 }
 
 :root[colour-theme='dark-blue'] {
   --primary-1: #1d9bf0;
   --primary-2: #a9d9f9;
+  --complementary: #ff7a00;
 }
 
 :root[colour-theme='dark-yellow'] {
   --primary-1: #f0b202;
   --primary-2: #fedb7a;
+  --complementary: #7856ff;
 }
 
 :root[colour-theme='dark-pink'] {
   --primary-1: #f91880;
   --primary-2: #fc80b8;
+  --complementary: #00ba7c;
 }
 
 :root[colour-theme='dark-purple'] {
   --primary-1: #7856ff;
   --primary-2: #b8a7ff;
+  --complementary: #f0b202;
 }
 
 :root[colour-theme='dark-orange'] {
   --primary-1: #ff7a00;
   --primary-2: #ffb36d;
+  --complementary: #1d9bf0;
 }
 
 :root[colour-theme='dark-green'] {
   --primary-1: #00ba7c;
   --primary-2: #b3ffe6;
+  --complementary: #f91880;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=swap');
