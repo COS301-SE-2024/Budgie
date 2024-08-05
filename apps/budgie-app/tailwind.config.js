@@ -7,6 +7,8 @@ module.exports = {
     join(
       __dirname,
       '{src,pages,components,app}/**/*!(*.stories|*.spec).{ts,tsx,html}'
+      // Path to Tremor module
+      // '../../node_modules/@tremor/**/*.{js,ts,jsx,tsx}'
     ),
     ...createGlobPatternsForDependencies(__dirname),
   ],
