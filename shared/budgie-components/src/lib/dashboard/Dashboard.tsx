@@ -13,16 +13,29 @@ export interface DashboardProps {}
 
 export function Dashboard(props: DashboardProps) {
 
-  const [viewMode, setViewMode] = useState('monthly');
   const user = useContext(UserContext);
-  const [accountOptions, setAccountOptions] = useState<{ alias: string, accountNumber: string }[]>([]);
-  const [currentAccountNumber, setCurrentAccountNumber] = useState<string>('');
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [Data, setData] = useState<any>(null);
+
+  // Yearly or monthly view
+  const [viewMode, setViewMode] = useState('monthly');
+  
+  // Default year is the current year
+  const currentYear = new Date().getFullYear();
+
+  // Current user's available accounts
+  const [accountOptions, setAccountOptions] = useState<{ alias: string, accountNumber: string }[]>([]);
+  
+  // Alias and account number of the currently selected account
   const [selectedAlias, setSelectedAlias] = useState<string>('');
+  const [currentAccountNumber, setCurrentAccountNumber] = useState<string>('');
+
+  // Set of years for which user has transactions
+  const [yearsWithData, setYearsWithData] = useState<number[]>([0]);
+
+  const [hasAccount, setHasAccount] = useState('No');
 
   useEffect(() => {
-    const fetchAliases = async () => {
+    const fetchAccounts = async () => {
       try {
         const q = query(collection(db, 'accounts'), where('uid', '==', user.uid));
         const querySnapshot = await getDocs(q);
@@ -35,14 +48,18 @@ export function Dashboard(props: DashboardProps) {
         if (accountOptionsList.length > 0) {
           setSelectedAlias(accountOptionsList[0].alias);
           setCurrentAccountNumber(accountOptionsList[0].accountNumber);
+          setHasAccount("Yes");
+        }
+        else{
+          setHasAccount("No");
         }
       } catch (error) {
         console.error("Error fetching aliases: ", error);
       }
     };
 
-    fetchAliases();
-  }, [user.uid]);
+    fetchAccounts();
+  }, []);
 
   useEffect(() => {
     const getYearlyTransactions = async () => {
@@ -61,19 +78,54 @@ export function Dashboard(props: DashboardProps) {
     getYearlyTransactions();
   }, [currentYear, currentAccountNumber, user.uid]);
 
-  const handleDropdownChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  useEffect(() => {
+    const fetchAvailableYears = async () => {
+      try {
+        const currentYear = new Date().getFullYear();
+        const years: number[] = [];
+        
+        for (let year = 2000; year <= currentYear; year++) {
+          const q = query(collection(db, `transaction_data_${year}`), where('uid', '==', user.uid), where('account_number', '==', currentAccountNumber));
+          const querySnapshot = await getDocs(q);
+          
+          if (!querySnapshot.empty) {
+            years.push(year);
+          }
+        }  
+        setYearsWithData(years);        
+      } catch (error) {
+        console.error('Error fetching years with data:', error);
+      }
+    }; 
+
+    fetchAvailableYears();
+  }, [currentAccountNumber]);
+
+  const handleAccountDropdownChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = event.target.value;
     const selectedOption = accountOptions.find(option => option.alias === selected);
     if (selectedOption) {
       setSelectedAlias(selected);
       setCurrentAccountNumber(selectedOption.accountNumber);
-      setData(null); // Reset data when dropdown changes
+      setData(null);
     }
   };
 
   return (
     <div>
-      <div className={styles.topBar}>
+      {hasAccount==="No" ? 
+          (<div className={styles.noAccountScreen}>
+            <div>
+              <div className={styles.noAccountText}>
+                You haven't added an account yet.
+              </div>
+              <div className={styles.noAccountText}>
+                Head to the Accounts page to add an account and upload a transaction statement.  
+              </div>   
+            </div>  
+          </div>)
+      
+      : (<div><div className={styles.topBar}>
         <div></div>{/*spacing div*/}
         <div>
           <button
@@ -82,6 +134,7 @@ export function Dashboard(props: DashboardProps) {
           >
               Yearly
           </button>
+
           <button
             className={`${styles.button} ${viewMode === 'monthly' ? styles.activeButton : ''}`}
             onClick={() => setViewMode('monthly')}
@@ -89,10 +142,11 @@ export function Dashboard(props: DashboardProps) {
             Monthly
           </button>
         </div>
+
         <select 
           className={styles.accountDropdown}
           value={selectedAlias}
-          onChange={handleDropdownChange}
+          onChange={handleAccountDropdownChange}
         >
           {accountOptions.map((option, index) => (
             <option key={index} value={option.alias}>
@@ -103,13 +157,22 @@ export function Dashboard(props: DashboardProps) {
       </div>
 
       <div>
-        {viewMode === 'monthly' && Data ? 
-          (<MonthlyTransactionsView account={currentAccountNumber} data={Data} />) : 
-        viewMode === 'all' && Data ? 
-          (<AllTransactionsView account={currentAccountNumber} data={Data}/>) : 
-        (<div className={styles.loadScreen}></div>)
-      }
+        {viewMode === 'monthly' && Data && yearsWithData[0]!==0  ? 
+        (<MonthlyTransactionsView account={currentAccountNumber} data={Data} availableYears={yearsWithData}/>) 
+
+        : viewMode === 'all' && Data && yearsWithData[0]!==0  ? 
+          (<AllTransactionsView account={currentAccountNumber} availableYears={yearsWithData}/>) 
+
+        : (<div className={styles.loadScreen}>
+            <div className={styles.loaderContainer}>
+              <div className={styles.loader}></div>
+            </div> 
+            <div className={styles.loaderText}>Loading...</div>            
+          </div>)
+        }
       </div>
+      </div>)
+      }
     </div>
   );
 }
