@@ -34,7 +34,7 @@ export function OverviewPage(props: OverviewPageProps) {
     someFunction();
   }, [showData]);
 
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -203,7 +203,14 @@ export function OverviewPage(props: OverviewPageProps) {
             </div>
           </div>
         ) : (
-          <p>There are no accounts available to display.</p>
+          <div className={styles.bodyText}>
+          <p>You have not uploaded <br/>
+              any transactions. <br/><br/>
+              Head to the accounts <br/>
+              section to upload your first <br/>
+              transaction history.
+          </p>
+      </div>
         )}
       </div>
     </div>
