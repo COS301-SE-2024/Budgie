@@ -4,6 +4,7 @@ import '../../root.css';
 import React, { useState } from 'react';
 import DisplaySettings from '../display-settings/DisplaySettings';
 import AccountSettings from '../account-settings/AccountSettings';
+import Support from '../support-page/support';
 
 export interface SettingsProps {}
 
@@ -72,9 +73,9 @@ export function Settings(props: SettingsProps) {
       {currentOverlay === 'Display' && (
         <DisplaySettings onClose={closeOverlay} />
       )}
+      {currentOverlay === 'Support' && <Support onClose={closeOverlay} />}
       {/*{currentOverlay === 'Notification' && <NotificationSettings onClose={closeOverlay} />}
-      {currentOverlay === 'General' && <GeneralSettings onClose={closeOverlay} />}
-  {currentOverlay === 'Support' && <SupportSettings onClose={closeOverlay} />}*/}
+      {currentOverlay === 'General' && <GeneralSettings onClose={closeOverlay} />*/}
     </div>
   );
 }

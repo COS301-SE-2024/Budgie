@@ -1,17 +1,19 @@
 'use client';
-
+import { useRouter } from 'next/router';
 import './SignInModal.module.css';
 import { useState } from 'react';
 import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
 import Link from 'next/link';
-
+import { ForgotPassword } from '../forgot-password/forgot-password';
 import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
+  setPersistence,
+  browserSessionPersistence,
+  getAuth,
 } from 'firebase/auth';
-import { auth } from '../../../../../apps/budgie-app/firebase/clientApp';
 
 /* eslint-disable-next-line */
 export interface SignInModalProps {}
@@ -21,6 +23,7 @@ export function SignInModal(props: SignInModalProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [forgot, setForgot] = useState(false);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -32,11 +35,12 @@ export function SignInModal(props: SignInModalProps) {
 
   const signInWithGoogle = async () => {
     try {
+      const auth = getAuth();
+      await setPersistence(auth, browserSessionPersistence);
       const provider = new GoogleAuthProvider();
       provider.addScope('email');
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      console.log('User information:', user);
     } catch (error) {
       if (error instanceof Error) {
         const errorCode = (error as any).code;
@@ -60,6 +64,8 @@ export function SignInModal(props: SignInModalProps) {
       return;
     }
     try {
+      const auth = getAuth();
+      await setPersistence(auth, browserSessionPersistence);
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
@@ -98,24 +104,37 @@ export function SignInModal(props: SignInModalProps) {
 
   return (
     <>
-      <div className="bg-BudgieBlue w-[794px] h-[521px] rounded-[61px]">
-        <div className="flex flex-col justify-start items-center bg-BudgieWhite w-[397px] h-[521px] rounded-[60px] rounded-tr-none rounded-br-none ">
-          <div className=" pt-4 h-[55px] w-[55px]">
-            <Image src={logo} alt="Logo"></Image>
+      {forgot && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
+          <div className="relative z-60 bg-white p-6 rounded-lg shadow-lg">
+            <ForgotPassword />
+            <button
+              className="absolute top-2 right-2 text-xl font-bold"
+              onClick={() => setForgot(false)}
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+      )}
+      <div className="relative z-10 bg-BudgieBlue w-[794px] h-[521px] rounded-[61px]">
+        <div className="flex flex-col justify-start items-center bg-BudgieWhite w-[397px] h-[521px] rounded-[60px] rounded-tr-none rounded-br-none">
+          <div className="pt-4 h-[55px] w-[55px]">
+            <Image src={logo} alt="Logo" />
           </div>
           <p className="pt-5 font-TripSans font-medium text-3xl text-BudgieBlue">
             Welcome to Budgie
           </p>
-          <form className="pt-4">
+          <form className="pt-4" onSubmit={(e) => e.preventDefault()}>
             <div>
               <input
-                className="appearance-none  text-lg w-72 h-10 font-TripSans font-normal pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow"
+                className="appearance-none text-lg w-72 h-10 font-TripSans font-normal pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow"
                 id="email"
                 type="text"
                 placeholder="Email"
                 value={email}
                 onChange={handleEmailChange}
-              ></input>
+              />
             </div>
             <div className="pt-4">
               <input
@@ -125,11 +144,11 @@ export function SignInModal(props: SignInModalProps) {
                 placeholder="Password"
                 value={password}
                 onChange={handlePasswordChange}
-              ></input>
+              />
             </div>
             <div className="flex flex-col justify-start pt-6 items-center">
               <button
-                className=" font-TripSans font-medium rounded-[25px] w-36 h-10 bg-BudgieBlue text-BudgieWhite"
+                className="font-TripSans font-medium rounded-[25px] w-36 h-10 bg-BudgieBlue text-BudgieWhite"
                 type="button"
                 onClick={handleLoginClick}
               >
@@ -137,7 +156,7 @@ export function SignInModal(props: SignInModalProps) {
               </button>
             </div>
             <div className="flex flex-col justify-start pt-3 items-center">
-              <p className=" text-BudgieBlue font-TripSans font-medium  ">OR</p>
+              <p className="text-BudgieBlue font-TripSans font-medium">OR</p>
             </div>
             <div className="flex flex-col justify-start pt-3 items-center">
               <button
@@ -159,20 +178,21 @@ export function SignInModal(props: SignInModalProps) {
               </div>
             )}
             <div className="flex flex-col justify-start pt-14 items-center">
-              <p className=" text-lg text-BudgieBlue font-TripSans font-medium  ">
+              <p className="text-lg text-BudgieBlue font-TripSans font-medium">
                 Don't have an account?{' '}
-                <Link href={'/signup'} className=" underline ">
+                <Link href={'/signup'} className="underline">
                   Sign Up
                 </Link>
               </p>
             </div>
             <div className="flex flex-col justify-start pt-2 items-center">
-              <Link
-                href={'#'}
-                className="underline text-lg text-BudgieBlue font-TripSans font-medium  "
+              <button
+                type="button"
+                onClick={() => setForgot(!forgot)}
+                className="underline text-lg text-BudgieBlue font-TripSans font-medium"
               >
                 Forgot Password?
-              </Link>
+              </button>
             </div>
           </form>
         </div>

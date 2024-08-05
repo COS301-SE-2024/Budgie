@@ -10,6 +10,8 @@ export { Landing } from './lib/Landing/Landing';
 export { SignUpPage } from './lib/sign-up-page/SignUpPage';
 export { UserProvider, UserContext } from './lib/hooks/UserProvider';
 export { OverviewPage } from './lib/overview-page/overview-page';
+export { Support } from './lib/support-page/support';
+export { ForgotPassword } from './lib/forgot-password/forgot-password';
 export { AccountsPage } from './lib/accounts-page/accounts-page';
 export { UploadStatementCSV } from './lib/upload-statement-csv/UploadStatementCSV';
 export { AddAccountsPage } from './lib/add-accounts-page/add-accounts-page';
