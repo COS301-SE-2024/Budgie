@@ -1,7 +1,40 @@
-/*
- * Replace this with your own classes
- *
- * e.g.
- * .container {
- * }
-*/
+.landingContainer {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+/* Bottom wave */
+.waveBottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100vw; /* Ensure full viewport width */
+  height: 48vh; /* Adjust height as needed */
+  background: linear-gradient(to right, #a0e9af, #c0f0c0); /* Darker green gradient */
+  clip-path: path('M0,200 C300,300 600,100 900,200 C1200,300 1500,100 1800,200 L1800,600 L0,600 Z');
+}
+
+/* Top circular wave with extended radius */
+.waveTop {
+  position: absolute;
+  top: 0%;
+  left: -5%;
+  width: 29vw; /* Increase width for better visibility */
+  height: 80vh; /* Increase height to accommodate extended circle */
+  background: linear-gradient(to right, #b2f5a8, #e0f8d1); /* Lighter green gradient */
+  clip-path: circle(60% at 20% 10%);
+}
+
+/* Inner darker green circle */
+.waveTop::before {
+  content: "";
+  position: absolute;
+  top: -12%;
+  left: -15%;
+  width: 80%;
+  height: 58%;
+  background: #a0e9af; /* Darker green */
+  border-radius: 110%; /* Circular shape */
+  z-index: 1; /* Ensure it appears on top */
+}
