@@ -46,8 +46,8 @@ export function OverviewPage(props: OverviewPageProps) {
   // Determine the message based on the progress
   const progressMessage =
     financialGoalsProgress < 50
-      ? 'A bit far from your target'
-      : 'Doing well towards your target';
+      ? 'A bit far from your target,please revaluate your planning'
+      : 'Doing well towards your target,keep up the good work';
 
   // Sample data for charts
   const spendingData = [
