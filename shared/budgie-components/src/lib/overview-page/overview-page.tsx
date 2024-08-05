@@ -46,8 +46,8 @@ export function OverviewPage(props: OverviewPageProps) {
   // Determine the message based on the progress
   const progressMessage =
     financialGoalsProgress < 50
-      ? 'A bit far from your target,please revaluate your planning'
-      : 'Doing well towards your target,keep up the good work';
+      ? 'A bit far from your target, please reevaluate your planning'
+      : 'Doing well towards your target, keep up the good work';
 
   // Sample data for charts
   const spendingData = [
@@ -108,41 +108,39 @@ export function OverviewPage(props: OverviewPageProps) {
             <button className={styles.toggleButton} onClick={toggleTheme}>
               {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             </button>
-            <div className={styles.chartContainer}>
-              <div className={styles.chartItem}>
-                <div className={styles.chartTitleContainer}>
-                  <h3 className={styles.chartTitle}>Net Worth Over Time</h3>
-                </div>
-                <LineChart width={650} height={300} data={spendingData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" tick={{ fill: isDarkMode ? 'white' : 'black' }} />
-                  <YAxis tick={{ fill: isDarkMode ? 'white' : 'black' }} />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="value" stroke="#8884d8" />
-                </LineChart>
+            <div className={styles.fullWidthChart}>
+              <div className={styles.chartTitleContainer}>
+                <h3 className={styles.chartTitle}>Net Worth Over Time</h3>
               </div>
-              <div className={styles.chartItem}>
-                <div className={styles.chartTitleContainer}>
-                  <h3 className={styles.chartTitle}>Spending by Category</h3>
-                </div>
-                <PieChart width={600} height={300}>
-                  <Pie
-                    data={categoryData}
-                    cx={250}
-                    cy={120}
-                    labelLine={false}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {categoryData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
+              <LineChart width={1000} height={300} data={spendingData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" tick={{ fill: isDarkMode ? 'white' : 'black' }} />
+                <YAxis tick={{ fill: isDarkMode ? 'white' : 'black' }} />
+                <Tooltip />
+                <Line type="monotone" dataKey="value" stroke="#8884d8" />
+              </LineChart>
+            </div>
+            <div className={styles.fullWidthChart}>
+              <div className={styles.chartTitleContainer}>
+                <h3 className={styles.chartTitle}>Spending by Category</h3>
               </div>
+              <PieChart width={1000} height={300}>
+                <Pie
+                  data={categoryData}
+                  cx={500}
+                  cy={150}
+                  labelLine={false}
+                  outerRadius={100}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {categoryData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
             </div>
             <div className={styles.gridContainer}>
               <div className={styles.gridItem}>

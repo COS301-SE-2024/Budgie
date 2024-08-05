@@ -213,3 +213,11 @@
   bottom: -4px;
   left: 0;
 }
+.fullWidthChart {
+  width: 100%;
+  margin-bottom: 20px;
+  background-color: var(--chart-bg-color);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
