@@ -12,7 +12,8 @@ import {
   getMoneyIn,
   getMoneyOut,
   getLastTransaction,
-  getMonthlyBalance
+  getMonthlyIncome,
+  getMonthlyExpenses
  } from "../overview-page/overviewServices";
 
 export interface OverviewPageProps {}
@@ -49,7 +50,8 @@ export function OverviewPage(props: OverviewPageProps) {
   const [moneyIn, setMoneyIn] = useState(0);
   const [moneyOut, setMoneyOut] = useState(0);
   const [lastTransaction, setLastTransaction] = useState<Transaction>(defaultTransaction);
-  const [monthlyBalance, setMonthlyBalance] = useState([]);
+  const [monthlyIncome, setMonthlyIncome] = useState([]);
+  const [monthlyExpenses, setMonthlyExpenses] = useState([]);
 
 
   const getData = async (number:string) => {
@@ -60,8 +62,10 @@ export function OverviewPage(props: OverviewPageProps) {
     setMoneyOut(moneyO);
     const lastT = await getLastTransaction(transaction);
     setLastTransaction(lastT);
-    const monthly = await getMonthlyBalance(transaction);
-    setMonthlyBalance(monthly);
+    const monthly = await getMonthlyIncome(transaction);
+    setMonthlyIncome(monthly);
+    const monthlyE = await getMonthlyExpenses(transaction);
+    setMonthlyExpenses(monthlyE);
 }
 
   useEffect(() => {
@@ -94,18 +98,18 @@ export function OverviewPage(props: OverviewPageProps) {
 
   // Sample data for charts
   const spendingData = [
-    { name: 'Jan', value: monthlyBalance[0], additionalValue: 1000 },
-    { name: 'Feb', value: monthlyBalance[1], additionalValue: 1000 },
-    { name: 'Mar', value: monthlyBalance[2], additionalValue: 1000 },
-    { name: 'Apr', value: monthlyBalance[3], additionalValue: 1000 },
-    { name: 'May', value: monthlyBalance[4], additionalValue: 1000 },
-    { name: 'Jun', value: monthlyBalance[5], additionalValue: 1000 },
-    { name: 'Jul', value: monthlyBalance[6], additionalValue: 1000 },
-    { name: 'Aug', value: monthlyBalance[7], additionalValue: 1000 },
-    { name: 'Sep', value: monthlyBalance[8], additionalValue: 1000 },
-    { name: 'Oct', value: monthlyBalance[9], additionalValue: 1000 },
-    { name: 'Nov', value: monthlyBalance[10], additionalValue: 1000 },
-    { name: 'Dec', value: monthlyBalance[11], additionalValue: 1000 },
+    { name: 'Jan', value: monthlyIncome[0], additionalValue: monthlyExpenses[0] },
+    { name: 'Feb', value: monthlyIncome[1], additionalValue: monthlyExpenses[1] },
+    { name: 'Mar', value: monthlyIncome[2], additionalValue: monthlyExpenses[2] },
+    { name: 'Apr', value: monthlyIncome[3], additionalValue: monthlyExpenses[3] },
+    { name: 'May', value: monthlyIncome[4], additionalValue: monthlyExpenses[4] },
+    { name: 'Jun', value: monthlyIncome[5], additionalValue: monthlyExpenses[5] },
+    { name: 'Jul', value: monthlyIncome[6], additionalValue: monthlyExpenses[6] },
+    { name: 'Aug', value: monthlyIncome[7], additionalValue: monthlyExpenses[7] },
+    { name: 'Sep', value: monthlyIncome[8], additionalValue: monthlyExpenses[8] },
+    { name: 'Oct', value: monthlyIncome[9], additionalValue: monthlyExpenses[9] },
+    { name: 'Nov', value: monthlyIncome[10], additionalValue: monthlyExpenses[10] },
+    { name: 'Dec', value: monthlyIncome[11], additionalValue: monthlyExpenses[11] },
   ];
 
   const categoryData = [
@@ -161,8 +165,8 @@ export function OverviewPage(props: OverviewPageProps) {
                 <XAxis dataKey="name" tick={{ fill: isDarkMode ? 'white' : 'black' }} />
                 <YAxis tick={{ fill: isDarkMode ? 'white' : 'black' }} />
                 <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#8884d8" />
-                <Line type="monotone" dataKey="additionalValue" stroke="#82ca9d" />
+                <Line type="monotone" dataKey="additionalValue" stroke="red" />
+                <Line type="monotone" dataKey="value" stroke="green" />
               </LineChart>
             </div>
             <div className={styles.fullWidthChart}>

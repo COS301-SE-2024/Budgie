@@ -109,20 +109,35 @@ export async function getLastTransaction(transactions:any){
   return transactions[0];
 }
 
-//get balance for all months
-export async function getMonthlyBalance(transactions:any){
+//get total income for all months
+export async function getMonthlyIncome(transactions:any){
   let balance:any = [12];
   for(let i =0; i<12; i++){
     balance[i] = 0;
   }
-  let flag = 1;
   for(let i=0; i<transactions.length; i++){
     const dateString = transactions[i].date;
     const parts = dateString.split('/');
     const month = parseInt(parts[1], 10);
-    if(month!=flag){
-      balance[month-1] += transactions[i].balance;
-      flag = month;
+    if(transactions[i].amount>0){
+      balance[month-1] += transactions[i].amount;
+    }
+  }
+  return balance;
+}
+
+//get total expenses for all months
+export async function getMonthlyExpenses(transactions:any){
+  let balance:any = [12];
+  for(let i =0; i<12; i++){
+    balance[i] = 0;
+  }
+  for(let i=0; i<transactions.length; i++){
+    const dateString = transactions[i].date;
+    const parts = dateString.split('/');
+    const month = parseInt(parts[1], 10);
+    if(transactions[i].amount<0){
+      balance[month-1] -= transactions[i].amount;
     }
   }
   return balance;
