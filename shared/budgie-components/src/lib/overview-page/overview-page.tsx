@@ -34,7 +34,7 @@ export function OverviewPage(props: OverviewPageProps) {
     someFunction();
   }, [showData]);
 
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
