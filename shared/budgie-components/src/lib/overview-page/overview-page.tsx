@@ -1,12 +1,12 @@
 "use client";
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { LineChart, Line, PieChart, Pie, Tooltip, CartesianGrid, XAxis, YAxis, Legend, Cell } from 'recharts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMoneyBill, faBank, faChartPie, faHistory, faCalendarAlt, faListUl, faBullseye } from '@fortawesome/free-solid-svg-icons';
 import styles from './overview-page.module.css';
 import HealthBar from './HealthBar';
 import '../../root.css';
-import { 
+import {
   getAccounts,
   getTransactions,
   getMoneyIn,
@@ -34,7 +34,7 @@ export function OverviewPage(props: OverviewPageProps) {
     description: string;
     category: string;
   }
-  
+
   const defaultTransaction: Transaction = {
     date: '',
     amount: 0,
@@ -109,44 +109,36 @@ export function OverviewPage(props: OverviewPageProps) {
   ];
 
   const categoryData = [
-    { name: 'Groceries', value: 200 },
-    { name: 'Utilities', value: 100 },
+    { name: 'Food', value: 400 },
+    { name: 'Rent', value: 300 },
+    { name: 'Utilities', value: 300 },
     { name: 'Entertainment', value: 200 },
-    { name: 'Transport', value: 150 },
-    { name: 'Insurance', value: 150 },
-    { name: 'Medical Aid', value: 150 },
-    { name: 'Eating Out', value: 150 },
-    { name: 'Shopping', value: 150 },
-    { name: 'Other', value: 150 },
   ];
 
-  const CATEGORY_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042','#FFBB','#00C4', '#FFB', '#FFAACC'];
+  const CATEGORY_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
-  const hasAccounts = showData;
-
-  const filteredAccounts = accounts.filter(account => account.type === selectedAccountType);
+  const hasAccounts = accounts.length > 0;
 
   return (
     <div className={styles.mainPage}>
       <div className={styles.header}>
         <div className={styles.accountTypeButtons}>
           {accounts.map(account => (
-            <button
+            <div
               key={account.alias}
-              className={`${styles.accountTypeButton} ${selectedAccountType === account.alias ? styles.active : ''}`}
+              className={`${styles.accountTypeText} ${selectedAccountType === account.alias ? styles.active : ''}`}
               onClick={() => {
                 setSelectedAccountType(account.alias);
                 getData(account.account_number);
               }}
             >
               {account.alias}
-            </button>
+            </div>
           ))}
         </div>
       </div>
       {hasAccounts ? (
       <div className={styles.accountStatus}>
-        
         {moneyIn>0 ? (
           <div className={`${styles.metricsContainer} ${isDarkMode ? styles.dark : styles.light}`}>
             <button className={styles.toggleButton} onClick={toggleTheme}>
