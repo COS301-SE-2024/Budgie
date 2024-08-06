@@ -9,21 +9,6 @@ import {
   where
 } from 'firebase/firestore';
 
-const monthNames = [
-  'january',
-  'february',
-  'march',
-  'april',
-  'may',
-  'june',
-  'july',
-  'august',
-  'september',
-  'october',
-  'november',
-  'december',
-];
-
 
 //get logged in users user id
 export function getUser(){
@@ -141,4 +126,42 @@ export async function getMonthlyExpenses(transactions:any){
     }
   }
   return balance;
+}
+
+//get amount for each category 
+export async function getExpensesByCategory(transactions:any){
+  let result:any = [9];
+  for(let i=0; i<9; i++){
+    result[i] = 0;
+  }
+  for(let i=0; i<transactions.length; i++){
+    if(transactions[i].category=='Groceries'){
+      result[0] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Utilities'){
+      result[1] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Entertainment'){
+      result[2] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Transport'){
+      result[3] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Insurance'){
+      result[4] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Medical Aid'){
+      result[5] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Eating Out'){
+      result[6] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Shopping'){
+      result[7] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Other'){
+      result[8] -= transactions[i].amount; 
+    }
+  }
+  return result;
 }

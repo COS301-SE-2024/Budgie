@@ -13,7 +13,8 @@ import {
   getMoneyOut,
   getLastTransaction,
   getMonthlyIncome,
-  getMonthlyExpenses
+  getMonthlyExpenses,
+  getExpensesByCategory
  } from "../overview-page/overviewServices";
 
 export interface OverviewPageProps {}
@@ -52,6 +53,7 @@ export function OverviewPage(props: OverviewPageProps) {
   const [lastTransaction, setLastTransaction] = useState<Transaction>(defaultTransaction);
   const [monthlyIncome, setMonthlyIncome] = useState([]);
   const [monthlyExpenses, setMonthlyExpenses] = useState([]);
+  const [expenseByCategory, setExpenseByCategory] = useState([]);
 
 
   const getData = async (number:string) => {
@@ -66,6 +68,8 @@ export function OverviewPage(props: OverviewPageProps) {
     setMonthlyIncome(monthly);
     const monthlyE = await getMonthlyExpenses(transaction);
     setMonthlyExpenses(monthlyE);
+    const categoryExpenses = await getExpensesByCategory(transaction);
+    setExpenseByCategory(categoryExpenses);
 }
 
   useEffect(() => {
@@ -98,30 +102,30 @@ export function OverviewPage(props: OverviewPageProps) {
 
   // Sample data for charts
   const spendingData = [
-    { name: 'Jan', value: monthlyIncome[0], additionalValue: monthlyExpenses[0] },
-    { name: 'Feb', value: monthlyIncome[1], additionalValue: monthlyExpenses[1] },
-    { name: 'Mar', value: monthlyIncome[2], additionalValue: monthlyExpenses[2] },
-    { name: 'Apr', value: monthlyIncome[3], additionalValue: monthlyExpenses[3] },
-    { name: 'May', value: monthlyIncome[4], additionalValue: monthlyExpenses[4] },
-    { name: 'Jun', value: monthlyIncome[5], additionalValue: monthlyExpenses[5] },
-    { name: 'Jul', value: monthlyIncome[6], additionalValue: monthlyExpenses[6] },
-    { name: 'Aug', value: monthlyIncome[7], additionalValue: monthlyExpenses[7] },
-    { name: 'Sep', value: monthlyIncome[8], additionalValue: monthlyExpenses[8] },
-    { name: 'Oct', value: monthlyIncome[9], additionalValue: monthlyExpenses[9] },
-    { name: 'Nov', value: monthlyIncome[10], additionalValue: monthlyExpenses[10] },
-    { name: 'Dec', value: monthlyIncome[11], additionalValue: monthlyExpenses[11] },
+    { name: 'Jan', Income: monthlyIncome[0], Expenses: monthlyExpenses[0] },
+    { name: 'Feb', Income: monthlyIncome[1], Expenses: monthlyExpenses[1] },
+    { name: 'Mar', Income: monthlyIncome[2], Expenses: monthlyExpenses[2] },
+    { name: 'Apr', Income: monthlyIncome[3], Expenses: monthlyExpenses[3] },
+    { name: 'May', Income: monthlyIncome[4], Expenses: monthlyExpenses[4] },
+    { name: 'Jun', Income: monthlyIncome[5], Expenses: monthlyExpenses[5] },
+    { name: 'Jul', Income: monthlyIncome[6], Expenses: monthlyExpenses[6] },
+    { name: 'Aug', Income: monthlyIncome[7], Expenses: monthlyExpenses[7] },
+    { name: 'Sep', Income: monthlyIncome[8], Expenses: monthlyExpenses[8] },
+    { name: 'Oct', Income: monthlyIncome[9], Expenses: monthlyExpenses[9] },
+    { name: 'Nov', Income: monthlyIncome[10], Expenses: monthlyExpenses[10] },
+    { name: 'Dec', Income: monthlyIncome[11], Expenses: monthlyExpenses[11] },
   ];
 
   const categoryData = [
-    { name: 'Groceries', value: 200 },
-    { name: 'Utilities', value: 100 },
-    { name: 'Entertainment', value: 200 },
-    { name: 'Transport', value: 150 },
-    { name: 'Insurance', value: 150 },
-    { name: 'Medical Aid', value: 150 },
-    { name: 'Eating Out', value: 150 },
-    { name: 'Shopping', value: 150 },
-    { name: 'Other', value: 150 },
+    { name: 'Groceries', value: expenseByCategory[0] },
+    { name: 'Utilities', value: expenseByCategory[1]  },
+    { name: 'Entertainment', value: expenseByCategory[2]  },
+    { name: 'Transport', value: expenseByCategory[3]  },
+    { name: 'Insurance', value: expenseByCategory[4]  },
+    { name: 'Medical Aid', value: expenseByCategory[5]  },
+    { name: 'Eating Out', value: expenseByCategory[6]  },
+    { name: 'Shopping', value: expenseByCategory[7]  },
+    { name: 'Other', value: expenseByCategory[8]  },
   ];
 
   const CATEGORY_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042','#FFBB','#00C4', '#FFB', '#FFAACC'];
@@ -165,8 +169,8 @@ export function OverviewPage(props: OverviewPageProps) {
                 <XAxis dataKey="name" tick={{ fill: isDarkMode ? 'white' : 'black' }} />
                 <YAxis tick={{ fill: isDarkMode ? 'white' : 'black' }} />
                 <Tooltip />
-                <Line type="monotone" dataKey="additionalValue" stroke="red" />
-                <Line type="monotone" dataKey="value" stroke="green" />
+                <Line type="monotone" dataKey="Expenses" stroke="red" />
+                <Line type="monotone" dataKey="Income" stroke="green" />
               </LineChart>
             </div>
             <div className={styles.fullWidthChart}>
