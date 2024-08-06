@@ -94,18 +94,18 @@ export function OverviewPage(props: OverviewPageProps) {
 
   // Sample data for charts
   const spendingData = [
-    { name: 'Jan', value: monthlyBalance[0] },
-    { name: 'Feb', value: monthlyBalance[1] },
-    { name: 'Mar', value: monthlyBalance[2] },
-    { name: 'Apr', value: monthlyBalance[3] },
-    { name: 'May', value: monthlyBalance[4] },
-    { name: 'Jun', value: monthlyBalance[5] },
-    { name: 'Jul', value: monthlyBalance[6] },
-    { name: 'Aug', value: monthlyBalance[7] },
-    { name: 'Sep', value: monthlyBalance[8] },
-    { name: 'Oct', value: monthlyBalance[9] },
-    { name: 'Nov', value: monthlyBalance[10] },
-    { name: 'Dec', value: monthlyBalance[11] },
+    { name: 'Jan', value: monthlyBalance[0], additionalValue: 1000 },
+    { name: 'Feb', value: monthlyBalance[1], additionalValue: 1000 },
+    { name: 'Mar', value: monthlyBalance[2], additionalValue: 1000 },
+    { name: 'Apr', value: monthlyBalance[3], additionalValue: 1000 },
+    { name: 'May', value: monthlyBalance[4], additionalValue: 1000 },
+    { name: 'Jun', value: monthlyBalance[5], additionalValue: 1000 },
+    { name: 'Jul', value: monthlyBalance[6], additionalValue: 1000 },
+    { name: 'Aug', value: monthlyBalance[7], additionalValue: 1000 },
+    { name: 'Sep', value: monthlyBalance[8], additionalValue: 1000 },
+    { name: 'Oct', value: monthlyBalance[9], additionalValue: 1000 },
+    { name: 'Nov', value: monthlyBalance[10], additionalValue: 1000 },
+    { name: 'Dec', value: monthlyBalance[11], additionalValue: 1000 },
   ];
 
   const categoryData = [
@@ -162,6 +162,7 @@ export function OverviewPage(props: OverviewPageProps) {
                 <YAxis tick={{ fill: isDarkMode ? 'white' : 'black' }} />
                 <Tooltip />
                 <Line type="monotone" dataKey="value" stroke="#8884d8" />
+                <Line type="monotone" dataKey="additionalValue" stroke="#82ca9d" />
               </LineChart>
             </div>
             <div className={styles.fullWidthChart}>
