@@ -62,7 +62,6 @@ export function OverviewPage(props: OverviewPageProps) {
     setLastTransaction(lastT);
     const monthly = await getMonthlyBalance(transaction);
     setMonthlyBalance(monthly);
-
 }
 
   useEffect(() => {
