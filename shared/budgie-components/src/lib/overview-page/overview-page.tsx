@@ -11,7 +11,8 @@ import {
   getTransactions,
   getMoneyIn,
   getMoneyOut,
-  getLastTransaction
+  getLastTransaction,
+  getMonthlyBalance
  } from "../overview-page/overviewServices";
 
 export interface OverviewPageProps {}
@@ -48,6 +49,7 @@ export function OverviewPage(props: OverviewPageProps) {
   const [moneyIn, setMoneyIn] = useState(0);
   const [moneyOut, setMoneyOut] = useState(0);
   const [lastTransaction, setLastTransaction] = useState<Transaction>(defaultTransaction);
+  const [monthlyBalance, setMonthlyBalance] = useState([]);
 
 
   const getData = async (number:string) => {
@@ -58,6 +60,9 @@ export function OverviewPage(props: OverviewPageProps) {
     setMoneyOut(moneyO);
     const lastT = await getLastTransaction(transaction);
     setLastTransaction(lastT);
+    const monthly = await getMonthlyBalance(transaction);
+    setMonthlyBalance(monthly);
+
 }
 
   useEffect(() => {
@@ -90,12 +95,18 @@ export function OverviewPage(props: OverviewPageProps) {
 
   // Sample data for charts
   const spendingData = [
-    { name: 'Jan', value: 400 },
-    { name: 'Feb', value: 300 },
-    { name: 'Mar', value: 200 },
-    { name: 'Apr', value: 500 },
-    { name: 'May', value: 450 },
-    { name: 'Jun', value: 600 },
+    { name: 'Jan', value: monthlyBalance[0] },
+    { name: 'Feb', value: monthlyBalance[1] },
+    { name: 'Mar', value: monthlyBalance[2] },
+    { name: 'Apr', value: monthlyBalance[3] },
+    { name: 'May', value: monthlyBalance[4] },
+    { name: 'Jun', value: monthlyBalance[5] },
+    { name: 'Jul', value: monthlyBalance[6] },
+    { name: 'Aug', value: monthlyBalance[7] },
+    { name: 'Sep', value: monthlyBalance[8] },
+    { name: 'Oct', value: monthlyBalance[9] },
+    { name: 'Nov', value: monthlyBalance[10] },
+    { name: 'Dec', value: monthlyBalance[11] },
   ];
 
   const categoryData = [
