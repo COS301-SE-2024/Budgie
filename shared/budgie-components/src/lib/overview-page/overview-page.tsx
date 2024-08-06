@@ -1,19 +1,23 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { LineChart, Line, PieChart, Pie, Tooltip, CartesianGrid, XAxis, YAxis, Legend, Cell } from 'recharts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMoneyBill, faBank, faChartPie, faHistory, faCalendarAlt, faListUl, faBullseye } from '@fortawesome/free-solid-svg-icons';
 import styles from './overview-page.module.css';
 import HealthBar from './HealthBar';
 import '../../root.css';
-import { getAccounts } from "../overview-page/overviewServices";
+import { 
+  getAccounts,
+  getTransactions,
+  getMoneyIn,
+  getMoneyOut,
+  getLastTransaction,
+  getMonthlyBalance
+ } from "../overview-page/overviewServices";
 
 export interface OverviewPageProps {}
 
 export function OverviewPage(props: OverviewPageProps) {
-  const [showData, setShowData] = useState(false);
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [selectedAccountType, setSelectedAccountType] = useState('Current');
 
   interface Account {
     account_number: string;
@@ -23,12 +27,51 @@ export function OverviewPage(props: OverviewPageProps) {
     uid: string;
   }
 
+  interface Transaction {
+    date: string;
+    amount: number;
+    balance: number;
+    description: string;
+    category: string;
+  }
+  
+  const defaultTransaction: Transaction = {
+    date: '',
+    amount: 0,
+    balance: 0,
+    description: '',
+    category: '',
+  }
+
+  const [showData, setShowData] = useState(false);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [selectedAccountType, setSelectedAccountType] = useState('Current');
+  const [moneyIn, setMoneyIn] = useState(0);
+  const [moneyOut, setMoneyOut] = useState(0);
+  const [lastTransaction, setLastTransaction] = useState<Transaction>(defaultTransaction);
+  const [monthlyBalance, setMonthlyBalance] = useState([]);
+
+
+  const getData = async (number:string) => {
+    const transaction = await getTransactions(number);
+    const moneyI = await getMoneyIn(transaction);
+    setMoneyIn(moneyI);
+    const moneyO = await getMoneyOut(transaction);
+    setMoneyOut(moneyO);
+    const lastT = await getLastTransaction(transaction);
+    setLastTransaction(lastT);
+    const monthly = await getMonthlyBalance(transaction);
+    setMonthlyBalance(monthly);
+}
+
   useEffect(() => {
     async function someFunction() {
       const account = await getAccounts();
       if (account.length > 0) {
         setAccounts(account);
         setShowData(true);
+        setSelectedAccountType(account[0].alias);
+        getData(account[0].account_number);
       }
     }
     someFunction();
@@ -51,12 +94,18 @@ export function OverviewPage(props: OverviewPageProps) {
 
   // Sample data for charts
   const spendingData = [
-    { name: 'Jan', value: 400 },
-    { name: 'Feb', value: 300 },
-    { name: 'Mar', value: 200 },
-    { name: 'Apr', value: 500 },
-    { name: 'May', value: 450 },
-    { name: 'Jun', value: 600 },
+    { name: 'Jan', value: monthlyBalance[0] },
+    { name: 'Feb', value: monthlyBalance[1] },
+    { name: 'Mar', value: monthlyBalance[2] },
+    { name: 'Apr', value: monthlyBalance[3] },
+    { name: 'May', value: monthlyBalance[4] },
+    { name: 'Jun', value: monthlyBalance[5] },
+    { name: 'Jul', value: monthlyBalance[6] },
+    { name: 'Aug', value: monthlyBalance[7] },
+    { name: 'Sep', value: monthlyBalance[8] },
+    { name: 'Oct', value: monthlyBalance[9] },
+    { name: 'Nov', value: monthlyBalance[10] },
+    { name: 'Dec', value: monthlyBalance[11] },
   ];
 
   const categoryData = [
@@ -81,29 +130,24 @@ export function OverviewPage(props: OverviewPageProps) {
     <div className={styles.mainPage}>
       <div className={styles.header}>
         <div className={styles.accountTypeButtons}>
-          <button
-            className={`${styles.accountTypeButton} ${selectedAccountType === 'Current' ? styles.active : ''}`}
-            onClick={() => setSelectedAccountType('Current')}
-          >
-            Current
-          </button>
-          <button
-            className={`${styles.accountTypeButton} ${selectedAccountType === 'Savings' ? styles.active : ''}`}
-            onClick={() => setSelectedAccountType('Savings')}
-          >
-            Savings
-          </button>
-          <button
-            className={`${styles.accountTypeButton} ${selectedAccountType === 'Custom' ? styles.active : ''}`}
-            onClick={() => setSelectedAccountType('Custom')}
-          >
-            Custom
-          </button>
+          {accounts.map(account => (
+            <button
+              key={account.alias}
+              className={`${styles.accountTypeButton} ${selectedAccountType === account.alias ? styles.active : ''}`}
+              onClick={() => {
+                setSelectedAccountType(account.alias);
+                getData(account.account_number);
+              }}
+            >
+              {account.alias}
+            </button>
+          ))}
         </div>
       </div>
-
+      {hasAccounts ? (
       <div className={styles.accountStatus}>
-        {hasAccounts ? (
+        
+        {moneyIn>0 ? (
           <div className={`${styles.metricsContainer} ${isDarkMode ? styles.dark : styles.light}`}>
             <button className={styles.toggleButton} onClick={toggleTheme}>
               {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
@@ -148,28 +192,19 @@ export function OverviewPage(props: OverviewPageProps) {
                   <FontAwesomeIcon icon={faMoneyBill} className={styles.icon} />
                   <h2 className={styles.gridTitle}>Total Balance for Year</h2>
                 </div>
-                <p>Total Money in: R25 647.76</p>
-                <p>Total Money out: R5 427.28</p>
+                <p>Total Money in: R {moneyIn}</p>
+                <p>Total Money out: R {moneyOut}</p>
               </div>
-              <div className={styles.gridItem}>
-                <div className={styles.gridTitleContainer}>
-                  <FontAwesomeIcon icon={faBank} className={styles.icon} />
-                  <h2 className={styles.gridTitle}>Current Accounts</h2>
-                </div>
-                <ul>
-                  {filteredAccounts.map(account => (
-                    <li key={account.uid}>{account.alias}</li>
-                  ))}
-                </ul>
-              </div>
+
               <div className={styles.gridItem}>
                 <div className={styles.gridTitleContainer}>
                   <FontAwesomeIcon icon={faHistory} className={styles.icon} />
                   <h2 className={styles.gridTitle}>Last Transaction</h2>
                 </div>
-                <p>PURCH Uber Eats 400738******4299</p>
-                <p>2024/06/22</p>
-                <p>Category: Eating Out</p>
+                <p>Date: {lastTransaction.date}</p>
+                <p>Amount: R {lastTransaction.amount}</p>
+                <p>Description: {lastTransaction.description}</p>
+                <p>Category: {lastTransaction.category}</p>
               </div>
               <div className={styles.gridItem}>
                 <div className={styles.gridTitleContainer}>
@@ -190,20 +225,28 @@ export function OverviewPage(props: OverviewPageProps) {
                 <p>Amount Spent: R3000.00</p>
                 <HealthBar progress={60} />
               </div>
-              <div className={styles.gridItem}>
-                <div className={styles.gridTitleContainer}>
-                  <FontAwesomeIcon icon={faBullseye} className={styles.icon} />
-                  <h2 className={styles.gridTitle}>Financial Goals Progress</h2>
-                </div>
-                <p>{progressMessage}</p>
-                <HealthBar progress={financialGoalsProgress} />
-              </div>
             </div>
           </div>
         ) : (
-          <p>There are no accounts available to display.</p>
+          <div className={styles.bodyText}>
+          <p>You have not uploaded <br/>
+              any transactions for this year. <br/><br/>
+              Head to the accounts <br/>
+              section to upload your transactions.
+          </p>
+          </div>
         )}
       </div>
+    ) : (
+        <div className={styles.bodyText}>
+          <p>You have not uploaded <br/>
+              any transactions. <br/><br/>
+              Head to the accounts <br/>
+              section to upload your first <br/>
+              transaction history.
+          </p>
+        </div>
+    )}
     </div>
   );
 }
