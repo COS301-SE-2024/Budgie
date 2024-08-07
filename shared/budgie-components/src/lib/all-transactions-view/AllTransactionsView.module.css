@@ -26,35 +26,35 @@
   color: grey;
 }
 
-.navButton1 {
+.leftNavButton {
   color: var(--main-text);
   border: none;
   cursor: pointer;
   transition: 0.3s ease;
 }
 
-.navButton1:hover {
+.leftNavButton:hover {
   color: var(--primary-2);
 }
 
-.greyedNavButton1 {
+.greyedleftNavButton {
   color: var(--greyed-text);
   border: none;
   transition: 0.3s ease;
 }
 
-.navButton2 {
+.rightNavButton {
   color: var(--main-text);
   border: none;
   cursor: pointer;
   transition: 0.3s ease;
 }
 
-.navButton2:hover {
+.rightNavButton:hover {
   color: var(--primary-2);
 }
 
-.greyedNavButton2 {
+.greyedrightNavButton {
   color: var(--greyed-text);
   border: none;
   transition: 0.3s ease;

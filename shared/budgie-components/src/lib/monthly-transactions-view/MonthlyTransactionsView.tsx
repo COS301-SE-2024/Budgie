@@ -30,8 +30,8 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   const [Data, setData] = useState<any>(null);
   const user = useContext(UserContext);
   const dropdownRef = useRef<HTMLSelectElement>(null);
-  const [ArrowStyle1, setArrowStyle1] = useState('');
-  const [ArrowStyle2, setArrowStyle2] = useState('');
+  const [LeftArrowStyle, setLeftArrowStyle] = useState('');
+  const [RightArrowStyle, setRightArrowStyle] = useState('');
 
   interface Transaction {
     date: string;
@@ -42,7 +42,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   }
 
   const handleNextMonth = () => {
-    setArrowStyle1('Normal');
     //change year
     if (currentMonth.getFullYear() != currentYear) {
       setCurrentYear(currentMonth.getFullYear());
@@ -57,17 +56,12 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
       setCurrentMonth(
         new Date(currentMonth.setMonth(currentMonth.getMonth() + 1))
       );
-    } else {
-      setArrowStyle2('Greyed');
-    }
+    } 
     display();
   };
 
   const handlePrevMonth = () => {
-    setArrowStyle2('Normal');
-    if (currentYear == props.availableYears[0] && currentMonth.getMonth() == 0) {
-      setArrowStyle1("Greyed");
-    } 
+    if (currentYear == props.availableYears[0] && currentMonth.getMonth() == 0) {} 
     else {
       setCurrentMonth(
         new Date(currentMonth.setMonth(currentMonth.getMonth() - 1))
@@ -120,13 +114,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   }, [currentYear]);
 
   useEffect(() => {
-    const Now = new Date();
-    if (currentMonth.getMonth() == Now.getMonth() && currentYear == Now.getFullYear()) {
-      setArrowStyle2('Greyed');
-    }    
-  }, [currentMonth]);
-
-  useEffect(() => {
     if (Data !== null) {
       display();
     }
@@ -137,6 +124,23 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   }, []);
 
   const display = async () => {
+
+    if (currentMonth.getMonth() == new Date().getMonth() && currentYear == new Date().getFullYear()) {
+      setRightArrowStyle('Greyed');
+    }    
+    else
+    {
+      setRightArrowStyle('Normal');
+    }
+
+    if (currentYear == props.availableYears[0] && currentMonth.getMonth()==0) {
+      setLeftArrowStyle('Greyed');
+    }  
+    else
+    {
+      setLeftArrowStyle('Normal');
+    }
+    
     const month = currentMonth
       .toLocaleString('default', { month: 'long' })
       .toLocaleLowerCase();
@@ -236,25 +240,25 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     }
   };
 
-  const getNavStyle1 = () => {
-    switch (ArrowStyle1) {
+  const getLeftArrowStyle = () => {
+    switch (LeftArrowStyle) {
       case 'Normal':
-        return styles.navButton1;
+        return styles.leftNavButton;
       case 'Greyed':
-        return styles.greyedNavButton1;
+        return styles.greyedleftNavButton;
       default:
-        return styles.navButton1;
+        return styles.leftNavButton;
     }
   };
 
-  const getNavStyle2 = () => {
-    switch (ArrowStyle2) {
+  const getRightArrowStyle = () => {
+    switch (RightArrowStyle) {
       case 'Normal':
-        return styles.navButton2;
+        return styles.rightNavButton;
       case 'Greyed':
-        return styles.greyedNavButton2;
+        return styles.greyedrightNavButton;
       default:
-        return styles.navButton2;
+        return styles.rightNavButton;
     }
   };
 
@@ -332,7 +336,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     <div className={styles.mainPage}>
       <div className={styles.header}>
         <div className={styles.monthNavigation}>
-          <button className={`${getNavStyle1()}`} onClick={handlePrevMonth}>
+          <button className={`${getLeftArrowStyle()}`} onClick={handlePrevMonth}>
             <span
               className="material-symbols-outlined"
               style={{
@@ -371,7 +375,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
             </select>
           </span>
 
-          <button className={`${getNavStyle2()}`} onClick={handleNextMonth}>
+          <button className={`${getRightArrowStyle()}`} onClick={handleNextMonth}>
             <span
               className="material-symbols-outlined"
               style={{

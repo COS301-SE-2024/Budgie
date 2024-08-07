@@ -29,8 +29,8 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   const user = useContext(UserContext);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [yearsWithData, setYearsWithData] = useState<number[]>([]);
-  const [ArrowStyle1, setArrowStyle1] = useState('');
-  const [ArrowStyle2, setArrowStyle2] = useState('');
+  const [LeftArrowStyle, setLeftArrowStyle] = useState('');
+  const [RightArrowStyle, setRightArrowStyle] = useState('');
 
 
   interface Transaction {
@@ -42,7 +42,6 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   }
 
   const handleNextYear = () => {
-    setArrowStyle1('Normal');
     const Now = new Date();
     if(Now.getFullYear()!=currentYear){
       setCurrentYear(currentYear+1)
@@ -51,13 +50,9 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   };
 
   const handlePrevYear = () => {
-    setArrowStyle2('Normal');
     if(currentYear!=props.availableYears[0]){
       setCurrentYear(currentYear-1)
       display();
-    }
-    else{
-      setArrowStyle1("Greyed");
     }
   };
 
@@ -95,15 +90,6 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
         getYearlyTransactions();
       }
     }
-
-    const Now = new Date();
-    if (currentYear == Now.getFullYear()) {
-      setArrowStyle2('Greyed');
-    }    
-
-    if (currentYear == props.availableYears[0]) {
-      setArrowStyle1('Greyed');
-    }  
   }, [currentYear]);
 
   useEffect(() => {
@@ -116,29 +102,63 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     fetchAvailableYears();
   }, []);
 
-  const getNavStyle1 = () => {
-    switch (ArrowStyle1) {
+  useEffect(() => {
+    if (currentYear == new Date().getFullYear()) {
+      setRightArrowStyle('Greyed');
+    }    
+    else
+    {
+      setRightArrowStyle('Normal');
+    }
+
+    if (currentYear == yearsWithData[0]) {
+      setLeftArrowStyle('Greyed');
+    }  
+    else
+    {
+      setLeftArrowStyle('Normal');
+    }
+  }, [yearsWithData]);
+
+  const getLeftArrowStyle = () => {
+    switch (LeftArrowStyle) {
       case 'Normal':
-        return styles.navButton1;
+        return styles.leftNavButton;
       case 'Greyed':
-        return styles.greyedNavButton1;
+        return styles.greyedleftNavButton;
       default:
-        return styles.navButton1;
+        return styles.leftNavButton;
     }
   };
 
-  const getNavStyle2 = () => {
-    switch (ArrowStyle2) {
+  const getRightArrowStyle = () => {
+    switch (RightArrowStyle) {
       case 'Normal':
-        return styles.navButton2;
+        return styles.rightNavButton;
       case 'Greyed':
-        return styles.greyedNavButton2;
+        return styles.greyedrightNavButton;
       default:
-        return styles.navButton2;
+        return styles.rightNavButton;
     }
   };
 
   const display = async () => {
+    if (currentYear == new Date().getFullYear()) {
+      setRightArrowStyle('Greyed');
+    }    
+    else
+    {
+      setRightArrowStyle('Normal');
+    }
+
+    if (currentYear == yearsWithData[0]) {
+      setLeftArrowStyle('Greyed');
+    }  
+    else
+    {
+      setLeftArrowStyle('Normal');
+    }
+
     if(Data!=null){
       let transactionsList: any[] = [];
       for (let i = 0; i < 12; i++) {
@@ -275,7 +295,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     <div className={styles.mainPage}>
       <div className={styles.header}>
         <div className={styles.monthNavigation}>
-          <button className={`${getNavStyle1()}`}  onClick={handlePrevYear}>
+          <button className={`${getLeftArrowStyle()}`}  onClick={handlePrevYear}>
             <span
               className="material-symbols-outlined"
               style={{ fontSize: 'calc(1.4rem * var(--font-size-multiplier))', alignContent:'center', display: 'flex'}}
@@ -295,7 +315,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
             </select>
           </span>
 
-          <button className={`${getNavStyle2()}`}  onClick={handleNextYear}>
+          <button className={`${getRightArrowStyle()}`}  onClick={handleNextYear}>
             <span
               className="material-symbols-outlined"
               style={{ fontSize: 'calc(1.4rem * var(--font-size-multiplier))', alignContent:'center', display: 'flex'}}
