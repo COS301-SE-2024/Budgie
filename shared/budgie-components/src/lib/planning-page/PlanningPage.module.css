@@ -1,0 +1,88 @@
+.pageContainer
+{
+    height: 100%;
+    width: 100%;
+}
+
+.paymentsBar {
+    width: 20%;
+    height: 100vh;
+    background-color: var(--block-background);
+    /*box-shadow: 0px 0 10px rgba(0, 0, 0, 0.5);*/
+    padding-top: 1rem;
+    padding-left: 1.5rem;
+    position: fixed;
+    top: 0;
+    right: 0;
+    font-size: calc(1rem * var(--font-size-multiplier));
+    display: flex;
+    justify-content: center;
+    color: var(--main-text);;
+}
+
+.paymentsBarTitle {
+    font-size: calc(1.5rem * var(--font-size-multiplier));
+    font-weight: bold;
+    color: var(--primary-1);
+    display: flex;
+    align-items: center;
+    height: 10vh;
+    width: 18vw;
+    justify-content: space-around;
+}
+
+.scrollableSection {
+    width: 75%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    overflow-y: scroll;
+}
+
+.planningModalContainer {
+    width: 80%;
+    margin-bottom: 2rem;
+}
+
+.planningModalTitle {
+    font-size: calc(1.5rem * var(--font-size-multiplier));
+    color: var(--main-text);
+    font-weight: bold;
+    padding-left: 1rem;
+}
+
+.planningModal {
+    background-color: var(--block-background);
+    border-radius: 1rem;
+    min-height: 40vh;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.noGoalsText {
+    font-size: calc(1.2rem * var(--font-size-multiplier));
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.addGoalsButton {
+    width: calc(10rem * var(--font-size-multiplier));
+    height: calc(4rem * var(--font-size-multiplier));
+    color: var(--block-background);
+    background-color: var(--primary-1);
+    font-weight: bold;
+    margin-top: 3rem;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.addGoalsButton:hover {
+    background-color: var(--accent-hover);
+}
+
+
+
