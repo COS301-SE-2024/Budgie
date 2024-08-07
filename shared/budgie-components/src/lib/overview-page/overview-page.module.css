@@ -78,6 +78,7 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
   border-radius: 5px;
+  align-self: flex-end; /* Align the toggle button to the end of its container */
 }
 
 .toggleButton:hover {
@@ -199,3 +200,4 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+

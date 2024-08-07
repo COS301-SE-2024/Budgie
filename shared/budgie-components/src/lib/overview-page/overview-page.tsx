@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { LineChart, Line, PieChart, Pie, Tooltip, CartesianGrid, XAxis, YAxis, Legend, Cell } from 'recharts';
+import { LineChart } from '@tremor/react'; // Tremor-specific import
+import { PieChart, Pie, Tooltip, Cell } from 'recharts'; // Recharts-specific import
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMoneyBill, faBank, faChartPie, faHistory, faCalendarAlt, faListUl, faBullseye } from '@fortawesome/free-solid-svg-icons';
 import styles from './overview-page.module.css';
@@ -51,7 +52,6 @@ export function OverviewPage(props: OverviewPageProps) {
   const [lastTransaction, setLastTransaction] = useState<Transaction>(defaultTransaction);
   const [monthlyBalance, setMonthlyBalance] = useState([]);
 
-
   const getData = async (number:string) => {
     const transaction = await getTransactions(number);
     const moneyI = await getMoneyIn(transaction);
@@ -62,7 +62,7 @@ export function OverviewPage(props: OverviewPageProps) {
     setLastTransaction(lastT);
     const monthly = await getMonthlyBalance(transaction);
     setMonthlyBalance(monthly);
-}
+  }
 
   useEffect(() => {
     async function someFunction() {
@@ -83,16 +83,13 @@ export function OverviewPage(props: OverviewPageProps) {
     setIsDarkMode(!isDarkMode);
   };
 
-  // Example progress value for the health bar
-  const financialGoalsProgress = 70; // Adjust this value as needed
+  const financialGoalsProgress = 70;
 
-  // Determine the message based on the progress
   const progressMessage =
     financialGoalsProgress < 50
       ? 'A bit far from your target, please reevaluate your planning'
       : 'Doing well towards your target, keep up the good work';
 
-  // Sample data for charts
   const spendingData = [
     { name: 'Jan', value: monthlyBalance[0] },
     { name: 'Feb', value: monthlyBalance[1] },
@@ -139,22 +136,27 @@ export function OverviewPage(props: OverviewPageProps) {
       </div>
       {hasAccounts ? (
       <div className={styles.accountStatus}>
-        {moneyIn>0 ? (
+        {moneyIn > 0 ? (
           <div className={`${styles.metricsContainer} ${isDarkMode ? styles.dark : styles.light}`}>
-            <button className={styles.toggleButton} onClick={toggleTheme}>
+            <button className={'styles.toggleButton greenButton'} onClick={toggleTheme}>
               {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             </button>
             <div className={styles.fullWidthChart}>
               <div className={styles.chartTitleContainer}>
                 <h3 className={styles.chartTitle}>Net Worth Over Time</h3>
               </div>
-              <LineChart width={1000} height={300} data={spendingData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" tick={{ fill: isDarkMode ? 'white' : 'black' }} />
-                <YAxis tick={{ fill: isDarkMode ? 'white' : 'black' }} />
-                <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#8884d8" />
-              </LineChart>
+              <LineChart
+                className="h-80"
+                data={spendingData}
+                index="name"
+                categories={['value']}
+                colors={['blue']}
+                valueFormatter={(number: number) =>
+                  `R ${Intl.NumberFormat('en-ZA').format(number).toString()}`
+                }
+                yAxisWidth={60}
+                onValueChange={(v) => console.log(v)}
+              />
             </div>
             <div className={styles.fullWidthChart}>
               <div className={styles.chartTitleContainer}>
@@ -175,7 +177,6 @@ export function OverviewPage(props: OverviewPageProps) {
                   ))}
                 </Pie>
                 <Tooltip />
-                <Legend />
               </PieChart>
             </div>
             <div className={styles.gridContainer}>
@@ -234,11 +235,10 @@ export function OverviewPage(props: OverviewPageProps) {
           <p>You have not uploaded <br/>
               any transactions. <br/><br/>
               Head to the accounts <br/>
-              section to upload your first <br/>
-              transaction history.
+              section to create new accounts.
           </p>
         </div>
-    )}
+      )}
     </div>
   );
 }
