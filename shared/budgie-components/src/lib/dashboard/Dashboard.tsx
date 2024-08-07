@@ -12,19 +12,20 @@ import styles from './Dashboard.module.css';
 export interface DashboardProps {}
 
 export function Dashboard(props: DashboardProps) {
-
   const user = useContext(UserContext);
   const [Data, setData] = useState<any>(null);
 
   // Yearly or monthly view
   const [viewMode, setViewMode] = useState('monthly');
-  
+
   // Default year is the current year
   const currentYear = new Date().getFullYear();
 
   // Current user's available accounts
-  const [accountOptions, setAccountOptions] = useState<{ alias: string, accountNumber: string }[]>([]);
-  
+  const [accountOptions, setAccountOptions] = useState<
+    { alias: string; accountNumber: string }[]
+  >([]);
+
   // Alias and account number of the currently selected account
   const [selectedAlias, setSelectedAlias] = useState<string>('');
   const [currentAccountNumber, setCurrentAccountNumber] = useState<string>('');
@@ -37,24 +38,26 @@ export function Dashboard(props: DashboardProps) {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const q = query(collection(db, 'accounts'), where('uid', '==', user.uid));
+        const q = query(
+          collection(db, 'accounts'),
+          where('uid', '==', user.uid)
+        );
         const querySnapshot = await getDocs(q);
-        const accountOptionsList = querySnapshot.docs.map(doc => ({
+        const accountOptionsList = querySnapshot.docs.map((doc) => ({
           alias: doc.data().alias,
-          accountNumber: doc.data().account_number
+          accountNumber: doc.data().account_number,
         }));
         setAccountOptions(accountOptionsList);
 
         if (accountOptionsList.length > 0) {
           setSelectedAlias(accountOptionsList[0].alias);
           setCurrentAccountNumber(accountOptionsList[0].accountNumber);
-          setHasAccount("Yes");
-        }
-        else{
-          setHasAccount("No");
+          setHasAccount('Yes');
+        } else {
+          setHasAccount('No');
         }
       } catch (error) {
-        console.error("Error fetching aliases: ", error);
+        console.error('Error fetching aliases: ', error);
       }
     };
 
@@ -65,9 +68,13 @@ export function Dashboard(props: DashboardProps) {
     const getYearlyTransactions = async () => {
       try {
         if (currentAccountNumber) {
-          const q = query(collection(db, `transaction_data_${currentYear}`), where('uid', '==', user.uid), where('account_number', '==', currentAccountNumber));
+          const q = query(
+            collection(db, `transaction_data_${currentYear}`),
+            where('uid', '==', user.uid),
+            where('account_number', '==', currentAccountNumber)
+          );
           const querySnapshot = await getDocs(q);
-          const transactionList = querySnapshot.docs.map(doc => doc.data());
+          const transactionList = querySnapshot.docs.map((doc) => doc.data());
           setData(transactionList[0]);
         }
       } catch (error) {
@@ -83,27 +90,35 @@ export function Dashboard(props: DashboardProps) {
       try {
         const currentYear = new Date().getFullYear();
         const years: number[] = [];
-        
+
         for (let year = 2000; year <= currentYear; year++) {
-          const q = query(collection(db, `transaction_data_${year}`), where('uid', '==', user.uid), where('account_number', '==', currentAccountNumber));
+          const q = query(
+            collection(db, `transaction_data_${year}`),
+            where('uid', '==', user.uid),
+            where('account_number', '==', currentAccountNumber)
+          );
           const querySnapshot = await getDocs(q);
-          
+
           if (!querySnapshot.empty) {
             years.push(year);
           }
-        }  
-        setYearsWithData(years);        
+        }
+        setYearsWithData(years);
       } catch (error) {
         console.error('Error fetching years with data:', error);
       }
-    }; 
+    };
 
     fetchAvailableYears();
   }, [currentAccountNumber]);
 
-  const handleAccountDropdownChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleAccountDropdownChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     const selected = event.target.value;
-    const selectedOption = accountOptions.find(option => option.alias === selected);
+    const selectedOption = accountOptions.find(
+      (option) => option.alias === selected
+    );
     if (selectedOption) {
       setSelectedAlias(selected);
       setCurrentAccountNumber(selectedOption.accountNumber);
@@ -113,66 +128,79 @@ export function Dashboard(props: DashboardProps) {
 
   return (
     <div>
-      {hasAccount==="No" ? 
-          (<div className={styles.noAccountScreen}>
-            <div>
-              <div className={styles.noAccountText}>
-                You haven't added an account yet.
-              </div>
-              <div className={styles.noAccountText}>
-                Head to the Accounts page to add an account and upload a transaction statement.  
-              </div>   
-            </div>  
-          </div>)
-      
-      : (<div><div className={styles.topBar}>
-        <div></div>{/*spacing div*/}
-        <div>
-          <button
-            className={`${styles.button} ${viewMode === 'all' ? styles.activeButton : ''}`}
-            onClick={() => setViewMode('all')}
-          >
-              Yearly
-          </button>
-
-          <button
-            className={`${styles.button} ${viewMode === 'monthly' ? styles.activeButton : ''}`}
-            onClick={() => setViewMode('monthly')}
-          >
-            Monthly
-          </button>
+      {hasAccount === 'No' ? (
+        <div className={styles.noAccountScreen}>
+          <div>
+            <div className={styles.noAccountText}>
+              You haven't added an account yet.
+            </div>
+            <div className={styles.noAccountText}>
+              Head to the Accounts page to add an account and upload a
+              transaction statement.
+            </div>
+          </div>
         </div>
+      ) : (
+        <div>
+          <div className={styles.topBar}>
+            <div></div>
+            {/*spacing div*/}
+            <div>
+              <button
+                className={`${styles.button} ${
+                  viewMode === 'all' ? styles.activeButton : ''
+                }`}
+                onClick={() => setViewMode('all')}
+              >
+                Yearly
+              </button>
 
-        <select 
-          className={styles.accountDropdown}
-          value={selectedAlias}
-          onChange={handleAccountDropdownChange}
-        >
-          {accountOptions.map((option, index) => (
-            <option key={index} value={option.alias}>
-              {option.alias}
-            </option>
-          ))}
-        </select>
-      </div>
+              <button
+                className={`${styles.button} ${
+                  viewMode === 'monthly' ? styles.activeButton : ''
+                }`}
+                onClick={() => setViewMode('monthly')}
+              >
+                Monthly
+              </button>
+            </div>
 
-      <div>
-        {viewMode === 'monthly' && Data && yearsWithData[0]!==0  ? 
-        (<MonthlyTransactionsView account={currentAccountNumber} data={Data} availableYears={yearsWithData}/>) 
+            <select
+              className={styles.accountDropdown}
+              value={selectedAlias}
+              onChange={handleAccountDropdownChange}
+            >
+              {accountOptions.map((option, index) => (
+                <option key={index} value={option.alias}>
+                  {option.alias}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        : viewMode === 'all' && Data && yearsWithData[0]!==0  ? 
-          (<AllTransactionsView account={currentAccountNumber} availableYears={yearsWithData}/>) 
-
-        : (<div className={styles.loadScreen}>
-            <div className={styles.loaderContainer}>
-              <div className={styles.loader}></div>
-            </div> 
-            <div className={styles.loaderText}>Loading...</div>            
-          </div>)
-        }
-      </div>
-      </div>)
-      }
+          <div>
+            {viewMode === 'monthly' && Data && yearsWithData[0] !== 0 ? (
+              <MonthlyTransactionsView
+                account={currentAccountNumber}
+                data={Data}
+                availableYears={yearsWithData}
+              />
+            ) : viewMode === 'all' && Data && yearsWithData[0] !== 0 ? (
+              <AllTransactionsView
+                account={currentAccountNumber}
+                availableYears={yearsWithData}
+              />
+            ) : (
+              <div className={styles.loadScreen}>
+                <div className={styles.loaderContainer}>
+                  <div className={styles.loader}></div>
+                </div>
+                <div className={styles.loaderText}>Loading...</div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

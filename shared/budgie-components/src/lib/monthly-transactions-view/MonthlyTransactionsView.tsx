@@ -4,7 +4,6 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import {
   collection,
-  doc,
   getDocs,
   updateDoc,
   query,
@@ -56,13 +55,16 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
       setCurrentMonth(
         new Date(currentMonth.setMonth(currentMonth.getMonth() + 1))
       );
-    } 
+    }
     display();
   };
 
   const handlePrevMonth = () => {
-    if (currentYear == props.availableYears[0] && currentMonth.getMonth() == 0) {} 
-    else {
+    if (
+      currentYear == props.availableYears[0] &&
+      currentMonth.getMonth() == 0
+    ) {
+    } else {
       setCurrentMonth(
         new Date(currentMonth.setMonth(currentMonth.getMonth() - 1))
       );
@@ -124,23 +126,24 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   }, []);
 
   const display = async () => {
-
-    if (currentMonth.getMonth() == new Date().getMonth() && currentYear == new Date().getFullYear()) {
+    if (
+      currentMonth.getMonth() == new Date().getMonth() &&
+      currentYear == new Date().getFullYear()
+    ) {
       setRightArrowStyle('Greyed');
-    }    
-    else
-    {
+    } else {
       setRightArrowStyle('Normal');
     }
 
-    if (currentYear == props.availableYears[0] && currentMonth.getMonth()==0) {
+    if (
+      currentYear == props.availableYears[0] &&
+      currentMonth.getMonth() == 0
+    ) {
       setLeftArrowStyle('Greyed');
-    }  
-    else
-    {
+    } else {
       setLeftArrowStyle('Normal');
     }
-    
+
     const month = currentMonth
       .toLocaleString('default', { month: 'long' })
       .toLocaleLowerCase();
@@ -336,7 +339,10 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     <div className={styles.mainPage}>
       <div className={styles.header}>
         <div className={styles.monthNavigation}>
-          <button className={`${getLeftArrowStyle()}`} onClick={handlePrevMonth}>
+          <button
+            className={`${getLeftArrowStyle()}`}
+            onClick={handlePrevMonth}
+          >
             <span
               className="material-symbols-outlined"
               style={{
@@ -375,7 +381,10 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
             </select>
           </span>
 
-          <button className={`${getRightArrowStyle()}`} onClick={handleNextMonth}>
+          <button
+            className={`${getRightArrowStyle()}`}
+            onClick={handleNextMonth}
+          >
             <span
               className="material-symbols-outlined"
               style={{
