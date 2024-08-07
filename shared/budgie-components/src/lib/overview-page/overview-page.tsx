@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { LineChart } from '@tremor/react'; // Tremor-specific import
-import { PieChart, Pie, Tooltip, Cell } from 'recharts'; // Recharts-specific import
+import { PieChart, Pie, Tooltip, Cell, Legend } from 'recharts'; // Recharts-specific import
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMoneyBill, faBank, faChartPie, faHistory, faCalendarAlt, faListUl, faBullseye } from '@fortawesome/free-solid-svg-icons';
 import styles from './overview-page.module.css';
@@ -177,6 +177,7 @@ export function OverviewPage(props: OverviewPageProps) {
                   ))}
                 </Pie>
                 <Tooltip />
+                <Legend />
               </PieChart>
             </div>
             <div className={styles.gridContainer}>
