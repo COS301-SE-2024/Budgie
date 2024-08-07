@@ -150,7 +150,7 @@ export function OverviewPage(props: OverviewPageProps) {
                 data={spendingData}
                 index="name"
                 categories={['value']}
-                colors={['blue']}
+                colors={['green']}
                 valueFormatter={(number: number) =>
                   `R ${Intl.NumberFormat('en-ZA').format(number).toString()}`
                 }
