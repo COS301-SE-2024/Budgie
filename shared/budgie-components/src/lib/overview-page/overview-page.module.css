@@ -201,3 +201,19 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Adjustments for the button placement */
+.toggleButton {
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  border: none;
+  background-color: green; /* Use green background for the toggle button */
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border-radius: 5px;
+  align-self: flex-end; /* Align the toggle button to the end of its container */
+}
+
+.toggleButton:hover {
+  background-color: darkgreen; /* Darker green on hover */
+}

@@ -138,7 +138,7 @@ export function OverviewPage(props: OverviewPageProps) {
       <div className={styles.accountStatus}>
         {moneyIn > 0 ? (
           <div className={`${styles.metricsContainer} ${isDarkMode ? styles.dark : styles.light}`}>
-            <button className={'styles.toggleButton greenButton'} onClick={toggleTheme}>
+            <button className={`${styles.toggleButton} ${styles.greenButton}`} onClick={toggleTheme}>
               {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             </button>
             <div className={styles.fullWidthChart}>
