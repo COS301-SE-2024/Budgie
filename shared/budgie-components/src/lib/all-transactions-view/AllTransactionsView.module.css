@@ -26,15 +26,38 @@
   color: grey;
 }
 
-.navButton {
+.navButton1 {
   color: var(--main-text);
   border: none;
   cursor: pointer;
   transition: 0.3s ease;
 }
 
-.navButton:hover {
-  color: var(--primary-1);
+.navButton1:hover {
+  color: var(--primary-2);
+}
+
+.greyedNavButton1 {
+  color: var(--greyed-text);
+  border: none;
+  transition: 0.3s ease;
+}
+
+.navButton2 {
+  color: var(--main-text);
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.navButton2:hover {
+  color: var(--primary-2);
+}
+
+.greyedNavButton2 {
+  color: var(--greyed-text);
+  border: none;
+  transition: 0.3s ease;
 }
 
 .yearDisplay {
@@ -122,6 +145,7 @@
   -moz-appearance: none;
   background-color: var(--main-background);
   border: none;
+  background-image: none;
 }
 
 .categoryDropdown option {
@@ -241,9 +265,10 @@
   cursor: pointer;
   white-space: nowrap; /* Prevent text from wrapping */
   overflow: hidden; /* Hide overflow if text is too long */
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none;
   text-align: left; 
   transition: 0.2s ease;
   padding: 0 5px;
@@ -252,7 +277,7 @@
 }
 
 .dateDropdown:hover {
-  background-color:var(--block-background);
+  color: var(--primary-2);
   cursor: pointer;
 }
 
