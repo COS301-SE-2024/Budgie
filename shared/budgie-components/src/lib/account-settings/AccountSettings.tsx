@@ -121,23 +121,17 @@ export function AccountSettings(props: AccountSettingsProps) {
       </div>
       <div className={styles.settingsOptionsContainer}>
         <div className={styles.settingsOption}>
-          <p className={styles.settingTitle}>Profile Information</p>
-          <p className={styles.settingDescription}>
-            Edit your profile information.
-          </p>
-        </div>
-        <div className="p-4 bg-white shadow-md rounded-md">
-          <p className="text-lg font-semibold mb-2">Password Management</p>
-          <p className="text-sm text-gray-600 mb-4">Change your password.</p>
+          <p className={styles.settingTitle}>Password Management</p>
+          <p className={styles.settingDescription}>Change your password.</p>
           <button
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            className={styles.deleteButton}
             onClick={handlePassChangeClick}
           >
-            Change password
+            <div className={styles.deleteButton}>Change password</div>
           </button>
           {isCPopupVisible && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <div className="bg-white p-6 rounded-md shadow-md">
+            <div className={styles.popupOverlay}>
+              <div className={styles.popupContent}>
                 <p className="mb-2">Type in your old password:</p>
                 <input
                   type="password"
@@ -164,13 +158,13 @@ export function AccountSettings(props: AccountSettingsProps) {
                 />
                 <div className="flex justify-between mt-4">
                   <button
-                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                    className={styles.confirmButton}
                     onClick={handleChangePassword}
                   >
                     Confirm
                   </button>
                   <button
-                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                    className={styles.cancelButton}
                     onClick={handlecClosePopup}
                   >
                     Cancel
