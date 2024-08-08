@@ -12,6 +12,7 @@ import {
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import AddGoalPopup from '../add-goal-popup/AddGoalPopup';
+import EditGoalPopup from '../edit-goal-popup/EditGoalPopup';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import '../../root.css';
 
@@ -21,6 +22,7 @@ export interface PlanningPageProps {}
 export function GoalModal() {
   const [Goals, setGoals] = useState<Goal[]>([]);
   const [isGoalPopupOpen, setisGoalPopupOpen] = useState(false);
+  const [isEditGoalPopupOpen, setisEditGoalPopupOpen] = useState(false);
   const user = useContext(UserContext);
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -70,8 +72,16 @@ export function GoalModal() {
     setisGoalPopupOpen(!isGoalPopupOpen);
   };
 
+  const toggleEditPopup = () => {
+    setisEditGoalPopupOpen(!isEditGoalPopupOpen);
+  };
+
   const addGoalPopup = () => {
     setisGoalPopupOpen(!isGoalPopupOpen);
+  };
+
+  const editGoalPopup = () => {
+    setisEditGoalPopupOpen(!isEditGoalPopupOpen);
   };
 
   const fetchGoals = async () => {
@@ -124,7 +134,6 @@ export function GoalModal() {
             <button className={styles.addGoalsButton} onClick={addGoalPopup}>
               Add a Goal
             </button>
-            {isGoalPopupOpen && <AddGoalPopup togglePopup={togglePopup} />}
           </div>
         ) : (
           <div>
@@ -139,13 +148,16 @@ export function GoalModal() {
                         fontSize:
                           'min(2.5rem, (calc(1.5rem * var(--font-size-multiplier))))',
                         fontWeight: 500,
-                        color: 'var(--greyed-text)',
+                        color: 'var(--primary-text)',
                         marginLeft: '1rem',
                       }}
-                      onClick={addGoalPopup}
+                      onClick={editGoalPopup}
                     >
                       edit
                     </span>
+                    {isEditGoalPopupOpen && (
+                      <EditGoalPopup togglePopup={toggleEditPopup} goal={currentGoal}/>
+                    )}
                   </div>
 
                   <div className={styles.goalPair}>
@@ -238,36 +250,41 @@ export function GoalModal() {
                   </div>
                 )}
             </div>
-            <div className={styles.paginationControls}>
-              <button onClick={handlePreviousPage} disabled={currentPage === 0}>
-                <span
-                  className="material-symbols-outlined"
-                  style={{
-                    fontSize: 'calc(1.4rem * var(--font-size-multiplier))',
-                    alignContent: 'center',
-                    display: 'flex',
-                  }}
+            {Goals[1] && (
+              <div className={styles.paginationControls}>
+                <button
+                  onClick={handlePreviousPage}
+                  disabled={currentPage === 0}
                 >
-                  arrow_back_ios
-                </span>
-              </button>
-              <span>{`Goal ${currentPage + 1} of ${totalPages}`}</span>
-              <button
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages - 1}
-              >
-                <span
-                  className="material-symbols-outlined"
-                  style={{
-                    fontSize: 'calc(1.4rem * var(--font-size-multiplier))',
-                    alignContent: 'center',
-                    display: 'flex',
-                  }}
+                  <span
+                    className="material-symbols-outlined"
+                    style={{
+                      fontSize: 'calc(1.4rem * var(--font-size-multiplier))',
+                      alignContent: 'center',
+                      display: 'flex',
+                    }}
+                  >
+                    arrow_back_ios
+                  </span>
+                </button>
+                <span>{` ${currentPage + 1} of ${totalPages}`}</span>
+                <button
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages - 1}
                 >
-                  arrow_forward_ios
-                </span>
-              </button>
-            </div>
+                  <span
+                    className="material-symbols-outlined"
+                    style={{
+                      fontSize: 'calc(1.4rem * var(--font-size-multiplier))',
+                      alignContent: 'center',
+                      display: 'flex',
+                    }}
+                  >
+                    arrow_forward_ios
+                  </span>
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -1,8 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { addDoc, collection } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
-import styles from './AddGoalPopup.module.css';
+import styles from './EditGoalPopup.module.css';
 import '../../root.css';
 
 /* eslint-disable-next-line */
@@ -38,38 +38,19 @@ const ClearableInput: React.FC<ClearableInputProps> = ({ value, onChange }) => {
   );
 };
 
-export interface AddGoalPopupProps {
+export interface EditGoalPopupProps {
   togglePopup: () => void;
+  goal: any;
 }
 
-export function AddGoalPopup(props: AddGoalPopupProps) {
-  const [activeTab, setActiveTab] = useState<string>('Savings');
-
+export function EditGoalPopup(props: EditGoalPopupProps) {
+const p = props.goal.type;
   return (
     <div className={styles.addGoalPopup}>
       <div className={styles.popupContainer}>
-        <div className={styles.tabs}>
-          <button
-            onClick={() => setActiveTab('Savings')}
-            className={activeTab === 'Savings' ? `${styles.active} ` : ''}
-          >
-            Savings
-          </button>
-          <button
-            onClick={() => setActiveTab('Debt')}
-            className={activeTab === 'Debt' ? `${styles.active} ` : ''}
-          >
-            Debt
-          </button>
-          <button
-            onClick={() => setActiveTab('Spending')}
-            className={activeTab === 'Spending' ? `${styles.active} ` : ''}
-          >
-            Spending
-          </button>
-        </div>
         <div className={styles.popupContent}>
-          <GoalForm activeTab={activeTab} togglePopup={props.togglePopup} />
+          
+          <GoalForm activeTab={p} togglePopup={props.togglePopup} goal = {props.goal}/>
           <button className={styles.cancelButton} onClick={props.togglePopup}>
             Cancel
           </button>
@@ -82,17 +63,16 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 interface GoalFormProps {
   activeTab: string;
   togglePopup: () => void;
+  goal: any;
 }
 
 const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
-  const [goalName, setGoalName] = useState('');
-  const [currentAmount, setCurrentAmount] = useState(0);
-  const [targetAmount, setTargetAmount] = useState(0);
-  const [startDate, setStartDate] = useState(
-    new Date().toISOString().split('T')[0]
-  );
-  const [targetDate, setTargetDate] = useState<string | null>(null);
-  const [spendingLimit, setSpendingLimit] = useState(0);
+  const [goalName, setGoalName] = useState(props.goal.name);
+  const [currentAmount, setCurrentAmount] = useState(props.goal.current_amount);
+  const [targetAmount, setTargetAmount] = useState(props.goal.target_amount);
+  const [startDate, setStartDate] = useState(props.goal.start_date);
+  const [targetDate, setTargetDate] = useState(props.goal.target_date);
+  const [spendingLimit, setSpendingLimit] = useState(props.goal.spending_limit);
   const user = useContext(UserContext);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -114,7 +94,8 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
     }
 
     try {
-      await addDoc(collection(db, 'goals'), goalData);
+      const goalDocRef = doc(db, 'goals', props.goal.id);
+      await updateDoc(goalDocRef, goalData);
       props.togglePopup();
     } catch (error) {
       console.error('Error saving goal:', error);
@@ -127,7 +108,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
         {props.activeTab === 'Savings' && (
           <>
             <p className={styles.goalDescription}>
-              Set your savings goal below:
+              Edit {props.goal.name} below:
             </p>
             <div className={styles.formGroup}>
               <span
@@ -164,7 +145,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               </span>
               <span className={styles.popupText}>
                 If you have already saved money towards this goal, add that
-                amount here. If you haven't, you should leave it as 0.
+                amount here. If you haven't, you should enter 0.
               </span>
               <label>Current Savings Amount:</label>
               <ClearableInput 
@@ -239,7 +220,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
         {props.activeTab === 'Debt' && (
           <>
             <p className={styles.goalDescription}>
-              Set your debt reduction goal below:
+            Edit {props.goal.name} below:
             </p>
             <div className={styles.formGroup}>
               <span
@@ -351,7 +332,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
         {props.activeTab === 'Spending' && (
           <>
             <p className={styles.goalDescription}>
-              Set your spending goal below:
+            Edit {props.goal.name} below:
             </p>
             <div className={styles.formGroup}>
               <span
@@ -427,4 +408,4 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   );
 };
 
-export default AddGoalPopup;
+export default EditGoalPopup;
