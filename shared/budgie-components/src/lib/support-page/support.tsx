@@ -20,6 +20,7 @@ export function Support(props: SupportProps) {
           <span
             className="material-symbols-outlined cursor-pointer"
             style={{ marginRight: '0.5rem', fontSize: '1.5rem' }}
+            onClick={props.onClose}
           >
             arrow_back
           </span>
@@ -52,7 +53,7 @@ export function Support(props: SupportProps) {
                   setHelpModal(!showHelpModal);
                 }}
               >
-                Help
+                Usage Guidance
               </button>
               {showHelpModal && <HelpModal></HelpModal>}
             </div>

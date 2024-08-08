@@ -5,3 +5,33 @@
  * .container {
  * }
 */
+.helpPage {
+  display: flex;
+}
+
+.nav {
+  width: 200px;
+  padding: 20px;
+  border-right: 1px solid #ccc;
+}
+
+.nav ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.nav li {
+  margin: 10px 0;
+  cursor: pointer;
+  color: blue;
+  text-decoration: underline;
+}
+
+.nav li:hover {
+  color: darkblue;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 20px;
+}
