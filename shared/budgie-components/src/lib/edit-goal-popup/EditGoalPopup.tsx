@@ -48,8 +48,7 @@ const p = props.goal.type;
   return (
     <div className={styles.addGoalPopup}>
       <div className={styles.popupContainer}>
-        <div className={styles.popupContent}>
-          
+        <div className={styles.popupContent}>          
           <GoalForm activeTab={p} togglePopup={props.togglePopup} goal = {props.goal}/>
           <button className={styles.cancelButton} onClick={props.togglePopup}>
             Cancel
@@ -102,6 +101,33 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
     }
   };
 
+  const handleDelete = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const goalData: any = {
+      type: props.activeTab,
+      name: goalName,
+      start_date: startDate,
+      uid: "User has deleted this goal.",
+    };
+
+    if (props.activeTab === 'Savings' || props.activeTab === 'Debt') {
+      goalData.current_amount = currentAmount;
+      goalData.target_amount = targetAmount;
+      goalData.target_date = targetDate;
+    } else if (props.activeTab === 'Spending') {
+      goalData.spending_limit = spendingLimit;
+    }
+
+    try {
+      const goalDocRef = doc(db, 'goals', props.goal.id);
+      await updateDoc(goalDocRef, goalData);
+      props.togglePopup();
+    } catch (error) {
+      console.error('Error saving goal:', error);
+    }
+  };
+
   return (
     <div className={styles.goalForm}>
       <form onSubmit={handleSubmit}>
@@ -109,6 +135,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           <>
             <p className={styles.goalDescription}>
               Edit {props.goal.name} below:
+              <button className={styles.deleteButton} onClick={handleDelete}>Delete Goal</button>
             </p>
             <div className={styles.formGroup}>
               <span

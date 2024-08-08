@@ -23,6 +23,7 @@ export function GoalModal() {
   const [Goals, setGoals] = useState<Goal[]>([]);
   const [isGoalPopupOpen, setisGoalPopupOpen] = useState(false);
   const [isEditGoalPopupOpen, setisEditGoalPopupOpen] = useState(false);
+  const [currentGoal, setCurrentGoal] = useState<Goal>({ id: '', name: '', type: '', start_date:'' });
   const user = useContext(UserContext);
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -55,7 +56,6 @@ export function GoalModal() {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  const currentGoal = Goals[currentPage];
 
   interface Goal {
     id: string;
@@ -68,20 +68,14 @@ export function GoalModal() {
     spending_limit?: number;
   }
 
-  const togglePopup = () => {
-    setisGoalPopupOpen(!isGoalPopupOpen);
-  };
-
-  const toggleEditPopup = () => {
-    setisEditGoalPopupOpen(!isEditGoalPopupOpen);
-  };
-
   const addGoalPopup = () => {
     setisGoalPopupOpen(!isGoalPopupOpen);
+    fetchGoals();
   };
 
   const editGoalPopup = () => {
     setisEditGoalPopupOpen(!isEditGoalPopupOpen);
+    fetchGoals();
   };
 
   const fetchGoals = async () => {
@@ -97,7 +91,6 @@ export function GoalModal() {
         };
       });
       setGoals(goalsList);
-      console.log(goalsList);
     } catch (error) {
       console.error('Error getting bank statement document:', error);
     }
@@ -105,6 +98,7 @@ export function GoalModal() {
 
   useEffect(() => {
     fetchGoals();
+    setCurrentGoal(Goals[currentPage]);
   }, [Goals]);
 
   return (
@@ -124,7 +118,7 @@ export function GoalModal() {
         >
           add_circle
         </span>
-        {isGoalPopupOpen && <AddGoalPopup togglePopup={togglePopup} />}
+        {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
       </div>
       <div className={styles.planningModal}>
         {!currentGoal ? (
@@ -156,7 +150,7 @@ export function GoalModal() {
                       edit
                     </span>
                     {isEditGoalPopupOpen && (
-                      <EditGoalPopup togglePopup={toggleEditPopup} goal={currentGoal}/>
+                      <EditGoalPopup togglePopup={editGoalPopup} goal={currentGoal}/>
                     )}
                   </div>
 

@@ -22,35 +22,6 @@
     border-top: 4px solid var(--primary-1);
   }
   
-  .tabs {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .tabs button {
-    padding: 10px 20px;
-    border: none;
-    background-color: var(--block-background);
-    cursor: pointer;
-    border-top-right-radius: 5px;
-    border-top-left-radius: 5px;
-    width: 32%;
-  }
-  
-  .tabs button.active {
-    background-color: var(--primary-1);
-    color: white;
-  }
-  
-  .tabs button:hover {
-    filter: brightness(0.9);
-    transition: 0.3s ease;
-  }
-  
-  .tabs button.active:hover {
-    filter: brightness(1);
-  }
-  
   .goalForm {
     margin: 0 auto;
     text-align: left;
@@ -123,6 +94,20 @@
     margin-bottom: 2rem;
     text-align: left;
     font-weight: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .deleteButton
+  {
+    background-color: rgb(177, 3, 3) !important;
+    border: none !important;
+    margin-top: 0 !important;
+  }
+
+  .goalForm button:hover {
+    background-color: rgb(196, 2, 2) !important;
   }
   
   .popupText {
