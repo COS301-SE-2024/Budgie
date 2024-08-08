@@ -14,28 +14,39 @@
 .popupContent {
     background: var(--block-background);
     padding: 20px;
-    border-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
     text-align: center;
     z-index: 100000;
-    width: 30vw;
+    width: calc(30vw * var(--font-size-multiplier));
+    border: 2px solid var(--greyed-text);
+    border-top: 4px solid var(--primary-1);
   }  
+
   .tabs {
     display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
+    justify-content: space-between;
   }
   
   .tabs button {
     padding: 10px 20px;
-    margin: 0 5px;
     border: none;
     background-color: #ccc;
     cursor: pointer;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    width: 32%;
+    border-top: 2px solid var(--greyed-text);
+    border-left: 2px solid var(--greyed-text);
+    border-right: 2px solid var(--greyed-text);
   }
   
   .tabs button.active {
-    background-color: #007bff;
-    color: white;
+    background-color: var(--primary-1);
+    color: var(--block-background);
+    border-top: 2px solid var(--primary-1);
+    border-left: 2px solid var(--primary-1);
+    border-right: 2px solid var(--primary-1);
   }
   
   .goalForm {

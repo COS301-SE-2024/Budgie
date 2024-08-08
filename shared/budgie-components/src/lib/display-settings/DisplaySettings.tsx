@@ -179,7 +179,7 @@ export function DisplaySettings(props: DisplaySettingsProps) {
           <p className={styles.settingTitle}>Font Size</p>        
           <div className={styles.sliderContainer}>
               <span style={{marginRight: "1rem", fontSize: "1rem" }}>A</span>
-              <input type="range" id="fontSlider" min="1" max="2" step="0.1" className={styles.slider}></input>
+              <input type="range" id="fontSlider" min="1" max="1.6" step="0.1" className={styles.slider}></input>
               <span style={{ marginLeft: "1rem", fontSize: "2rem" }}>A</span>
           </div>
         </div>

@@ -9,23 +9,38 @@ export interface AddGoalPopupProps {
 
 export function AddGoalPopup(props: AddGoalPopupProps) {
   const [activeTab, setActiveTab] = useState<string>('Savings');
-  
+
   return (
     <div className={styles.addGoalPopup}>
-      <div className={styles.popupContent}>
+      <div className={styles.popupContainer}>
         <div className={styles.tabs}>
-          <button onClick={() => setActiveTab('Savings')} className={activeTab === 'Savings' ? `${styles.active} `: ''}>
+          <button
+            onClick={() => setActiveTab('Savings')}
+            className={activeTab === 'Savings' ? `${styles.active} ` : ''}
+          >
             Savings
           </button>
-          <button onClick={() => setActiveTab('Debt Reduction')} className={activeTab === 'Debt Reduction' ? `${styles.active} ` : ''}>
+          <button
+            onClick={() => setActiveTab('Debt Reduction')}
+            className={
+              activeTab === 'Debt Reduction' ? `${styles.active} ` : ''
+            }
+          >
             Debt Reduction
           </button>
-          <button onClick={() => setActiveTab('Spending')} className={activeTab === 'Spending' ? `${styles.active} ` : ''}>
+          <button
+            onClick={() => setActiveTab('Spending')}
+            className={activeTab === 'Spending' ? `${styles.active} ` : ''}
+          >
             Spending
           </button>
         </div>
-        <GoalForm activeTab={activeTab} />
-        <button className={styles.cancelButton} onClick={props.togglePopup}>Cancel</button>
+        <div className={styles.popupContent}>
+          <GoalForm activeTab={activeTab} />
+          <button className={styles.cancelButton} onClick={props.togglePopup}>
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -34,7 +49,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 interface GoalFormProps {
   activeTab: string;
 }
-
 
 const GoalForm: React.FC<GoalFormProps> = ({ activeTab }) => {
   return (

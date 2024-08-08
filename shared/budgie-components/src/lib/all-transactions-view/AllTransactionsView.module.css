@@ -71,7 +71,6 @@
 .transactionsList {
   font-size: calc(1.2rem * var(--font-size-multiplier));
   text-align: left;
-  height: 30vh;
   overflow-y: auto;
   height: calc(99vh - ((16vh * var(--font-size-multiplier))));
   margin-top: 1vh;
@@ -254,6 +253,8 @@
   padding: 0 5px;
   border: none;
   font-size: calc(1.4rem * var(--font-size-multiplier));
+  height: 3rem;
+  line-height: 3rem;
 }
 
 .dateDropdown:hover {
