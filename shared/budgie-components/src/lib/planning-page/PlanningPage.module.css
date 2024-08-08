@@ -50,6 +50,8 @@
   color: var(--main-text);
   font-weight: bold;
   padding-left: 1rem;
+  display: flex;
+  align-items: center;
 }
 
 .planningModal {
@@ -86,22 +88,25 @@
 }
 
 .goalGraph {
-  width: 50%;
+  width: 40%;
   height: 100%;
-  border: 1px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .goalsContainer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
   width: calc(0.75 * (82vw - (18vw * var(--font-size-multiplier))));
   height: calc(40vh * var(--font-size-multiplier));
 }
 
 .goalDisplay {
   margin-bottom: 20px;
-  width: 50%;
+  width: auto;
 }
 
 .goal {
@@ -129,6 +134,8 @@
     width: 100%;
     font-weight: bold;
     font-size: calc(1.5rem * var(--font-size-multiplier));
+    display: flex;
+    align-items: center;
 }
 
 .goalLabel {
@@ -145,3 +152,11 @@
     align-items: center;
     margin-top: 1rem;
 }
+
+.percentageDisplay {
+    position: fixed;
+    font-size: calc(3rem * var(--font-size-multiplier));
+    font-weight: bold;
+    color: var(--primary-1);
+}
+

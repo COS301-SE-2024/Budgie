@@ -79,6 +79,7 @@
   .goalForm input {
     flex: 1;
     padding: 5px;
+    color: black;
   }
   
   .goalForm button {

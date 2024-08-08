@@ -12,6 +12,7 @@ import {
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import AddGoalPopup from '../add-goal-popup/AddGoalPopup';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import '../../root.css';
 
 /* eslint-disable-next-line */
@@ -95,11 +96,26 @@ export function GoalModal() {
   useEffect(() => {
     fetchGoals();
   }, [Goals]);
- 
 
   return (
     <div className={styles.planningModalContainer}>
-      <p className={styles.planningModalTitle}>Goals</p>
+      <div className={styles.planningModalTitle}>
+        Goals
+        <span
+          className="material-symbols-outlined"
+          style={{
+            fontSize:
+              'min(2.5rem, (calc(1.5rem * var(--font-size-multiplier))))',
+            fontWeight: 500,
+            color: 'var(--primary-text)',
+            marginLeft: '1rem',
+          }}
+          onClick={addGoalPopup}
+        >
+          add_circle
+        </span>
+        {isGoalPopupOpen && <AddGoalPopup togglePopup={togglePopup} />}
+      </div>
       <div className={styles.planningModal}>
         {!currentGoal ? (
           <div className={styles.noGoalsText}>
@@ -115,7 +131,22 @@ export function GoalModal() {
             <div className={styles.goalsContainer}>
               <div className={styles.goalDisplay}>
                 <div className={styles.goal}>
-                  <div className={styles.goalName}>{currentGoal.name}</div>
+                  <div className={styles.goalName}>
+                    {currentGoal.name}
+                    <span
+                      className="material-symbols-outlined"
+                      style={{
+                        fontSize:
+                          'min(2.5rem, (calc(1.5rem * var(--font-size-multiplier))))',
+                        fontWeight: 500,
+                        color: 'var(--greyed-text)',
+                        marginLeft: '1rem',
+                      }}
+                      onClick={addGoalPopup}
+                    >
+                      edit
+                    </span>
+                  </div>
 
                   <div className={styles.goalPair}>
                     <div className={styles.goalLabel}>Type:</div>
@@ -138,7 +169,7 @@ export function GoalModal() {
                             {currentGoal.target_amount}
                           </div>
                         </div>
-                        <div className={styles.goalPair}>
+                        {/*<div className={styles.goalPair}>
                           <div className={styles.goalLabel}>Progress:</div>
                           <div className={styles.goalValue}>
                             {calculateProgressPercentage(
@@ -147,10 +178,10 @@ export function GoalModal() {
                             ).toFixed(2)}
                             %
                           </div>
-                        </div>
+                        </div>*/}
                       </div>
                     )}
-                    <div className={styles.goalPair}>
+                  <div className={styles.goalPair}>
                     <div className={styles.goalLabel}>Start Date:</div>
                     <div className={styles.goalValue}>
                       {currentGoal.start_date}
@@ -167,7 +198,9 @@ export function GoalModal() {
                       <div className={styles.goalPair}>
                         <div className={styles.goalLabel}>Days Left:</div>
                         <div className={styles.goalValue}>
-                          {calculateDaysLeft(currentGoal.target_date) > 0 ? ` ${calculateDaysLeft(currentGoal.target_date)}` : "Target Date Passed"}
+                          {calculateDaysLeft(currentGoal.target_date) > 0
+                            ? ` ${calculateDaysLeft(currentGoal.target_date)}`
+                            : 'Target Date Passed'}
                         </div>
                       </div>
                     </div>
@@ -182,7 +215,28 @@ export function GoalModal() {
                   )}
                 </div>
               </div>
-              <div className={styles.goalGraph}></div>
+
+              {currentGoal.current_amount !== undefined &&
+                currentGoal.target_amount !== undefined && (
+                  <div className={styles.goalGraph}>
+                    <CircularProgressbar
+                      value={calculateProgressPercentage(
+                        currentGoal.current_amount,
+                        currentGoal.target_amount
+                      )}
+                      styles={buildStyles({
+                        pathColor: 'var(--primary-1)',
+                        trailColor: '#d6d6d6',
+                      })}
+                    />
+                    <div
+                      className={styles.percentageDisplay}
+                    >{`${calculateProgressPercentage(
+                      currentGoal.current_amount,
+                      currentGoal.target_amount
+                    ).toFixed(2)}%`}</div>
+                  </div>
+                )}
             </div>
             <div className={styles.paginationControls}>
               <button onClick={handlePreviousPage} disabled={currentPage === 0}>
