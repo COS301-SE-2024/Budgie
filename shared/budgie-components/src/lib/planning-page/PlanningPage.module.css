@@ -5,7 +5,7 @@
 }
 
 .paymentsBar {
-    width: 20%;
+    width: calc(18vw * var(--font-size-multiplier));
     height: 100vh;
     background-color: var(--block-background);
     /*box-shadow: 0px 0 10px rgba(0, 0, 0, 0.5);*/
@@ -27,12 +27,12 @@
     display: flex;
     align-items: center;
     height: 10vh;
-    width: 18vw;
+    width: calc(18vw * var(--font-size-multiplier));
     justify-content: space-around;
 }
 
 .scrollableSection {
-    width: 75%;
+    width: calc(82vw - (18vw * var(--font-size-multiplier)));
     height: 100%;
     display: flex;
     align-items: center;
@@ -72,16 +72,16 @@
 .addGoalsButton {
     width: calc(10rem * var(--font-size-multiplier));
     height: calc(4rem * var(--font-size-multiplier));
-    color: var(--block-background);
+    color: white;
     background-color: var(--primary-1);
     font-weight: bold;
     margin-top: 3rem;
     border-radius: 10px;
-    transition: background-color 0.3s ease;
+    transition: 0.3s ease;
 }
 
 .addGoalsButton:hover {
-    background-color: var(--accent-hover);
+    filter: brightness(1.15);
 }
 
 

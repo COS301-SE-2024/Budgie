@@ -8,7 +8,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 100;
+    z-index: 1;
 }
 
 .popupContent {
@@ -17,9 +17,8 @@
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
     text-align: center;
-    z-index: 100000;
+    z-index: 2;
     width: calc(30vw * var(--font-size-multiplier));
-    border: 2px solid var(--greyed-text);
     border-top: 4px solid var(--primary-1);
   }  
 
@@ -31,22 +30,25 @@
   .tabs button {
     padding: 10px 20px;
     border: none;
-    background-color: #ccc;
+    background-color: var(--block-background);
     cursor: pointer;
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
     width: 32%;
-    border-top: 2px solid var(--greyed-text);
-    border-left: 2px solid var(--greyed-text);
-    border-right: 2px solid var(--greyed-text);
   }
   
   .tabs button.active {
     background-color: var(--primary-1);
-    color: var(--block-background);
-    border-top: 2px solid var(--primary-1);
-    border-left: 2px solid var(--primary-1);
-    border-right: 2px solid var(--primary-1);
+    color: white;
+  }
+
+  .tabs button:hover {
+    filter: brightness(0.9);
+    transition:  0.3s ease;
+  }
+
+  .tabs button.active:hover {
+    filter: brightness(1);
   }
   
   .goalForm {
@@ -58,6 +60,8 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 10px;
+    align-items: center;
+    position: relative;
   }
   
   .goalForm form {
@@ -69,10 +73,11 @@
   .goalForm label {
     flex: 1;
     text-align: left;
+    margin-left: 0.5rem;
   }
   
   .goalForm input {
-    flex: 2;
+    flex: 1;
     padding: 5px;
   }
   
@@ -82,24 +87,55 @@
     color: white;
     border: none;
     cursor: pointer;
+    margin-top: 2rem;
+    transition: 0.3s ease;
+    border: 1px solid var(--primary-1);
   }
   
   .goalForm button:hover {
-    background-color: #0056b3;
+    filter: brightness(1.1);
   }
 
   .cancelButton  {
     padding: 10px;
-    background-color: #e62828;
-    color: e62828;
+    background-color: var(--main-background);
+    color: var(--main-text);
     border: none;
     cursor: pointer;
     width: 100%;
     margin-top: 0.5rem;
-    color: white;
+    transition:  0.3s ease;
+    margin-top: 1rem;
+    border: 1px solid var(--main-background);
   }
   
   .cancelButton:hover {
-    background-color: #b92b2b; 
+    filter: brightness(1.05);
+  }
+  
+  .goalDescription {
+    color: var(--main-text);
+    margin-bottom: 2rem;
+    text-align: left;
+  }
+
+  .popupText {
+    visibility: hidden;
+    background-color: var(--main-background);
+    color: var(--main-text);
+    text-align: center;
+    border-radius: 5px;
+    padding: 1rem;
+    z-index: 1000000;
+    position: fixed;
+    transform: translateX(calc(30vw * var(--font-size-multiplier)));
+    opacity: 0;
+    transition: opacity 0.3s;
+    width: 25vw;
+  }
+  
+  .icon:hover + .popupText {
+    visibility: visible;
+    opacity: 1;
   }
   
