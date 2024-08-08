@@ -1,12 +1,31 @@
-"use client";
+'use client';
 import React, { useEffect, useState } from 'react';
-import { LineChart, Line, PieChart, Pie, Tooltip, CartesianGrid, XAxis, YAxis, Legend, Cell } from 'recharts';
+import {
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Tooltip,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Legend,
+  Cell,
+} from 'recharts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMoneyBill, faBank, faChartPie, faHistory, faCalendarAlt, faListUl, faBullseye } from '@fortawesome/free-solid-svg-icons';
+import {
+  faMoneyBill,
+  faBank,
+  faChartPie,
+  faHistory,
+  faCalendarAlt,
+  faListUl,
+  faBullseye,
+} from '@fortawesome/free-solid-svg-icons';
 import styles from './overview-page.module.css';
 import HealthBar from './HealthBar';
 import '../../root.css';
-import { getAccounts } from "../overview-page/overviewServices";
+import { getAccounts } from '../overview-page/overviewServices';
 
 export interface OverviewPageProps {}
 
@@ -71,30 +90,47 @@ export function OverviewPage(props: OverviewPageProps) {
     { name: 'Other', value: 150 },
   ];
 
-  const CATEGORY_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042','#FFBB','#00C4', '#FFB', '#FFAACC'];
+  const CATEGORY_COLORS = [
+    '#0088FE',
+    '#00C49F',
+    '#FFBB28',
+    '#FF8042',
+    '#FFBB',
+    '#00C4',
+    '#FFB',
+    '#FFAACC',
+  ];
 
   const hasAccounts = showData;
 
-  const filteredAccounts = accounts.filter(account => account.type === selectedAccountType);
+  const filteredAccounts = accounts.filter(
+    (account) => account.type === selectedAccountType
+  );
 
   return (
     <div className={styles.mainPage}>
       <div className={styles.header}>
         <div className={styles.accountTypeButtons}>
           <button
-            className={`${styles.accountTypeButton} ${selectedAccountType === 'Current' ? styles.active : ''}`}
+            className={`${styles.accountTypeButton} ${
+              selectedAccountType === 'Current' ? styles.active : ''
+            }`}
             onClick={() => setSelectedAccountType('Current')}
           >
             Current
           </button>
           <button
-            className={`${styles.accountTypeButton} ${selectedAccountType === 'Savings' ? styles.active : ''}`}
+            className={`${styles.accountTypeButton} ${
+              selectedAccountType === 'Savings' ? styles.active : ''
+            }`}
             onClick={() => setSelectedAccountType('Savings')}
           >
             Savings
           </button>
           <button
-            className={`${styles.accountTypeButton} ${selectedAccountType === 'Custom' ? styles.active : ''}`}
+            className={`${styles.accountTypeButton} ${
+              selectedAccountType === 'Custom' ? styles.active : ''
+            }`}
             onClick={() => setSelectedAccountType('Custom')}
           >
             Custom
@@ -104,7 +140,11 @@ export function OverviewPage(props: OverviewPageProps) {
 
       <div className={styles.accountStatus}>
         {hasAccounts ? (
-          <div className={`${styles.metricsContainer} ${isDarkMode ? styles.dark : styles.light}`}>
+          <div
+            className={`${styles.metricsContainer} ${
+              isDarkMode ? styles.dark : styles.light
+            }`}
+          >
             <button className={styles.toggleButton} onClick={toggleTheme}>
               {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             </button>
@@ -115,7 +155,10 @@ export function OverviewPage(props: OverviewPageProps) {
                 </div>
                 <LineChart width={650} height={300} data={spendingData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" tick={{ fill: isDarkMode ? 'white' : 'black' }} />
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fill: isDarkMode ? 'white' : 'black' }}
+                  />
                   <YAxis tick={{ fill: isDarkMode ? 'white' : 'black' }} />
                   <Tooltip />
                   <Line type="monotone" dataKey="value" stroke="#8884d8" />
@@ -136,7 +179,10 @@ export function OverviewPage(props: OverviewPageProps) {
                     dataKey="value"
                   >
                     {categoryData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <Tooltip />
@@ -159,7 +205,7 @@ export function OverviewPage(props: OverviewPageProps) {
                   <h2 className={styles.gridTitle}>Current Accounts</h2>
                 </div>
                 <ul>
-                  {filteredAccounts.map(account => (
+                  {filteredAccounts.map((account) => (
                     <li key={account.uid}>{account.alias}</li>
                   ))}
                 </ul>
@@ -175,8 +221,13 @@ export function OverviewPage(props: OverviewPageProps) {
               </div>
               <div className={styles.gridItem}>
                 <div className={styles.gridTitleContainer}>
-                  <FontAwesomeIcon icon={faCalendarAlt} className={styles.icon} />
-                  <h2 className={styles.gridTitle}>Upcoming Bills & Payments</h2>
+                  <FontAwesomeIcon
+                    icon={faCalendarAlt}
+                    className={styles.icon}
+                  />
+                  <h2 className={styles.gridTitle}>
+                    Upcoming Bills & Payments
+                  </h2>
                 </div>
                 <ul>
                   <li>Car Instalment - Due in 15 days</li>

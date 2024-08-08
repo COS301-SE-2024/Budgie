@@ -146,7 +146,7 @@ export function SignInModal(props: SignInModalProps) {
                 onChange={handlePasswordChange}
               />
             </div>
-            <div className="flex flex-col justify-start pt-6 items-center">
+            <div className="flex flex-col justify-start pt-6 items-center w-37 h-11">
               <button
                 className="font-TripSans font-medium rounded-[25px] w-36 h-10 bg-BudgieBlue text-BudgieWhite"
                 type="button"
@@ -158,7 +158,7 @@ export function SignInModal(props: SignInModalProps) {
             <div className="flex flex-col justify-start pt-3 items-center">
               <p className="text-BudgieBlue font-TripSans font-medium">OR</p>
             </div>
-            <div className="flex flex-col justify-start pt-3 items-center">
+            <div className="flex flex-col justify-start pt-3 items-center w-50 h-11">
               <button
                 className="flex items-center justify-center font-TripSans font-medium rounded-[25px] w-48 h-10 bg-BudgieBlue text-BudgieWhite"
                 type="button"
@@ -172,20 +172,13 @@ export function SignInModal(props: SignInModalProps) {
                 Sign In with Google
               </button>
             </div>
-            {error && (
-              <div className="pt-2 text-red-600 font-TripSans font-medium">
-                {errorMessage}
-              </div>
-            )}
-            <div className="flex flex-col justify-start pt-14 items-center">
+            <div className="flex flex-col pt-14 items-center">
               <p className="text-lg text-BudgieBlue font-TripSans font-medium">
                 Don't have an account?{' '}
                 <Link href={'/signup'} className="underline">
                   Sign Up
                 </Link>
               </p>
-            </div>
-            <div className="flex flex-col justify-start pt-2 items-center">
               <button
                 type="button"
                 onClick={() => setForgot(!forgot)}
@@ -194,6 +187,11 @@ export function SignInModal(props: SignInModalProps) {
                 Forgot Password?
               </button>
             </div>
+            {error && (
+              <div className="pt-2 w-72 h-10 text-red-600 font-TripSans font-medium">
+                {errorMessage}
+              </div>
+            )}
           </form>
         </div>
       </div>

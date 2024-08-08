@@ -171,11 +171,6 @@ export function SignUpModal(props: SignUpModalProps) {
                 Sign Up with Google
               </button>
             </div>
-            {error && (
-              <div className="pt-2 text-red-600 font-TripSans font-medium">
-                {errorMessage}
-              </div>
-            )}
             <div className="flex flex-col justify-start pt-7 items-center">
               <Link
                 className=" underline text-lg text-BudgieBlue font-TripSans font-medium  "
@@ -184,6 +179,11 @@ export function SignUpModal(props: SignUpModalProps) {
                 Already Have an Account?
               </Link>
             </div>
+            {error && (
+              <div className="pt-2 w-72 h-10 text-red-600 font-TripSans font-medium">
+                {errorMessage}
+              </div>
+            )}
           </form>
         </div>
       </div>
