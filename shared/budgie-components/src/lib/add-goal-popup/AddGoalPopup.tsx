@@ -1,10 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
+import { UserContext } from '@capstone-repo/shared/budgie-components';
 import styles from './AddGoalPopup.module.css';
 import '../../root.css';
 
 /* eslint-disable-next-line */
+
+interface ClearableInputProps {
+  value: number;
+  onChange: (value: number) => void;
+}
+
+const ClearableInput: React.FC<ClearableInputProps> = ({ value, onChange }) => {
+  const [inputValue, setInputValue] = useState<number | string>(value);
+
+  const handleFocus = () => {
+    if (inputValue === value) {
+      setInputValue('');
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value === '' ? '' : Number(e.target.value);
+    setInputValue(newValue);
+    onChange(newValue as number);
+  };
+
+  return (
+    <input
+      type="number"
+      value={inputValue}
+      onFocus={handleFocus}
+      onChange={handleChange}
+      required
+    />
+  );
+};
+
 export interface AddGoalPopupProps {
   togglePopup: () => void;
 }
@@ -60,6 +93,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   );
   const [targetDate, setTargetDate] = useState<string | null>(null);
   const [spendingLimit, setSpendingLimit] = useState(0);
+  const user = useContext(UserContext);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,6 +102,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
       type: props.activeTab,
       name: goalName,
       start_date: startDate,
+      uid: user.uid,
     };
 
     if (props.activeTab === 'Savings' || props.activeTab === 'Debt') {
@@ -80,7 +115,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
 
     try {
       await addDoc(collection(db, 'goals'), goalData);
-      alert('Goal saved successfully!');
+      props.togglePopup();
     } catch (error) {
       console.error('Error saving goal:', error);
     }
@@ -132,11 +167,9 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
                 amount here. If you haven't, you should enter 0.
               </span>
               <label>Current Savings Amount:</label>
-              <input
-                type="number"
+              <ClearableInput 
                 value={currentAmount}
-                onChange={(e) => setCurrentAmount(Number(e.target.value))}
-                required
+                onChange={setCurrentAmount}
               />
             </div>
             <div className={styles.formGroup}>
@@ -153,11 +186,9 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
                 Enter the amount of money you aim to save for this goal.
               </span>
               <label>Target Savings Amount:</label>
-              <input
-                type="number"
+              <ClearableInput 
                 value={targetAmount}
-                onChange={(e) => setTargetAmount(Number(e.target.value))}
-                required
+                onChange={setTargetAmount}
               />
             </div>
             <div className={styles.formGroup}>
@@ -247,11 +278,9 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
                 Enter the amount of money you currently owe.
               </span>
               <label>Current Debt Amount:</label>
-              <input
-                type="number"
+              <ClearableInput 
                 value={currentAmount}
-                onChange={(e) => setCurrentAmount(Number(e.target.value))}
-                required
+                onChange={setCurrentAmount}
               />
             </div>
             <div className={styles.formGroup}>
@@ -269,11 +298,9 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
                 than the current amount you owe and can even be zero.
               </span>
               <label>Target Debt Amount:</label>
-              <input
-                type="number"
+              <ClearableInput 
                 value={targetAmount}
-                onChange={(e) => setTargetAmount(Number(e.target.value))}
-                required
+                onChange={setTargetAmount}
               />
             </div>
             <div className={styles.formGroup}>
@@ -386,11 +413,9 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
                 contribute to your progress.
               </span>
               <label>Spending Limit per Month:</label>
-              <input
-                type="number"
+              <ClearableInput 
                 value={spendingLimit}
-                onChange={(e) => setSpendingLimit(Number(e.target.value))}
-                required
+                onChange={setSpendingLimit}
               />
             </div>
           </>

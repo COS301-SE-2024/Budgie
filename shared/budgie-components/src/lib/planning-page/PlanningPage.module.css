@@ -1,88 +1,147 @@
-.pageContainer
-{
-    height: 100%;
-    width: 100%;
+.pageContainer {
+  height: 100%;
+  width: 100%;
 }
 
 .paymentsBar {
-    width: calc(18vw * var(--font-size-multiplier));
-    height: 100vh;
-    background-color: var(--block-background);
-    /*box-shadow: 0px 0 10px rgba(0, 0, 0, 0.5);*/
-    padding-top: 1rem;
-    padding-left: 1.5rem;
-    position: fixed;
-    top: 0;
-    right: 0;
-    font-size: calc(1rem * var(--font-size-multiplier));
-    display: flex;
-    justify-content: center;
-    color: var(--main-text);;
+  width: calc(18vw * var(--font-size-multiplier));
+  height: 100vh;
+  background-color: var(--block-background);
+  /*box-shadow: 0px 0 10px rgba(0, 0, 0, 0.5);*/
+  padding-top: 1rem;
+  padding-left: 1.5rem;
+  position: fixed;
+  top: 0;
+  right: 0;
+  font-size: calc(1rem * var(--font-size-multiplier));
+  display: flex;
+  justify-content: center;
+  color: var(--main-text);
 }
 
 .paymentsBarTitle {
-    font-size: calc(1.5rem * var(--font-size-multiplier));
-    font-weight: bold;
-    color: var(--primary-1);
-    display: flex;
-    align-items: center;
-    height: 10vh;
-    width: calc(18vw * var(--font-size-multiplier));
-    justify-content: space-around;
+  font-size: calc(1.5rem * var(--font-size-multiplier));
+  font-weight: bold;
+  color: var(--primary-1);
+  display: flex;
+  align-items: center;
+  height: 10vh;
+  width: calc(18vw * var(--font-size-multiplier));
+  justify-content: space-around;
 }
 
 .scrollableSection {
-    width: calc(82vw - (18vw * var(--font-size-multiplier)));
-    height: 100%;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    overflow-y: scroll;
+  width: calc(82vw - (18vw * var(--font-size-multiplier)));
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  overflow-y: scroll;
 }
 
 .planningModalContainer {
-    width: 80%;
-    margin-bottom: 2rem;
+  width: 80%;
+  margin-bottom: 2rem;
+  font-size: calc(1rem * var(--font-size-multiplier));
 }
 
 .planningModalTitle {
-    font-size: calc(1.5rem * var(--font-size-multiplier));
-    color: var(--main-text);
-    font-weight: bold;
-    padding-left: 1rem;
+  font-size: calc(1.5rem * var(--font-size-multiplier));
+  color: var(--main-text);
+  font-weight: bold;
+  padding-left: 1rem;
 }
 
 .planningModal {
-    background-color: var(--block-background);
-    border-radius: 1rem;
-    min-height: 40vh;
-    padding: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  background-color: var(--block-background);
+  border-radius: 1rem;
+  min-height: 40vh;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .noGoalsText {
-    font-size: calc(1.2rem * var(--font-size-multiplier));
-    display: flex;
-    align-items: center;
-    flex-direction: column;
+  font-size: calc(1.2rem * var(--font-size-multiplier));
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
 
 .addGoalsButton {
-    width: calc(10rem * var(--font-size-multiplier));
-    height: calc(4rem * var(--font-size-multiplier));
-    color: white;
-    background-color: var(--primary-1);
-    font-weight: bold;
-    margin-top: 3rem;
-    border-radius: 10px;
-    transition: 0.3s ease;
+  width: calc(10rem * var(--font-size-multiplier));
+  height: calc(4rem * var(--font-size-multiplier));
+  color: white;
+  background-color: var(--primary-1);
+  font-weight: bold;
+  margin-top: 3rem;
+  border-radius: 10px;
+  transition: 0.3s ease;
 }
 
 .addGoalsButton:hover {
-    filter: brightness(1.15);
+  filter: brightness(1.15);
 }
 
+.goalGraph {
+  width: 50%;
+  height: 100%;
+  border: 1px solid black;
+}
 
+.goalsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: calc(0.75 * (82vw - (18vw * var(--font-size-multiplier))));
+  height: calc(40vh * var(--font-size-multiplier));
+}
 
+.goalDisplay {
+  margin-bottom: 20px;
+  width: 50%;
+}
+
+.goal {
+  padding: 20px;
+  border-radius: 5px;
+  width: 100%;
+  max-width: 600px;
+  width: 100%;
+}
+
+.paginationControls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+  width: calc(0.75 * (82vw - (18vw * var(--font-size-multiplier))));
+}
+
+.paginationControls button {
+  margin: 0 10px;
+}
+
+.goalName {
+    color: var(--main-text);
+    width: 100%;
+    font-weight: bold;
+    font-size: calc(1.5rem * var(--font-size-multiplier));
+}
+
+.goalLabel {
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.goalValue {
+    color: var(--primary-1);
+}
+
+.goalPair {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+}
