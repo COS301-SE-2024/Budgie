@@ -70,6 +70,7 @@ export function OverviewPage(props: OverviewPageProps) {
     setMonthlyExpenses(monthlyE);
     const categoryExpenses = await getExpensesByCategory(transaction);
     setExpenseByCategory(categoryExpenses);
+    alert(JSON.stringify(categoryExpenses));
 }
 
   useEffect(() => {
@@ -162,8 +163,8 @@ export function OverviewPage(props: OverviewPageProps) {
                 className="h-80"
                 data={spendingData}
                 index="name"
-                categories={['value']}
-                colors={['green']}
+                categories={['Income', 'Expenses']}
+                colors={['green', 'red']}
                 valueFormatter={(number: number) =>
                   `R ${Intl.NumberFormat('en-ZA').format(number).toString()}`
                 }
