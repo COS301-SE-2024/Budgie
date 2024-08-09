@@ -13,7 +13,9 @@ import {
   getMoneyIn,
   getMoneyOut,
   getLastTransaction,
-  getMonthlyBalance
+  getMonthlyIncome,
+  getMonthlyExpenses,
+  getExpensesByCategory
  } from "../overview-page/overviewServices";
 
 export interface OverviewPageProps {}
@@ -50,7 +52,9 @@ export function OverviewPage(props: OverviewPageProps) {
   const [moneyIn, setMoneyIn] = useState(0);
   const [moneyOut, setMoneyOut] = useState(0);
   const [lastTransaction, setLastTransaction] = useState<Transaction>(defaultTransaction);
-  const [monthlyBalance, setMonthlyBalance] = useState([]);
+  const [monthlyIncome, setMonthlyIncome] = useState([]);
+  const [monthlyExpenses, setMonthlyExpenses] = useState([]);
+  const [expenseByCategory, setExpenseByCategory] = useState([]);
 
   const getData = async (number:string) => {
     const transaction = await getTransactions(number);
@@ -60,9 +64,13 @@ export function OverviewPage(props: OverviewPageProps) {
     setMoneyOut(moneyO);
     const lastT = await getLastTransaction(transaction);
     setLastTransaction(lastT);
-    const monthly = await getMonthlyBalance(transaction);
-    setMonthlyBalance(monthly);
-  }
+    const monthly = await getMonthlyIncome(transaction);
+    setMonthlyIncome(monthly);
+    const monthlyE = await getMonthlyExpenses(transaction);
+    setMonthlyExpenses(monthlyE);
+    const categoryExpenses = await getExpensesByCategory(transaction);
+    setExpenseByCategory(categoryExpenses);
+}
 
   useEffect(() => {
     async function someFunction() {
@@ -91,25 +99,30 @@ export function OverviewPage(props: OverviewPageProps) {
       : 'Doing well towards your target, keep up the good work';
 
   const spendingData = [
-    { name: 'Jan', value: monthlyBalance[0] },
-    { name: 'Feb', value: monthlyBalance[1] },
-    { name: 'Mar', value: monthlyBalance[2] },
-    { name: 'Apr', value: monthlyBalance[3] },
-    { name: 'May', value: monthlyBalance[4] },
-    { name: 'Jun', value: monthlyBalance[5] },
-    { name: 'Jul', value: monthlyBalance[6] },
-    { name: 'Aug', value: monthlyBalance[7] },
-    { name: 'Sep', value: monthlyBalance[8] },
-    { name: 'Oct', value: monthlyBalance[9] },
-    { name: 'Nov', value: monthlyBalance[10] },
-    { name: 'Dec', value: monthlyBalance[11] },
+    { name: 'Jan', Income: monthlyIncome[0], Expenses: monthlyExpenses[0] },
+    { name: 'Feb', Income: monthlyIncome[1], Expenses: monthlyExpenses[1] },
+    { name: 'Mar', Income: monthlyIncome[2], Expenses: monthlyExpenses[2] },
+    { name: 'Apr', Income: monthlyIncome[3], Expenses: monthlyExpenses[3] },
+    { name: 'May', Income: monthlyIncome[4], Expenses: monthlyExpenses[4] },
+    { name: 'Jun', Income: monthlyIncome[5], Expenses: monthlyExpenses[5] },
+    { name: 'Jul', Income: monthlyIncome[6], Expenses: monthlyExpenses[6] },
+    { name: 'Aug', Income: monthlyIncome[7], Expenses: monthlyExpenses[7] },
+    { name: 'Sep', Income: monthlyIncome[8], Expenses: monthlyExpenses[8] },
+    { name: 'Oct', Income: monthlyIncome[9], Expenses: monthlyExpenses[9] },
+    { name: 'Nov', Income: monthlyIncome[10], Expenses: monthlyExpenses[10] },
+    { name: 'Dec', Income: monthlyIncome[11], Expenses: monthlyExpenses[11] },
   ];
 
   const categoryData = [
-    { name: 'Food', value: 400 },
-    { name: 'Rent', value: 300 },
-    { name: 'Utilities', value: 300 },
-    { name: 'Entertainment', value: 200 },
+    { name: 'Groceries', value: expenseByCategory[0] },
+    { name: 'Utilities', value: expenseByCategory[1]  },
+    { name: 'Entertainment', value: expenseByCategory[2]  },
+    { name: 'Transport', value: expenseByCategory[3]  },
+    { name: 'Insurance', value: expenseByCategory[4]  },
+    { name: 'Medical Aid', value: expenseByCategory[5]  },
+    { name: 'Eating Out', value: expenseByCategory[6]  },
+    { name: 'Shopping', value: expenseByCategory[7]  },
+    { name: 'Other', value: expenseByCategory[8]  },
   ];
 
   const CATEGORY_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
@@ -157,6 +170,7 @@ export function OverviewPage(props: OverviewPageProps) {
                 yAxisWidth={60}
                 onValueChange={(v) => console.log(v)}
               />
+
             </div>
             <div className={styles.fullWidthChart}>
               <div className={styles.chartTitleContainer}>

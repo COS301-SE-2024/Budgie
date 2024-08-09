@@ -9,21 +9,6 @@ import {
   where
 } from 'firebase/firestore';
 
-const monthNames = [
-  'january',
-  'february',
-  'march',
-  'april',
-  'may',
-  'june',
-  'july',
-  'august',
-  'september',
-  'october',
-  'november',
-  'december',
-];
-
 
 //get logged in users user id
 export function getUser(){
@@ -109,21 +94,74 @@ export async function getLastTransaction(transactions:any){
   return transactions[0];
 }
 
-//get balance for all months
-export async function getMonthlyBalance(transactions:any){
+//get total income for all months
+export async function getMonthlyIncome(transactions:any){
   let balance:any = [12];
   for(let i =0; i<12; i++){
     balance[i] = 0;
   }
-  let flag = 1;
   for(let i=0; i<transactions.length; i++){
     const dateString = transactions[i].date;
     const parts = dateString.split('/');
     const month = parseInt(parts[1], 10);
-    if(month!=flag){
-      balance[month-1] += transactions[i].balance;
-      flag = month;
+    if(transactions[i].amount>0){
+      balance[month-1] += transactions[i].amount;
     }
   }
   return balance;
+}
+
+//get total expenses for all months
+export async function getMonthlyExpenses(transactions:any){
+  let balance:any = [12];
+  for(let i =0; i<12; i++){
+    balance[i] = 0;
+  }
+  for(let i=0; i<transactions.length; i++){
+    const dateString = transactions[i].date;
+    const parts = dateString.split('/');
+    const month = parseInt(parts[1], 10);
+    if(transactions[i].amount<0){
+      balance[month-1] -= transactions[i].amount;
+    }
+  }
+  return balance;
+}
+
+//get amount for each category 
+export async function getExpensesByCategory(transactions:any){
+  let result:any = [9];
+  for(let i=0; i<9; i++){
+    result[i] = 0;
+  }
+  for(let i=0; i<transactions.length; i++){
+    if(transactions[i].category=='Groceries'){
+      result[0] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Utilities'){
+      result[1] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Entertainment'){
+      result[2] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Transport'){
+      result[3] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Insurance'){
+      result[4] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Medical Aid'){
+      result[5] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Eating Out'){
+      result[6] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Shopping'){
+      result[7] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Other'){
+      result[8] -= transactions[i].amount; 
+    }
+  }
+  return result;
 }
