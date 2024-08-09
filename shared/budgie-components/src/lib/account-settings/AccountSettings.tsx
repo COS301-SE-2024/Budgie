@@ -2,7 +2,14 @@
 import styles from './AccountSettings.module.css';
 import '../../root.css';
 import React, { useState, useEffect } from 'react';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  getFirestore,
+  collection,
+  getDocs,
+} from 'firebase/firestore';
 import { updatePassword } from 'firebase/auth';
 import { db, auth } from '../../../../../apps/budgie-app/firebase/clientApp';
 import {
@@ -77,8 +84,16 @@ export function AccountSettings(props: AccountSettingsProps) {
       return;
     }
     const credential = EmailAuthProvider.credential(user.email || '', password);
+    //const db = getFirestore();
     try {
       await reauthenticateWithCredential(user, credential);
+      /*const userRef = doc(db, 'accounts', user.uid);
+      await updateDoc(userRef, {
+        account_number: 'ANONYMIZED',
+        alias: 'ANONYMIZED',
+        name: 'ANONYMIZED',
+        uid: 'ANONYMIZED',
+      });*/
       await deleteUser(user);
       auth.signOut();
 
