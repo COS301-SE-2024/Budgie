@@ -109,6 +109,10 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
       goalData.current_amount = currentAmount;
       goalData.target_amount = targetAmount;
       goalData.target_date = targetDate;
+      if(props.activeTab === 'Debt')
+      {
+        goalData.initial_amount = currentAmount;
+      }
     } else if (props.activeTab === 'Spending') {
       goalData.spending_limit = spendingLimit;
     }

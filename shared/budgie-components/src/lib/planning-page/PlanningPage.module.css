@@ -37,6 +37,7 @@
   align-items: center;
   flex-direction: column;
   overflow-y: scroll;
+  padding-top:5vh;
 }
 
 .planningModalContainer {
@@ -120,8 +121,7 @@
 .paginationControls {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-top: 2rem;
+  justify-content: left;
   width: calc(0.75 * (82vw - (18vw * var(--font-size-multiplier))));
 }
 
@@ -160,3 +160,30 @@
     color: var(--primary-1);
 }
 
+.buttonContainer
+{
+    width: 90%;
+    display: flex;
+    justify-content: space-between;
+    font-size: calc(1.2rem * var(--font-size-multiplier));
+}
+
+.updateViewButton{
+    width: 48%;
+    height: 100%;
+    padding: 10px;
+    background-color: var(--primary-1);
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 2rem;
+    transition: 0.3s ease;
+    border: 1px solid var(--primary-1);
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+  }
+  
+  .updateViewButton:hover {
+    filter: brightness(1.1);
+  }

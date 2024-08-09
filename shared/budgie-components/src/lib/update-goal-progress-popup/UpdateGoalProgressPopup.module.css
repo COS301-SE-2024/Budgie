@@ -98,17 +98,6 @@
     justify-content: space-between;
     align-items: center;
   }
-
-  .deleteButton
-  {
-    background-color: rgb(177, 3, 3) !important;
-    border: none !important;
-    margin-top: 0 !important;
-  }
-
-  .deleteButton:hover {
-    background-color: rgb(196, 2, 2) !important;
-  }
   
   .popupText {
     visibility: hidden;
@@ -131,3 +120,42 @@
     opacity: 1;
   }
   
+  .progressInfoContainer
+  {
+    width: 100%;
+    background-color: var(--main-background);
+    padding: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .progressInfoBox
+  {
+    width: 100%;
+    display: flex;
+  }
+
+  .progressInfo
+  {
+    width: 50%;
+    text-align: left;
+  }
+
+  .progressInfo div{
+    margin-top: 2rem;
+  }
+
+  .progressInfo p {
+    color: var(--primary-1);
+    font-weight: bold;
+  }
+
+  .target {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .target  p{
+    color: var(--primary-1);
+    font-weight: bold;
+  }

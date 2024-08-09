@@ -13,8 +13,12 @@ import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import AddGoalPopup from '../add-goal-popup/AddGoalPopup';
 import EditGoalPopup from '../edit-goal-popup/EditGoalPopup';
+import UpdateGoalPopup, {
+  UpdateGoalProgressPopup,
+} from '../update-goal-progress-popup/UpdateGoalProgressPopup';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import '../../root.css';
+import { DisplaySettings } from '@mui/icons-material';
 
 /* eslint-disable-next-line */
 export interface PlanningPageProps {}
@@ -23,7 +27,13 @@ export function GoalModal() {
   const [Goals, setGoals] = useState<Goal[]>([]);
   const [isGoalPopupOpen, setisGoalPopupOpen] = useState(false);
   const [isEditGoalPopupOpen, setisEditGoalPopupOpen] = useState(false);
-  const [currentGoal, setCurrentGoal] = useState<Goal>({ id: '', name: '', type: '', start_date:'' });
+  const [isUpdateGoalPopupOpen, setisUpdateGoalPopupOpen] = useState(false);
+  const [currentGoal, setCurrentGoal] = useState<Goal>({
+    id: '',
+    name: '',
+    type: '',
+    start_date: '',
+  });
   const user = useContext(UserContext);
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -42,11 +52,22 @@ export function GoalModal() {
   };
 
   const calculateProgressPercentage = (
-    currentAmount: number,
-    targetAmount: number
+
+    goal: Goal
   ): number => {
-    if (targetAmount === 0) return 0;
-    return Math.min(100, (currentAmount / targetAmount) * 100);
+
+    if(goal.current_amount && goal.target_amount !== undefined)
+    {
+      if(goal.initial_amount) 
+      {
+        return Math.min(100, ((goal.initial_amount-goal.current_amount) / (goal.initial_amount-goal.target_amount)) * 100);
+      }
+      else
+      {
+        return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
+      }
+    }    
+    return 0;
   };
 
   const calculateDaysLeft = (targetDate: string): number => {
@@ -56,12 +77,12 @@ export function GoalModal() {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
-
   interface Goal {
     id: string;
     name: string;
     type: string;
     start_date: string;
+    initial_amount?: number;
     current_amount?: number;
     target_amount?: number;
     target_date?: string;
@@ -75,6 +96,11 @@ export function GoalModal() {
 
   const editGoalPopup = () => {
     setisEditGoalPopupOpen(!isEditGoalPopupOpen);
+    fetchGoals();
+  };
+
+  const updateGoalPopup = () => {
+    setisUpdateGoalPopupOpen(!isUpdateGoalPopupOpen);
     fetchGoals();
   };
 
@@ -121,6 +147,38 @@ export function GoalModal() {
         {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
       </div>
       <div className={styles.planningModal}>
+        {Goals[1] && (
+          <div className={styles.paginationControls}>
+            <button onClick={handlePreviousPage} disabled={currentPage === 0}>
+              <span
+                className="material-symbols-outlined"
+                style={{
+                  fontSize: 'calc(1.4rem * var(--font-size-multiplier))',
+                  alignContent: 'center',
+                  display: 'flex',
+                }}
+              >
+                arrow_back_ios
+              </span>
+            </button>
+            <span>{` ${currentPage + 1} of ${totalPages}`}</span>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages - 1}
+            >
+              <span
+                className="material-symbols-outlined"
+                style={{
+                  fontSize: 'calc(1.4rem * var(--font-size-multiplier))',
+                  alignContent: 'center',
+                  display: 'flex',
+                }}
+              >
+                arrow_forward_ios
+              </span>
+            </button>
+          </div>
+        )}
         {!currentGoal ? (
           <div className={styles.noGoalsText}>
             You haven't added any goals yet.
@@ -130,7 +188,13 @@ export function GoalModal() {
             </button>
           </div>
         ) : (
-          <div>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
             <div className={styles.goalsContainer}>
               <div className={styles.goalDisplay}>
                 <div className={styles.goal}>
@@ -150,17 +214,34 @@ export function GoalModal() {
                       edit
                     </span>
                     {isEditGoalPopupOpen && (
-                      <EditGoalPopup togglePopup={editGoalPopup} goal={currentGoal}/>
+                      <EditGoalPopup
+                        togglePopup={editGoalPopup}
+                        goal={currentGoal}
+                      />
                     )}
                   </div>
 
                   <div className={styles.goalPair}>
-                    <div className={styles.goalLabel}>Type:</div>
-                    <div className={styles.goalValue}>{currentGoal.type}</div>
+                    <div className={styles.goalLabel}>Goal Type:</div>
+                    <div className={styles.goalValue}>
+                      {currentGoal.type === 'Savings' && <>Savings</>}
+                      {currentGoal.type === 'Debt' && <>Debt Reduction</>}
+                      {currentGoal.type === 'Spending' && <>Limiting Spending</>}
+                    </div>
                   </div>
                   {currentGoal.current_amount !== undefined &&
                     currentGoal.target_amount !== undefined && (
                       <div>
+                        {currentGoal.initial_amount !== undefined && (
+                          <div className={styles.goalPair}>
+                            <div className={styles.goalLabel}>
+                              Initial Amount:
+                            </div>
+                            <div className={styles.goalValue}>
+                              {currentGoal.initial_amount}
+                            </div>
+                          </div>
+                        )}
                         <div className={styles.goalPair}>
                           <div className={styles.goalLabel}>
                             Current Amount:
@@ -227,8 +308,7 @@ export function GoalModal() {
                   <div className={styles.goalGraph}>
                     <CircularProgressbar
                       value={calculateProgressPercentage(
-                        currentGoal.current_amount,
-                        currentGoal.target_amount
+                        currentGoal
                       )}
                       styles={buildStyles({
                         pathColor: 'var(--primary-1)',
@@ -238,47 +318,26 @@ export function GoalModal() {
                     <div
                       className={styles.percentageDisplay}
                     >{`${calculateProgressPercentage(
-                      currentGoal.current_amount,
-                      currentGoal.target_amount
+                      currentGoal
                     ).toFixed(2)}%`}</div>
                   </div>
                 )}
             </div>
-            {Goals[1] && (
-              <div className={styles.paginationControls}>
-                <button
-                  onClick={handlePreviousPage}
-                  disabled={currentPage === 0}
-                >
-                  <span
-                    className="material-symbols-outlined"
-                    style={{
-                      fontSize: 'calc(1.4rem * var(--font-size-multiplier))',
-                      alignContent: 'center',
-                      display: 'flex',
-                    }}
-                  >
-                    arrow_back_ios
-                  </span>
-                </button>
-                <span>{` ${currentPage + 1} of ${totalPages}`}</span>
-                <button
-                  onClick={handleNextPage}
-                  disabled={currentPage === totalPages - 1}
-                >
-                  <span
-                    className="material-symbols-outlined"
-                    style={{
-                      fontSize: 'calc(1.4rem * var(--font-size-multiplier))',
-                      alignContent: 'center',
-                      display: 'flex',
-                    }}
-                  >
-                    arrow_forward_ios
-                  </span>
-                </button>
+            <div className={styles.buttonContainer}>
+              <div
+                className={styles.updateViewButton}
+                onClick={updateGoalPopup}
+              >
+                Update Progress
               </div>
-            )}
+              {isUpdateGoalPopupOpen && (
+                <UpdateGoalProgressPopup
+                  togglePopup={updateGoalPopup}
+                  goal={currentGoal}
+                />
+              )}
+              <div className={styles.updateViewButton}>View Insights</div>
+            </div>
           </div>
         )}
       </div>
