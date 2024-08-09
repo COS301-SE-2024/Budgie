@@ -51,22 +51,19 @@ export function GoalModal() {
     }
   };
 
-  const calculateProgressPercentage = (
-
-    goal: Goal
-  ): number => {
-
-    if(goal.current_amount && goal.target_amount !== undefined)
-    {
-      if(goal.initial_amount) 
-      {
-        return Math.min(100, ((goal.initial_amount-goal.current_amount) / (goal.initial_amount-goal.target_amount)) * 100);
-      }
-      else
-      {
+  const calculateProgressPercentage = (goal: Goal): number => {
+    if (goal.current_amount && goal.target_amount !== undefined) {
+      if (goal.initial_amount) {
+        return Math.min(
+          100,
+          ((goal.initial_amount - goal.current_amount) /
+            (goal.initial_amount - goal.target_amount)) *
+            100
+        );
+      } else {
         return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
       }
-    }    
+    }
     return 0;
   };
 
@@ -125,7 +122,7 @@ export function GoalModal() {
   useEffect(() => {
     fetchGoals();
     setCurrentGoal(Goals[currentPage]);
-  }, [Goals]);
+  }, [Goals, isGoalPopupOpen, isEditGoalPopupOpen, isUpdateGoalPopupOpen]);
 
   return (
     <div className={styles.planningModalContainer}>
@@ -226,7 +223,9 @@ export function GoalModal() {
                     <div className={styles.goalValue}>
                       {currentGoal.type === 'Savings' && <>Savings</>}
                       {currentGoal.type === 'Debt' && <>Debt Reduction</>}
-                      {currentGoal.type === 'Spending' && <>Limiting Spending</>}
+                      {currentGoal.type === 'Spending' && (
+                        <>Limiting Spending</>
+                      )}
                     </div>
                   </div>
                   {currentGoal.current_amount !== undefined &&
@@ -307,9 +306,7 @@ export function GoalModal() {
                 currentGoal.target_amount !== undefined && (
                   <div className={styles.goalGraph}>
                     <CircularProgressbar
-                      value={calculateProgressPercentage(
-                        currentGoal
-                      )}
+                      value={calculateProgressPercentage(currentGoal)}
                       styles={buildStyles({
                         pathColor: 'var(--primary-1)',
                         trailColor: '#d6d6d6',
@@ -317,9 +314,9 @@ export function GoalModal() {
                     />
                     <div
                       className={styles.percentageDisplay}
-                    >{`${calculateProgressPercentage(
-                      currentGoal
-                    ).toFixed(2)}%`}</div>
+                    >{`${calculateProgressPercentage(currentGoal).toFixed(
+                      2
+                    )}%`}</div>
                   </div>
                 )}
             </div>

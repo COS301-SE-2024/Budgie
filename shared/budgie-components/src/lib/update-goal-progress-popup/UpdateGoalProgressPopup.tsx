@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { addDoc, collection, doc, updateDoc  } from 'firebase/firestore';
+import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import styles from './UpdateGoalProgressPopup.module.css';
@@ -82,41 +82,69 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   );
   const user = useContext(UserContext);
 
-  const calculateProgressPercentage = (
-    currentAmount: number,
-    targetAmount: number
-  ): number => {
-    if (targetAmount === 0) return 0;
-    return Math.min(100, (currentAmount / targetAmount) * 100);
+  interface Goal {
+    id: string;
+    name: string;
+    type: string;
+    start_date: string;
+    initial_amount?: number;
+    current_amount?: number;
+    target_amount?: number;
+    target_date?: string;
+    spending_limit?: number;
+  }
+
+  const calculateProgressPercentage = (goal: Goal): string => {
+    if (goal.current_amount !== undefined && goal.target_amount !== undefined) {
+      if (goal.initial_amount !== undefined) {
+        return Math.min(
+          100,
+          ((goal.initial_amount - goal.current_amount) /
+            (goal.initial_amount - goal.target_amount)) *
+            100
+        ).toFixed(2);
+      } else {
+        return Math.min(
+          100,
+          (goal.current_amount / goal.target_amount) * 100
+        ).toFixed(2);
+      }
+    }
+    return '0.00';
   };
 
-  const calculateNewCurrentAmount = (
-    currentAmount: number,
-    updateAmount: number
-  ): string => {
-    if (updateAmount) {
+  const calculateNewCurrentAmount = (goal: Goal): string => {
+    if (
+      updateAmount &&
+      goal.current_amount !== undefined &&
+      goal.target_amount !== undefined
+    ) {
+      if (goal.initial_amount !== undefined) {
+        return Math.min(goal.current_amount - updateAmount).toFixed(2);
+      }
       return (currentAmount + updateAmount).toFixed(2);
     } else {
-      return (currentAmount).toFixed(2);
+      return currentAmount.toFixed(2);
     }
   };
 
-  const currentProgress = calculateProgressPercentage(
-    props.goal.current_amount,
-    props.goal.target_amount
-  ).toFixed(2);
-
-  const calculateNewProgress = (
-    currentAmount: number,
-    updateAmount: number,
-    targetAmount: number
-  ): string => {
-    return (
-      Math.min(
-        100,
-        ((currentAmount + updateAmount) / targetAmount) * 100
-      ).toFixed(2) + '%'
-    );
+  const calculateNewProgress = (goal: Goal): string => {
+    if (goal.current_amount !== undefined && goal.target_amount !== undefined) {
+      if (goal.initial_amount !== undefined) {
+        return Math.min(
+          100,
+          ((goal.initial_amount - goal.current_amount + updateAmount) /
+            (goal.initial_amount - goal.target_amount)) *
+            100
+        ).toFixed(2);
+      } else {
+        return Math.min(
+          100,
+          ((goal.current_amount + updateAmount) / goal.target_amount) * 100
+        ).toFixed(2);
+      }
+    }
+    return '0.00';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -130,9 +158,14 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
     };
 
     if (props.activeTab === 'Savings' || props.activeTab === 'Debt') {
-      goalData.current_amount = currentAmount+updateAmount;
+      goalData.current_amount = currentAmount + updateAmount;
       goalData.target_amount = targetAmount;
       goalData.target_date = props.goal.target_date;
+
+      if(props.activeTab === 'Debt')
+      {
+        goalData.current_amount = currentAmount - updateAmount;
+      }
     } else if (props.activeTab === 'Spending') {
       goalData.spending_limit = spendingLimit;
     }
@@ -207,29 +240,22 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               <ClearableInput value={updateAmount} onChange={setUpdateAmount} />
             </div>
             <div className={styles.progressInfoContainer}>
-              <div className={styles.target}>Target Amount: 
-                <p>R{targetAmount.toFixed(2)}</p>
-              </div>              
+              <div className={styles.target}>
+                Target Amount:
+                <p>R {targetAmount.toFixed(2)}</p>
+              </div>
               <div className={styles.progressInfoBox}>
                 <div className={styles.progressInfo}>
                   <div>Current Savings Amount:</div>
-                  <p>R{currentAmount.toFixed(2)}</p>
+                  <p>R {currentAmount.toFixed(2)}</p>
                   <div>Current Savings Progress:</div>
-                  <p>{currentProgress}%</p>
+                  <p>{calculateProgressPercentage(props.goal)} %</p>
                 </div>
                 <div className={styles.progressInfo}>
                   <div>New Savings Amount:</div>
-                  <p>
-                    R{calculateNewCurrentAmount(currentAmount, updateAmount)}
-                  </p>
+                  <p>R {calculateNewCurrentAmount(props.goal)}</p>
                   <div>New Savings Progress:</div>
-                  <p>
-                    {calculateNewProgress(
-                      currentAmount,
-                      updateAmount,
-                      targetAmount
-                    )}
-                  </p>
+                  <p>{calculateNewProgress(props.goal)} %</p>
                 </div>
               </div>
             </div>
@@ -249,7 +275,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
                 info
               </span>
               <span className={styles.popupText}>
-                Select the date this goal update was made.
+                Select the date this debt payment was made.
               </span>
               <label>Transaction Date:</label>
               <input
@@ -270,36 +296,28 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
                 info
               </span>
               <span className={styles.popupText}>
-                Enter the amount of money you added/withdrew from this goal. If
-                you withdrew money, enter a negative number.
+                Enter the amount of money you paid towards the debt.
               </span>
-              <label>Amount to Add/Withdraw:</label>
+              <label>Payment Amount:</label>
               <ClearableInput value={updateAmount} onChange={setUpdateAmount} />
             </div>
             <div className={styles.progressInfoContainer}>
-              <div className={styles.target}>Target Amount: 
-                <p>R{targetAmount.toFixed(2)}</p>
-              </div>              
+              <div className={styles.target}>
+                Target Amount:
+                <p>R {targetAmount.toFixed(2)}</p>
+              </div>
               <div className={styles.progressInfoBox}>
                 <div className={styles.progressInfo}>
-                  <div>Current Savings Amount:</div>
-                  <p>R{currentAmount.toFixed(2)}</p>
-                  <div>Current Savings Progress:</div>
-                  <p>{currentProgress}%</p>
+                  <div>Current Debt Amount:</div>
+                  <p>R {currentAmount.toFixed(2)}</p>
+                  <div>Current Goal Progress:</div>
+                  <p>{calculateProgressPercentage(props.goal)} %</p>
                 </div>
                 <div className={styles.progressInfo}>
-                  <div>New Savings Amount:</div>
-                  <p>
-                    R{calculateNewCurrentAmount(currentAmount, updateAmount)}
-                  </p>
-                  <div>New Savings Progress:</div>
-                  <p>
-                    {calculateNewProgress(
-                      currentAmount,
-                      updateAmount,
-                      targetAmount
-                    )}
-                  </p>
+                  <div>New Debt Amount:</div>
+                  <p>R {calculateNewCurrentAmount(props.goal)}</p>
+                  <div>New Goal Progress:</div>
+                  <p>{calculateNewProgress(props.goal)} %</p>
                 </div>
               </div>
             </div>
