@@ -70,7 +70,6 @@ export function OverviewPage(props: OverviewPageProps) {
     setMonthlyExpenses(monthlyE);
     const categoryExpenses = await getExpensesByCategory(transaction);
     setExpenseByCategory(categoryExpenses);
-    alert(JSON.stringify(categoryExpenses));
 }
 
   useEffect(() => {
