@@ -181,10 +181,16 @@ export function AccountSettings(props: AccountSettingsProps) {
         </div>
         <div className={styles.settingsOption}>
           <p className={styles.settingTitle}>Delete Account</p>
-          <p className={styles.settingDescription}>
-            Click the button below to start deleting your account. Learn about
-            our deletion policy here.
-          </p>
+          <div className={styles.tooltipContainer}>
+            <p className={styles.settingDescription}>
+              Click the button below to start deleting your account. Learn about
+              our deletion policy here.
+            </p>
+            <div className={styles.tooltip}>
+              User data is anonymized upon the deletion of the account by the
+              user, leaving no association of the data with the user.
+            </div>
+          </div>
           <button className={styles.deleteButton} onClick={handleDeleteClick}>
             <div className={styles.deleteButton}>Delete Account</div>
           </button>
