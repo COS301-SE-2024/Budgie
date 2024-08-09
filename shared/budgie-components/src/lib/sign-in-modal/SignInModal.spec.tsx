@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import SignInModal from './SignInModal';
 import {
@@ -14,14 +14,10 @@ import {
 jest.mock('firebase/auth', () => ({
   getAuth: jest.fn(),
   signInWithEmailAndPassword: jest.fn(),
-  signInWithPopup: jest.fn().mockResolvedValue({
-    user: {
-      email: 'test@gmail.com',
-    },
-  }),
-  GoogleAuthProvider: jest.fn(),
-  setPersistence: jest.fn(),
-  browserSessionPersistence: jest.fn(),
+  signInWithPopup: jest.fn(),
+  GoogleAuthProvider: jest.fn(() => ({
+    addScope: jest.fn(),
+  })),
 }));
 
 jest.mock('../forgot-password/forgot-password', () => () => (
@@ -30,9 +26,6 @@ jest.mock('../forgot-password/forgot-password', () => () => (
 
 describe('SignInModal Component', () => {
   afterAll(() => {
-    jest.clearAllMocks();
-  });
-  beforeEach(() => {
     jest.clearAllMocks();
   });
 
@@ -69,11 +62,15 @@ describe('SignInModal Component', () => {
     ).toBeDefined();
   });
 
-  /*it('should call signInWithPopup when "Sign In with Google" button is clicked', async () => {
+  it('should call signInWithPopup when "Sign In with Google" button is clicked', async () => {
+    const signInWithPopupMock = signInWithPopup as jest.Mock;
+    signInWithPopupMock.mockResolvedValueOnce({ user: {} });
     render(<SignInModal />);
-
     const googleButton = screen.getByText('Sign In with Google');
     fireEvent.click(googleButton);
     expect(signInWithPopup).toHaveBeenCalled();
-  });*/
+    await waitFor(() => {
+      expect(signInWithPopup).toHaveBeenCalled();
+    });
+  });
 });

@@ -7,8 +7,8 @@ import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
+  getAuth,
 } from 'firebase/auth';
-import { auth, db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { collection, addDoc } from 'firebase/firestore';
 import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
@@ -21,6 +21,7 @@ export function SignUpModal(props: SignUpModalProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const auth = getAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

@@ -14,6 +14,7 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@headlessui/react": "^2.1.2",
     "@headlessui/tailwindcss": "^0.2.1",
+    "@jest/globals": "^29.7.0",
     "@mui/icons-material": "^5.15.19",
     "@remixicon/react": "^4.2.0",
     "@testing-library/jest-dom": "^6.4.8",

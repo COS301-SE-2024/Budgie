@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
 import Link from 'next/link';
+import { FirebaseError } from 'firebase/app';
 import { ForgotPassword } from '../forgot-password/forgot-password';
 import {
   signInWithEmailAndPassword,
@@ -24,7 +25,7 @@ export function SignInModal(props: SignInModalProps) {
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [forgot, setForgot] = useState(false);
-
+  const auth = getAuth();
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
   };
@@ -35,24 +36,24 @@ export function SignInModal(props: SignInModalProps) {
 
   const signInWithGoogle = async () => {
     try {
-      const auth = getAuth();
-      await setPersistence(auth, browserSessionPersistence);
       const provider = new GoogleAuthProvider();
-      provider.addScope('Email');
+      provider.addScope('profile');
+      provider.addScope('email');
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+      console.log('User information:', user);
     } catch (error) {
-      if (error instanceof Error) {
-        const errorCode = (error as any).code;
+      if (error instanceof FirebaseError) {
+        const errorCode = error.code;
         const errorMessage = error.message;
-        const email = (error as any).customData.email;
-        const credential = GoogleAuthProvider.credentialFromError(error as any);
+        const email = error.customData?.email;
+        const credential = GoogleAuthProvider.credentialFromError(error);
         console.error('Error code:', errorCode);
         console.error('Error message:', errorMessage);
         console.error('Email:', email);
         console.error('Credential:', credential);
       } else {
-        console.error('Unknown error:', error);
+        console.error('Unexpected error', error);
       }
     }
   };
