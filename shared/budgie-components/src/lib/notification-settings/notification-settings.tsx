@@ -28,9 +28,6 @@ export function NotificationSettings(props: NotificationSettingsProps) {
           Notification Settings
         </div>
         <div className="bg-white rounded-lg shadow-lg w-96">
-          <div className="border-b px-6 py-4 flex justify-between items-center">
-            <h2 className="text-lg font-semibold">Notification Settings</h2>
-          </div>
           <div className="p-6 space-y-6">
             <div>
               <div className="mt-3 space-y-3">
@@ -108,8 +105,11 @@ export function NotificationSettings(props: NotificationSettingsProps) {
             </div>
           </div>
           <div className="border-t px-6 py-4 flex justify-between items-center">
-            <button className="text-gray-500" onClick={uncheckAll}>
-              Cancel
+            <button
+              className="bg-black text-white px-4 py-2 rounded"
+              onClick={uncheckAll}
+            >
+              Clear
             </button>
             <button className="bg-black text-white px-4 py-2 rounded">
               Save
