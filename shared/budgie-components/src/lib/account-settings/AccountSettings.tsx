@@ -132,14 +132,6 @@ export function AccountSettings(props: AccountSettingsProps) {
           {isCPopupVisible && (
             <div className={styles.popupOverlay}>
               <div className={styles.popupContent}>
-                <p className="mb-2">Type in your old password:</p>
-                <input
-                  type="password"
-                  value={OldPassword}
-                  placeholder="Enter your old password"
-                  onChange={(e) => setOldPassword(e.target.value)}
-                  className="px-2 py-2 border border-gray-300 rounded w-3/4 mb-4"
-                />
                 <p className="mb-2">Type in your new password:</p>
                 <input
                   type="password"
@@ -154,17 +146,17 @@ export function AccountSettings(props: AccountSettingsProps) {
                   value={ConPassword}
                   placeholder="Enter your new password"
                   onChange={(e) => setConPassword(e.target.value)}
-                  className="px-2 py-2 border border-gray-300 rounded w-3/4 mb-4"
+                  className="px-2 py-2 border border-gray-300 rounded w-3/4 mb-4 "
                 />
                 <div className="flex justify-between mt-4">
                   <button
-                    className={styles.confirmButton}
+                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                     onClick={handleChangePassword}
                   >
                     Confirm
                   </button>
                   <button
-                    className={styles.cancelButton}
+                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-900"
                     onClick={handlecClosePopup}
                   >
                     Cancel
@@ -181,16 +173,10 @@ export function AccountSettings(props: AccountSettingsProps) {
         </div>
         <div className={styles.settingsOption}>
           <p className={styles.settingTitle}>Delete Account</p>
-          <div className={styles.tooltipContainer}>
-            <p className={styles.settingDescription}>
-              Click the button below to start deleting your account. Learn about
-              our deletion policy here.
-            </p>
-            <div className={styles.tooltip}>
-              User data is anonymized upon the deletion of the account by the
-              user, leaving no association of the data with the user.
-            </div>
-          </div>
+          <p className={styles.settingDescription}>
+            Click the button below to start deleting your account. Learn about
+            our deletion policy here.
+          </p>
           <button className={styles.deleteButton} onClick={handleDeleteClick}>
             <div className={styles.deleteButton}>Delete Account</div>
           </button>

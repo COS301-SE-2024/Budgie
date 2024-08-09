@@ -102,7 +102,7 @@
   left: 50%;
   transform: translateX(-50%);
   background-color: #333;
-  color: #fff;
+  color: var(--greyed-text);
   padding: 0.5rem;
   border-radius: 0.25rem;
   font-size: 0.75rem;
