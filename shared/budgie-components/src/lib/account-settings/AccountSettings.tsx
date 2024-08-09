@@ -92,7 +92,6 @@ export function AccountSettings(props: AccountSettingsProps) {
         account_number: 'ANONYMIZED',
         alias: 'ANONYMIZED',
         name: 'ANONYMIZED',
-        uid: 'ANONYMIZED',
       });*/
       await deleteUser(user);
       auth.signOut();
