@@ -1,7 +1,77 @@
-.pageContainer {
-  height: 100%;
-  width: 100%;
+.topBar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--block-background);
+  width: 85vw;
+  height: calc(6vh * var(--font-size-multiplier));
 }
+
+.button {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: calc(1.4rem * var(--font-size-multiplier));
+  font-weight: bold;
+  padding: 5px 10px;
+  padding-top: 10px;
+  margin: 0px calc(10px * var(--font-size-multiplier));
+  border-bottom: 5px solid var(--block-background);
+  height: 100%;
+}
+
+.button:hover {
+  background-color: lightgray;
+}
+
+.activeButton {
+  border-bottom: 5px solid var(--primary-1);
+}
+
+.loadScreen {
+  background-color: var(--main-background);
+  width: 85vw;
+  height: calc(100vh - (6vh * var(--font-size-multiplier)));
+  padding-top: 40vh;
+}
+
+.loaderContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.loader {
+  width: 7rem;
+  height: 4rem;
+  --g1:conic-gradient(from  90deg at left   3px top   3px,#0000 90deg,var(--primary-1) 0);
+  --g2:conic-gradient(from -90deg at bottom 3px right 3px,#0000 90deg,var(--primary-1) 0);
+  background: var(--g1),var(--g1),var(--g1), var(--g2),var(--g2),var(--g2);
+  background-position: left,center,right;
+  background-repeat: no-repeat;
+  animation: l10 1s infinite alternate;
+}
+@keyframes l10 {
+  0%,
+  2%   {background-size:2rem 50% ,2rem 50% ,2rem 50%}
+  20%  {background-size:2rem 25% ,2rem 50% ,2rem 50%}
+  40%  {background-size:2rem 100%,2rem 25% ,2rem 50%}
+  60%  {background-size:2rem 50% ,2rem 100%,2rem 25%}
+  80%  {background-size:2rem 50% ,2rem 50% ,2rem 100%}
+  98%,
+  100% {background-size:2rem 50% ,2rem 50% ,2rem 50%}
+}
+
+.loaderText {
+  font-size: 1.5rem;
+  width: 100%;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+
+
+
+
+
 
 .paymentsBar {
   width: calc(18vw * var(--font-size-multiplier));
@@ -160,16 +230,7 @@
     color: var(--primary-1);
 }
 
-.buttonContainer
-{
-    width: 90%;
-    display: flex;
-    justify-content: space-between;
-    font-size: calc(1.2rem * var(--font-size-multiplier));
-}
-
 .updateViewButton{
-    width: 48%;
     height: 100%;
     padding: 10px;
     background-color: var(--primary-1);

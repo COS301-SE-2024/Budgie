@@ -96,6 +96,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   const user = useContext(UserContext);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log("QQQ");
     e.preventDefault();
 
     const goalData: any = {

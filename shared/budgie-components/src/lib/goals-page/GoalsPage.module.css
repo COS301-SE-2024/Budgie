@@ -1,0 +1,260 @@
+.mainPage {
+  background-color: var(--main-background);
+  width: 85vw;
+  height: calc(100vh - (6vh * var(--font-size-multiplier)));
+  padding-left: calc(1.5rem * var(--font-size-multiplier));
+  padding-right: 2rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loadScreen {
+  background-color: var(--main-background);
+  width: 85vw;
+  height: calc(100vh - (6vh * var(--font-size-multiplier)));
+  padding-top: 40vh;
+}
+
+.loaderContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.loader {
+  width: 7rem;
+  height: 4rem;
+  --g1: conic-gradient(
+    from 90deg at left 3px top 3px,
+    #0000 90deg,
+    var(--primary-1) 0
+  );
+  --g2: conic-gradient(
+    from -90deg at bottom 3px right 3px,
+    #0000 90deg,
+    var(--primary-1) 0
+  );
+  background: var(--g1), var(--g1), var(--g1), var(--g2), var(--g2), var(--g2);
+  background-position: left, center, right;
+  background-repeat: no-repeat;
+  animation: l10 1s infinite alternate;
+}
+@keyframes l10 {
+  0%,
+  2% {
+    background-size: 2rem 50%, 2rem 50%, 2rem 50%;
+  }
+  20% {
+    background-size: 2rem 25%, 2rem 50%, 2rem 50%;
+  }
+  40% {
+    background-size: 2rem 100%, 2rem 25%, 2rem 50%;
+  }
+  60% {
+    background-size: 2rem 50%, 2rem 100%, 2rem 25%;
+  }
+  80% {
+    background-size: 2rem 50%, 2rem 50%, 2rem 100%;
+  }
+  98%,
+  100% {
+    background-size: 2rem 50%, 2rem 50%, 2rem 50%;
+  }
+}
+
+.loaderText {
+  font-size: 1.5rem;
+  width: 100%;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.header {
+  width: 80%;
+  display: flex;
+  justify-content: left;
+  padding-bottom: 1rem;
+  padding-top: 1rem;
+  border-bottom: 1px solid var(--greyed-text);
+  position: fixed;
+  background-color: var(--main-background);
+  z-index: 100;
+}
+
+.planningModalContainer {
+  width: 80%;
+  margin-bottom: 2rem;
+  font-size: calc(1.5rem * var(--font-size-multiplier));
+}
+
+.planningModalTitle {
+  font-size: calc(1.5rem * var(--font-size-multiplier));
+  color: var(--main-text);
+  font-weight: bold;
+  padding-left: 1rem;
+  display: flex;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.planningModal {
+  background-color: var(--block-background);
+  border-radius: 1rem;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.noGoalsText {
+  font-size: calc(1.2rem * var(--font-size-multiplier));
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.addGoalsButton {
+  width: calc(10rem * var(--font-size-multiplier));
+  height: calc(4rem * var(--font-size-multiplier));
+  color: white;
+  background-color: var(--primary-1);
+  font-weight: bold;
+  border-radius: 10px;
+  transition: 0.3s ease;
+}
+
+.addGoalsButton:hover {
+  filter: brightness(1.15);
+}
+
+.goalsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 85%;
+}
+
+.goalDisplay {
+  margin-bottom: 20px;
+  width: auto;
+}
+
+.goal {
+  border-radius: 5px;
+  width: 100%;
+  max-width: 600px;
+  margin-top: 2rem;
+}
+
+.goalName {
+  color: var(--main-text);
+  width: 100%;
+  font-weight: bold;
+  font-size: calc(1.5rem * var(--font-size-multiplier));
+  display: flex;
+  align-items: center;
+}
+
+.goalLabel {
+  font-weight: bold;
+  margin-right: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.goalValue {
+  color: var(--primary-1);
+}
+
+.goalPair {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.percentageDisplay {
+  font-size: calc(3rem * var(--font-size-multiplier));
+  font-weight: bold;
+  color: var(--primary-1);
+  position: absolute;
+  top: 45%; 
+  transform: translate(0%, -50%);
+}
+
+.updateViewButton {
+  height: 100%;
+  padding: 10px;
+  background-color: var(--primary-1);
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  transition: 0.3s ease;
+  border: 1px solid var(--primary-1);
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.updateViewButton:hover {
+  filter: brightness(1.1);
+}
+
+.goalGraph {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+  }
+
+.sliderContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45%;
+  position: relative;
+  flex-direction: column;
+}
+
+.slider {
+  width: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.slide {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  color: white;
+}
+
+.arrow {
+  font-size: 2rem;
+  color: #333;
+  cursor: pointer;
+  user-select: none;
+}
+
+.arrow:hover {
+  color: #000;
+}
+
+.arrow:nth-of-type(1) {
+  left: 0;
+}
+
+.arrow:nth-of-type(2) {
+  right: 0;
+}

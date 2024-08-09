@@ -8,17 +8,19 @@ import {
   updateDoc,
   query,
   where,
+  doc,
+  getDoc,
 } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import AddGoalPopup from '../add-goal-popup/AddGoalPopup';
 import EditGoalPopup from '../edit-goal-popup/EditGoalPopup';
+import GoalsPage from '../goals-page/GoalsPage';
 import UpdateGoalPopup, {
   UpdateGoalProgressPopup,
 } from '../update-goal-progress-popup/UpdateGoalProgressPopup';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import '../../root.css';
-import { DisplaySettings } from '@mui/icons-material';
 
 /* eslint-disable-next-line */
 export interface PlanningPageProps {}
@@ -124,6 +126,11 @@ export function GoalModal() {
     setCurrentGoal(Goals[currentPage]);
   }, [Goals, isGoalPopupOpen, isEditGoalPopupOpen, isUpdateGoalPopupOpen]);
 
+  useEffect(() => {
+    fetchGoals();
+    setCurrentGoal(Goals[0]);
+  }, []);
+
   return (
     <div className={styles.planningModalContainer}>
       <div className={styles.planningModalTitle}>
@@ -176,7 +183,7 @@ export function GoalModal() {
             </button>
           </div>
         )}
-        {!currentGoal ? (
+        {currentGoal === undefined ? (
           <div className={styles.noGoalsText}>
             You haven't added any goals yet.
             <br></br>
@@ -210,12 +217,12 @@ export function GoalModal() {
                     >
                       edit
                     </span>
-                    {isEditGoalPopupOpen && (
+                    {/*{isEditGoalPopupOpen && (
                       <EditGoalPopup
                         togglePopup={editGoalPopup}
                         goal={currentGoal}
                       />
-                    )}
+                    )}*/}
                   </div>
 
                   <div className={styles.goalPair}>
@@ -255,16 +262,6 @@ export function GoalModal() {
                             {currentGoal.target_amount}
                           </div>
                         </div>
-                        {/*<div className={styles.goalPair}>
-                          <div className={styles.goalLabel}>Progress:</div>
-                          <div className={styles.goalValue}>
-                            {calculateProgressPercentage(
-                              currentGoal.current_amount,
-                              currentGoal.target_amount
-                            ).toFixed(2)}
-                            %
-                          </div>
-                        </div>*/}
                       </div>
                     )}
                   <div className={styles.goalPair}>
@@ -300,6 +297,18 @@ export function GoalModal() {
                     </div>
                   )}
                 </div>
+                <div
+                  className={styles.updateViewButton}
+                  onClick={updateGoalPopup}
+                >
+                  Update Progress
+                </div>
+                {isUpdateGoalPopupOpen && (
+                  <UpdateGoalProgressPopup
+                    togglePopup={updateGoalPopup}
+                    goal={currentGoal}
+                  />
+                )}
               </div>
 
               {currentGoal.current_amount !== undefined &&
@@ -319,21 +328,9 @@ export function GoalModal() {
                     )}%`}</div>
                   </div>
                 )}
-            </div>
-            <div className={styles.buttonContainer}>
-              <div
-                className={styles.updateViewButton}
-                onClick={updateGoalPopup}
-              >
-                Update Progress
-              </div>
-              {isUpdateGoalPopupOpen && (
-                <UpdateGoalProgressPopup
-                  togglePopup={updateGoalPopup}
-                  goal={currentGoal}
-                />
+              {currentGoal.spending_limit !== undefined && (
+                <div className={styles.goalGraph}>Poop</div>
               )}
-              <div className={styles.updateViewButton}>View Insights</div>
             </div>
           </div>
         )}
@@ -364,13 +361,92 @@ export function UpcomingPaymentsBar() {
 }
 
 export function PlanningPage(props: PlanningPageProps) {
+  const [viewMode, setViewMode] = useState('goals');
+  const user = useContext(UserContext);
+  const [Goals, setGoals] = useState<Goal[]>([]);
+
+  interface Goal {
+    id: string;
+    name: string;
+    type: string;
+    start_date: string;
+    initial_amount?: number;
+    current_amount?: number;
+    target_amount?: number;
+    target_date?: string;
+    spending_limit?: number;
+  }
+
+  useEffect(() => {
+    const fetchGoals = async () => {
+      try {
+        const goalsCollection = collection(db, 'goals');
+        const goalsQuery = query(goalsCollection, where('uid', '==', user.uid));
+        const goalsSnapshot = await getDocs(goalsQuery);
+        const goalsList = goalsSnapshot.docs.map((doc) => {
+          const data = doc.data() as Omit<Goal, 'id'>;
+          return {
+            id: doc.id,
+            ...data,
+          };
+        });
+        setGoals(goalsList);
+      } catch (error) {
+        console.error('Error getting bank statement document:', error);
+      }
+    };
+    fetchGoals();
+  }, []);
+
   return (
-    <div className="mainPage">
-      <div className={styles.pageContainer}>
-        <div className={styles.scrollableSection}>
-          <GoalModal></GoalModal>
+    <div>
+      <div className={styles.topBar}>
+        <div>
+          <button
+            className={`${styles.button} ${
+              viewMode === 'goals' ? styles.activeButton : ''
+            }`}
+            onClick={() => setViewMode('goals')}
+          >
+            Goals
+          </button>
+
+          <button
+            className={`${styles.button} ${
+              viewMode === 'insights' ? styles.activeButton : ''
+            }`}
+            onClick={() => setViewMode('insights')}
+            style={{ marginLeft: '5rem' }}
+          >
+            Insights
+          </button>
+
+          <button
+            className={`${styles.button} ${
+              viewMode === 'upcoming' ? styles.activeButton : ''
+            }`}
+            onClick={() => setViewMode('upcoming')}
+            style={{ marginLeft: '5rem' }}
+          >
+            Upcoming
+          </button>
         </div>
-        <UpcomingPaymentsBar></UpcomingPaymentsBar>
+      </div>
+      <div>
+        <div>
+          {viewMode === 'goals' && Goals? (
+            <GoalsPage />
+          ) : viewMode === 'all' ? (
+            <GoalsPage />
+          ) : (
+            <div className={styles.loadScreen}>
+              <div className={styles.loaderContainer}>
+                <div className={styles.loader}></div>
+              </div>
+              <div className={styles.loaderText}>Loading...</div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

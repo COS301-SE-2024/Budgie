@@ -119,7 +119,7 @@ export function DisplaySettings(props: DisplaySettingsProps) {
         document.documentElement.setAttribute('colour-theme', 'dark-green');
         setSelectedCircle(5);
       }
-      else if (theme == 'light-blue')
+      else
       {
         document.documentElement.setAttribute('colour-theme', 'dark-blue');
         setSelectedCircle(0);
