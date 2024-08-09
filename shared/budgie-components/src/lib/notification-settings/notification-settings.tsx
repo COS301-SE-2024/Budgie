@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import styles from './notification-settings.module.css';
 
 /* eslint-disable-next-line */
@@ -6,14 +7,49 @@ export interface NotificationSettingsProps {
 }
 
 export function NotificationSettings(props: NotificationSettingsProps) {
+  const [settings, setSettings] = useState({
+    budget: false,
+    goal: false,
+    spending: false,
+    csv: false,
+  });
+
+  useEffect(() => {
+    const storedSettings = {
+      budget: localStorage.getItem('budget') === 'true',
+      goal: localStorage.getItem('goal') === 'true',
+      spending: localStorage.getItem('spending') === 'true',
+      csv: localStorage.getItem('csv') === 'true',
+    };
+    setSettings(storedSettings);
+  }, []);
+
+  function handleCheckboxChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, checked } = e.target;
+    setSettings((prevSettings) => ({
+      ...prevSettings,
+      [name]: checked,
+    }));
+  }
+
+  function saveSettings() {
+    localStorage.setItem('budget', settings.budget.toString());
+    localStorage.setItem('goal', settings.goal.toString());
+    localStorage.setItem('spending', settings.spending.toString());
+    localStorage.setItem('csv', settings.csv.toString());
+
+    alert('Settings saved.');
+  }
+
   function uncheckAll() {
-    const checkboxes = document.querySelectorAll(
-      'input[type="checkbox"]:not(:disabled)'
-    );
-    checkboxes.forEach((checkbox) => {
-      checkbox.checked = false;
+    setSettings({
+      budget: false,
+      goal: false,
+      spending: false,
+      csv: false,
     });
   }
+
   return (
     <>
       <div className="mainPage">
@@ -45,6 +81,8 @@ export function NotificationSettings(props: NotificationSettingsProps) {
                       type="checkbox"
                       className="toggle-switch"
                       name="budget"
+                      checked={settings.budget}
+                      onChange={handleCheckboxChange}
                     />
                   </label>
                 </div>
@@ -63,6 +101,8 @@ export function NotificationSettings(props: NotificationSettingsProps) {
                       type="checkbox"
                       className="toggle-switch"
                       name="goal"
+                      checked={settings.goal}
+                      onChange={handleCheckboxChange}
                     />
                   </label>
                 </div>
@@ -80,6 +120,8 @@ export function NotificationSettings(props: NotificationSettingsProps) {
                       type="checkbox"
                       className="toggle-switch"
                       name="spending"
+                      checked={settings.spending}
+                      onChange={handleCheckboxChange}
                     />
                   </label>
                 </div>
@@ -98,6 +140,8 @@ export function NotificationSettings(props: NotificationSettingsProps) {
                       type="checkbox"
                       className="toggle-switch"
                       name="csv"
+                      checked={settings.csv}
+                      onChange={handleCheckboxChange}
                     />
                   </label>
                 </div>
@@ -111,7 +155,10 @@ export function NotificationSettings(props: NotificationSettingsProps) {
             >
               Clear
             </button>
-            <button className="bg-black text-white px-4 py-2 rounded">
+            <button
+              className="bg-black text-white px-4 py-2 rounded"
+              onClick={saveSettings}
+            >
               Save
             </button>
           </div>
