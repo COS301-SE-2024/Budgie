@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/router';
 import styles from './Landing.module.css';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import SignInModal from '../sign-in-modal/SignInModal';
 import LearnModal from '../learn-more-modal/LearnMore';
 
@@ -11,6 +11,11 @@ export interface LandingProps {}
 export function Landing(props: LandingProps) {
   const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
   const [showLearnMore, setShowLearnMore] = useState<boolean>(false);
+
+  useEffect(() => {
+    console.log('ran useffect');
+  }, []);
+
   return (
     <>
       {showSignInModal && (

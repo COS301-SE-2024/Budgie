@@ -6,6 +6,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
+import { AreaChart, Color } from '@tremor/react';
 import {
   collection,
   DocumentData,
@@ -18,8 +19,7 @@ import { Diversity1 } from '@mui/icons-material';
 /* eslint-disable-next-line */
 export interface AccountsPageProps {}
 
-//pages and modals------------------------------------------
-
+//interfaces
 interface Account {
   name: string;
   alias: string;
@@ -30,6 +30,164 @@ interface NoAccountsPageProps {
   onAddClick: () => void;
 }
 
+interface AccountUnitProps {
+  account: Account;
+}
+
+interface Transaction {
+  date: string;
+  amount: number;
+  balance: number;
+  description: string;
+  category: string;
+}
+
+interface GraphSectionProps {
+  xAxis: string[];
+  yAxis: number[];
+}
+//helpers
+
+function rollingYears(monthYear: string): number[] {
+  // Extract the month and year from the input string
+  const currentMonth = parseInt(monthYear.slice(0, 2));
+  const currentYear = parseInt(monthYear.slice(2, 6));
+
+  const years: number[] = [];
+
+  // Loop through the 12 months
+  for (let i = 0; i < 12; i++) {
+    // Calculate the month and year for each step
+    const month = currentMonth - i;
+
+    if (month <= 0) {
+      // If the month goes below 1, subtract from the year
+      years.push(currentYear - 1);
+    } else {
+      years.push(currentYear);
+    }
+  }
+
+  // Remove duplicates and return the list of years
+  return Array.from(new Set(years)).sort();
+}
+
+function getCurrentMonthYear(): string {
+  const now = new Date();
+  const month = (now.getMonth() + 1).toString().padStart(2, '0'); // getMonth() returns 0-11, so add 1
+  const year = now.getFullYear().toString();
+
+  return `${month}${year}`;
+}
+
+function getRollingMonthYears(monthYear: string): string[] {
+  const currentMonth = parseInt(monthYear.slice(0, 2));
+  const currentYear = parseInt(monthYear.slice(2, 6));
+
+  const rollingMonthYears: string[] = [];
+
+  for (let i = 0; i < 12; i++) {
+    let month = currentMonth - i;
+    let year = currentYear;
+
+    if (month <= 0) {
+      month += 12;
+      year -= 1;
+    }
+
+    const monthString = month.toString().padStart(2, '0');
+    const monthYearString = `${monthString}${year}`;
+    rollingMonthYears.push(monthYearString);
+  }
+
+  return rollingMonthYears.reverse();
+}
+
+function splitMonthYear(monthYear: string): [string, string] {
+  const month = monthYear.slice(0, 2); // Extracts the month (first 2 characters)
+  const year = monthYear.slice(2); // Extracts the year (remaining characters)
+
+  return [month, year];
+}
+
+function getMonthName(month: string): string {
+  // Array of month names in all lowercase
+  const monthNames = [
+    'january',
+    'february',
+    'march',
+    'april',
+    'may',
+    'june',
+    'july',
+    'august',
+    'september',
+    'october',
+    'november',
+    'december',
+  ];
+
+  // Convert month string to number and adjust for 0-based index
+  const monthIndex = parseInt(month, 10) - 1;
+
+  // Return the month name from the array, or an empty string if invalid
+  return monthIndex >= 0 && monthIndex < 12 ? monthNames[monthIndex] : '';
+}
+
+async function getBalancesForMonthYears(
+  years: number[],
+  rollingMonthYears: string[],
+  user: any
+): Promise<Record<string, number>> {
+  let returnData: Record<string, number> = {};
+  console.log(years);
+  console.log(rollingMonthYears);
+  for (const year of years) {
+    const accRef = collection(db, `transaction_data_${year}`);
+    const q = query(accRef, where('uid', '==', user.uid));
+    const querySnapshot = await getDocs(q);
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      for (const monthYear of rollingMonthYears) {
+        const monthYearSplit = splitMonthYear(monthYear);
+        const monthSplit = monthYearSplit[0];
+        const yearSplit = monthYearSplit[1];
+        const monthName = getMonthName(monthSplit);
+        if (parseInt(yearSplit) == year) {
+          if (data[monthName]) {
+            const balance = JSON.parse(data[monthName])[0].balance;
+            if (monthYear in returnData) {
+              returnData[monthYear] = returnData[monthYear] + balance;
+            } else {
+              returnData[monthYear] = balance;
+            }
+          }
+        }
+      }
+    });
+  }
+
+  for (const monthyear of rollingMonthYears) {
+    if (!(monthyear in returnData)) {
+      returnData[monthyear] = 0;
+    }
+  }
+
+  return returnData;
+}
+
+function yearMonthToString(yearMonth: string): string {
+  const split = splitMonthYear(yearMonth);
+  let name = getMonthName(split[0]);
+  name = name.charAt(0).toUpperCase() + name.slice(1);
+  const year = split[1];
+
+  return `${name} ${year}`;
+}
+
+//---------------------------------
+//Components
 function NoAccountsPage(props: NoAccountsPageProps) {
   return (
     <div className="mainPage">
@@ -56,10 +214,6 @@ function NoAccountsPage(props: NoAccountsPageProps) {
       </div>
     </div>
   );
-}
-
-interface AccountUnitProps {
-  account: Account;
 }
 
 function AccountUnit(props: AccountUnitProps) {
@@ -135,79 +289,181 @@ function AddAccountIcon() {
   );
 }
 
-function GraphSection() {
-  useEffect(() => {
-    //fetch all account balances and sum
-    //generate graph data
-  }, []);
+function GraphSection(props: GraphSectionProps) {
+  let dataset = [];
+
+  for (let i = 0; i < 12; i++) {
+    dataset.push({ monthyear: props.xAxis[i], Balance: props.yAxis[i] });
+  }
+  console.log(dataset);
   return (
-    //display graph and account balance data
-    true
+    <AreaChart
+      className=" w-[90%] h-[85%] "
+      data={dataset}
+      index="monthyear"
+      categories={['Balance']}
+      colors={['emerald']}
+      yAxisWidth={60}
+      showGridLines={false}
+      showLegend={true}
+      showAnimation={true}
+    />
   );
 }
 
-function PageLoader() {
+function InfoSection(props: GraphSectionProps) {
+  let balanceTotal = 0;
+  let balancePrev = 0;
+  let recentMonth = props.xAxis[11];
+  for (let i = 0; i < 12; i++) {
+    if (props.yAxis[i] != 0) {
+      balanceTotal = props.yAxis[i];
+      if (i >= 1) {
+        balancePrev = props.yAxis[i - 1];
+      } else {
+        balancePrev = 0;
+      }
+    }
+  }
+
+  function UpOrDown() {
+    return (
+      <>
+        {balancePrev <= balanceTotal && (
+          <span
+            className="text-BudgieGreen1 material-symbols-outlined"
+            style={{
+              fontSize: '2rem',
+            }}
+          >
+            north_east
+          </span>
+        )}
+        {balancePrev > balanceTotal && (
+          <span
+            className="text-red-400 material-symbols-outlined"
+            style={{
+              fontSize: '2rem',
+            }}
+          >
+            south_east
+          </span>
+        )}
+      </>
+    );
+  }
+
   return (
     <>
-      <div className="mainPage">Loading</div>
+      <span className="font-TripSans font-bold text-3xl ml-10">
+        {recentMonth}
+      </span>
+      <div className="mr-10 h-full flex flex-col items-start justify-center">
+        <div className="flex items-center">
+          <span className="font-TripSans font-bold text-3xl">
+            Total Balance: {balanceTotal}
+          </span>
+          <UpOrDown></UpOrDown>
+        </div>
+        <div>
+          {props.yAxis[11] == 0 && (
+            <>
+              <span className="font-TripSans text-gray-400">
+                Upload More Financial data to update balance.
+              </span>
+            </>
+          )}
+        </div>
+      </div>
     </>
   );
 }
 
 export function AccountsPage(props: AccountsPageProps) {
-  const [pageLoader, setPageLoader] = useState(true);
   const [showNoAccounts, setShowNoAccounts] = useState(true);
   const [accountsArray, SetAccountsArray] = useState<Account[]>([]);
+  const [graphX, setGraphX] = useState<string[]>([]);
+  const [graphY, setGraphY] = useState<number[]>([]);
 
   const router = useRouter();
   const user = useContext(UserContext);
 
   useEffect(() => {
-    const fetchAccounts = async () => {
-      const accRef = collection(db, 'accounts');
-      const q = query(accRef, where('uid', '==', user.uid));
-      const querySnapshot = await getDocs(q);
-      // Do something with querySnapshot
-      if (querySnapshot.docs.length == 0) {
-        setShowNoAccounts(true);
-      } else {
-        let acc: Account[] = [];
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          const account: Account = {
-            name: data.name,
-            alias: data.alias,
-            type: data.type,
-            number: data.account_number,
-          };
-          acc.push(account);
-        });
-        SetAccountsArray(acc);
-        setShowNoAccounts(false);
-      }
+    const fetchData = async () => {
+      const fetchAccounts = async () => {
+        const accRef = collection(db, 'accounts');
+        const q = query(accRef, where('uid', '==', user.uid));
+        const querySnapshot = await getDocs(q);
+        // Do something with querySnapshot
+        if (querySnapshot.docs.length == 0) {
+          setShowNoAccounts(true);
+        } else {
+          let acc: Account[] = [];
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const account: Account = {
+              name: data.name,
+              alias: data.alias,
+              type: data.type,
+              number: data.account_number,
+            };
+            acc.push(account);
+          });
+          SetAccountsArray(acc);
+          setShowNoAccounts(false);
+        }
+      };
+
+      const fetchGraphData = async () => {
+        const curr = getCurrentMonthYear();
+        const affectedYears: number[] = rollingYears(curr);
+        const rollingMonthYears: string[] = getRollingMonthYears(curr);
+
+        const data: Record<string, number> = await getBalancesForMonthYears(
+          affectedYears,
+          rollingMonthYears,
+          user
+        );
+
+        let xAxis: string[] = [];
+        let yAxis: number[] = [];
+
+        for (const yearmonth of rollingMonthYears) {
+          xAxis.push(yearMonthToString(yearmonth));
+          yAxis.push(data[yearmonth]);
+        }
+        setGraphX(xAxis);
+        setGraphY(yAxis);
+      };
+
+      fetchGraphData();
+      fetchAccounts();
     };
-    fetchAccounts().then(() => {
-      setPageLoader(false);
-    });
+    fetchData();
   }, []);
 
   return (
     <>
-      {showNoAccounts && !pageLoader && (
+      {showNoAccounts && (
         <NoAccountsPage
           onAddClick={() => {
             router.push('/accounts/new');
           }}
         ></NoAccountsPage>
       )}
-      {!showNoAccounts && !pageLoader && (
+      {!showNoAccounts && (
         <div className="mainPage">
-          <div className="w-full h-[52%] shadow-lg bg-BudgieWhite rounded-[2rem]">
-            <GraphSection></GraphSection>
+          <div className="w-full h-[10%] flex items-center justify-between shadow-md bg-BudgieWhite rounded-[2rem]">
+            <InfoSection xAxis={graphX} yAxis={graphY}></InfoSection>
           </div>
-          <div className="w-full mt-[1rem] grid grid-cols-3">
+          <div className="w-full h-[40%] mt-[1rem] fl shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center">
+            {graphX.length != 0 && graphY.length != 0 && (
+              <GraphSection xAxis={graphX} yAxis={graphY}></GraphSection>
+            )}
+          </div>
+          <div className="w-full grid grid-cols-3">
             {accountsArray.map((account) => (
-              <AccountUnit account={account}></AccountUnit>
+              <AccountUnit account={account} key={account.number}></AccountUnit>
             ))}
             <AddAccountIcon></AddAccountIcon>
           </div>
