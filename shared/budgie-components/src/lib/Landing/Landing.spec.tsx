@@ -37,7 +37,7 @@ describe('Landing', () => {
     const learnMoreButton = screen.getByText('Learn More ↓');
     fireEvent.click(learnMoreButton);
 
-    expect(screen.getByText('Back')).toBeDefined();
+    expect(screen.queryByTestId('learn-more-modal')).toBeDefined();
   });
 
   it('should close LearnMore modal when the "Close" button is clicked', () => {

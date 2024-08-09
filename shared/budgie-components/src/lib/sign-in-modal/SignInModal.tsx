@@ -38,7 +38,7 @@ export function SignInModal(props: SignInModalProps) {
       const auth = getAuth();
       await setPersistence(auth, browserSessionPersistence);
       const provider = new GoogleAuthProvider();
-      provider.addScope('email');
+      provider.addScope('Email');
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
     } catch (error) {
