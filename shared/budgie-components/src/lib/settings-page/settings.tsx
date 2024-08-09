@@ -4,6 +4,7 @@ import '../../root.css';
 import React, { useState } from 'react';
 import DisplaySettings from '../display-settings/DisplaySettings';
 import AccountSettings from '../account-settings/AccountSettings';
+import NotificationSettings from '../notification-settings/notification-settings';
 import Support from '../support-page/support';
 
 export interface SettingsProps {}
@@ -25,8 +26,7 @@ export function Settings(props: SettingsProps) {
         >
           <p className={styles.settingTitle}>Account Settings</p>
           <p className={styles.settingDescription}>
-            Edit your profile information, change your password, or delete your
-            account
+            Change your password, or delete your account
           </p>
         </div>
         <div
@@ -50,15 +50,6 @@ export function Settings(props: SettingsProps) {
         </div>
         <div
           className={styles.settingsOption}
-          onClick={() => setCurrentOverlay('General')}
-        >
-          <p className={styles.settingTitle}>General Settings</p>
-          <p className={styles.settingDescription}>
-            Select preferred language, currency, and date and time formats
-          </p>
-        </div>
-        <div
-          className={styles.settingsOption}
           onClick={() => setCurrentOverlay('Support')}
         >
           <p className={styles.settingTitle}>Support</p>
@@ -74,8 +65,10 @@ export function Settings(props: SettingsProps) {
         <DisplaySettings onClose={closeOverlay} />
       )}
       {currentOverlay === 'Support' && <Support onClose={closeOverlay} />}
-      {/*{currentOverlay === 'Notification' && <NotificationSettings onClose={closeOverlay} />}
-      {currentOverlay === 'General' && <GeneralSettings onClose={closeOverlay} />*/}
+      {currentOverlay === 'Notification' && (
+        <NotificationSettings onClose={closeOverlay} />
+      )}
+      {/*currentOverlay === 'General' && <GeneralSettings onClose={closeOverlay} />*/}
     </div>
   );
 }
