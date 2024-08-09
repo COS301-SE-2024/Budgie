@@ -51,6 +51,18 @@
   justify-content: center;
 }
 
+.changeOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .popupContent {
   background-color: white;
   padding: 2rem;
@@ -89,30 +101,4 @@
 
 .cancelButton:hover {
   background-color: #666969;
-}
-
-.tooltipContainer {
-  position: relative;
-}
-
-.tooltip {
-  display: none;
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #333;
-  color: var(--greyed-text);
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-  white-space: nowrap;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.tooltipContainer:hover .tooltip {
-  display: block;
-  opacity: 1;
 }

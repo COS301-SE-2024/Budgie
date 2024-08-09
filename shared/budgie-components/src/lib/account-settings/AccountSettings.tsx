@@ -130,15 +130,23 @@ export function AccountSettings(props: AccountSettingsProps) {
             <div className={styles.deleteButton}>Change password</div>
           </button>
           {isCPopupVisible && (
-            <div className={styles.popupOverlay}>
+            <div className={styles.changeOverlay}>
               <div className={styles.popupContent}>
+                <p className="mb-2">Type in your old password:</p>
+                <input
+                  type="password"
+                  value={OldPassword}
+                  placeholder="Enter your old password"
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  className="px-2 py-2 border border-gray-300 rounded w-500 mb-4"
+                />
                 <p className="mb-2">Type in your new password:</p>
                 <input
                   type="password"
                   value={newPassword}
                   placeholder="Enter your new password"
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="px-2 py-2 border border-gray-300 rounded w-3/4 mb-4"
+                  className="px-2 py-2 border border-gray-300 rounded w-500 mb-4"
                 />
                 <p className="mb-2">Confirm new password:</p>
                 <input
@@ -146,7 +154,7 @@ export function AccountSettings(props: AccountSettingsProps) {
                   value={ConPassword}
                   placeholder="Enter your new password"
                   onChange={(e) => setConPassword(e.target.value)}
-                  className="px-2 py-2 border border-gray-300 rounded w-3/4 mb-4 "
+                  className="px-2 py-2 border border-gray-300 rounded w-500 mb-4 "
                 />
                 <div className="flex justify-between mt-4">
                   <button
