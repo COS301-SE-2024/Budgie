@@ -13,6 +13,14 @@ export function Support(props: SupportProps) {
   const [showFaqModal, setFaqModal] = useState<boolean>(false);
   const [showHelpModal, setHelpModal] = useState<boolean>(false);
 
+  const handleCloseHelp = () => {
+    setHelpModal(false);
+  };
+
+  const handleCloseFaq = () => {
+    setFaqModal(false);
+  };
+
   return (
     <>
       <div className="mainPage">
@@ -55,7 +63,9 @@ export function Support(props: SupportProps) {
               >
                 Usage Guidance
               </button>
-              {showHelpModal && <HelpModal></HelpModal>}
+              {showHelpModal && (
+                <HelpModal onClose={handleCloseHelp}></HelpModal>
+              )}
             </div>
             <div className="bg-white p-6 rounded-lg shadow-md hover: ">
               <div className="flex justify-center mb-4">
@@ -77,7 +87,7 @@ export function Support(props: SupportProps) {
               >
                 FAQs
               </button>
-              {showFaqModal && <FaqModal></FaqModal>}
+              {showFaqModal && <FaqModal onClose={handleCloseFaq}></FaqModal>}
             </div>
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="flex justify-center mb-4">

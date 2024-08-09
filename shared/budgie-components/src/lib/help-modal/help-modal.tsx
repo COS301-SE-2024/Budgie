@@ -15,8 +15,8 @@ export function HelpModal(props: HelpModalProps) {
       case 'introduction':
         return (
           <div className="max-w-full">
-            <h2>Welcome to Budgie</h2>
-            <p>
+            <h2 className="text-BudgieBlue">Welcome to Budgie</h2>
+            <p className="text-s text-gray-500">
               Budgie is a financial management tool designed to help users take
               control of their spending. Users can import bank statements,
               categorize their spending, and set financial goals. By predicting
@@ -163,47 +163,45 @@ export function HelpModal(props: HelpModalProps) {
     }
   };
   return (
-    <>
-      <div className="mainPage">
-        <div className="pageTitle">
-          <span
-            className="material-symbols-outlined cursor-pointer"
-            style={{ marginRight: '0.5rem', fontSize: '1.5rem' }}
-            onClick={props.onClose}
-          >
-            arrow_back
-          </span>
-          Usage guidance
-        </div>
-        <section className=" to-white py-16">
-          <div className={styles.helpPage}>
-            <nav className={styles.nav}>
-              <ul>
-                <li onClick={() => setSelectedSection('introduction')}>
-                  Introduction
-                </li>
-                <li onClick={() => setSelectedSection('gettingStarted')}>
-                  Getting Started
-                </li>
-                <li onClick={() => setSelectedSection('coreFeatures')}>
-                  Core Features
-                </li>
-                <li onClick={() => setSelectedSection('tips')}>Tips</li>
-                <li onClick={() => setSelectedSection('settings')}>Settings</li>
-                <li onClick={() => setSelectedSection('troubleshooting')}>
-                  Troubleshooting
-                </li>
-                <li onClick={() => setSelectedSection('support')}>
-                  Contact Support
-                </li>
-                <li onClick={() => setSelectedSection('legal')}>Legal</li>
-              </ul>
-            </nav>
-            <div className={styles.content}>{renderContent()}</div>
-          </div>
-        </section>
+    <div className="mainPage">
+      <div className="pageTitle">
+        <span
+          className="material-symbols-outlined cursor-pointer"
+          style={{ marginRight: '0.5rem', fontSize: '1.5rem' }}
+          onClick={props.onClose}
+        >
+          arrow_back
+        </span>
+        Usage guidance
       </div>
-    </>
+      <section className="bg-white p-6 rounded-lg shadow-md">
+        <div className={styles.helpPage}>
+          <nav className={styles.nav}>
+            <ul>
+              <li onClick={() => setSelectedSection('introduction')}>
+                Introduction
+              </li>
+              <li onClick={() => setSelectedSection('gettingStarted')}>
+                Getting Started
+              </li>
+              <li onClick={() => setSelectedSection('coreFeatures')}>
+                Core Features
+              </li>
+              <li onClick={() => setSelectedSection('tips')}>Tips</li>
+              <li onClick={() => setSelectedSection('settings')}>Settings</li>
+              <li onClick={() => setSelectedSection('troubleshooting')}>
+                Troubleshooting
+              </li>
+              <li onClick={() => setSelectedSection('support')}>
+                Contact Support
+              </li>
+              <li onClick={() => setSelectedSection('legal')}>Legal</li>
+            </ul>
+          </nav>
+          <div className={styles.content}>{renderContent()}</div>
+        </div>
+      </section>
+    </div>
   );
 }
 export default HelpModal;
