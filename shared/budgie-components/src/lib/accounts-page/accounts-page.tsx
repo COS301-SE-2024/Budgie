@@ -5,6 +5,7 @@ import '../../root.css';
 import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
+import { useThemeSettings } from '../../useThemes';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import {
   collection,
@@ -31,6 +32,7 @@ interface NoAccountsPageProps {
 }
 
 function NoAccountsPage(props: NoAccountsPageProps) {
+  useThemeSettings();
   return (
     <div className="mainPage">
       <div className="flex items-center justify-center bg-BudgieGray h-full w-full">
@@ -147,6 +149,7 @@ function GraphSection() {
 }
 
 function PageLoader() {
+  useThemeSettings();
   return (
     <>
       <div className="mainPage">Loading</div>
@@ -158,7 +161,7 @@ export function AccountsPage(props: AccountsPageProps) {
   const [pageLoader, setPageLoader] = useState(true);
   const [showNoAccounts, setShowNoAccounts] = useState(true);
   const [accountsArray, SetAccountsArray] = useState<Account[]>([]);
-
+  useThemeSettings();
   const router = useRouter();
   const user = useContext(UserContext);
 

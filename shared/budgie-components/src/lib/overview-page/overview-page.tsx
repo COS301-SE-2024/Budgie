@@ -12,6 +12,7 @@ import {
   Legend,
   Cell,
 } from 'recharts';
+import { useThemeSettings } from '../../useThemes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faMoneyBill,
@@ -41,7 +42,7 @@ export function OverviewPage(props: OverviewPageProps) {
     type: string;
     uid: string;
   }
-
+  useThemeSettings();
   useEffect(() => {
     async function someFunction() {
       const account = await getAccounts();

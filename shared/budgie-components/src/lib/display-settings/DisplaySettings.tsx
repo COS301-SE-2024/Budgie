@@ -12,7 +12,6 @@ export function DisplaySettings(props: DisplaySettingsProps) {
   const [selectedCircle, setSelectedCircle] = useState<number | null>(null);
   const [mainTheme, setTheme] = useState<string | null>(null);
 
-  // Load settings from localStorage
   useEffect(() => {
     const storedTheme = localStorage.getItem('data-theme') || 'light';
     const storedColourTheme =
@@ -23,7 +22,6 @@ export function DisplaySettings(props: DisplaySettingsProps) {
     document.documentElement.setAttribute('data-theme', storedTheme);
     document.documentElement.setAttribute('colour-theme', storedColourTheme);
 
-    // Set the circle based on stored colour theme
     const themeIndex = {
       'light-blue': 0,
       'dark-blue': 0,

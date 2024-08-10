@@ -1,17 +1,20 @@
 'use client';
 import styles from './settings.module.css';
 import '../../root.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DisplaySettings from '../display-settings/DisplaySettings';
 import AccountSettings from '../account-settings/AccountSettings';
 import NotificationSettings from '../notification-settings/notification-settings';
 import Support from '../support-page/support';
+import { useThemeSettings } from '../../useThemes';
 
 export interface SettingsProps {}
 
 export function Settings(props: SettingsProps) {
   const [currentOverlay, setCurrentOverlay] = useState<string | null>(null);
+  const [mainTheme, setTheme] = useState<string | null>(null);
 
+  useThemeSettings();
   const closeOverlay = () => {
     setCurrentOverlay(null);
   };
