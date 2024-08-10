@@ -5,30 +5,23 @@ import {
   BarChart,
   Bar,
   Tooltip,
-  CartesianGrid,
   XAxis,
   YAxis,
   ResponsiveContainer,
   Label,
-  ReferenceLine,
 } from 'recharts';
 import {
   collection,
   getDocs,
-  updateDoc,
   query,
   where,
-  doc,
-  getDoc,
 } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import AddGoalPopup from '../add-goal-popup/AddGoalPopup';
 import EditGoalPopup from '../edit-goal-popup/EditGoalPopup';
 import styles from './GoalsPage.module.css';
-import UpdateGoalPopup, {
-  UpdateGoalProgressPopup,
-} from '../update-goal-progress-popup/UpdateGoalProgressPopup';
+import UpdateGoalPopup from '../update-goal-progress-popup/UpdateGoalProgressPopup';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import '../../root.css';
 
@@ -61,153 +54,11 @@ const monthNames = [
   'December',
 ];
 
-export interface SliderProps {
+export interface GraphCarouselProps {
   goal: Goal;
 }
 
-const Slider = ({ goal }: SliderProps) => {
-  const [divs, setDivs] = useState<JSX.Element[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  interface GoalUpdate {
-    amount: number;
-    date: string;
-  }
-
-  interface GoalMonthlyUpdate {
-    amount: number;
-    month: string;
-  }
-
-  const calculateProgressPercentage = (goal: Goal): number => {
-    if (goal.current_amount && goal.target_amount !== undefined) {
-      if (goal.initial_amount) {
-        return Math.min(
-          100,
-          ((goal.initial_amount - goal.current_amount) /
-            (goal.initial_amount - goal.target_amount)) *
-            100
-        );
-      } else {
-        return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
-      }
-    }
-    return 0;
-  };
-
-  useEffect(() => {
-    const newSlides: JSX.Element[] = [];
-
-    if (goal.type === 'Savings') {
-      newSlides.push(
-        <div className={styles.goalGraph} key="progress">
-          <CircularProgressbar
-            value={calculateProgressPercentage(goal)}
-            styles={buildStyles({
-              pathColor: 'var(--primary-1)',
-              trailColor: '#d6d6d6',
-            })}
-          />
-          <div className={styles.percentageDisplay}>
-            {`${calculateProgressPercentage(goal).toFixed(2)}%`}
-          </div>
-          <div
-            style={{
-              marginTop: '1rem',
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-          >
-            {goal.updates !== undefined && (
-              <span className={styles.arrow} onClick={prevSlide}>
-                &#8592;
-              </span>
-            )}
-            <span
-              className={styles.goalLabel}
-              style={{ marginLeft: '1rem', marginRight: '1rem' }}
-            >
-              Goal Progress
-            </span>
-            {goal.updates !== undefined && (
-              <span className={styles.arrow} onClick={nextSlide}>
-                &#8594;
-              </span>
-            )}
-          </div>
-        </div>
-      );
-
-      if (goal.monthly_updates) {
-        const updatesData: GoalMonthlyUpdate[] = JSON.parse(
-          goal.monthly_updates
-        );
-        const formattedData = updatesData.map((update) => ({
-          month: update.month,
-          amount: update.amount,
-        }));
-
-        newSlides.push(
-          <div className={styles.goalGraph} key="chart">
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={formattedData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="amount" fill="#82ca9d" />
-              </BarChart>
-            </ResponsiveContainer>
-            <div
-              style={{
-                marginTop: '1rem',
-                display: 'flex',
-                justifyContent: 'center',
-              }}
-            >
-              <span className={styles.arrow} onClick={prevSlide}>
-                &#8592;
-              </span>
-              <span
-                className={styles.goalLabel}
-                style={{ marginLeft: '1rem', marginRight: '1rem' }}
-              >
-                Savings by Month
-              </span>
-              <span className={styles.arrow} onClick={nextSlide}>
-                &#8594;
-              </span>
-            </div>
-          </div>
-        );
-      }
-    }
-
-    setDivs(newSlides);
-    setCurrentIndex(0);
-  }, [goal, goal.monthly_updates]);
-
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === divs.length - 1 ? 0 : prevIndex + 1
-    );
-    console.log(divs);
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? divs.length - 1 : prevIndex - 1
-    );
-  };
-
-  return (
-    <div className={styles.sliderContainer}>
-      <div className={styles.slider}>{divs[currentIndex]}</div>
-    </div>
-  );
-};
-
-const GraphCarousel = ({ goal }: SliderProps) => {
+const GraphCarousel = ({ goal }: GraphCarouselProps) => {
   const slides = ['Slide 1', 'Slide 2', 'Slide 3'];
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -239,7 +90,7 @@ const GraphCarousel = ({ goal }: SliderProps) => {
       goal.monthly_updates !== undefined
     ) {
       const amountForCurrentMonth = monthlyBudgetSpent(now.getMonth());
-      return Math.min(100, (amountForCurrentMonth / goal.spending_limit) * 100);
+      return (amountForCurrentMonth / goal.spending_limit) * 100;
     }
     return 0;
   };
@@ -329,11 +180,9 @@ const GraphCarousel = ({ goal }: SliderProps) => {
 
   const currentMonthName = monthNames[currentMonthIndex];
 
-  const getBarColor = (value: number) => {
-    if (goal.spending_limit) {
-      if (value > goal.spending_limit) return 'red';
-    }
-    return 'var(--primary-1)';
+  const getColorForValue = (value: number): string => {
+    if (value < 100) return 'var(--primary-1)'; 
+    return '#FF0000'; 
   };
 
   return (
@@ -345,8 +194,6 @@ const GraphCarousel = ({ goal }: SliderProps) => {
           transition: 'none',
         }}
       >
-        {/*HERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE*/}
-
         {goal.type === 'Savings' && (
           <div className={styles.carouselSlide} key="progress">
             <div className={styles.goalGraph}>
@@ -400,7 +247,7 @@ const GraphCarousel = ({ goal }: SliderProps) => {
         {goal.type === 'Savings' && goal.updates !== undefined && (
           <div className={styles.carouselSlide} key="chart">
             <div className={styles.goalGraph}>
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={getUpdates()}
                   margin={{ top: 0, right: 0, bottom: 0, left: 10 }}
@@ -508,7 +355,7 @@ const GraphCarousel = ({ goal }: SliderProps) => {
         {goal.type === 'Debt' && goal.updates !== undefined && (
           <div className={styles.carouselSlide} key="chart">
             <div className={styles.goalGraph}>
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={getUpdates()}
                   margin={{ top: 0, right: 0, bottom: 0, left: 10 }}
@@ -562,6 +409,7 @@ const GraphCarousel = ({ goal }: SliderProps) => {
             </div>
           </div>
         )}
+        
 
         {goal.type === 'Spending' && (
           <div className={styles.carouselSlide} key="progress">
@@ -569,11 +417,11 @@ const GraphCarousel = ({ goal }: SliderProps) => {
               <CircularProgressbar
                 value={calculateProgressPercentage(goal)}
                 styles={buildStyles({
-                  pathColor: 'var(--primary-1)',
+                  pathColor: getColorForValue(calculateProgressPercentage(goal)),
                   trailColor: '#d6d6d6',
                 })}
               />
-              <div className={styles.percentageDisplay}>
+              <div className={styles.percentageDisplay} style={{color: getColorForValue(calculateProgressPercentage(goal))}}>
                 {`${calculateProgressPercentage(goal).toFixed(2)}%`}
               </div>
               <div
@@ -616,7 +464,7 @@ const GraphCarousel = ({ goal }: SliderProps) => {
         {goal.type === 'Spending' && goal.updates !== undefined && (
           <div className={styles.carouselSlide} key="chart">
             <div className={styles.goalGraph}>
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={getBudgetUpdates()}
                   margin={{ top: 0, right: 0, bottom: 0, left: 10 }}
@@ -672,7 +520,7 @@ const GraphCarousel = ({ goal }: SliderProps) => {
           </div>
         )}
 
-        {/*HERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE*/}
+
       </div>
     </div>
   );
@@ -897,7 +745,7 @@ export function GoalsPage() {
                         Update Progress
                       </div>
                       {updatePopupOpen[index] && (
-                        <UpdateGoalProgressPopup
+                        <UpdateGoalPopup
                           togglePopup={() => handleUpdateGoalPopup(index)}
                           goal={goal}
                         />

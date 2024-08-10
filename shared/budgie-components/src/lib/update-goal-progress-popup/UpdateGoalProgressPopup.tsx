@@ -241,11 +241,66 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
     return year;
   }
 
+  const monthNames = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonthIndex = now.getMonth();
+
+  const currentMonthName = monthNames[currentMonthIndex];
+
+  const monthlyBudgetSpent = (month: number): number => {
+    if (props.goal.monthly_updates !== undefined) {
+      const data = JSON.parse(props.goal.monthly_updates);
+      const currentMonthYear = `${currentMonthName} ${currentYear}`;
+      const currentMonthData = data.find(
+        (item: { month: string }) => item.month === currentMonthYear
+      );
+      const amountForCurrentMonth = currentMonthData
+        ? currentMonthData.amount
+        : 0;
+      return amountForCurrentMonth;
+    }
+    return 0;
+  };
+
+  const calculateNewAmountSpent = (goal: Goal): string => {
+    if (
+      updateAmount) {
+      return (monthlyBudgetSpent(props.goal) + updateAmount).toFixed(2)
+    } else {
+      return monthlyBudgetSpent(props.goal).toFixed(2);
+    }
+  };
+
+  const calculateNewAmountLeft = (goal: Goal): string => {
+    if (
+      updateAmount) {
+      return (spendingLimit - monthlyBudgetSpent(props.goal) - updateAmount).toFixed(2);
+    } else {
+      return (spendingLimit - monthlyBudgetSpent(props.goal)).toFixed(2);
+    }
+  };
+
+
   useEffect(() => {
     function getMonthAmount() {
       const dateToFind = getMonthName(updateDate) + ' ' + getYear(updateDate);
-      const spendingArray: SpentAmount[] = props.goal.spending
-        ? JSON.parse(props.goal.spending)
+      const spendingArray: SpentAmount[] = props.goal.monthly_updates
+        ? JSON.parse(props.goal.monthly_updates)
         : [];
       const entry = spendingArray.find((entry) => entry.date === dateToFind);
 
@@ -437,15 +492,15 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               <div className={styles.progressInfoBox}>
                 <div className={styles.progressInfo}>
                   <div>Current Amount Spent:</div>
-                  <p>R {spentAmount.toFixed(2)}</p>
+                  <p>R {monthlyBudgetSpent(props.goal).toFixed(2)}</p>
                   <div>Current Amount Left in Budget:</div>
-                  <p>R {(spendingLimit - spentAmount).toFixed(2)}</p>
+                  <p>R {(spendingLimit - monthlyBudgetSpent(props.goal)).toFixed(2)}</p>
                 </div>
                 <div className={styles.progressInfo}>
                   <div>New Amount Spent:</div>
-                  <p>R {(spentAmount + updateAmount).toFixed(2)}</p>
+                  <p>R {calculateNewAmountSpent(props.goal)}</p>
                   <div>New Amount Left in Budget:</div>
-                  <p>R {(spendingLimit - spentAmount - updateAmount).toFixed(2)}</p>
+                  <p>R {calculateNewAmountLeft(props.goal)}</p>
                 </div>
                 {/*<div className={styles.progressInfo}>
                   <div>New Debt Amount:</div>
