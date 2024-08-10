@@ -1,6 +1,5 @@
 'use client';
-import React, { useEffect } from 'react';
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../../root.css';
 import styles from './DisplaySettings.module.css';
 
@@ -13,59 +12,51 @@ export function DisplaySettings(props: DisplaySettingsProps) {
   const [selectedCircle, setSelectedCircle] = useState<number | null>(null);
   const [mainTheme, setTheme] = useState<string | null>(null);
 
+  // Load settings from localStorage
   useEffect(() => {
-    setTheme('light');
+    const storedTheme = localStorage.getItem('data-theme') || 'light';
+    const storedColourTheme =
+      localStorage.getItem('colour-theme') || 'light-blue';
+    const storedFontSize = localStorage.getItem('font-size-multiplier') || '1';
 
-    const rootStyles = getComputedStyle(document.documentElement);
-    const colourThemeValue =
-      document.documentElement.getAttribute('colour-theme');
-    setTheme(document.documentElement.getAttribute('data-theme'));
-    let initialCircleIndex = 0;
+    setTheme(storedTheme);
+    document.documentElement.setAttribute('data-theme', storedTheme);
+    document.documentElement.setAttribute('colour-theme', storedColourTheme);
 
-    if (colourThemeValue === 'dark-blue' || colourThemeValue === 'light-blue') {
-      initialCircleIndex = 0;
-    } else if (
-      colourThemeValue === 'dark-yellow' ||
-      colourThemeValue === 'light-yellow'
-    ) {
-      initialCircleIndex = 1;
-    } else if (
-      colourThemeValue === 'dark-pink' ||
-      colourThemeValue === 'light-pink'
-    ) {
-      initialCircleIndex = 2;
-    } else if (
-      colourThemeValue === 'dark-purple' ||
-      colourThemeValue === 'light-purple'
-    ) {
-      initialCircleIndex = 3;
-    } else if (
-      colourThemeValue === 'dark-orange' ||
-      colourThemeValue === 'light-orange'
-    ) {
-      initialCircleIndex = 4;
-    } else if (
-      colourThemeValue === 'dark-green' ||
-      colourThemeValue === 'light-green'
-    ) {
-      initialCircleIndex = 5;
-    }
-    setSelectedCircle(initialCircleIndex);
+    // Set the circle based on stored colour theme
+    const themeIndex = {
+      'light-blue': 0,
+      'dark-blue': 0,
+      'light-yellow': 1,
+      'dark-yellow': 1,
+      'light-pink': 2,
+      'dark-pink': 2,
+      'light-purple': 3,
+      'dark-purple': 3,
+      'light-orange': 4,
+      'dark-orange': 4,
+      'light-green': 5,
+      'dark-green': 5,
+    };
+    setSelectedCircle(themeIndex[storedColourTheme]);
 
-    const fontSizeValue = parseFloat(
-      rootStyles.getPropertyValue('--font-size-multiplier')
-    );
-
+    // Set font size slider
     const fontSlider = document.getElementById(
       'fontSlider'
     ) as HTMLInputElement;
-    fontSlider.value = fontSizeValue.toString();
+    fontSlider.value = storedFontSize;
+    document.documentElement.style.setProperty(
+      '--font-size-multiplier',
+      storedFontSize
+    );
+
     const handleSliderChange = () => {
       const fontSizeValue = parseFloat(fontSlider.value);
       document.documentElement.style.setProperty(
         '--font-size-multiplier',
         fontSizeValue.toString()
       );
+      localStorage.setItem('font-size-multiplier', fontSizeValue.toString());
     };
 
     fontSlider.addEventListener('input', handleSliderChange);
@@ -75,91 +66,37 @@ export function DisplaySettings(props: DisplaySettingsProps) {
     };
   }, []);
 
-  const setLight = () => {
-    setTheme('light');
-    document.documentElement.setAttribute('data-theme', 'light');
-    const theme = document.documentElement.getAttribute('colour-theme');
-    if (theme == 'dark-blue') {
-      document.documentElement.setAttribute('colour-theme', 'light-blue');
-      setSelectedCircle(0);
-    } else if (theme == 'dark-yellow') {
-      document.documentElement.setAttribute('colour-theme', 'light-yellow');
-      setSelectedCircle(1);
-    } else if (theme == 'dark-pink') {
-      document.documentElement.setAttribute('colour-theme', 'light-pink');
-      setSelectedCircle(2);
-    } else if (theme == 'dark-purple') {
-      document.documentElement.setAttribute('colour-theme', 'light-purple');
-      setSelectedCircle(3);
-    } else if (theme == 'dark-orange') {
-      document.documentElement.setAttribute('colour-theme', 'light-orange');
-      setSelectedCircle(4);
-    } else if (theme == 'dark-green') {
-      document.documentElement.setAttribute('colour-theme', 'light-green');
-      setSelectedCircle(5);
-    }
+  const updateSettings = (theme: string, colour: string) => {
+    setTheme(theme);
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('colour-theme', colour);
+    localStorage.setItem('data-theme', theme);
+    localStorage.setItem('colour-theme', colour);
+
+    const themeIndex = {
+      'light-blue': 0,
+      'dark-blue': 0,
+      'light-yellow': 1,
+      'dark-yellow': 1,
+      'light-pink': 2,
+      'dark-pink': 2,
+      'light-purple': 3,
+      'dark-purple': 3,
+      'light-orange': 4,
+      'dark-orange': 4,
+      'light-green': 5,
+      'dark-green': 5,
+    };
+    setSelectedCircle(themeIndex[colour]);
   };
 
-  const setDark = () => {
-    setTheme('dark');
-    document.documentElement.setAttribute('data-theme', 'dark');
-    const theme = document.documentElement.getAttribute('colour-theme');
-    if (theme == 'light-yellow') {
-      document.documentElement.setAttribute('colour-theme', 'dark-yellow');
-      setSelectedCircle(1);
-    } else if (theme == 'light-pink') {
-      document.documentElement.setAttribute('colour-theme', 'dark-pink');
-      setSelectedCircle(2);
-    } else if (theme == 'light-purple') {
-      document.documentElement.setAttribute('colour-theme', 'dark-purple');
-      setSelectedCircle(3);
-    } else if (theme == 'light-orange') {
-      document.documentElement.setAttribute('colour-theme', 'dark-orange');
-      setSelectedCircle(4);
-    } else if (theme == 'light-green') {
-      document.documentElement.setAttribute('colour-theme', 'dark-green');
-      setSelectedCircle(5);
-    } else if (theme == 'light-blue') {
-      document.documentElement.setAttribute('colour-theme', 'dark-blue');
-      setSelectedCircle(0);
-    }
-  };
+  const setLight = () => updateSettings('light', 'light-blue');
+  const setDark = () => updateSettings('dark', 'dark-blue');
 
-  const setBlue = () => {
-    const theme = document.documentElement.getAttribute('data-theme');
-    const color = theme == 'dark' ? 'dark-blue' : 'light-blue';
-    document.documentElement.setAttribute('colour-theme', color);
-    setSelectedCircle(0);
-  };
-  const setYellow = () => {
-    const theme = document.documentElement.getAttribute('data-theme');
-    const color = theme == 'dark' ? 'dark-yellow' : 'light-yellow';
-    document.documentElement.setAttribute('colour-theme', color);
-    setSelectedCircle(1);
-  };
-  const setPink = () => {
-    const theme = document.documentElement.getAttribute('data-theme');
-    const color = theme == 'dark' ? 'dark-pink' : 'light-pink';
-    document.documentElement.setAttribute('colour-theme', color);
-    setSelectedCircle(2);
-  };
-  const setPurple = () => {
-    const theme = document.documentElement.getAttribute('data-theme');
-    const color = theme == 'dark' ? 'dark-purple' : 'light-purple';
-    document.documentElement.setAttribute('colour-theme', color);
-    setSelectedCircle(3);
-  };
-  const setOrange = () => {
-    const theme = document.documentElement.getAttribute('data-theme');
-    const color = theme == 'dark' ? 'dark-orange' : 'light-orange';
-    document.documentElement.setAttribute('colour-theme', color);
-    setSelectedCircle(4);
-  };
-  const setGreen = () => {
-    const theme = document.documentElement.getAttribute('data-theme');
-    const color = theme == 'dark' ? 'dark-green' : 'light-green';
-    document.documentElement.setAttribute('colour-theme', color);
-    setSelectedCircle(5);
+  const setColor = (color: string) => {
+    const theme =
+      document.documentElement.getAttribute('data-theme') || 'light';
+    updateSettings(theme, color);
   };
 
   return (
@@ -189,29 +126,47 @@ export function DisplaySettings(props: DisplaySettingsProps) {
               max="2"
               step="0.1"
               className={styles.slider}
-            ></input>
+            />
             <span style={{ marginLeft: '1rem', fontSize: '2rem' }}>A</span>
           </div>
         </div>
         <div className={styles.settingsOption}>
           <p className={styles.settingTitle}>Colour</p>
           <div className={styles.circleContainer}>
-            <div className={styles.blueCircle} onClick={setBlue}>
+            <div
+              className={styles.blueCircle}
+              onClick={() => setColor('light-blue')}
+            >
               {selectedCircle === 0 && <span>✔</span>}
             </div>
-            <div className={styles.yellowCircle} onClick={setYellow}>
+            <div
+              className={styles.yellowCircle}
+              onClick={() => setColor('light-yellow')}
+            >
               {selectedCircle === 1 && <span>✔</span>}
             </div>
-            <div className={styles.pinkCircle} onClick={setPink}>
+            <div
+              className={styles.pinkCircle}
+              onClick={() => setColor('light-pink')}
+            >
               {selectedCircle === 2 && <span>✔</span>}
             </div>
-            <div className={styles.purpleCircle} onClick={setPurple}>
+            <div
+              className={styles.purpleCircle}
+              onClick={() => setColor('light-purple')}
+            >
               {selectedCircle === 3 && <span>✔</span>}
             </div>
-            <div className={styles.orangeCircle} onClick={setOrange}>
+            <div
+              className={styles.orangeCircle}
+              onClick={() => setColor('light-orange')}
+            >
               {selectedCircle === 4 && <span>✔</span>}
             </div>
-            <div className={styles.greenCircle} onClick={setGreen}>
+            <div
+              className={styles.greenCircle}
+              onClick={() => setColor('light-green')}
+            >
               {selectedCircle === 5 && <span>✔</span>}
             </div>
           </div>
