@@ -8,4 +8,6 @@ describe('Landing', () => {
     // const { baseElement } = render(<Landing />);
     // expect(baseElement).toBeTruthy();
   });
+
+  it('learn more', () => {});
 });
