@@ -10,6 +10,7 @@ import {
   getUser,
   getAccounts,
   getTransactions,
+  getMoneyIn,
 } from './overviewServices';
 import { getAuth } from 'firebase/auth';
 
@@ -216,6 +217,64 @@ describe('getTransactions', () => {
   });
 
 });
+
+
+describe('getMoneyIn', () => {
+  it('should return the correct sum for positive amounts', async () => {
+    const transactions = [
+      { amount: 100 },
+      { amount: 200 },
+      { amount: 50 },
+    ];
+
+    const result = await getMoneyIn(transactions);
+    expect(result).toBe(350);
+  });
+
+  it('should return 0 when all amounts are negative', async () => {
+    const transactions = [
+      { amount: -100 },
+      { amount: -200 },
+      { amount: -50 },
+    ];
+
+    const result = await getMoneyIn(transactions);
+    expect(result).toBe(0);
+  });
+
+  it('should ignore transactions with amount equal to 0', async () => {
+    const transactions = [
+      { amount: 0 },
+      { amount: 100 },
+      { amount: -50 },
+      { amount: 0 },
+    ];
+
+    const result = await getMoneyIn(transactions);
+    expect(result).toBe(100);
+  });
+
+  it('should return 0 for an empty list of transactions', async () => {
+    const transactions: any[] = [];
+  
+    const result = await getMoneyIn(transactions);
+    expect(result).toBe(0);
+  });
+
+  it('should handle a mix of positive and negative amounts', async () => {
+    const transactions = [
+      { amount: 100 },
+      { amount: -50 },
+      { amount: 200 },
+      { amount: -100 },
+    ];
+
+    const result = await getMoneyIn(transactions);
+    expect(result).toBe(300);
+  });
+
+});
+
 
 /*===========================================================================================
 INTEGRATED TESTS
