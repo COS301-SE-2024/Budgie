@@ -12,6 +12,7 @@ import {
   getTransactions,
   getMoneyIn,
   getMoneyOut,
+  getLastTransaction
 } from './overviewServices';
 import { getAuth } from 'firebase/auth';
 
@@ -307,6 +308,38 @@ describe('getMoneyOut', () => {
     const result = await getMoneyOut(transactions);
 
     expect(result).toBe(-0); // Empty array, so result should be 0
+  });
+});
+
+describe('getLastTransaction', () => {
+  it('should return the first transaction in the array', async () => {
+    const transactions = [
+      { id: 3, amount: 150 },
+      { id: 2, amount: -50 },
+      { id: 1, amount: 100 },
+    ];
+
+    const result = await getLastTransaction(transactions);
+
+    expect(result).toEqual({ id: 3, amount: 150 });
+  });
+
+  it('should return undefined if the transactions array is empty', async () => {
+    const transactions: any[] = [];
+
+    const result = await getLastTransaction(transactions);
+
+    expect(result).toBeUndefined();
+  });
+
+  it('should return the only transaction if the array has one element', async () => {
+    const transactions = [
+      { id: 1, amount: 100 },
+    ];
+
+    const result = await getLastTransaction(transactions);
+
+    expect(result).toEqual({ id: 1, amount: 100 });
   });
 });
 
