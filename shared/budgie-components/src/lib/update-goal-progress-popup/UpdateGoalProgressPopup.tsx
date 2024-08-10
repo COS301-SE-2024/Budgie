@@ -179,54 +179,45 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
     try {
       const goalDocRef = doc(db, 'goals', props.goal.id);
       const goalDoc = await getDoc(goalDocRef);
+
+      //updates-------------------------------------------------------------------------
       const existingUpdates = goalDoc.exists()
         ? goalDoc.data()?.updates || '[]'
         : '[]';
       const updatesArray = JSON.parse(existingUpdates);
-
-      const existingSpending = goalDoc.exists()
-        ? goalDoc.data()?.spending || '[]'
-        : '[]';
-      const spendingArray = JSON.parse(existingSpending);
 
       const newUpdate = {
         amount: updateAmount,
         date: updateDate,
       };
       updatesArray.push(newUpdate);
+      const existingMonthlyUpdates = goalDoc.exists()
+        ? goalDoc.data()?.monthly_updates || []
+        : [];
 
-      if (props.activeTab === 'Spending') {
-        const newSpendingUpdate = {
-          amount: updateAmount,
-          date: getMonthName(updateDate) + ' ' + getYear(updateDate),
-        };
+      const newMonthlyUpdate = {
+        amount: updateAmount,
+        month: getMonthName(updateDate) + ' ' + getYear(updateDate),
+      };
 
-        const goalDocRef = doc(db, 'goals', props.goal.id);
-        const goalDoc = await getDoc(goalDocRef);
-        const existingData = goalDoc.data();
-        const spendingArray = existingData?.spending
-          ? JSON.parse(existingData.spending)
-          : [];
+      const updatedMonthlyUpdatesArray = Array.isArray(existingMonthlyUpdates)
+        ? existingMonthlyUpdates
+        : JSON.parse(existingMonthlyUpdates);
 
-        const existingEntryIndex = spendingArray.findIndex(
-          (entry: { date: string }) => entry.date === newSpendingUpdate.date
-        );
+      const existingEntryIndex = updatedMonthlyUpdatesArray.findIndex(
+        (entry: { month: string }) => entry.month === newMonthlyUpdate.month
+      );
 
-        if (existingEntryIndex >= 0) {
-          spendingArray[existingEntryIndex].amount += newSpendingUpdate.amount;
-        } else {
-          spendingArray.push(newSpendingUpdate);
-        }
-
-        await updateDoc(goalDocRef, {
-          ...goalData,
-          spending: JSON.stringify(spendingArray),
-        });
-        props.togglePopup();
+      if (existingEntryIndex >= 0) {
+        updatedMonthlyUpdatesArray[existingEntryIndex].amount +=
+          newMonthlyUpdate.amount;
+      } else {
+        updatedMonthlyUpdatesArray.push(newMonthlyUpdate);
       }
 
       await updateDoc(goalDocRef, {
         ...goalData,
+        monthly_updates: JSON.stringify(updatedMonthlyUpdatesArray),
         updates: JSON.stringify(updatesArray),
       });
 
@@ -448,13 +439,13 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
                   <div>Current Amount Spent:</div>
                   <p>R {spentAmount}</p>
                   <div>Current Amount Left in Budget:</div>
-                  <p>R {spendingLimit- spentAmount}</p>
+                  <p>R {spendingLimit - spentAmount}</p>
                 </div>
                 <div className={styles.progressInfo}>
                   <div>New Amount Spent:</div>
                   <p>R {spentAmount + updateAmount}</p>
                   <div>New Amount Left in Budget:</div>
-                  <p>R {spendingLimit- spentAmount - updateAmount}</p>
+                  <p>R {spendingLimit - spentAmount - updateAmount}</p>
                 </div>
                 {/*<div className={styles.progressInfo}>
                   <div>New Debt Amount:</div>

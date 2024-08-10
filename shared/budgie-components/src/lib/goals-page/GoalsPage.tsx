@@ -2,6 +2,16 @@
 
 import React, { useEffect, useState, useContext } from 'react';
 import {
+  BarChart,
+  Bar,
+  Tooltip,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Label,
+} from 'recharts';
+import {
   collection,
   getDocs,
   updateDoc,
@@ -31,6 +41,8 @@ interface Goal {
   target_amount?: number;
   target_date?: string;
   spending_limit?: number;
+  updates?: string;
+  monthly_updates?: string;
 }
 
 export interface SliderProps {
@@ -40,6 +52,16 @@ export interface SliderProps {
 const Slider = ({ goal }: SliderProps) => {
   const [divs, setDivs] = useState<JSX.Element[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  interface GoalUpdate {
+    amount: number;
+    date: string;
+  }
+
+  interface GoalMonthlyUpdate {
+    amount: number;
+    month: string;
+  }
 
   const calculateProgressPercentage = (goal: Goal): number => {
     if (goal.current_amount && goal.target_amount !== undefined) {
@@ -62,7 +84,7 @@ const Slider = ({ goal }: SliderProps) => {
 
     if (goal.type === 'Savings') {
       newSlides.push(
-        <div className={styles.goalGraph}>
+        <div className={styles.goalGraph} key="progress">
           <CircularProgressbar
             value={calculateProgressPercentage(goal)}
             styles={buildStyles({
@@ -73,36 +95,87 @@ const Slider = ({ goal }: SliderProps) => {
           <div className={styles.percentageDisplay}>
             {`${calculateProgressPercentage(goal).toFixed(2)}%`}
           </div>
-          <div style={{ marginTop: '1rem', display: 'flex', justifyContent:'center'}}>
-            <span className={styles.arrow} onClick={prevSlide}>
-              &#8592;
+          <div
+            style={{
+              marginTop: '1rem',
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            {goal.updates !== undefined && (
+              <span className={styles.arrow} onClick={prevSlide}>
+                &#8592;
+              </span>
+            )}
+            <span
+              className={styles.goalLabel}
+              style={{ marginLeft: '1rem', marginRight: '1rem' }}
+            >
+              Goal Progress
             </span>
-            <span className={styles.goalLabel} style={{marginLeft:'1rem', marginRight: '1rem'}}>Goal Progress</span>
-            <span className={styles.arrow} onClick={nextSlide}>
-              &#8594;
-            </span>
+            {goal.updates !== undefined && (
+              <span className={styles.arrow} onClick={nextSlide}>
+                &#8594;
+              </span>
+            )}
           </div>
         </div>
       );
 
-      newSlides.push(
-        <div
-          className={styles.slide}
-          style={{ backgroundColor: 'orange', color: 'white' }}
-          key="slide5"
-        >
-          Slide 5
-        </div>
-      );
+      if (goal.monthly_updates) {
+        const updatesData: GoalMonthlyUpdate[] = JSON.parse(
+          goal.monthly_updates
+        );
+        const formattedData = updatesData.map((update) => ({
+          month: update.month,
+          amount: update.amount,
+        }));
+
+        newSlides.push(
+          <div className={styles.goalGraph} key="chart">
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={formattedData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="amount" fill="#82ca9d" />
+              </BarChart>
+            </ResponsiveContainer>
+            <div
+              style={{
+                marginTop: '1rem',
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
+              <span className={styles.arrow} onClick={prevSlide}>
+                &#8592;
+              </span>
+              <span
+                className={styles.goalLabel}
+                style={{ marginLeft: '1rem', marginRight: '1rem' }}
+              >
+                Savings by Month
+              </span>
+              <span className={styles.arrow} onClick={nextSlide}>
+                &#8594;
+              </span>
+            </div>
+          </div>
+        );
+      }
     }
 
     setDivs(newSlides);
-  }, [goal]);
+    setCurrentIndex(0);
+  }, [goal, goal.monthly_updates]);
 
   const nextSlide = () => {
     setCurrentIndex((prevIndex) =>
       prevIndex === divs.length - 1 ? 0 : prevIndex + 1
     );
+    console.log(divs);
   };
 
   const prevSlide = () => {
@@ -117,13 +190,177 @@ const Slider = ({ goal }: SliderProps) => {
     </div>
   );
 };
-{
-  /*<div className={styles.sliderContainer}>
-      <div className={styles.arrow} onClick={prevSlide}>&#8592;</div>
-      <div className={styles.slider}>{divs[currentIndex]}</div>
-      <div className={styles.arrow} onClick={nextSlide}>&#8594;</div>
-    </div>*/
-}
+
+const GraphCarousel = ({ goal }: SliderProps) => {
+  const slides = ['Slide 1', 'Slide 2', 'Slide 3'];
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  interface GoalUpdate {
+    amount: number;
+    date: string;
+  }
+
+  interface GoalMonthlyUpdate {
+    amount: number;
+    month: string;
+  }
+
+  const calculateProgressPercentage = (goal: Goal): number => {
+    if (goal.current_amount && goal.target_amount !== undefined) {
+      if (goal.initial_amount) {
+        return Math.min(
+          100,
+          ((goal.initial_amount - goal.current_amount) /
+            (goal.initial_amount - goal.target_amount)) *
+            100
+        );
+      } else {
+        return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
+      }
+    }
+    return 0;
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? slides.length - 1 : prevIndex - 1
+    );
+  };
+
+  const nextSlide = () => {
+    if (goal.type === 'Savings' || goal.type === 'Debt') {
+      setCurrentIndex((prevIndex) => (prevIndex === 2 - 1 ? 0 : prevIndex + 1));
+    } else {
+      setCurrentIndex((prevIndex) => (prevIndex === 3 - 1 ? 0 : prevIndex + 1));
+    }
+  };
+
+  const getUpdates = () => {
+    if (goal.monthly_updates) {
+      const updatesData: GoalMonthlyUpdate[] = JSON.parse(goal.monthly_updates);
+
+      const parseMonth = (monthStr: string): Date => {
+        return new Date(`1 ${monthStr}`);
+      };
+
+      const formattedData = updatesData
+        .map((update) => ({
+          month: update.month,
+          amount: update.amount,
+          date: parseMonth(update.month),
+        }))
+        .sort((a, b) => a.date.getTime() - b.date.getTime())
+        .map(({ date, ...rest }) => rest);
+      return formattedData;
+    }
+  };
+
+  return (
+    <div className={styles.carousel}>
+      <div
+        className={styles.carouselContainer}
+        style={{
+          transform: `translateX(-${currentIndex * 100}%)`,
+          transition: 'none',
+        }}
+      >
+        {/*HERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE*/}
+
+        {goal.type === 'Savings' && (
+          <div className={styles.carouselSlide} key="progress">
+            <div className={styles.goalGraph}>
+              <CircularProgressbar
+                value={calculateProgressPercentage(goal)}
+                styles={buildStyles({
+                  pathColor: 'var(--primary-1)',
+                  trailColor: '#d6d6d6',
+                })}
+              />
+              <div className={styles.percentageDisplay}>
+                {`${calculateProgressPercentage(goal).toFixed(2)}%`}
+              </div>
+              <div
+                style={{
+                  marginTop: '1rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                }}
+              >
+                {goal.updates !== undefined && (
+                  <span className={styles.arrow} onClick={prevSlide}>
+                    &#8592;
+                  </span>
+                )}
+                <span
+                  className={styles.goalLabel}
+                  style={{ marginLeft: '1rem', marginRight: '1rem' }}
+                >
+                  Goal Progress
+                </span>
+                {goal.updates !== undefined && (
+                  <span className={styles.arrow} onClick={nextSlide}>
+                    &#8594;
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {goal.type === 'Savings' && goal.updates !== undefined && (
+          <div className={styles.carouselSlide} key="chart">
+            <div className={styles.goalGraph}>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={getUpdates()}
+                  margin={{ top: 0, right: 0, bottom: 0, left: 10 }}
+                >
+                  <XAxis dataKey="month" tick={false} />
+                  <YAxis>
+                    <Label
+                      value="Amount"
+                      angle={-90}
+                      position="left"
+                      style={{ textAnchor: 'middle' }}
+                    />
+                  </YAxis>
+                  <Tooltip />
+                  <Bar dataKey="amount" fill="#82ca9d" />
+                </BarChart>
+              </ResponsiveContainer>
+
+              <div
+                style={{
+                  marginTop: '1rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                }}
+              >
+                <span className={styles.arrow} onClick={prevSlide}>
+                  &#8592;
+                </span>
+                <span
+                  className={styles.goalLabel}
+                  style={{ marginLeft: '1rem', marginRight: '1rem' }}
+                >
+                  Savings by Month
+                </span>
+                <span className={styles.arrow} onClick={nextSlide}>
+                  &#8594;
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/*HERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE*/}
+      </div>
+    </div>
+  );
+};
+
 export interface GoalsPageProps {}
 
 export function GoalsPage() {
@@ -325,7 +562,7 @@ export function GoalsPage() {
 
                     {goal.current_amount !== undefined &&
                       goal.target_amount !== undefined && (
-                        <Slider goal={goal} key={goal.id} />
+                        <GraphCarousel goal={goal} key={goal.id} />
                       )}
                     {goal.spending_limit !== undefined && (
                       <div className={styles.goalGraph}>Graph</div>
