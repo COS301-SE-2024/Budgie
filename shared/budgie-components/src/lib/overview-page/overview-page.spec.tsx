@@ -13,7 +13,8 @@ import {
   getMoneyIn,
   getMoneyOut,
   getLastTransaction,
-  getMonthlyIncome
+  getMonthlyIncome,
+  getMonthlyExpenses,
 } from './overviewServices';
 import { getAuth } from 'firebase/auth';
 
@@ -388,6 +389,55 @@ describe('getMonthlyIncome', () => {
     ];
 
     const result = await getMonthlyIncome(transactions);
+
+    expect(result).toEqual([100, 150, 0, 0, 0, 0, 0, 0, 0, 0, 0, 500]);
+  });
+});
+
+
+describe('getMonthlyExpenses', () => {
+  it('should return correct monthly expenses totals', async () => {
+    const transactions = [
+      { date: '2024/01/15', amount: -100 },
+      { date: '2024/01/20', amount: -150 },
+      { date: '2024/02/05', amount: -200 },
+      { date: '2024/03/10', amount: -250 },
+      { date: '2024/03/25', amount: 50 }, // positive amount, should not be counted
+    ];
+
+    const result = await getMonthlyExpenses(transactions);
+
+    expect(result).toEqual([250, 200, 250, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('should return an array of zeros when no transactions are present', async () => {
+    const transactions: any[] = [];
+    const result = await getMonthlyExpenses(transactions);
+
+    expect(result).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('should handle transactions with mixed positive and negative amounts correctly', async () => {
+    const transactions = [
+      { date: '2024/01/01', amount: -100 },
+      { date: '2024/01/15', amount: 50 },
+      { date: '2024/02/10', amount: -200 },
+      { date: '2024/02/20', amount: 100 },
+    ];
+
+    const result = await getMonthlyExpenses(transactions);
+
+    expect(result).toEqual([100, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('should correctly parse dates and assign amounts to the correct month', async () => {
+    const transactions = [
+      { date: '2024/01/31', amount: -100 },
+      { date: '2024/02/01', amount: -150 },
+      { date: '2024/12/25', amount: -500 },
+    ];
+
+    const result = await getMonthlyExpenses(transactions);
 
     expect(result).toEqual([100, 150, 0, 0, 0, 0, 0, 0, 0, 0, 0, 500]);
   });
