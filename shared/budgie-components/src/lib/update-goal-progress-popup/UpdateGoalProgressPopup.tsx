@@ -437,15 +437,15 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               <div className={styles.progressInfoBox}>
                 <div className={styles.progressInfo}>
                   <div>Current Amount Spent:</div>
-                  <p>R {spentAmount}</p>
+                  <p>R {spentAmount.toFixed(2)}</p>
                   <div>Current Amount Left in Budget:</div>
-                  <p>R {spendingLimit - spentAmount}</p>
+                  <p>R {(spendingLimit - spentAmount).toFixed(2)}</p>
                 </div>
                 <div className={styles.progressInfo}>
                   <div>New Amount Spent:</div>
-                  <p>R {spentAmount + updateAmount}</p>
+                  <p>R {(spentAmount + updateAmount).toFixed(2)}</p>
                   <div>New Amount Left in Budget:</div>
-                  <p>R {spendingLimit - spentAmount - updateAmount}</p>
+                  <p>R {(spendingLimit - spentAmount - updateAmount).toFixed(2)}</p>
                 </div>
                 {/*<div className={styles.progressInfo}>
                   <div>New Debt Amount:</div>
