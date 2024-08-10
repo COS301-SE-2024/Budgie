@@ -12,7 +12,6 @@ import styles from './specific-account-page.module.css';
 import { AreaChart, Color } from '@tremor/react';
 import { useRouter } from 'next/navigation';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
-import { useParams } from 'next/navigation';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import {
   addDoc,
@@ -58,6 +57,7 @@ interface InfoSectionProps {
   account: AccountInfo;
   setShowAreYouSure: Dispatch<SetStateAction<boolean>>;
   setShowEditAlias: Dispatch<SetStateAction<boolean>>;
+  setAccount: Dispatch<SetStateAction<AccountInfo>>;
 }
 
 interface AreYouSureProps {
@@ -592,7 +592,28 @@ function InfoSection(props: InfoSectionProps) {
     router.back();
   }
 
-  function handleEdit(Property: string) {}
+  const handleTypeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (e.target.value == props.account.type) {
+      return;
+    }
+
+    const q = query(
+      collection(db, 'accounts'),
+      where('uid', '==', user.uid),
+      where('account_number', '==', props.account.number)
+    );
+    const querySnapshot = await getDocs(q);
+    const doc = querySnapshot.docs[0];
+    await updateDoc(doc.ref, {
+      type: e.target.value,
+    });
+    props.setAccount({
+      name: props.account.name,
+      alias: props.account.alias,
+      type: e.target.value,
+      number: props.account.number,
+    });
+  };
 
   return (
     <div className="w-full h-[28%] flex flex-col items-center justify-start shadow-md bg-BudgieWhite rounded-[2rem]">
@@ -644,19 +665,28 @@ function InfoSection(props: InfoSectionProps) {
           </div>
           <div className="flex items-center justify-center">
             <span className=" p-1 flex items-center justify-center rounded-lg">
-              Type: {props.account.type}
+              Type:
             </span>
-            <span
-              onClick={() => {
-                handleEdit('type');
-              }}
-              className="material-symbols-outlined ml-1 transition-all hover:bg-gray-200 p-1 rounded-xl text-BudgieAccentHover"
-              style={{
-                fontSize: '1.5rem',
-              }}
+            <select
+              className="font-TripSans focus:outline-none focus:border-BudgieGreen1 outline-none font-medium ml-2 rounded-xl py-1"
+              onChange={handleTypeChange}
             >
-              edit
-            </span>
+              <option
+                selected={props.account.type == 'current'}
+                value="current"
+              >
+                Current
+              </option>
+              <option
+                selected={props.account.type == 'savings'}
+                value="savings"
+              >
+                Savings
+              </option>
+              <option selected={props.account.type == 'custom'} value="custom">
+                Custom
+              </option>
+            </select>
           </div>
         </div>
       </div>
@@ -918,6 +948,7 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
           account={account}
           setShowAreYouSure={setShowAreYouSureModal}
           setShowEditAlias={setEditAliasModal}
+          setAccount={setAccount}
         ></InfoSection>
         <div className="w-full h-[65%] mt-[1rem] bg-BudgieWhite rounded-3xl flex flex-col items-center justify-center shadow-xl ">
           <GraphSection
