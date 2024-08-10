@@ -56,5 +56,8 @@ describe('NewNavbar', () => {
     render(<NewNavbar />);
     fireEvent.click(screen.getByText('Logout'));
     expect(signOutMock).toHaveBeenCalled();
+  it('should render successfully', () => {
+    // const { baseElement } = render(<NewNavbar />);
+    // expect(baseElement).toBeTruthy();
   });
 });

@@ -165,3 +165,11 @@ describe('SignUpModal', () => {
 //   };
 //   return Image;
 // });
+
+describe('SignUpModal', () => {
+  it('should render successfully', () => {
+     const { baseElement } = render(<SignUpModal />);
+     expect(baseElement).toBeTruthy();
+  });
+});
+

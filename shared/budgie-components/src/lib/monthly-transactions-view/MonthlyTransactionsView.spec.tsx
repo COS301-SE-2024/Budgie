@@ -6,5 +6,7 @@ describe('MonthlyTransactionsView', () => {
   it('should render successfully', () => {
     //const { baseElement } = render(<MonthlyTransactionsView />);
     //expect(baseElement).toBeTruthy();
+    // const { baseElement } = render(<MonthlyTransactionsView />);
+    // expect(baseElement).toBeTruthy();
   });
 });

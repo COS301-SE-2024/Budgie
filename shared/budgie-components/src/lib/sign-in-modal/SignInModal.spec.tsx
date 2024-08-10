@@ -72,5 +72,4 @@ describe('SignInModal Component', () => {
     await waitFor(() => {
       expect(signInWithPopup).toHaveBeenCalled();
     });
-  });
 });

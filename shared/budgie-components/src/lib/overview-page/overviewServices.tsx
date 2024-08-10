@@ -5,27 +5,28 @@ import {
   doc,
   getDocs,
   updateDoc,
-  query,
-  where,
+  query, 
+  where
 } from 'firebase/firestore';
 
+
 //get logged in users user id
-export function getUser() {
-  const auth = getAuth();
-  if (auth) {
-    const user = auth.currentUser;
-    return user?.uid;
-  }
+export function getUser(){
+    const auth = getAuth();
+    if (auth) {
+      const user = auth.currentUser;
+      return user?.uid;
+    }
 }
 
 //get all accounts for user
 export async function getAccounts() {
   let uid = getUser();
-  const accounts: any = [];
+  const accounts:any = [];
   const a = query(collection(db, `accounts`), where('uid', '==', uid));
   const result = await getDocs(a);
-
-  result.forEach((doc) => {
+  
+  result.forEach(doc => {
     accounts.push(doc.data());
   });
 
@@ -33,10 +34,10 @@ export async function getAccounts() {
 }
 
 //get all transaction for this year for an account
-export async function getTransactions(accountNumber: string) {
+export async function getTransactions(accountNumber:string) {
   let uid = getUser();
   const now = new Date();
-  let transactions: any = [];
+  let transactions:any = [];
 
   const q = query(
     collection(db, `transaction_data_${now.getFullYear()}`),
@@ -45,7 +46,7 @@ export async function getTransactions(accountNumber: string) {
   );
   const result = await getDocs(q);
 
-  result.forEach((doc) => {
+  result.forEach(doc => {
     const data = doc.data();
     for (let key in data) {
       if (typeof data[key] === 'string') {
@@ -66,92 +67,100 @@ export async function getTransactions(accountNumber: string) {
   return transactions;
 }
 
-//calculate total money in for the year
-export async function getMoneyIn(transactions: any) {
+//calculate total money in for the year 
+export async function getMoneyIn(transactions:any){
   let amount = 0;
-  for (let i = 0; i < transactions.length; i++) {
-    if (transactions[i].amount > 0) {
-      amount += transactions[i].amount;
-    }
+  for(let i=0; i<transactions.length; i++){
+      if(transactions[i].amount>0){
+        amount += transactions[i].amount;
+      }
   }
   return amount;
 }
 
-//calculate total money out for the year
-export async function getMoneyOut(transactions: any) {
+//calculate total money out for the year 
+export async function getMoneyOut(transactions:any){
   let amount = 0;
-  for (let i = 0; i < transactions.length; i++) {
-    if (transactions[i].amount < 0) {
-      amount += transactions[i].amount;
-    }
+  for(let i=0; i<transactions.length; i++){
+      if(transactions[i].amount<0){
+        amount += transactions[i].amount;
+      }
   }
-  return amount * -1;
+  return amount*-1;
 }
 
 //get the last transaction
-export async function getLastTransaction(transactions: any) {
+export async function getLastTransaction(transactions:any){
   return transactions[0];
 }
 
 //get total income for all months
-export async function getMonthlyIncome(transactions: any) {
-  let balance: any = [12];
-  for (let i = 0; i < 12; i++) {
+export async function getMonthlyIncome(transactions:any){
+  let balance:any = [12];
+  for(let i =0; i<12; i++){
     balance[i] = 0;
   }
-  for (let i = 0; i < transactions.length; i++) {
+  for(let i=0; i<transactions.length; i++){
     const dateString = transactions[i].date;
     const parts = dateString.split('/');
     const month = parseInt(parts[1], 10);
-    if (transactions[i].amount > 0) {
-      balance[month - 1] += transactions[i].amount;
+    if(transactions[i].amount>0){
+      balance[month-1] += transactions[i].amount;
     }
   }
   return balance;
 }
 
 //get total expenses for all months
-export async function getMonthlyExpenses(transactions: any) {
-  let balance: any = [12];
-  for (let i = 0; i < 12; i++) {
+export async function getMonthlyExpenses(transactions:any){
+  let balance:any = [12];
+  for(let i =0; i<12; i++){
     balance[i] = 0;
   }
-  for (let i = 0; i < transactions.length; i++) {
+  for(let i=0; i<transactions.length; i++){
     const dateString = transactions[i].date;
     const parts = dateString.split('/');
     const month = parseInt(parts[1], 10);
-    if (transactions[i].amount < 0) {
-      balance[month - 1] -= transactions[i].amount;
+    if(transactions[i].amount<0){
+      balance[month-1] -= transactions[i].amount;
     }
   }
   return balance;
 }
 
-//get amount for each category
-export async function getExpensesByCategory(transactions: any) {
-  let result: any = [9];
-  for (let i = 0; i < 9; i++) {
+//get amount for each category 
+export async function getExpensesByCategory(transactions:any){
+  let result:any = [9];
+  for(let i=0; i<9; i++){
     result[i] = 0;
   }
-  for (let i = 0; i < transactions.length; i++) {
-    if (transactions[i].category == 'Groceries') {
-      result[0] -= transactions[i].amount;
-    } else if (transactions[i].category == 'Utilities') {
-      result[1] -= transactions[i].amount;
-    } else if (transactions[i].category == 'Entertainment') {
-      result[2] -= transactions[i].amount;
-    } else if (transactions[i].category == 'Transport') {
-      result[3] -= transactions[i].amount;
-    } else if (transactions[i].category == 'Insurance') {
-      result[4] -= transactions[i].amount;
-    } else if (transactions[i].category == 'Medical Aid') {
-      result[5] -= transactions[i].amount;
-    } else if (transactions[i].category == 'Eating Out') {
-      result[6] -= transactions[i].amount;
-    } else if (transactions[i].category == 'Shopping') {
-      result[7] -= transactions[i].amount;
-    } else if (transactions[i].category == 'Other') {
-      result[8] -= transactions[i].amount;
+  for(let i=0; i<transactions.length; i++){
+    if(transactions[i].category=='Groceries'){
+      result[0] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Utilities'){
+      result[1] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Entertainment'){
+      result[2] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Transport'){
+      result[3] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Insurance'){
+      result[4] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Medical Aid'){
+      result[5] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Eating Out'){
+      result[6] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Shopping'){
+      result[7] -= transactions[i].amount; 
+    }
+    else if(transactions[i].category=='Other'){
+      result[8] -= transactions[i].amount; 
     }
   }
   return result;

@@ -7,5 +7,8 @@ describe('Metrics', () => {
     //const mockOnClose = jest.fn();
     //const { baseElement } = render(<Metrics onClose={mockOnClose} />);
     //expect(baseElement).toBeTruthy();
+    // const mockOnClose = jest.fn();
+    // const { baseElement } = render(<Metrics onClose={mockOnClose} />);
+    // expect(baseElement).toBeTruthy();
   });
 });
