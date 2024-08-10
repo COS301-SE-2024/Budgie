@@ -317,7 +317,6 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
           let docSnap = querySnapshot.docs[0];
-          alert('exists already');
           for (const YearMonth of YearMonths) {
             let [Y, Month] = YearMonth.split('/');
             Month = getMonthName(Month);

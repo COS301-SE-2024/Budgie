@@ -56,6 +56,21 @@ interface AccountInfo {
 
 interface InfoSectionProps {
   account: AccountInfo;
+  setShowAreYouSure: Dispatch<SetStateAction<boolean>>;
+  setShowEditAlias: Dispatch<SetStateAction<boolean>>;
+}
+
+interface AreYouSureProps {
+  account: AccountInfo;
+  setShow: Dispatch<SetStateAction<boolean>>;
+  setSpinner: Dispatch<SetStateAction<boolean>>;
+}
+
+interface EditAliasModalProps {
+  account: AccountInfo;
+  setShow: Dispatch<SetStateAction<boolean>>;
+  setSpinner: Dispatch<SetStateAction<boolean>>;
+  setAccount: Dispatch<SetStateAction<AccountInfo>>;
 }
 //helpers
 
@@ -442,6 +457,7 @@ function GraphSection(props: GraphSectionProps) {
   const [graphX, setGraphX] = useState<string[]>([]);
   const [graphY, setGraphY] = useState<number[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -470,7 +486,7 @@ function GraphSection(props: GraphSectionProps) {
       await fetchGraphData();
     };
     fetchData();
-  }, []);
+  }, [refresh]);
 
   const handleButtonClick = () => {
     if (fileInputRef.current) {
@@ -506,7 +522,7 @@ function GraphSection(props: GraphSectionProps) {
             props.setShowSuccess(true);
             setTimeout(() => {
               props.setShowSuccess(false);
-              router.refresh();
+              setRefresh(!refresh);
             }, 1000);
           });
         } else {
@@ -529,7 +545,9 @@ function GraphSection(props: GraphSectionProps) {
     graphY.length != 0 && (
       <>
         <div>
-          <span className="font-TripSans font-medium text-3xl">Balance</span>
+          <span className="font-TripSans font-medium text-3xl">
+            Account Balance
+          </span>
           <button
             onClick={handleButtonClick}
             className="font-TripSans ml-4 font-medium text-xl text-BudgieGreen3 bg-BudgieGreen1 bg-opacity-30 hover:text-BudgieWhite hover:bg-BudgieGreen1 hover:bg-opacity-100 transition-all ease-in duration-150 p-2 rounded-2xl"
@@ -567,16 +585,7 @@ function InfoSection(props: InfoSectionProps) {
   const user = useContext(UserContext);
 
   async function handleDelete() {
-    // const accRef = collection(db, 'accounts');
-    // const q = query(
-    //   accRef,
-    //   where('uid', '==', user.uid),
-    //   where('account_number', '==', props.account.number)
-    // );
-    // const querySnapshot = await getDocs(q);
-    // const doc = querySnapshot.docs[0].ref;
-    // await deleteDoc(doc);
-    //TODO delete finance info
+    props.setShowAreYouSure(true);
   }
 
   function handleback() {
@@ -623,7 +632,7 @@ function InfoSection(props: InfoSectionProps) {
             </span>
             <span
               onClick={() => {
-                handleEdit('alias');
+                props.setShowEditAlias(true);
               }}
               className="material-symbols-outlined ml-1 transition-all hover:bg-gray-200 p-1 rounded-xl text-BudgieAccentHover"
               style={{
@@ -723,9 +732,145 @@ function SuccessModal() {
   );
 }
 
+function EditAliasModal(props: EditAliasModalProps) {
+  const [aliasError, setAliasError] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const user = useContext(UserContext);
+
+  const handleExit = () => {
+    props.setShow(false);
+  };
+
+  const handleChildElementClick = (e: { stopPropagation: () => void }) => {
+    //ignore clicks
+    e.stopPropagation();
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAliasError(false);
+    setInputValue(e.target.value);
+  };
+
+  const submitAlias = async () => {
+    props.setShow(false);
+    props.setSpinner(true);
+    if (inputValue == '') {
+      setAliasError(true);
+      return;
+    }
+
+    const q = query(
+      collection(db, 'accounts'),
+      where('uid', '==', user.uid),
+      where('account_number', '==', props.account.number)
+    );
+    const querySnapshot = await getDocs(q);
+    const doc = querySnapshot.docs[0];
+    await updateDoc(doc.ref, {
+      alias: inputValue,
+    });
+    props.setAccount({
+      name: props.account.name,
+      alias: inputValue,
+      type: props.account.type,
+      number: props.account.number,
+    });
+    props.setSpinner(false);
+  };
+
+  return (
+    <div onClick={handleExit} className={styles.mainPageBlurModal}>
+      <div
+        className="flex flex-col items-center justify-around rounded-[2rem] w-96 h-56 bg-BudgieWhite "
+        onClick={(e) => handleChildElementClick(e)}
+      >
+        <span className="text-center text-3xl font-TripSans font-medium">
+          Edit Alias:
+        </span>
+        <input
+          autoFocus
+          spellCheck="false"
+          onChange={handleChange}
+          className={`${
+            !aliasError
+              ? 'bg-white text-3xl w-3/4  px-5 py-4 rounded-xl border-1 border-BudgiePrimary2 outline-none focus:border-1 focus:border-BudgieAccentHover'
+              : 'bg-white text-3xl w-3/4  px-5 py-4 rounded-xl border-1 border-red-400 outline-none focus:border-1 focus:border-red-400'
+          }`}
+          type="text"
+        />
+        <button
+          onClick={submitAlias}
+          className=" px-5 py-1 mb-2 text-xl rounded-lg text-BudgieGreen3 bg-BudgieGreen1 bg-opacity-30 hover:text-BudgieWhite hover:bg-BudgieGreen1 hover:bg-opacity-100 transition-all ease-in duration-150"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function AreYouSure(props: AreYouSureProps) {
+  const router = useRouter();
+  const user = useContext(UserContext);
+  const handleExit = () => {
+    props.setShow(false);
+  };
+
+  const handleChildElementClick = (e: { stopPropagation: () => void }) => {
+    //ignore clicks
+    e.stopPropagation();
+  };
+
+  async function handleDeleteConfirm() {
+    props.setShow(false);
+    props.setSpinner(true);
+    const accRef = collection(db, 'accounts');
+    const q = query(
+      accRef,
+      where('uid', '==', user.uid),
+      where('account_number', '==', props.account.number)
+    );
+    const querySnapshot = await getDocs(q);
+    const doc = querySnapshot.docs[0].ref;
+    await deleteDoc(doc).then(() => {
+      router.push('/accounts');
+    });
+    // TODO delete finance info potentially not, to allow account persistence if re-tracked
+  }
+
+  return (
+    <div onClick={handleExit} className={styles.mainPageBlurModal}>
+      <div
+        className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-56 bg-BudgieWhite "
+        onClick={(e) => handleChildElementClick(e)}
+      >
+        <span className="text-center text-2xl font-TripSans font-medium">
+          Are you sure you would <br /> like to remove this account permanently?
+        </span>
+        <div className="mt-10">
+          <button
+            className=" hover:bg-gray-400 px-10 hover:text-BudgieWhite p-1 transition-all rounded-xl text-gray-600 bg-gray-200"
+            onClick={handleExit}
+          >
+            No
+          </button>
+          <button
+            className=" ml-8 hover:bg-red-400 px-10 hover:text-BudgieWhite p-1 transition-all rounded-xl text-red-600 bg-red-200"
+            onClick={handleDeleteConfirm}
+          >
+            Yes
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function SpecificAccountPage(props: SpecificAccountPageProps) {
   const [uploadLoading, setUploadLoading] = useState(false);
   const [successModal, setSuccessModal] = useState(false);
+  const [editAliasModal, setEditAliasModal] = useState(false);
+  const [areYouSureModal, setShowAreYouSureModal] = useState(false);
   const [account, setAccount] = useState<AccountInfo>({
     name: '',
     alias: '',
@@ -769,7 +914,11 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
   return (
     <>
       <div className="mainPage">
-        <InfoSection account={account}></InfoSection>
+        <InfoSection
+          account={account}
+          setShowAreYouSure={setShowAreYouSureModal}
+          setShowEditAlias={setEditAliasModal}
+        ></InfoSection>
         <div className="w-full h-[65%] mt-[1rem] bg-BudgieWhite rounded-3xl flex flex-col items-center justify-center shadow-xl ">
           <GraphSection
             accNo={props.number}
@@ -781,6 +930,21 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
       </div>
       {uploadLoading && <SpinnerLoader></SpinnerLoader>}
       {successModal && <SuccessModal></SuccessModal>}
+      {areYouSureModal && (
+        <AreYouSure
+          account={account}
+          setShow={setShowAreYouSureModal}
+          setSpinner={setUploadLoading}
+        ></AreYouSure>
+      )}
+      {editAliasModal && (
+        <EditAliasModal
+          setAccount={setAccount}
+          account={account}
+          setShow={setEditAliasModal}
+          setSpinner={setUploadLoading}
+        ></EditAliasModal>
+      )}
     </>
   );
 }

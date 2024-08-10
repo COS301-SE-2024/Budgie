@@ -246,7 +246,13 @@ exports.categoriseExpenses = onCall(async (request) => {
         for (transaction of IncomingMonthData) {
           if (transaction.category == '') {
             updateFlag = true;
-            let newCategory = await useKnownList(transaction.description);
+            let newCategory = '';
+            if (transaction.amount > 0) {
+              newCategory = 'Income';
+            }
+            if (newCategory == '') {
+              newCategory = await useKnownList(transaction.description);
+            }
             if (newCategory == '') {
               newCategory = await useModel(transaction.description);
             }
@@ -268,37 +274,4 @@ exports.categoriseExpenses = onCall(async (request) => {
       }
     }
   });
-
-  // if (docSnap) {
-  //   let updateFlag = false;
-  //   //can categorize and set
-  //   for (month of Months) {
-  //     if (docSnap.data()[month]) {
-  //       const IncomingMonthData = JSON.parse(docSnap.data()[month]);
-  //       for (transaction of IncomingMonthData) {
-  //         if (transaction.category === '') {
-  //           updateFlag = true;
-  //           newCategory = useKnownList(transaction.description);
-  //           if (
-  //             newCategory == 'Fuel' &&
-  //             Math.abs(parseFloat(transaction.amount) < 100)
-  //           ) {
-  //             newCategory == 'Eating Out';
-  //           } else {
-  //             newCategory == 'Transport';
-  //           }
-  //           if (newCategory == '') {
-  //             newCategory = await useModel(transaction.description);
-  //           }
-  //           transaction.category = newCategory;
-  //         }
-  //       }
-  //       if (updateFlag) {
-  //         await getFirestore()
-  //           .doc(`transaction_data_${year}/${uid}`)
-  //           .update({ [month]: JSON.stringify(IncomingMonthData) });
-  //       }
-  //     }
-  //   }
-  // }
 });
