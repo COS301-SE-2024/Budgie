@@ -10,6 +10,7 @@ import {
   getUser,
   getAccounts
 } from './overviewServices';
+import { getAuth } from 'firebase/auth';
 
 /*============================================================================================
  MOCKS
@@ -18,9 +19,6 @@ import {
 jest.mock('firebase/auth', () => ({
   getAuth: jest.fn(),
 }));
-
-// Import the mocked getAuth function
-import { getAuth } from 'firebase/auth';
 
 // Mock Firebase Firestore methods
 jest.mock('firebase/firestore', () => ({
@@ -75,34 +73,60 @@ describe('getUser', () => {
 });
 
 
-// describe('getAccounts', () => {
-//   it('should return accounts for the user', async () => {
-//     const mockUid = '123456';
-//     const mockAccounts = [
-//       { id: '1', name: 'Account 1' },
-//       { id: '2', name: 'Account 2' },
-//     ];
+describe('getAccounts', () => {
+  it('should return accounts for the user', async () => {
+    const mockUid = '123456';
+    const mockAccounts = [
+      { id: '1', name: 'Account 1' },
+      { id: '2', name: 'Account 2' },
+    ];
 
-//     // Mock getUser to return a predefined UID
-//     mockGetUser.mockReturnValue(mockUid);
+    // Mock Firestore methods
+    mockCollection.mockReturnValue('mockCollection');
+    mockWhere.mockReturnValue('mockWhere');
+    mockQuery.mockReturnValue('mockQuery');
+    mockGetDocs.mockResolvedValue({
+      forEach: (callback: (doc: any) => void) => {
+        mockAccounts.forEach(account => callback({ data: () => account }));
+      },
+    });
 
-//     // Mock Firestore methods
-//     mockCollection.mockReturnValue('mockCollection');
-//     mockWhere.mockReturnValue('mockWhere');
-//     mockQuery.mockReturnValue('mockQuery');
-//     mockGetDocs.mockResolvedValue({
-//       forEach: (callback: (doc: any) => void) => {
-//         mockAccounts.forEach(account => callback({ data: () => account }));
-//       },
-//     });
+    const accounts = await getAccounts();
 
-//     const accounts = await getAccounts();
+    expect(accounts).toEqual(mockAccounts);
+    expect(mockGetDocs).toHaveBeenCalled();
+  });
 
-//     expect(accounts).toEqual(mockAccounts);
-//     expect(mockGetDocs).toHaveBeenCalled();
-//   });
+  it('should return an empty array if no accounts are found', async () => {
+    const mockUid = '123456';
 
-// });
+    // Mock Firestore methods
+    mockCollection.mockReturnValue('mockCollection');
+    mockWhere.mockReturnValue('mockWhere');
+    mockQuery.mockReturnValue('mockQuery');
+    mockGetDocs.mockResolvedValue({
+      forEach: (callback: (doc: any) => void) => {},
+    });
+
+    const accounts = await getAccounts();
+
+    expect(accounts).toEqual([]);
+    expect(mockGetDocs).toHaveBeenCalled();
+  });
+
+  it('should handle errors gracefully', async () => {
+    const mockUid = '123456';
+
+    // Mock Firestore methods to throw an error
+    mockCollection.mockReturnValue('mockCollection');
+    mockWhere.mockReturnValue('mockWhere');
+    mockQuery.mockReturnValue('mockQuery');
+    mockGetDocs.mockRejectedValue(new Error('Firestore error'));
+
+    await expect(getAccounts()).rejects.toThrow('Firestore error');
+  });
+
+});
 
 /*===========================================================================================
 INTEGRATED TESTS
