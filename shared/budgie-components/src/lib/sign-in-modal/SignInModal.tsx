@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
 import Link from 'next/link';
+import { FirebaseError } from 'firebase/app';
 import { ForgotPassword } from '../forgot-password/forgot-password';
 import {
   signInWithEmailAndPassword,
@@ -24,7 +25,7 @@ export function SignInModal(props: SignInModalProps) {
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [forgot, setForgot] = useState(false);
-
+  const auth = getAuth();
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
   };
@@ -35,24 +36,24 @@ export function SignInModal(props: SignInModalProps) {
 
   const signInWithGoogle = async () => {
     try {
-      const auth = getAuth();
-      await setPersistence(auth, browserSessionPersistence);
       const provider = new GoogleAuthProvider();
+      provider.addScope('profile');
       provider.addScope('email');
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+      console.log('User information:', user);
     } catch (error) {
-      if (error instanceof Error) {
-        const errorCode = (error as any).code;
+      if (error instanceof FirebaseError) {
+        const errorCode = error.code;
         const errorMessage = error.message;
-        const email = (error as any).customData.email;
-        const credential = GoogleAuthProvider.credentialFromError(error as any);
+        const email = error.customData?.email;
+        const credential = GoogleAuthProvider.credentialFromError(error);
         console.error('Error code:', errorCode);
         console.error('Error message:', errorMessage);
         console.error('Email:', email);
         console.error('Credential:', credential);
       } else {
-        console.error('Unknown error:', error);
+        console.error('Unexpected error', error);
       }
     }
   };
@@ -146,7 +147,7 @@ export function SignInModal(props: SignInModalProps) {
                 onChange={handlePasswordChange}
               />
             </div>
-            <div className="flex flex-col justify-start pt-6 items-center">
+            <div className="flex flex-col justify-start pt-6 items-center w-37 h-11">
               <button
                 className="font-TripSans font-medium rounded-[25px] w-36 h-10 bg-BudgieBlue text-BudgieWhite"
                 type="button"
@@ -158,7 +159,7 @@ export function SignInModal(props: SignInModalProps) {
             <div className="flex flex-col justify-start pt-3 items-center">
               <p className="text-BudgieBlue font-TripSans font-medium">OR</p>
             </div>
-            <div className="flex flex-col justify-start pt-3 items-center">
+            <div className="flex flex-col justify-start pt-3 items-center w-50 h-11">
               <button
                 className="flex items-center justify-center font-TripSans font-medium rounded-[25px] w-48 h-10 bg-BudgieBlue text-BudgieWhite"
                 type="button"
@@ -172,20 +173,13 @@ export function SignInModal(props: SignInModalProps) {
                 Sign In with Google
               </button>
             </div>
-            {error && (
-              <div className="pt-2 text-red-600 font-TripSans font-medium">
-                {errorMessage}
-              </div>
-            )}
-            <div className="flex flex-col justify-start pt-14 items-center">
+            <div className="flex flex-col pt-14 items-center">
               <p className="text-lg text-BudgieBlue font-TripSans font-medium">
                 Don't have an account?{' '}
                 <Link href={'/signup'} className="underline">
                   Sign Up
                 </Link>
               </p>
-            </div>
-            <div className="flex flex-col justify-start pt-2 items-center">
               <button
                 type="button"
                 onClick={() => setForgot(!forgot)}
@@ -194,6 +188,11 @@ export function SignInModal(props: SignInModalProps) {
                 Forgot Password?
               </button>
             </div>
+            {error && (
+              <div className="pt-2 w-72 h-10 text-red-600 font-TripSans font-medium">
+                {errorMessage}
+              </div>
+            )}
           </form>
         </div>
       </div>
