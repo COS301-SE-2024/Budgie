@@ -11,6 +11,7 @@ import {
   getAccounts,
   getTransactions,
   getMoneyIn,
+  getMoneyOut,
 } from './overviewServices';
 import { getAuth } from 'firebase/auth';
 
@@ -273,6 +274,40 @@ describe('getMoneyIn', () => {
     expect(result).toBe(300);
   });
 
+});
+
+describe('getMoneyOut', () => {
+  it('should return the total money out for the year', async () => {
+    const transactions = [
+      { amount: -100 },
+      { amount: 200 },
+      { amount: -50 },
+      { amount: -300 },
+    ];
+
+    const result = await getMoneyOut(transactions);
+
+    expect(result).toBe(450); // The total money out should be 450
+  });
+
+  it('should return 0 if there are no money out transactions', async () => {
+    const transactions = [
+      { amount: 200 },
+      { amount: 150 },
+    ];
+
+    const result = await getMoneyOut(transactions);
+
+    expect(result).toBe(-0); // No money out, so result should be 0
+  });
+
+  it('should handle an empty transactions array', async () => {
+    const transactions: any[] = [];
+
+    const result = await getMoneyOut(transactions);
+
+    expect(result).toBe(-0); // Empty array, so result should be 0
+  });
 });
 
 
