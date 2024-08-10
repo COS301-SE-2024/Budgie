@@ -17,6 +17,7 @@ import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import {
   addDoc,
   collection,
+  deleteDoc,
   DocumentData,
   DocumentReference,
   getDocs,
@@ -565,7 +566,18 @@ function InfoSection(props: InfoSectionProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const user = useContext(UserContext);
 
-  function handleDelete() {}
+  async function handleDelete() {
+    // const accRef = collection(db, 'accounts');
+    // const q = query(
+    //   accRef,
+    //   where('uid', '==', user.uid),
+    //   where('account_number', '==', props.account.number)
+    // );
+    // const querySnapshot = await getDocs(q);
+    // const doc = querySnapshot.docs[0].ref;
+    // await deleteDoc(doc);
+    //TODO delete finance info
+  }
 
   function handleback() {
     router.back();
