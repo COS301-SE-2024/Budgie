@@ -24,6 +24,7 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 /* eslint-disable-next-line */
 export interface SpecificAccountPageProps {
@@ -274,13 +275,10 @@ async function MergeTransactions(
         }
       }
       //call categorize function
-      // const functions = getFunctions();
-      // const categoriseExpenses = httpsCallable(
-      //   functions,
-      //   'categoriseExpenses'
-      // );
-      // console.log('first run');
-      // categoriseExpenses({ year: Year });
+      const functions = getFunctions();
+      const categoriseExpenses = httpsCallable(functions, 'categoriseExpenses');
+      console.log('first run');
+      categoriseExpenses({ year: Year });
     } else {
       //documents do not exist for this year can safely add to merged
       for (const YearMonth of YearMonths) {
@@ -326,13 +324,10 @@ async function MergeTransactions(
         }
       }
       //call categorize function
-      // const functions = getFunctions();
-      // const categoriseExpenses = httpsCallable(
-      //   functions,
-      //   'categoriseExpenses'
-      // );
-      // console.log('first run');
-      // categoriseExpenses({ year: Year });
+      const functions = getFunctions();
+      const categoriseExpenses = httpsCallable(functions, 'categoriseExpenses');
+      console.log('first run');
+      categoriseExpenses({ year: Year });
     }
   }
 }

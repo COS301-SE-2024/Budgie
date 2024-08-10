@@ -229,31 +229,33 @@ exports.categoriseExpenses = onCall(async (request) => {
   const uid = request.auth.uid;
   // const doc = await getFirestore().doc(`transaction_data_${year}/${uid}`);
   // const docSnap = await doc.get();
+  // .collection(db, `transaction_data_${year}`);
+  const db = getDatabase();
+  const accRef = getFirestore().collection(`transaction_data_${year}`);
+  const snapshot = await accRef.where('uid', '==', uid).get();
 
-  const accRef = getFirestore().collection(db, `transaction_data_${year}`);
-  const q = query(accRef, where('uid', '==', user.uid));
-  const querySnapshot = await getDocs(q);
+  // const q = getFirestore().query(accRef, where('uid', '==', user.uid));
+  // const querySnapshot = await getDocs(q);
 
-  querySnapshot.forEach(async (doc) => {
+  snapshot.forEach(async (doc) => {
     let updateFlag = false;
     //can categorize and set
     for (month of Months) {
       if (doc.data()[month]) {
         const IncomingMonthData = JSON.parse(doc.data()[month]);
         for (transaction of IncomingMonthData) {
-          if (transaction.category === '') {
+          if (transaction.category == '') {
             updateFlag = true;
-            newCategory = useKnownList(transaction.description);
-            if (
-              newCategory == 'Fuel' &&
-              Math.abs(parseFloat(transaction.amount) < 100)
-            ) {
-              newCategory == 'Eating Out';
-            } else {
-              newCategory == 'Transport';
-            }
+            let newCategory = await useKnownList(transaction.description);
             if (newCategory == '') {
               newCategory = await useModel(transaction.description);
+            }
+            if (newCategory == 'Fuel') {
+              if (Math.abs(parseFloat(transaction.amount)) < 100) {
+                newCategory = 'Eating Out';
+              } else {
+                newCategory = 'Transport';
+              }
             }
             transaction.category = newCategory;
           }
