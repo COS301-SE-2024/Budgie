@@ -94,6 +94,7 @@
   transition: 0.2s ease;
   border: none;
   transition: 0.2s ease;
+  cursor: pointer;
 }
 
 .sortDropdown option {
@@ -269,4 +270,26 @@
 
 .arrow:hover {
   color: #000;
+}
+
+.noGoalScreen {
+  background-color: var(--main-background);
+  width: 85vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(1.4rem * var(--font-size-multiplier));
+  flex-direction: column;
+}
+
+.noGoalText {
+  display: flex;
+  width: calc(28vw * var(--font-size-multiplier));
+  justify-content: center;
+  flex-wrap: wrap;
+  text-align: center;
+  padding: 1rem;
+  font-weight: bold;
+  color: var(--greyed-text);
 }

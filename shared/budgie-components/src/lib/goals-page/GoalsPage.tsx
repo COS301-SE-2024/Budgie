@@ -537,6 +537,7 @@ export function GoalsPage() {
     [key: number]: boolean;
   }>({});
   const [sortOption, setSortOption] = useState('name');
+  const [hasGoals, setHasGoals] = useState(false);
   const user = useContext(UserContext);
 
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -570,12 +571,12 @@ export function GoalsPage() {
           ? calculateProgressPercentage(b)
           : 0;
 
-          if (aValue === null && bValue !== null) return -1;
-          if (bValue === null && aValue !== null) return 1;
-      
-          // Compare values if both are present
-          if (aValue < bValue) return -1;
-          if (aValue > bValue) return 1;
+      if (aValue === null && bValue !== null) return -1;
+      if (bValue === null && aValue !== null) return 1;
+
+      // Compare values if both are present
+      if (aValue < bValue) return -1;
+      if (aValue > bValue) return 1;
       return 0;
     });
   };
@@ -622,12 +623,14 @@ export function GoalsPage() {
           ...data,
         };
       });
+      if (goalsList.length > 0) {
+        setHasGoals(true);
+      }
       setGoals(sortGoals(goalsList, sortOption));
     } catch (error) {
       console.error('Error getting goals document:', error);
     }
   };
-  
 
   const addGoalPopup = () => {
     setIsGoalPopupOpen(!isGoalPopupOpen);
@@ -673,176 +676,204 @@ export function GoalsPage() {
 
   return (
     <div className={styles.mainPage}>
-      <div className={styles.header}>
-        <button className={styles.addGoalsButton} onClick={addGoalPopup}>
-          Add a Goal
-        </button>
-        <div style={{display:"flex", alignItems:'center'}}>
-          <p className={styles.sortHeader}>Sort By:</p>
-        <select value={sortOption} onChange={handleSortChange} className={styles.sortDropdown}>
-          <option value="name">Name</option>
-          <option value="type">Type</option>
-          <option value="start_date">Start Date</option>
-          <option value="end_date">Target Date</option>
-          <option value="progress">Progress</option>
-        </select>
-        </div>
-        {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
-      </div>
-      <div
-        style={{
-          width: '85vw',
-          backgroundColor: 'var(--main-background)',
-          marginBottom: 'calc((5rem * var(--font-size-multiplier)))',
-        }}
-      ></div>
-      <div className={styles.planningModalContainer}>
-        {Goals ? (
-          <>
-            {Goals.map((goal, index) => (
-              <div key={goal.id || index}>
-                <div className={styles.planningModalTitle}>
-                  {goal.name}
-                  <span
-                    className="material-symbols-outlined"
-                    style={{
-                      fontSize:
-                        'min(2.5rem, (calc(1.5rem * var(--font-size-multiplier))))',
-                      fontWeight: 500,
-                      color: 'var(--primary-text)',
-                      marginLeft: '1rem',
-                    }}
-                    onClick={() => handleEditGoalPopup(index)}
-                  >
-                    edit
-                  </span>
-                  {editPopupOpen[index] && (
-                    <EditGoalPopup
-                      togglePopup={() => handleEditGoalPopup(index)}
-                      goal={goal}
-                    />
-                  )}
-                </div>
-                <div className={styles.planningModal}>
-                  <div className={styles.goalsContainer}>
-                    <div className={styles.goalDisplay}>
-                      <div className={styles.goal}>
-                        <div className={styles.goalPair}>
-                          <div className={styles.goalLabel}>Goal Type:</div>
-                          <div className={styles.goalValue}>
-                            {goal.type === 'Savings' && <>Savings</>}
-                            {goal.type === 'Debt' && <>Debt Reduction</>}
-                            {goal.type === 'Spending' && <>Limiting Spending</>}
-                          </div>
-                        </div>
-                        {goal.current_amount !== undefined &&
-                          goal.target_amount !== undefined && (
-                            <div>
-                              {goal.initial_amount !== undefined && (
-                                <div className={styles.goalPair}>
-                                  <div className={styles.goalLabel}>
-                                    Initial Amount:
-                                  </div>
-                                  <div className={styles.goalValue}>
-                                    R {goal.initial_amount.toFixed(2)}
-                                  </div>
-                                </div>
-                              )}
-                              <div className={styles.goalPair}>
-                                <div className={styles.goalLabel}>
-                                  Current Amount:
-                                </div>
-                                <div className={styles.goalValue}>
-                                  R {goal.current_amount.toFixed(2)}
-                                </div>
-                              </div>
-                              <div className={styles.goalPair}>
-                                <div className={styles.goalLabel}>
-                                  Target Amount:
-                                </div>
-                                <div className={styles.goalValue}>
-                                  R{goal.target_amount.toFixed(2)}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        <div className={styles.goalPair}>
-                          <div className={styles.goalLabel}>Start Date:</div>
-                          <div className={styles.goalValue}>
-                            {goal.start_date}
-                          </div>
-                        </div>
-                        {goal.target_date && (
-                          <div>
-                            <div className={styles.goalPair}>
-                              <div className={styles.goalLabel}>
-                                Target Date:
-                              </div>
-                              <div className={styles.goalValue}>
-                                {goal.target_date}
-                              </div>
-                            </div>
-                            <div className={styles.goalPair}>
-                              <div className={styles.goalLabel}>Days Left:</div>
-                              <div className={styles.goalValue}>
-                                {calculateDaysLeft(goal.target_date) > 0
-                                  ? ` ${calculateDaysLeft(goal.target_date)}`
-                                  : 'Target Date Passed'}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                        {goal.spending_limit !== undefined && (
-                          <div className={styles.goalPair}>
-                            <div className={styles.goalLabel}>
-                              Spending Limit:
-                            </div>
-                            <div className={styles.goalValue}>
-                              R {goal.spending_limit.toFixed(2)}
-                            </div>
-                          </div>
-                        )}
-                        {goal.spending_limit !== undefined && (
-                          <div className={styles.goalPair}>
-                            <div className={styles.goalLabel}>
-                              Spent this Month:
-                            </div>
-                            <div className={styles.goalValue}>
-                              R {monthlyBudgetSpent(goal).toFixed(2)}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      <div
-                        className={styles.updateViewButton}
-                        onClick={() => handleUpdateGoalPopup(index)}
+      {!hasGoals ? (
+        <>
+          <div className={styles.noGoalScreen}> 
+              <div className={styles.noGoalText}>
+                Add your first goal:
+              </div>
+              <button className={styles.addGoalsButton} onClick={addGoalPopup}>
+              Add a Goal
+            </button>
+            {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
+          </div>
+        </>
+      ) : (
+        <>
+          <div className={styles.header}>
+            <button className={styles.addGoalsButton} onClick={addGoalPopup}>
+              Add a Goal
+            </button>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <p className={styles.sortHeader}>Sort By:</p>
+              <select
+                value={sortOption}
+                onChange={handleSortChange}
+                className={styles.sortDropdown}
+              >
+                <option value="name">Name</option>
+                <option value="type">Type</option>
+                <option value="start_date">Start Date</option>
+                <option value="end_date">Target Date</option>
+                <option value="progress">Progress</option>
+              </select>
+            </div>
+            {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
+          </div>
+          <div
+            style={{
+              width: '85vw',
+              backgroundColor: 'var(--main-background)',
+              marginBottom: 'calc((5rem * var(--font-size-multiplier)))',
+            }}
+          ></div>
+          <div className={styles.planningModalContainer}>
+            {Goals ? (
+              <>
+                {Goals.map((goal, index) => (
+                  <div key={goal.id || index}>
+                    <div className={styles.planningModalTitle}>
+                      {goal.name}
+                      <span
+                        className="material-symbols-outlined"
+                        style={{
+                          fontSize:
+                            'min(2.5rem, (calc(1.5rem * var(--font-size-multiplier))))',
+                          fontWeight: 500,
+                          color: 'var(--primary-text)',
+                          marginLeft: '1rem',
+                        }}
+                        onClick={() => handleEditGoalPopup(index)}
                       >
-                        Update Progress
-                      </div>
-                      {updatePopupOpen[index] && (
-                        <UpdateGoalPopup
-                          togglePopup={() => handleUpdateGoalPopup(index)}
+                        edit
+                      </span>
+                      {editPopupOpen[index] && (
+                        <EditGoalPopup
+                          togglePopup={() => handleEditGoalPopup(index)}
                           goal={goal}
                         />
                       )}
                     </div>
+                    <div className={styles.planningModal}>
+                      <div className={styles.goalsContainer}>
+                        <div className={styles.goalDisplay}>
+                          <div className={styles.goal}>
+                            <div className={styles.goalPair}>
+                              <div className={styles.goalLabel}>Goal Type:</div>
+                              <div className={styles.goalValue}>
+                                {goal.type === 'Savings' && <>Savings</>}
+                                {goal.type === 'Debt' && <>Debt Reduction</>}
+                                {goal.type === 'Spending' && (
+                                  <>Limiting Spending</>
+                                )}
+                              </div>
+                            </div>
+                            {goal.current_amount !== undefined &&
+                              goal.target_amount !== undefined && (
+                                <div>
+                                  {goal.initial_amount !== undefined && (
+                                    <div className={styles.goalPair}>
+                                      <div className={styles.goalLabel}>
+                                        Initial Amount:
+                                      </div>
+                                      <div className={styles.goalValue}>
+                                        R {goal.initial_amount.toFixed(2)}
+                                      </div>
+                                    </div>
+                                  )}
+                                  <div className={styles.goalPair}>
+                                    <div className={styles.goalLabel}>
+                                      Current Amount:
+                                    </div>
+                                    <div className={styles.goalValue}>
+                                      R {goal.current_amount.toFixed(2)}
+                                    </div>
+                                  </div>
+                                  <div className={styles.goalPair}>
+                                    <div className={styles.goalLabel}>
+                                      Target Amount:
+                                    </div>
+                                    <div className={styles.goalValue}>
+                                      R{goal.target_amount.toFixed(2)}
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            <div className={styles.goalPair}>
+                              <div className={styles.goalLabel}>
+                                Start Date:
+                              </div>
+                              <div className={styles.goalValue}>
+                                {goal.start_date}
+                              </div>
+                            </div>
+                            {goal.target_date && (
+                              <div>
+                                <div className={styles.goalPair}>
+                                  <div className={styles.goalLabel}>
+                                    Target Date:
+                                  </div>
+                                  <div className={styles.goalValue}>
+                                    {goal.target_date}
+                                  </div>
+                                </div>
+                                <div className={styles.goalPair}>
+                                  <div className={styles.goalLabel}>
+                                    Days Left:
+                                  </div>
+                                  <div className={styles.goalValue}>
+                                    {calculateDaysLeft(goal.target_date) > 0
+                                      ? ` ${calculateDaysLeft(
+                                          goal.target_date
+                                        )}`
+                                      : 'Target Date Passed'}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {goal.spending_limit !== undefined && (
+                              <div className={styles.goalPair}>
+                                <div className={styles.goalLabel}>
+                                  Spending Limit:
+                                </div>
+                                <div className={styles.goalValue}>
+                                  R {goal.spending_limit.toFixed(2)}
+                                </div>
+                              </div>
+                            )}
+                            {goal.spending_limit !== undefined && (
+                              <div className={styles.goalPair}>
+                                <div className={styles.goalLabel}>
+                                  Spent this Month:
+                                </div>
+                                <div className={styles.goalValue}>
+                                  R {monthlyBudgetSpent(goal).toFixed(2)}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          <div
+                            className={styles.updateViewButton}
+                            onClick={() => handleUpdateGoalPopup(index)}
+                          >
+                            Update Progress
+                          </div>
+                          {updatePopupOpen[index] && (
+                            <UpdateGoalPopup
+                              togglePopup={() => handleUpdateGoalPopup(index)}
+                              goal={goal}
+                            />
+                          )}
+                        </div>
 
-                    {goal.current_amount !== undefined &&
-                      goal.target_amount !== undefined && (
-                        <GraphCarousel goal={goal} key={goal.id} />
-                      )}
-                    {goal.spending_limit !== undefined && (
-                      <GraphCarousel goal={goal} key={goal.id} />
-                    )}
+                        {goal.current_amount !== undefined &&
+                          goal.target_amount !== undefined && (
+                            <GraphCarousel goal={goal} key={goal.id} />
+                          )}
+                        {goal.spending_limit !== undefined && (
+                          <GraphCarousel goal={goal} key={goal.id} />
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </>
-        ) : (
-          <></>
-        )}
-      </div>
+                ))}
+              </>
+            ) : (
+              <></>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
