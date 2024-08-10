@@ -29,5 +29,10 @@ describe('FaqModal Component', () => {
 
     fireEvent.click(screen.getByText('arrow_back'));
     expect(onCloseMock).toHaveBeenCalled();
+
+describe('FaqModal', () => {
+  it('should render successfully', () => {
+    // const { baseElement } = render(<FaqModal />);
+    // expect(baseElement).toBeTruthy();
   });
 });

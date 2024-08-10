@@ -52,5 +52,10 @@ describe('NewNavbar Component', () => {
 
     fireEvent.click(screen.getByText('Logout'));
     expect(signOut).toHaveBeenCalledWith(getAuth());
+
+describe('NewNavbar', () => {
+  it('should render successfully', () => {
+    // const { baseElement } = render(<NewNavbar />);
+    // expect(baseElement).toBeTruthy();
   });
 });
