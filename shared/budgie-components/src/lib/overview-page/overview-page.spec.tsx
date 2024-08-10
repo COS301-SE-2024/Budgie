@@ -8,7 +8,8 @@ import {
 import OverviewPage from './overview-page';
 import {
   getUser,
-  getAccounts
+  getAccounts,
+  getTransactions,
 } from './overviewServices';
 import { getAuth } from 'firebase/auth';
 
@@ -124,6 +125,94 @@ describe('getAccounts', () => {
     mockGetDocs.mockRejectedValue(new Error('Firestore error'));
 
     await expect(getAccounts()).rejects.toThrow('Firestore error');
+  });
+
+});
+
+
+describe('getTransactions', () => {
+  it('should return transactions for the user and account for the current year', async () => {
+    const mockUid = '123456';
+    const mockAccountNumber = 'ACC123';
+    const mockTransactions = [
+      { id: 'txn1', amount: 100 },
+      { id: 'txn2', amount: 200 },
+    ];
+
+    // Mock Firestore methods
+    mockCollection.mockReturnValue('mockCollection');
+    mockWhere.mockReturnValue('mockWhere');
+    mockQuery.mockReturnValue('mockQuery');
+    mockGetDocs.mockResolvedValue({
+      forEach: (callback: (doc: any) => void) => {
+        const data = {
+          jan: JSON.stringify(mockTransactions),
+        };
+        callback({ data: () => data });
+      },
+    });
+
+    const transactions = await getTransactions(mockAccountNumber);
+
+    expect(transactions).toEqual(mockTransactions);
+    expect(mockGetDocs).toHaveBeenCalled();
+    expect(mockQuery).toHaveBeenCalledWith(
+      'mockCollection',
+      'mockWhere',
+      'mockWhere'
+    );
+  });
+  it('should handle non-JSON and non-array fields', async () => {
+    const mockUid = '123456';
+    const mockAccountNumber = 'ACC123';
+    const mockTransactions = [
+      { id: 'txn1', amount: 100 },
+      { id: 'txn2', amount: 200 },
+    ];
+
+    // Mock Firestore methods
+    mockCollection.mockReturnValue('mockCollection');
+    mockWhere.mockReturnValue('mockWhere');
+    mockQuery.mockReturnValue('mockQuery');
+    mockGetDocs.mockResolvedValue({
+      forEach: (callback: (doc: any) => void) => {
+        const data = {
+          jan: JSON.stringify(mockTransactions),
+          feb: mockTransactions, // array
+          mar: 'invalid-json-string',
+        };
+        callback({ data: () => data });
+      },
+    });
+
+    const transactions = await getTransactions(mockAccountNumber);
+
+    expect(transactions).toEqual([...mockTransactions, ...mockTransactions]);
+    expect(mockGetDocs).toHaveBeenCalled();
+    expect(mockQuery).toHaveBeenCalledWith(
+      'mockCollection',
+      'mockWhere',
+      'mockWhere'
+    );
+  });
+  it('should return an empty array if no transactions are found', async () => {
+    const mockUid = '123456';
+    const mockAccountNumber = 'ACC123';
+
+    // Mock Firestore methods
+    mockCollection.mockReturnValue('mockCollection');
+    mockWhere.mockReturnValue('mockWhere');
+    mockQuery.mockReturnValue('mockQuery');
+    mockGetDocs.mockResolvedValue({
+      forEach: (callback: (doc: any) => void) => {
+        // No transactions in Firestore
+      },
+    });
+
+    const transactions = await getTransactions(mockAccountNumber);
+
+    expect(transactions).toEqual([]);
+    expect(mockGetDocs).toHaveBeenCalled();
   });
 
 });
