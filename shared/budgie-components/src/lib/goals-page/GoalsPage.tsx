@@ -10,12 +10,7 @@ import {
   ResponsiveContainer,
   Label,
 } from 'recharts';
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-} from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import AddGoalPopup from '../add-goal-popup/AddGoalPopup';
@@ -181,8 +176,8 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
   const currentMonthName = monthNames[currentMonthIndex];
 
   const getColorForValue = (value: number): string => {
-    if (value < 100) return 'var(--primary-1)'; 
-    return '#FF0000'; 
+    if (value < 100) return 'var(--primary-1)';
+    return '#FF0000';
   };
 
   return (
@@ -409,7 +404,6 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
             </div>
           </div>
         )}
-        
 
         {goal.type === 'Spending' && (
           <div className={styles.carouselSlide} key="progress">
@@ -417,11 +411,18 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
               <CircularProgressbar
                 value={calculateProgressPercentage(goal)}
                 styles={buildStyles({
-                  pathColor: getColorForValue(calculateProgressPercentage(goal)),
+                  pathColor: getColorForValue(
+                    calculateProgressPercentage(goal)
+                  ),
                   trailColor: '#d6d6d6',
                 })}
               />
-              <div className={styles.percentageDisplay} style={{color: getColorForValue(calculateProgressPercentage(goal))}}>
+              <div
+                className={styles.percentageDisplay}
+                style={{
+                  color: getColorForValue(calculateProgressPercentage(goal)),
+                }}
+              >
                 {`${calculateProgressPercentage(goal).toFixed(2)}%`}
               </div>
               <div
@@ -519,8 +520,6 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
             </div>
           </div>
         )}
-
-
       </div>
     </div>
   );
@@ -537,7 +536,72 @@ export function GoalsPage() {
   const [updatePopupOpen, setUpdatePopupOpen] = useState<{
     [key: number]: boolean;
   }>({});
+  const [sortOption, setSortOption] = useState('name');
   const user = useContext(UserContext);
+
+  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortOption(event.target.value);
+  };
+  const sortGoals = (goals: Goal[], option: string) => {
+    return [...goals].sort((a, b) => {
+      const aValue =
+        option === 'name'
+          ? a.name
+          : option === 'type'
+          ? a.type
+          : option === 'start_date'
+          ? new Date(a.start_date || '').getTime()
+          : option === 'end_date'
+          ? new Date(a.target_date || '').getTime()
+          : option === 'progress'
+          ? calculateProgressPercentage(a)
+          : 0;
+
+      const bValue =
+        option === 'name'
+          ? b.name
+          : option === 'type'
+          ? b.type
+          : option === 'start_date'
+          ? new Date(b.start_date || '').getTime()
+          : option === 'end_date'
+          ? new Date(b.target_date || '2100-01-01').getTime()
+          : option === 'progress'
+          ? calculateProgressPercentage(b)
+          : 0;
+
+          if (aValue === null && bValue !== null) return -1;
+          if (bValue === null && aValue !== null) return 1;
+      
+          // Compare values if both are present
+          if (aValue < bValue) return -1;
+          if (aValue > bValue) return 1;
+      return 0;
+    });
+  };
+
+  const calculateProgressPercentage = (goal: Goal): number => {
+    if (goal.current_amount && goal.target_amount !== undefined) {
+      if (goal.initial_amount) {
+        return Math.min(
+          100,
+          ((goal.initial_amount - goal.current_amount) /
+            (goal.initial_amount - goal.target_amount)) *
+            100
+        );
+      } else {
+        return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
+      }
+    }
+    if (
+      goal.spending_limit !== undefined &&
+      goal.monthly_updates !== undefined
+    ) {
+      const amountForCurrentMonth = monthlyBudgetSpent(goal);
+      return (amountForCurrentMonth / goal.spending_limit) * 100;
+    }
+    return 0;
+  };
 
   const calculateDaysLeft = (targetDate: string): number => {
     const currentDate = new Date();
@@ -558,11 +622,12 @@ export function GoalsPage() {
           ...data,
         };
       });
-      setGoals(goalsList);
+      setGoals(sortGoals(goalsList, sortOption));
     } catch (error) {
-      console.error('Error getting bank statement document:', error);
+      console.error('Error getting goals document:', error);
     }
   };
+  
 
   const addGoalPopup = () => {
     setIsGoalPopupOpen(!isGoalPopupOpen);
@@ -571,7 +636,7 @@ export function GoalsPage() {
 
   useEffect(() => {
     fetchGoals();
-  }, []);
+  }, [sortOption]);
 
   const handleEditGoalPopup = (index: number) => {
     setEditPopupOpen((prevState) => ({
@@ -612,6 +677,16 @@ export function GoalsPage() {
         <button className={styles.addGoalsButton} onClick={addGoalPopup}>
           Add a Goal
         </button>
+        <div style={{display:"flex", alignItems:'center'}}>
+          <p className={styles.sortHeader}>Sort By:</p>
+        <select value={sortOption} onChange={handleSortChange} className={styles.sortDropdown}>
+          <option value="name">Name</option>
+          <option value="type">Type</option>
+          <option value="start_date">Start Date</option>
+          <option value="end_date">Target Date</option>
+          <option value="progress">Progress</option>
+        </select>
+        </div>
         {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
       </div>
       <div

@@ -73,14 +73,49 @@
 .header {
   width: 80%;
   display: flex;
-  justify-content: left;
+  justify-content: space-between;
   padding-bottom: 1rem;
   padding-top: 1rem;
   border-bottom: 1px solid var(--greyed-text);
   position: fixed;
   background-color: var(--main-background);
   z-index: 10;
+  font-size: calc(1.2rem * var(--font-size-multiplier));
 }
+
+.sortHeader {
+  font-weight: bold;
+  margin-right: 1rem;
+}
+.sortDropdown {
+  background-color: var(--block-background);
+  padding-right: 2.5vw;
+  font-size: calc(1.2rem * var(--font-size-multiplier));
+  transition: 0.2s ease;
+  border: none;
+  transition: 0.2s ease;
+}
+
+.sortDropdown option {
+  text-align: left;
+  background-color: white;
+  color: black;
+}
+
+.addGoalsButton {
+  width: calc(10rem * var(--font-size-multiplier));
+  height: calc(4rem * var(--font-size-multiplier));
+  color: white;
+  background-color: var(--primary-1);
+  font-weight: bold;
+  border-radius: 10px;
+  transition: 0.3s ease;
+}
+
+.addGoalsButton:hover {
+  filter: brightness(1.15);
+}
+
 
 .planningModalContainer {
   width: 80%;
@@ -113,20 +148,6 @@
   display: flex;
   align-items: center;
   flex-direction: column;
-}
-
-.addGoalsButton {
-  width: calc(10rem * var(--font-size-multiplier));
-  height: calc(4rem * var(--font-size-multiplier));
-  color: white;
-  background-color: var(--primary-1);
-  font-weight: bold;
-  border-radius: 10px;
-  transition: 0.3s ease;
-}
-
-.addGoalsButton:hover {
-  filter: brightness(1.15);
 }
 
 .goalsContainer {
@@ -249,4 +270,3 @@
 .arrow:hover {
   color: #000;
 }
-
