@@ -40,41 +40,48 @@ export function AccountSettings(props: AccountSettingsProps) {
 
   const handleChangePassword = async () => {
     const user = auth.currentUser;
-
+    setError(!error);
+    setMessage('');
     if (!user) {
       console.error('No user is currently logged in.');
       setError(true);
       setErrorMessage('No user is currently logged in.');
       return;
     }
+
     const credential = EmailAuthProvider.credential(user.email, OldPassword);
-    await reauthenticateWithCredential(user, credential)
-      .then(() => {
-        console.log('Authenticated successfully');
-      })
-      .catch((error) => {
-        console.log('Reauthentication failed');
-        setError(true);
-        setErrorMessage(error.message);
-        return;
-      });
-    if (newPassword !== ConPassword) {
+
+    try {
+      await reauthenticateWithCredential(user, credential);
+      console.log('Authenticated successfully');
+    } catch (error) {
+      console.log('Reauthentication failed');
       setError(true);
-      setErrorMessage('Password mismatch');
+      setErrorMessage(error.message);
       return;
     }
+    const r =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-    updatePassword(user, newPassword)
-      .then(() => {
-        console.log('new password set');
-        handlecClosePopup();
-      })
-      .catch((e) => {
-        console.log('here');
+    try {
+      const ans = r.test(newPassword);
+      if (ans === false) {
+        const e = new Error('Weak password');
+        throw e;
+      }
+      if (newPassword !== ConPassword) {
         setError(true);
-        setErrorMessage(e.message);
+        setErrorMessage('Password mismatch');
         return;
-      });
+      }
+      await updatePassword(user, newPassword);
+      console.log('New password set');
+      handlecClosePopup();
+    } catch (e) {
+      console.log('Error setting new password');
+      setError(true);
+      setErrorMessage(e.message);
+    }
   };
 
   const handleDeleteUser = async () => {
@@ -119,6 +126,7 @@ export function AccountSettings(props: AccountSettingsProps) {
 
   const handlecClosePopup = () => {
     setCPopupVisible(false);
+    setError(!error);
   };
 
   return (
@@ -166,7 +174,7 @@ export function AccountSettings(props: AccountSettingsProps) {
                 <input
                   type="password"
                   value={ConPassword}
-                  placeholder="Enter your new password"
+                  placeholder="Confirm new password"
                   onChange={(e) => setConPassword(e.target.value)}
                   className="px-2 py-2 border border-gray-300 rounded w-500 mb-4 "
                 />
@@ -194,7 +202,7 @@ export function AccountSettings(props: AccountSettingsProps) {
           )}
         </div>
         <div className={styles.settingsOption}>
-          <p className={styles.settingTitle}>Delete Account</p>
+          <p className={styles.settingTitle}>Account Deletion</p>
           <p className={styles.settingDescription}>
             Click the button below to start deleting your account. Learn about
             our deletion policy here.
