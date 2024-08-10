@@ -43,12 +43,12 @@ export function SignUpModal(props: SignUpModalProps) {
         const errorMessage = error.message;
         const email = error.customData?.email;
         const credential = GoogleAuthProvider.credentialFromError(error);
-        console.error('Error code:', errorCode);
-        console.error('Error message:', errorMessage);
-        console.error('Email:', email);
-        console.error('Credential:', credential);
+        console.log('Error code:', errorCode);
+        console.log('Error message:', errorMessage);
+        console.log('Email:', email);
+        console.log('Credential:', credential);
       } else {
-        console.error('Unexpected error', error);
+        console.log('Unexpected error', error);
       }
     }
   };
@@ -109,7 +109,7 @@ export function SignUpModal(props: SignUpModalProps) {
           console.log(errorMessage);
         }
       } else {
-        console.error('Unexpected error', err);
+        console.log('Unexpected error', err);
       }
     }
   }
