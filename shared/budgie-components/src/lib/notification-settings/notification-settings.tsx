@@ -81,6 +81,7 @@ export function NotificationSettings(props: NotificationSettingsProps) {
                       type="checkbox"
                       className="toggle-switch"
                       name="budget"
+                      data-testid="budget"
                       checked={settings.budget}
                       onChange={handleCheckboxChange}
                     />
@@ -101,6 +102,7 @@ export function NotificationSettings(props: NotificationSettingsProps) {
                       type="checkbox"
                       className="toggle-switch"
                       name="goal"
+                      data-testid="goal"
                       checked={settings.goal}
                       onChange={handleCheckboxChange}
                     />
@@ -120,6 +122,7 @@ export function NotificationSettings(props: NotificationSettingsProps) {
                       type="checkbox"
                       className="toggle-switch"
                       name="spending"
+                      data-testid="spending"
                       checked={settings.spending}
                       onChange={handleCheckboxChange}
                     />
@@ -140,6 +143,7 @@ export function NotificationSettings(props: NotificationSettingsProps) {
                       type="checkbox"
                       className="toggle-switch"
                       name="csv"
+                      data-testid="csv"
                       checked={settings.csv}
                       onChange={handleCheckboxChange}
                     />
