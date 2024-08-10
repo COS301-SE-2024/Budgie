@@ -15,6 +15,7 @@ import {
   getLastTransaction,
   getMonthlyIncome,
   getMonthlyExpenses,
+  getExpensesByCategory
 } from './overviewServices';
 import { getAuth } from 'firebase/auth';
 
@@ -443,6 +444,58 @@ describe('getMonthlyExpenses', () => {
   });
 });
 
+
+describe('getExpensesByCategory', () => {
+  it('should return correct totals for each category', async () => {
+    const transactions = [
+      { category: 'Groceries', amount: -100 },
+      { category: 'Utilities', amount: -50 },
+      { category: 'Entertainment', amount: -75 },
+      { category: 'Transport', amount: -25 },
+      { category: 'Insurance', amount: -150 },
+      { category: 'Medical Aid', amount: -200 },
+      { category: 'Eating Out', amount: -60 },
+      { category: 'Shopping', amount: -80 },
+      { category: 'Other', amount: -30 },
+      { category: 'Groceries', amount: -20 }, // another Groceries transaction
+    ];
+
+    const result = await getExpensesByCategory(transactions);
+
+    expect(result).toEqual([120, 50, 75, 25, 150, 200, 60, 80, 30]);
+  });
+
+  it('should return an array of zeros when no transactions are present', async () => {
+    const transactions: any[] = [];
+    const result = await getExpensesByCategory(transactions);
+
+    expect(result).toEqual([0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('should ignore transactions with categories not in the list', async () => {
+    const transactions = [
+      { category: 'Groceries', amount: -100 },
+      { category: 'Vacation', amount: -500 }, // category not in the list
+      { category: 'Other', amount: -30 },
+    ];
+
+    const result = await getExpensesByCategory(transactions);
+
+    expect(result).toEqual([100, 0, 0, 0, 0, 0, 0, 0, 30]);
+  });
+
+  it('should handle mixed positive and negative amounts correctly', async () => {
+    const transactions = [
+      { category: 'Groceries', amount: -100 },
+      { category: 'Groceries', amount: 50 }, 
+      { category: 'Utilities', amount: -50 },
+    ];
+
+    const result = await getExpensesByCategory(transactions);
+
+    expect(result).toEqual([50, 50, 0, 0, 0, 0, 0, 0, 0]);
+  });
+});
 
 /*===========================================================================================
 INTEGRATED TESTS
