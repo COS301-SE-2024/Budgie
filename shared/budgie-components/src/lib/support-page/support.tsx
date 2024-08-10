@@ -106,7 +106,7 @@ export function Support(props: SupportProps) {
                   }}
                   className=" bg-blue-950 BudgieBlue px-4 py-2 rounded-full shadow-lg"
                 >
-                  Contacts
+                  Contact
                 </button>
               )}
               {showContact && (
