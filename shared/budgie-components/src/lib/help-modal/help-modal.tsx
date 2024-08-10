@@ -90,13 +90,6 @@ export function HelpModal(props: HelpModalProps) {
               for.
             </p>
             <p className="text-s text-gray-500">
-              <strong>Transactions Page:</strong>Allows the user to see account
-              transactions within a timeframe of a month or year. The
-              transactions provided to the user are categorized and can be
-              further categorized by the user to show what each transaction was
-              for.
-            </p>
-            <p className="text-s text-gray-500">
               <strong>Planning Page:</strong>Provides a predictions of expected
               income and expenditures based on past spending patterns and
               expected payments. Predictions of common expenses such as petrol
