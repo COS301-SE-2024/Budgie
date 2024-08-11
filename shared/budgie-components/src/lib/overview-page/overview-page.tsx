@@ -92,6 +92,10 @@ export function OverviewPage(props: OverviewPageProps) {
       }
     }
     someFunction();
+
+    const storedTheme = localStorage.getItem('data-theme') || 'light';
+    if(storedTheme === 'dark') { setIsDarkMode(true);}
+    else {setIsDarkMode(false)}
   }, [showData]);
 
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -134,7 +138,7 @@ export function OverviewPage(props: OverviewPageProps) {
     { name: 'Other', value: expenseByCategory[8] },
   ];
 
-  const CATEGORY_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  const CATEGORY_COLORS = ['#A98DFB', '#FDAD73', '#FD7575', '#4EB5FF', '#72F1E2', '#C1C1C1', '#FFCD4E', '#FB94F1', 'var(--main-text)',];
 
   const hasAccounts = accounts.length > 0;
 
@@ -166,12 +170,12 @@ export function OverviewPage(props: OverviewPageProps) {
                 isDarkMode ? styles.dark : styles.light
               }`}
             >
-              <button
+              {/*<button
                 className={`${styles.toggleButton} ${styles.greenButton}`}
                 onClick={toggleTheme}
               >
                 {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              </button>
+              </button>*/}
               <div className={styles.fullWidthChart}>
                 <div className={styles.chartTitleContainer}>
                   <h3 className={styles.chartTitle}>Net Worth Over Time</h3>
