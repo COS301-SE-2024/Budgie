@@ -125,6 +125,17 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
     }
   };
 
+  function getPopupWidth(): string {
+    const root = document.documentElement;
+    const computedStyle = getComputedStyle(root);
+    const width = 20 - (((35 * parseFloat(computedStyle.getPropertyValue('--font-size-multiplier')))-35)*0.5);
+    const widthString = width.toString();
+    console.log(computedStyle.getPropertyValue('--font-size-multiplier'));
+    return widthString + "vw";
+  };
+
+  const popupWidth = getPopupWidth();
+
   return (
     <div className={styles.goalForm}>
       <form onSubmit={handleSubmit}>
@@ -143,7 +154,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               >
                 info
               </span>
-              <span className={styles.popupText}>
+              <span className={styles.popupText} style={{width: popupWidth}}>
                 Enter a descriptive name for your savings goal. This could be a
                 short term goal like a vacation fund or a long term goal like
                 your retirement savings.
@@ -166,7 +177,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               >
                 info
               </span>
-              <span className={styles.popupText}>
+              <span className={styles.popupText} style={{width: popupWidth}}>
                 If you have already saved money towards this goal, add that
                 amount here. If you haven't, you should leave it as 0.
               </span>
@@ -186,7 +197,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               >
                 info
               </span>
-              <span className={styles.popupText}>
+              <span className={styles.popupText} style={{width: popupWidth}}>
                 Enter the amount of money you aim to save for this goal.
               </span>
               <label>Target Savings Amount:</label>
@@ -205,7 +216,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               >
                 info
               </span>
-              <span className={styles.popupText}>
+              <span className={styles.popupText} style={{width: popupWidth}}>
                 Select the date you started working towards this goal.
               </span>
               <label>Start Date:</label>
@@ -226,7 +237,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               >
                 info
               </span>
-              <span className={styles.popupText}>
+              <span className={styles.popupText} style={{width: popupWidth}}>
                 Select the date by which you want to reach this goal.
               </span>
               <label>Target Date:</label>
@@ -255,7 +266,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               >
                 info
               </span>
-              <span className={styles.popupText}>
+              <span className={styles.popupText} style={{width: popupWidth}}>
                 Enter a descriptive name for your debt reduction goal. This
                 could be a goal to pay off any money you owe, such as a credit
                 card or a loan.
@@ -278,7 +289,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               >
                 info
               </span>
-              <span className={styles.popupText}>
+              <span className={styles.popupText} style={{width: popupWidth}}>
                 Enter the amount of money you currently owe.
               </span>
               <label>Current Debt Amount:</label>
@@ -297,7 +308,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               >
                 info
               </span>
-              <span className={styles.popupText}>
+              <span className={styles.popupText} style={{width: popupWidth}}>
                 Enter the amount of money you aim to owe. This should be less
                 than the current amount you owe and can even be zero.
               </span>
@@ -317,7 +328,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               >
                 info
               </span>
-              <span className={styles.popupText}>
+              <span className={styles.popupText} style={{width: popupWidth}}>
                 Select the date you started working towards this goal.
               </span>
               <label>Start Date:</label>
@@ -338,7 +349,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               >
                 info
               </span>
-              <span className={styles.popupText}>
+              <span className={styles.popupText} style={{width: popupWidth}}>
                 Select the date by which you want to reach this goal.
               </span>
               <label>Target Date:</label>
@@ -367,7 +378,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               >
                 info
               </span>
-              <span className={styles.popupText}>
+              <span className={styles.popupText} style={{width: popupWidth}}>
                 Enter a descriptive name for your spending reduction goal. This
                 could be a specific type of spending you want to reduce such as
                 entertainment or dining out.
@@ -390,7 +401,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               >
                 info
               </span>
-              <span className={styles.popupText}>
+              <span className={styles.popupText} style={{width: popupWidth}}>
                 Select the date you started working towards this goal.
               </span>
               <label>Start Date:</label>
@@ -411,7 +422,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               >
                 info
               </span>
-              <span className={styles.popupText}>
+              <span className={styles.popupText} style={{width: popupWidth}}>
                 Enter the monthly spending limit you want to set for this type
                 of expense. Spending below this amount each month will
                 contribute to your progress.

@@ -137,7 +137,6 @@
   transform: translateX(calc(35vw * var(--font-size-multiplier)));
   opacity: 0;
   transition: opacity 0.3s;
-  width: 25vw;
   font-weight: 200;
 }
 
