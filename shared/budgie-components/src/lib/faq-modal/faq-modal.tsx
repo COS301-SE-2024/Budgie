@@ -1,7 +1,9 @@
 import styles from './faq-modal.module.css';
 
 /* eslint-disable-next-line */
-export interface FaqModalProps {}
+export interface FaqModalProps {
+  onClose: () => void;
+}
 
 export function FaqModal(props: FaqModalProps) {
   return (
@@ -11,6 +13,7 @@ export function FaqModal(props: FaqModalProps) {
           <span
             className="material-symbols-outlined cursor-pointer"
             style={{ marginRight: '0.5rem', fontSize: '1.5rem' }}
+            onClick={props.onClose}
           >
             arrow_back
           </span>

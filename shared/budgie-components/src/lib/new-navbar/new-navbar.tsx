@@ -11,13 +11,7 @@ export interface NavbarProps {}
 
 function signout() {
   const auth = getAuth();
-  signOut(auth)
-    .then(() => {
-      console.log('signed out');
-    })
-    .catch((error) => {
-      console.log('error');
-    });
+  signOut(auth);
 }
 
 function getFirstSubstring(url: string) {

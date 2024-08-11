@@ -2,7 +2,14 @@
 import styles from './AccountSettings.module.css';
 import '../../root.css';
 import React, { useState, useEffect } from 'react';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  getFirestore,
+  collection,
+  getDocs,
+} from 'firebase/firestore';
 import { updatePassword } from 'firebase/auth';
 import { db, auth } from '../../../../../apps/budgie-app/firebase/clientApp';
 import {
@@ -33,41 +40,48 @@ export function AccountSettings(props: AccountSettingsProps) {
 
   const handleChangePassword = async () => {
     const user = auth.currentUser;
-
+    setError(!error);
+    setMessage('');
     if (!user) {
       console.error('No user is currently logged in.');
       setError(true);
       setErrorMessage('No user is currently logged in.');
       return;
     }
+
     const credential = EmailAuthProvider.credential(user.email, OldPassword);
-    await reauthenticateWithCredential(user, credential)
-      .then(() => {
-        console.log('Authenticated successfully');
-      })
-      .catch((error) => {
-        console.log('Reauthentication failed');
-        setError(true);
-        setErrorMessage(error.message);
-        return;
-      });
-    if (newPassword !== ConPassword) {
+
+    try {
+      await reauthenticateWithCredential(user, credential);
+      console.log('Authenticated successfully');
+    } catch (error) {
+      console.log('Reauthentication failed');
       setError(true);
-      setErrorMessage('Password mismatch');
+      setErrorMessage(error.message);
       return;
     }
+    const r =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-    updatePassword(user, newPassword)
-      .then(() => {
-        console.log('new password set');
-        handlecClosePopup();
-      })
-      .catch((e) => {
-        console.log('here');
+    try {
+      const ans = r.test(newPassword);
+      if (ans === false) {
+        const e = new Error('Weak password');
+        throw e;
+      }
+      if (newPassword !== ConPassword) {
         setError(true);
-        setErrorMessage(e.message);
+        setErrorMessage('Password mismatch');
         return;
-      });
+      }
+      await updatePassword(user, newPassword);
+      console.log('New password set');
+      handlecClosePopup();
+    } catch (e) {
+      console.log('Error setting new password');
+      setError(true);
+      setErrorMessage(e.message);
+    }
   };
 
   const handleDeleteUser = async () => {
@@ -77,15 +91,22 @@ export function AccountSettings(props: AccountSettingsProps) {
       return;
     }
     const credential = EmailAuthProvider.credential(user.email || '', password);
+    //const db = getFirestore();
     try {
       await reauthenticateWithCredential(user, credential);
+      /*const userRef = doc(db, 'accounts', user.uid);
+      await updateDoc(userRef, {
+        account_number: 'ANONYMIZED',
+        alias: 'ANONYMIZED',
+        name: 'ANONYMIZED',
+      });*/
       await deleteUser(user);
       auth.signOut();
 
-      alert('User deleted.');
+      //alert('User deleted.');
     } catch (error) {
-      console.error('Error deleting user:', error);
-      alert('Failed to delete user: ' + (error as Error).message);
+      console.log('Error deleting user:', error);
+      //alert('Failed to delete user: ' + (error as Error).message);
     }
   };
   const [isPopupVisible, setPopupVisible] = useState(false);
@@ -105,6 +126,7 @@ export function AccountSettings(props: AccountSettingsProps) {
 
   const handlecClosePopup = () => {
     setCPopupVisible(false);
+    setError(!error);
   };
 
   return (
@@ -121,30 +143,24 @@ export function AccountSettings(props: AccountSettingsProps) {
       </div>
       <div className={styles.settingsOptionsContainer}>
         <div className={styles.settingsOption}>
-          <p className={styles.settingTitle}>Profile Information</p>
-          <p className={styles.settingDescription}>
-            Edit your profile information.
-          </p>
-        </div>
-        <div className="p-4 bg-white shadow-md rounded-md">
-          <p className="text-lg font-semibold mb-2">Password Management</p>
-          <p className="text-sm text-gray-600 mb-4">Change your password.</p>
+          <p className={styles.settingTitle}>Password Management</p>
+          <p className={styles.settingDescription}>Change your password.</p>
           <button
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            className={styles.deleteButton}
             onClick={handlePassChangeClick}
           >
-            Change password
+            <div className={styles.deleteButton}>Change password</div>
           </button>
           {isCPopupVisible && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <div className="bg-white p-6 rounded-md shadow-md">
+            <div className={styles.changeOverlay}>
+              <div className={styles.popupContent}>
                 <p className="mb-2">Type in your old password:</p>
                 <input
                   type="password"
                   value={OldPassword}
                   placeholder="Enter your old password"
                   onChange={(e) => setOldPassword(e.target.value)}
-                  className="px-2 py-2 border border-gray-300 rounded w-3/4 mb-4"
+                  className="px-2 py-2 border border-gray-300 rounded w-500 mb-4"
                 />
                 <p className="mb-2">Type in your new password:</p>
                 <input
@@ -152,15 +168,15 @@ export function AccountSettings(props: AccountSettingsProps) {
                   value={newPassword}
                   placeholder="Enter your new password"
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="px-2 py-2 border border-gray-300 rounded w-3/4 mb-4"
+                  className="px-2 py-2 border border-gray-300 rounded w-500 mb-4"
                 />
                 <p className="mb-2">Confirm new password:</p>
                 <input
                   type="password"
                   value={ConPassword}
-                  placeholder="Enter your new password"
+                  placeholder="Confirm new password"
                   onChange={(e) => setConPassword(e.target.value)}
-                  className="px-2 py-2 border border-gray-300 rounded w-3/4 mb-4"
+                  className="px-2 py-2 border border-gray-300 rounded w-500 mb-4 "
                 />
                 <div className="flex justify-between mt-4">
                   <button
@@ -170,7 +186,7 @@ export function AccountSettings(props: AccountSettingsProps) {
                     Confirm
                   </button>
                   <button
-                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-900"
                     onClick={handlecClosePopup}
                   >
                     Cancel
@@ -186,7 +202,7 @@ export function AccountSettings(props: AccountSettingsProps) {
           )}
         </div>
         <div className={styles.settingsOption}>
-          <p className={styles.settingTitle}>Delete Account</p>
+          <p className={styles.settingTitle}>Account Deletion</p>
           <p className={styles.settingDescription}>
             Click the button below to start deleting your account. Learn about
             our deletion policy here.

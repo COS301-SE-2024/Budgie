@@ -9,7 +9,10 @@ import {
   updateDoc,
   query,
   where,
+  query,
+  where,
 } from 'firebase/firestore';
+import { useThemeSettings } from '../../useThemes';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from 'firebase/auth';
 import '../../root.css';
@@ -31,7 +34,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   const [yearsWithData, setYearsWithData] = useState<number[]>([]);
   const [LeftArrowStyle, setLeftArrowStyle] = useState('');
   const [RightArrowStyle, setRightArrowStyle] = useState('');
-
+  useThemeSettings();
   interface Transaction {
     date: string;
     amount: number;
@@ -69,7 +72,6 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     'november',
     'december',
   ];
-
   useEffect(() => {
     const getYearlyTransactions = async () => {
       try {
@@ -85,7 +87,6 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
         console.error('Error getting bank statement document:', error);
       }
     };
-
     const auth = getAuth();
     if (auth) {
       const user = auth.currentUser;
