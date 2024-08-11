@@ -11,13 +11,7 @@ export interface NavbarProps {}
 
 function signout() {
   const auth = getAuth();
-  signOut(auth)
-    .then(() => {
-      console.log('signed out');
-    })
-    .catch((error) => {
-      console.log('error');
-    });
+  signOut(auth);
 }
 
 function getFirstSubstring(url: string) {
@@ -104,6 +98,30 @@ export function NewNavbar(props: NavbarProps) {
               receipt_long
             </span>
             Transactions
+          </li>
+        </Link>
+        {/* Planning item */}
+        <Link href={'/planning'}>
+          <li
+            className={`${styles.navItem} ${
+              selectedItem === 'planning' ? styles.selected : ''
+            }`}
+            onClick={() => setSelectedItem('planning')}
+          >
+            <span
+              className="material-symbols-outlined"
+              style={{
+                marginRight: '0.3rem',
+                marginLeft: '0.3rem',
+                marginBottom: '0.2rem',
+                fontSize:
+                  'min(2rem, (calc(1.5rem * var(--font-size-multiplier))))',
+                fontWeight: 500,
+              }}
+            >
+            browse_activity
+            </span>
+            Planning
           </li>
         </Link>
         {/* Settings item */}

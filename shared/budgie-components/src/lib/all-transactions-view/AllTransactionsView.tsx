@@ -7,9 +7,10 @@ import {
   doc,
   getDocs,
   updateDoc,
-  query, 
-  where
+  query,
+  where,
 } from 'firebase/firestore';
+import { useThemeSettings } from '../../useThemes';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from 'firebase/auth';
 import '../../root.css';
@@ -29,7 +30,9 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   const user = useContext(UserContext);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [yearsWithData, setYearsWithData] = useState<number[]>([]);
-
+  const [LeftArrowStyle, setLeftArrowStyle] = useState('');
+  const [RightArrowStyle, setRightArrowStyle] = useState('');
+  useThemeSettings();
   interface Transaction {
     date: string;
     amount: number;
@@ -40,15 +43,17 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
 
   const handleNextYear = () => {
     const Now = new Date();
-    if(Now.getFullYear()!=currentYear){
-      setCurrentYear(currentYear+1)
+    if (Now.getFullYear() != currentYear) {
+      setCurrentYear(currentYear + 1);
       display();
     }
   };
 
   const handlePrevYear = () => {
-   setCurrentYear(currentYear-1)
-   display();
+    if (currentYear != props.availableYears[0]) {
+      setCurrentYear(currentYear - 1);
+      display();
+    }
   };
 
   const monthNames = [
@@ -65,19 +70,21 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     'november',
     'december',
   ];
-
   useEffect(() => {
     const getYearlyTransactions = async () => {
       try {
-        const q = query(collection(db, `transaction_data_${currentYear}`), where('uid', '==', user.uid), where('account_number', '==', props.account));
+        const q = query(
+          collection(db, `transaction_data_${currentYear}`),
+          where('uid', '==', user.uid),
+          where('account_number', '==', props.account)
+        );
         const querySnapshot = await getDocs(q);
-        const transactionList = querySnapshot.docs.map(doc => doc.data());
+        const transactionList = querySnapshot.docs.map((doc) => doc.data());
         setData(transactionList[0]);
       } catch (error) {
         console.error('Error getting bank statement document:', error);
       }
     };
-
     const auth = getAuth();
     if (auth) {
       const user = auth.currentUser;
@@ -97,8 +104,56 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     fetchAvailableYears();
   }, []);
 
+  useEffect(() => {
+    if (currentYear == new Date().getFullYear()) {
+      setRightArrowStyle('Greyed');
+    } else {
+      setRightArrowStyle('Normal');
+    }
+
+    if (currentYear == yearsWithData[0]) {
+      setLeftArrowStyle('Greyed');
+    } else {
+      setLeftArrowStyle('Normal');
+    }
+  }, [yearsWithData]);
+
+  const getLeftArrowStyle = () => {
+    switch (LeftArrowStyle) {
+      case 'Normal':
+        return styles.leftNavButton;
+      case 'Greyed':
+        return styles.greyedleftNavButton;
+      default:
+        return styles.leftNavButton;
+    }
+  };
+
+  const getRightArrowStyle = () => {
+    switch (RightArrowStyle) {
+      case 'Normal':
+        return styles.rightNavButton;
+      case 'Greyed':
+        return styles.greyedrightNavButton;
+      default:
+        return styles.rightNavButton;
+    }
+  };
+
   const display = async () => {
-    if(Data!=null){
+    if (currentYear == new Date().getFullYear()) {
+      setRightArrowStyle('Greyed');
+    } else {
+      setRightArrowStyle('Normal');
+    }
+
+    if (currentYear == yearsWithData[0]) {
+      setLeftArrowStyle('Greyed');
+    } else {
+      setLeftArrowStyle('Normal');
+    }
+
+    if (Data != null) {
       let transactionsList: any[] = [];
       for (let i = 0; i < 12; i++) {
         if (Data[monthNames[i]]) {
@@ -109,17 +164,22 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
       }
       setTransactions(transactionsList);
       const moneyInTotal = transactionsList
-        .filter((transaction: { amount: number; }) => transaction.amount > 0)
-        .reduce((acc: any, transaction: { amount: any; }) => acc + transaction.amount, 0);
+        .filter((transaction: { amount: number }) => transaction.amount > 0)
+        .reduce(
+          (acc: any, transaction: { amount: any }) => acc + transaction.amount,
+          0
+        );
 
       const moneyOutTotal = transactionsList
-        .filter((transaction: { amount: number; }) => transaction.amount < 0)
-        .reduce((acc: any, transaction: { amount: any; }) => acc + transaction.amount, 0);
+        .filter((transaction: { amount: number }) => transaction.amount < 0)
+        .reduce(
+          (acc: any, transaction: { amount: any }) => acc + transaction.amount,
+          0
+        );
 
       setMoneyIn(moneyInTotal);
       setMoneyOut(Math.abs(moneyOutTotal)); // moneyOut should be positive for display
-    }
-    else{
+    } else {
       setTransactions([]);
       setBalance(0);
       setMoneyIn(0);
@@ -127,36 +187,45 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     }
   };
 
-  const handleChange = async (event: React.ChangeEvent<HTMLSelectElement>, index: number) => {
+  const handleChange = async (
+    event: React.ChangeEvent<HTMLSelectElement>,
+    index: number
+  ) => {
     const selectedCategory = event.target.value;
-    const transactionMonth = parseInt(event.target.id.substring(5,7), 10) -1;
+    const transactionMonth = parseInt(event.target.id.substring(5, 7), 10) - 1;
 
     if (selectedCategory === 'Add category') {
       alert('under construction');
     } else {
       const updatedTransactions = transactions.map((transaction, i) =>
-        i === index ? { ...transaction, category: selectedCategory } : transaction
+        i === index
+          ? { ...transaction, category: selectedCategory }
+          : transaction
       );
 
-      const filteredTransactions = updatedTransactions.filter(transaction => {
+      const filteredTransactions = updatedTransactions.filter((transaction) => {
         const transactionDate = new Date(transaction.date);
-        return transactionDate.getMonth() === transactionMonth; 
+        return transactionDate.getMonth() === transactionMonth;
       });
 
-      const q = query(collection(db, `transaction_data_${currentYear}`), where('uid', '==', user.uid), where('account_number', '==', props.account));
+      const q = query(
+        collection(db, `transaction_data_${currentYear}`),
+        where('uid', '==', user.uid),
+        where('account_number', '==', props.account)
+      );
       const querySnapshot = await getDocs(q);
-      
+
       if (!querySnapshot.empty) {
         const docRef = querySnapshot.docs[0].ref;
         await updateDoc(docRef, {
           [monthNames[transactionMonth]]: JSON.stringify(filteredTransactions),
         });
-      } 
+      }
 
       setTransactions(updatedTransactions);
     }
   };
-  
+
   const getCategoryStyle = (category: string) => {
     switch (category) {
       case 'Income':
@@ -206,115 +275,137 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     setCurrentYear(selectedYear);
     setCurrentMonth(new Date(currentMonth.setFullYear(selectedYear)));
     display();
-  }; 
+  };
 
   const fetchAvailableYears = async () => {
     try {
       const currentYear = new Date().getFullYear();
       const years: number[] = [];
-      
+
       // Adjust this range based on your needs
       for (let year = 2000; year <= currentYear; year++) {
-        const q = query(collection(db, `transaction_data_${year}`), where('uid', '==', user.uid), where('account_number', '==', props.account));
+        const q = query(
+          collection(db, `transaction_data_${year}`),
+          where('uid', '==', user.uid),
+          where('account_number', '==', props.account)
+        );
         const querySnapshot = await getDocs(q);
-  
+
         if (!querySnapshot.empty) {
           years.push(year);
         }
       }
-  
+
       setYearsWithData(years);
     } catch (error) {
       console.error('Error fetching years with data:', error);
     }
-  }; 
-  
+  };
 
   return (
     <div className={styles.mainPage}>
       <div className={styles.header}>
         <div className={styles.monthNavigation}>
-          <button className={styles.navButton} onClick={handlePrevYear}>
+          <button className={`${getLeftArrowStyle()}`} onClick={handlePrevYear}>
             <span
               className="material-symbols-outlined"
-              style={{ fontSize: 'calc(1.4rem * var(--font-size-multiplier))', alignContent:'center', display: 'flex'}}
+              style={{
+                fontSize: 'calc(1.4rem * var(--font-size-multiplier))',
+                alignContent: 'center',
+                display: 'flex',
+              }}
             >
               arrow_back_ios
             </span>
           </button>
           <span className={styles.yearDisplay}>
-          <select
+            <select
               className={styles.dateDropdown}
               value={currentYear}
               onChange={handleYearChange}
             >
-              {props.availableYears.map(year => (
-                <option key={year} value={year}>{year}</option>
+              {props.availableYears.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
               ))}
             </select>
           </span>
 
-          <button className={styles.navButton} onClick={handleNextYear}>
+          <button
+            className={`${getRightArrowStyle()}`}
+            onClick={handleNextYear}
+          >
             <span
               className="material-symbols-outlined"
-              style={{ fontSize: 'calc(1.4rem * var(--font-size-multiplier))', alignContent:'center', display: 'flex'}}
+              style={{
+                fontSize: 'calc(1.4rem * var(--font-size-multiplier))',
+                alignContent: 'center',
+                display: 'flex',
+              }}
             >
               arrow_forward_ios
             </span>
           </button>
         </div>
-            <div className={styles.balanceInfo}>
-              Balance:  {formatCurrency(balance)}
-              <p className={styles.moneyInfo}>Money In:  {formatCurrency(moneyIn)}</p>
-              <p className={styles.moneyInfo}>Money Out:  {formatCurrency(moneyOut)}</p>
-            </div>  
+        <div className={styles.balanceInfo}>
+          Balance: {formatCurrency(balance)}
+          <p className={styles.moneyInfo}>
+            Money In: {formatCurrency(moneyIn)}
+          </p>
+          <p className={styles.moneyInfo}>
+            Money Out: {formatCurrency(moneyOut)}
+          </p>
+        </div>
       </div>
 
       {balance !== null && (
         <div className={styles.transactionsList}>
           {transactions.length > 0 && (
             <div className={styles.transactions}>
-              <br/>
+              <br />
               {transactions.map((transaction, index) => (
                 <div
                   key={index}
                   className={styles.transactionCard}
                   style={{
                     borderLeft:
-                    transaction.amount >= 0
-                    ? '15px solid #8EE5A2'
-                    : '15px solid var(--primary-1)',
+                      transaction.amount >= 0
+                        ? '15px solid #8EE5A2'
+                        : '15px solid var(--primary-1)',
                   }}
                 >
-                    <div className={styles.transactionContent}>
-                        <div className={styles.transactionDate}>
-                          {transaction.date}
-                        </div>
-                        <div className={styles.transactionDescription}>
-                          {transaction.description}
-                        </div>
-                      <div className={styles.transactionAmount}>
-                        {formatTransactionValue(transaction.amount)}                   
-                      </div>
-                      <select
-                          className={`${styles.categoryDropdown} ${getCategoryStyle(transaction.category)}`}
-                          onChange={(event) => handleChange(event, index)}
-                          id={`${transaction.date}-${transaction.description}`}
-                          value={transaction.category}
-                        >
-                          <option value=""></option>
-                          <option value="Income">Income</option>
-                          <option value="Transport">Transport</option>
-                          <option value="Eating Out">Eating Out</option>
-                          <option value="Groceries">Groceries</option>
-                          <option value="Entertainment">Entertainment</option>
-                          <option value="Shopping">Shopping</option>
-                          <option value="Insurance">Insurance</option>
-                          <option value="Utilities">Utilities</option>
-                          <option value="Medical Aid">Medical Aid</option>
-                          <option value="Other">Other</option>
-                        </select>
+                  <div className={styles.transactionContent}>
+                    <div className={styles.transactionDate}>
+                      {transaction.date}
                     </div>
+                    <div className={styles.transactionDescription}>
+                      {transaction.description}
+                    </div>
+                    <div className={styles.transactionAmount}>
+                      {formatTransactionValue(transaction.amount)}
+                    </div>
+                    <select
+                      className={`${styles.categoryDropdown} ${getCategoryStyle(
+                        transaction.category
+                      )}`}
+                      onChange={(event) => handleChange(event, index)}
+                      id={`${transaction.date}-${transaction.description}`}
+                      value={transaction.category}
+                    >
+                      <option value=""></option>
+                      <option value="Income">Income</option>
+                      <option value="Transport">Transport</option>
+                      <option value="Eating Out">Eating Out</option>
+                      <option value="Groceries">Groceries</option>
+                      <option value="Entertainment">Entertainment</option>
+                      <option value="Shopping">Shopping</option>
+                      <option value="Insurance">Insurance</option>
+                      <option value="Utilities">Utilities</option>
+                      <option value="Medical Aid">Medical Aid</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
                 </div>
               ))}
             </div>

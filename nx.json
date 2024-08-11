@@ -54,8 +54,8 @@
     {
       "plugin": "@nx/storybook/plugin",
       "options": {
-        "serveStorybookTargetName": "storybook",
         "buildStorybookTargetName": "build-storybook",
+        "serveStorybookTargetName": "storybook",
         "testStorybookTargetName": "test-storybook",
         "staticStorybookTargetName": "static-storybook"
       }

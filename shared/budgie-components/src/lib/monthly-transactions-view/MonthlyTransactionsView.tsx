@@ -4,11 +4,10 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import {
   collection,
-  doc,
   getDocs,
   updateDoc,
-  query, 
-  where
+  query,
+  where,
 } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from 'firebase/auth';
@@ -30,8 +29,8 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   const [Data, setData] = useState<any>(null);
   const user = useContext(UserContext);
   const dropdownRef = useRef<HTMLSelectElement>(null);
-  
-
+  const [LeftArrowStyle, setLeftArrowStyle] = useState('');
+  const [RightArrowStyle, setRightArrowStyle] = useState('');
 
   interface Transaction {
     date: string;
@@ -46,10 +45,10 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     if (currentMonth.getFullYear() != currentYear) {
       setCurrentYear(currentMonth.getFullYear());
     }
-    //can't go passed next month
+    //can't go past current month
     const Now = new Date();
     if (
-      currentMonth.getMonth() != Now.getMonth()  ||
+      currentMonth.getMonth() != Now.getMonth() ||
       currentYear != Now.getFullYear()
     ) {
       //change the month
@@ -61,13 +60,19 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   };
 
   const handlePrevMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.setMonth(currentMonth.getMonth() - 1))
-    );
-    if (currentMonth.getFullYear() != currentYear) {
-      setCurrentYear(currentMonth.getFullYear());
+    if (
+      currentYear == props.availableYears[0] &&
+      currentMonth.getMonth() == 0
+    ) {
+    } else {
+      setCurrentMonth(
+        new Date(currentMonth.setMonth(currentMonth.getMonth() - 1))
+      );
+      if (currentMonth.getFullYear() != currentYear) {
+        setCurrentYear(currentMonth.getFullYear());
+      }
+      display();
     }
-    display();
   };
 
   const monthNames = [
@@ -88,9 +93,13 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   useEffect(() => {
     const getYearlyTransactions = async () => {
       try {
-        const q = query(collection(db, `transaction_data_${currentYear}`), where('uid', '==', user.uid), where('account_number', '==', props.account));
+        const q = query(
+          collection(db, `transaction_data_${currentYear}`),
+          where('uid', '==', user.uid),
+          where('account_number', '==', props.account)
+        );
         const querySnapshot = await getDocs(q);
-        const transactionList = querySnapshot.docs.map(doc => doc.data());
+        const transactionList = querySnapshot.docs.map((doc) => doc.data());
         setData(transactionList[0]);
       } catch (error) {
         console.error('Error getting bank statement document:', error);
@@ -116,12 +125,33 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     setData(props.data);
   }, []);
 
-  
   const display = async () => {
+    if (
+      currentMonth.getMonth() == new Date().getMonth() &&
+      currentYear == new Date().getFullYear()
+    ) {
+      setRightArrowStyle('Greyed');
+    } else {
+      setRightArrowStyle('Normal');
+    }
+
+    if (
+      currentYear == props.availableYears[0] &&
+      currentMonth.getMonth() == 0
+    ) {
+      setLeftArrowStyle('Greyed');
+    } else {
+      setLeftArrowStyle('Normal');
+    }
+
     const month = currentMonth
       .toLocaleString('default', { month: 'long' })
       .toLocaleLowerCase();
-    if (Data === undefined || Data[month] === undefined || Data[month] === null) {
+    if (
+      Data === undefined ||
+      Data[month] === undefined ||
+      Data[month] === null
+    ) {
       setTransactions([]);
       setBalance(0);
       setMoneyIn(0);
@@ -130,46 +160,62 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
       const transactionsList = JSON.parse(Data[month]);
       setTransactions(transactionsList);
       setBalance(JSON.parse(Data[month])[0].balance);
-      
+
       const moneyInTotal = transactionsList
-        .filter((transaction: { amount: number; }) => transaction.amount > 0)
-        .reduce((acc: any, transaction: { amount: any; }) => acc + transaction.amount, 0);
+        .filter((transaction: { amount: number }) => transaction.amount > 0)
+        .reduce(
+          (acc: any, transaction: { amount: any }) => acc + transaction.amount,
+          0
+        );
 
       const moneyOutTotal = transactionsList
-        .filter((transaction: { amount: number; }) => transaction.amount < 0)
-        .reduce((acc: any, transaction: { amount: any; }) => acc + transaction.amount, 0);
+        .filter((transaction: { amount: number }) => transaction.amount < 0)
+        .reduce(
+          (acc: any, transaction: { amount: any }) => acc + transaction.amount,
+          0
+        );
 
       setMoneyIn(moneyInTotal);
       setMoneyOut(Math.abs(moneyOutTotal)); // money out should be positive for display
     }
   };
 
-  const handleChange = async (event: React.ChangeEvent<HTMLSelectElement>, index: number) => {
+  const handleChange = async (
+    event: React.ChangeEvent<HTMLSelectElement>,
+    index: number
+  ) => {
     const selectedCategory = event.target.value;
     if (selectedCategory === 'Add category') {
       alert('under construction');
     } else {
       const updatedTransactions = transactions.map((transaction, i) =>
-        i === index ? { ...transaction, category: selectedCategory } : transaction
+        i === index
+          ? { ...transaction, category: selectedCategory }
+          : transaction
       );
 
-      const q = query(collection(db, `transaction_data_${currentYear}`), where('uid', '==', user.uid), where('account_number', '==', props.account));
+      const q = query(
+        collection(db, `transaction_data_${currentYear}`),
+        where('uid', '==', user.uid),
+        where('account_number', '==', props.account)
+      );
       const querySnapshot = await getDocs(q);
-      
+
       if (!querySnapshot.empty) {
         const docRef = querySnapshot.docs[0].ref;
         await updateDoc(docRef, {
-          [monthNames[currentMonth.getMonth()]]: JSON.stringify(updatedTransactions),
+          [monthNames[currentMonth.getMonth()]]:
+            JSON.stringify(updatedTransactions),
         });
 
         const querySnapshot2 = await getDocs(q);
-        const transactionList = querySnapshot2.docs.map(doc => doc.data());
+        const transactionList = querySnapshot2.docs.map((doc) => doc.data());
         setData(transactionList[0]);
-      } 
+      }
       setTransactions(updatedTransactions);
     }
   };
-  
+
   const getCategoryStyle = (category: string) => {
     switch (category) {
       case 'Income':
@@ -197,6 +243,28 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     }
   };
 
+  const getLeftArrowStyle = () => {
+    switch (LeftArrowStyle) {
+      case 'Normal':
+        return styles.leftNavButton;
+      case 'Greyed':
+        return styles.greyedleftNavButton;
+      default:
+        return styles.leftNavButton;
+    }
+  };
+
+  const getRightArrowStyle = () => {
+    switch (RightArrowStyle) {
+      case 'Normal':
+        return styles.rightNavButton;
+      case 'Greyed':
+        return styles.greyedrightNavButton;
+      default:
+        return styles.rightNavButton;
+    }
+  };
+
   const formatCurrency = (value: number) => {
     const formatter = new Intl.NumberFormat('en-ZA', {
       style: 'currency',
@@ -212,17 +280,29 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
       minimumFractionDigits: 2,
     });
     return formatter.format(value);
-  };  
+  };
 
   const monthOptions = [
-    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
-  ];  
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
 
   useEffect(() => {
     if (dropdownRef.current) {
-      const selectedOption = dropdownRef.current.options[dropdownRef.current.selectedIndex];
+      const selectedOption =
+        dropdownRef.current.options[dropdownRef.current.selectedIndex];
       const size = getMonthWidth(selectedOption.text);
-      dropdownRef.current.style.width = `${size+12}px`;
+      dropdownRef.current.style.width = `${size + 12}px`;
     }
   }, [currentMonth]);
 
@@ -232,15 +312,18 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     setCurrentMonth(new Date(currentMonth.setMonth(monthIndex)));
     display();
   };
-  
+
   const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedYear = parseInt(event.target.value);
     setCurrentYear(selectedYear);
     setCurrentMonth(new Date(currentMonth.setFullYear(selectedYear)));
     display();
-  };    
+  };
 
-  function getMonthWidth(text: string, font: string = 'calc(1.4rem * var(--font-size-multiplier)) Trip Sans'): number {
+  function getMonthWidth(
+    text: string,
+    font: string = 'calc(1.4rem * var(--font-size-multiplier)) Trip Sans'
+  ): number {
     const span = document.createElement('span');
     span.style.font = font;
     span.style.visibility = 'hidden';
@@ -250,21 +333,28 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     const width: number = span.offsetWidth;
     document.body.removeChild(span);
     return width;
-}
+  }
 
   return (
     <div className={styles.mainPage}>
       <div className={styles.header}>
         <div className={styles.monthNavigation}>
-          <button className={styles.navButton} onClick={handlePrevMonth}>
+          <button
+            className={`${getLeftArrowStyle()}`}
+            onClick={handlePrevMonth}
+          >
             <span
               className="material-symbols-outlined"
-              style={{ fontSize: 'calc(1.4rem * var(--font-size-multiplier))', alignContent:'center', display: 'flex'}}
+              style={{
+                fontSize: 'calc(1.4rem * var(--font-size-multiplier))',
+                alignContent: 'center',
+                display: 'flex',
+              }}
             >
               arrow_back_ios
             </span>
           </button>
-          <span className={styles.monthDisplay}>      
+          <span className={styles.monthDisplay}>
             <select
               ref={dropdownRef}
               className={styles.dateDropdown}
@@ -272,98 +362,110 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
               onChange={handleMonthChange}
             >
               {monthOptions.map((month, index) => (
-                <option key={index} value={month}>{month}</option>
+                <option key={index} value={month}>
+                  {month}
+                </option>
               ))}
             </select>
-            
+
             <select
               className={styles.dateDropdown}
               value={currentYear}
               onChange={handleYearChange}
             >
-              {props.availableYears.map(year => (
-                <option key={year} value={year}>{year}</option>
+              {props.availableYears.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
               ))}
             </select>
           </span>
-          
-          <button className={styles.navButton} onClick={handleNextMonth}>
+
+          <button
+            className={`${getRightArrowStyle()}`}
+            onClick={handleNextMonth}
+          >
             <span
               className="material-symbols-outlined"
-              style={{ fontSize: 'calc(1.4rem * var(--font-size-multiplier))', alignContent:'center', display: 'flex'}}
+              style={{
+                fontSize: 'calc(1.4rem * var(--font-size-multiplier))',
+                alignContent: 'center',
+                display: 'flex',
+              }}
             >
               arrow_forward_ios
             </span>
           </button>
         </div>
-          <div className={styles.balanceInfo}>
-            Balance:  {formatCurrency(balance)}
-            <p className={styles.moneyInfo}>Money In:  {formatCurrency(moneyIn)}</p>
-            <p className={styles.moneyInfo}>Money Out:  {formatCurrency(moneyOut)}</p>
-          </div>  
+        <div className={styles.balanceInfo}>
+          Balance: {formatCurrency(balance)}
+          <p className={styles.moneyInfo}>
+            Money In: {formatCurrency(moneyIn)}
+          </p>
+          <p className={styles.moneyInfo}>
+            Money Out: {formatCurrency(moneyOut)}
+          </p>
+        </div>
       </div>
 
-        <div className={styles.transactionsList}>
-          {moneyIn === 0 && moneyOut === 0?
-          (
-            <div className={styles.noTransactionsMessage}>There are no transactions to display for this month.</div>
-          )
-          : 
-          
-          (
-            <div className={styles.transactions}>
-              <br/>
-              {transactions.map((transaction, index) => (
-                <div
-                  key={index}
-                  className={styles.transactionCard}
-                  style={{
-                    borderLeft:
-                      transaction.amount >= 0
-                        ? '15px solid #8EE5A2'
-                        : '15px solid var(--primary-1)',
-                  }}
-                >
-                    <div className={styles.transactionContent}>
-                        <div className={styles.transactionDate}>
-                          {transaction.date}
-                        </div>
-                        <div className={styles.transactionDescription}>
-                          {transaction.description}
-                        </div>
-                      <div className={styles.transactionAmount}>
-                        {formatTransactionValue(transaction.amount)}                   
-                      </div>
-                      <select
-                          className={`${styles.categoryDropdown} ${getCategoryStyle(transaction.category)}`}
-                          onChange={(event) => handleChange(event, index)}
-                          id={`${transaction.date}-${transaction.description}`}
-                          value={transaction.category}
-                        >
-                          <option value=""></option>
-                          <option value="Income">Income</option>
-                          <option value="Transport">Transport</option>
-                          <option value="Eating Out">Eating Out</option>
-                          <option value="Groceries">Groceries</option>
-                          <option value="Entertainment">Entertainment</option>
-                          <option value="Shopping">Shopping</option>
-                          <option value="Insurance">Insurance</option>
-                          <option value="Utilities">Utilities</option>
-                          <option value="Medical Aid">Medical Aid</option>
-                          <option value="Other">Other</option>
-                      </select>
-                    </div>
+      <div className={styles.transactionsList}>
+        {moneyIn === 0 && moneyOut === 0 ? (
+          <div className={styles.noTransactionsMessage}>
+            There are no transactions to display for this month.
+          </div>
+        ) : (
+          <div className={styles.transactions}>
+            <br />
+            {transactions.map((transaction, index) => (
+              <div
+                key={index}
+                className={styles.transactionCard}
+                style={{
+                  borderLeft:
+                    transaction.amount >= 0
+                      ? '15px solid #8EE5A2'
+                      : '15px solid var(--primary-1)',
+                }}
+              >
+                <div className={styles.transactionContent}>
+                  <div className={styles.transactionDate}>
+                    {transaction.date}
+                  </div>
+                  <div className={styles.transactionDescription}>
+                    {transaction.description}
+                  </div>
+                  <div className={styles.transactionAmount}>
+                    {formatTransactionValue(transaction.amount)}
+                  </div>
+                  <select
+                    className={`${styles.categoryDropdown} ${getCategoryStyle(
+                      transaction.category
+                    )}`}
+                    onChange={(event) => handleChange(event, index)}
+                    id={`${transaction.date}-${transaction.description}`}
+                    value={transaction.category}
+                  >
+                    <option value=""></option>
+                    <option value="Income">Income</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Eating Out">Eating Out</option>
+                    <option value="Groceries">Groceries</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Insurance">Insurance</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Medical Aid">Medical Aid</option>
+                    <option value="Other">Other</option>
+                  </select>
                 </div>
-              ))}
-            </div>
-          )}
-        <div>
+              </div>
+            ))}
+          </div>
+        )}
+        <div></div>
+      </div>
     </div>
-  </div>
-
-
-  </div>  );
+  );
 }
 
 export default MonthlyTransactionsView;
-

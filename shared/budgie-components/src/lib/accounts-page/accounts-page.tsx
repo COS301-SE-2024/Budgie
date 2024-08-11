@@ -5,6 +5,7 @@ import '../../root.css';
 import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
+import { useThemeSettings } from '../../useThemes';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { AreaChart, Color } from '@tremor/react';
 import {
@@ -189,6 +190,7 @@ function yearMonthToString(yearMonth: string): string {
 //---------------------------------
 //Components
 function NoAccountsPage(props: NoAccountsPageProps) {
+  useThemeSettings();
   return (
     <div className="mainPage">
       <div className="flex items-center justify-center bg-BudgieGray h-full w-full">
@@ -384,7 +386,7 @@ export function AccountsPage(props: AccountsPageProps) {
   const [accountsArray, SetAccountsArray] = useState<Account[]>([]);
   const [graphX, setGraphX] = useState<string[]>([]);
   const [graphY, setGraphY] = useState<number[]>([]);
-
+  useThemeSettings();
   const router = useRouter();
   const user = useContext(UserContext);
 

@@ -1,0 +1,32 @@
+.toggle-switch:checked {
+  background-color: #4ade80; /* Green color when active */
+}
+
+.toggle-switch {
+  appearance: none;
+  width: 2rem;
+  height: 1rem;
+  background-color: #d1d5db;
+  border-radius: 9999px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.2s ease;
+}
+
+.toggle-switch:before {
+  content: '';
+  width: 1rem;
+  height: 1rem;
+  background-color: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateX(0);
+  transition: transform 0.2s ease;
+}
+
+.toggle-switch:checked:before {
+  transform: translateX(1rem);
+}

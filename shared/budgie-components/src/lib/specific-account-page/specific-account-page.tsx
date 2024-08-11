@@ -782,12 +782,12 @@ function EditAliasModal(props: EditAliasModalProps) {
   };
 
   const submitAlias = async () => {
-    props.setShow(false);
-    props.setSpinner(true);
     if (inputValue == '') {
       setAliasError(true);
       return;
     }
+    props.setShow(false);
+    props.setSpinner(true);
 
     const q = query(
       collection(db, 'accounts'),
