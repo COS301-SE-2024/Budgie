@@ -3,6 +3,7 @@ import { addDoc, collection, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import styles from './UpdateGoalProgressPopup.module.css';
+import { useThemeSettings } from '../../useThemes';
 import '../../root.css';
 import { type } from 'os';
 
@@ -45,6 +46,7 @@ export interface UpdateGoalProgressPopupProps {
 }
 
 export function UpdateGoalProgressPopup(props: UpdateGoalProgressPopupProps) {
+  useThemeSettings();
   const p = props.goal.type;
   return (
     <div className={styles.addGoalPopup}>
@@ -278,23 +280,24 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   };
 
   const calculateNewAmountSpent = (goal: Goal): string => {
-    if (
-      updateAmount) {
-      return (monthlyBudgetSpent(props.goal) + updateAmount).toFixed(2)
+    if (updateAmount) {
+      return (monthlyBudgetSpent(props.goal) + updateAmount).toFixed(2);
     } else {
       return monthlyBudgetSpent(props.goal).toFixed(2);
     }
   };
 
   const calculateNewAmountLeft = (goal: Goal): string => {
-    if (
-      updateAmount) {
-      return (spendingLimit - monthlyBudgetSpent(props.goal) - updateAmount).toFixed(2);
+    if (updateAmount) {
+      return (
+        spendingLimit -
+        monthlyBudgetSpent(props.goal) -
+        updateAmount
+      ).toFixed(2);
     } else {
       return (spendingLimit - monthlyBudgetSpent(props.goal)).toFixed(2);
     }
   };
-
 
   useEffect(() => {
     function getMonthAmount() {
@@ -494,7 +497,12 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
                   <div>Current Amount Spent:</div>
                   <p>R {monthlyBudgetSpent(props.goal).toFixed(2)}</p>
                   <div>Current Amount Left in Budget:</div>
-                  <p>R {(spendingLimit - monthlyBudgetSpent(props.goal)).toFixed(2)}</p>
+                  <p>
+                    R{' '}
+                    {(spendingLimit - monthlyBudgetSpent(props.goal)).toFixed(
+                      2
+                    )}
+                  </p>
                 </div>
                 <div className={styles.progressInfo}>
                   <div>New Amount Spent:</div>
