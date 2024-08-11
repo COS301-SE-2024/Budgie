@@ -230,9 +230,9 @@ useThemeSettings
                   <FontAwesomeIcon icon={faListUl} className={styles.icon} />
                   <h2 className={styles.gridTitle}>Budget Status</h2>
                 </div>
-                <p>Amount Targeted: R5000.00</p>
-                <p>Amount Spent: R3000.00</p>
-                <HealthBar progress={60} />
+                <p>Amount Targeted: R50 000.00</p>
+                <p>Amount Spent: {moneyOut}</p>
+                <HealthBar progress={(moneyOut/50000)*100} />
               </div>
             </div>
           </div>
