@@ -9,8 +9,6 @@ import {
   updateDoc,
   query,
   where,
-  query,
-  where,
 } from 'firebase/firestore';
 import { useThemeSettings } from '../../useThemes';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
