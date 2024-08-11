@@ -4,7 +4,6 @@ import React, { useState, useEffect, useContext } from 'react';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import {
   collection,
-  doc,
   getDocs,
   updateDoc,
   query,
@@ -331,9 +330,9 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
                       {formatTransactionValue(transaction.amount)}
                     </div>
                     <select
-                      className={`${styles.categoryDropdown} ${getCategoryStyle(
-                        transaction.category
-                      )}`}
+                        className={`${styles.categoryDropdown} ${getCategoryStyle(transaction.category)}`}
+                        data-testid="category-dropdown-income"
+                      
                       onChange={(event) => handleChange(event, index)}
                       id={`${transaction.date}-${transaction.description}`}
                       value={transaction.category}
