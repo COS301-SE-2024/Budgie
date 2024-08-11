@@ -173,7 +173,7 @@ export function SignInModal(props: SignInModalProps) {
                 Sign In with Google
               </button>
             </div>
-            <div className="flex flex-col pt-14 items-center">
+            <div className="flex flex-col pt-3 items-center">
               <p className="text-lg text-BudgieBlue font-TripSans font-medium">
                 Don't have an account?{' '}
                 <Link href={'/signup'} className="underline">
