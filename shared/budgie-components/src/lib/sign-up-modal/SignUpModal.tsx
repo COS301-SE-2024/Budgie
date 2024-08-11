@@ -7,8 +7,8 @@ import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
+  getAuth,
 } from 'firebase/auth';
-import { auth, db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { collection, addDoc } from 'firebase/firestore';
 import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
@@ -21,6 +21,7 @@ export function SignUpModal(props: SignUpModalProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const auth = getAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -42,12 +43,12 @@ export function SignUpModal(props: SignUpModalProps) {
         const errorMessage = error.message;
         const email = error.customData?.email;
         const credential = GoogleAuthProvider.credentialFromError(error);
-        console.error('Error code:', errorCode);
-        console.error('Error message:', errorMessage);
-        console.error('Email:', email);
-        console.error('Credential:', credential);
+        console.log('Error code:', errorCode);
+        console.log('Error message:', errorMessage);
+        console.log('Email:', email);
+        console.log('Credential:', credential);
       } else {
-        console.error('Unexpected error', error);
+        console.log('Unexpected error', error);
       }
     }
   };
@@ -108,7 +109,7 @@ export function SignUpModal(props: SignUpModalProps) {
           console.log(errorMessage);
         }
       } else {
-        console.error('Unexpected error', err);
+        console.log('Unexpected error', err);
       }
     }
   }
@@ -171,11 +172,6 @@ export function SignUpModal(props: SignUpModalProps) {
                 Sign Up with Google
               </button>
             </div>
-            {error && (
-              <div className="pt-2 text-red-600 font-TripSans font-medium">
-                {errorMessage}
-              </div>
-            )}
             <div className="flex flex-col justify-start pt-7 items-center">
               <Link
                 className=" underline text-lg text-BudgieBlue font-TripSans font-medium  "
@@ -184,6 +180,11 @@ export function SignUpModal(props: SignUpModalProps) {
                 Already Have an Account?
               </Link>
             </div>
+            {error && (
+              <div className="pt-2 w-72 h-10 text-red-600 font-TripSans font-medium">
+                {errorMessage}
+              </div>
+            )}
           </form>
         </div>
       </div>

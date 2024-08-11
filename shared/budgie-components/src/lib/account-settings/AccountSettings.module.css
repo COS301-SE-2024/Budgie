@@ -1,91 +1,104 @@
 .settingsOptionsContainer {
-    margin-top: 0.6rem;
+  margin-top: 0.6rem;
 }
 
-.settingsOption { 
-    width: 100%;
-    padding: calc(0.6rem * var(--font-size-multiplier));
-    background-color: var(--block-background);
-    border-radius: 0.2rem;
-    margin-bottom: calc(0.5rem * var(--font-size-multiplier));
-    transition:  0.2s ease;
+.settingsOption {
+  width: 100%;
+  padding: calc(0.6rem * var(--font-size-multiplier));
+  background-color: var(--block-background);
+  border-radius: 0.2rem;
+  margin-bottom: calc(0.5rem * var(--font-size-multiplier));
+  transition: 0.2s ease;
 }
 
 .settingTitle {
-    font-size: calc(1rem * var(--font-size-multiplier));
-    font-weight: bold;
-    color: var(--accent-colour);
+  font-size: calc(1rem * var(--font-size-multiplier));
+  font-weight: bold;
+  color: var(--accent-colour);
 }
 
 .settingDescription {
-    font-size: calc(0.8rem * var(--font-size-multiplier));
-    color: var(--greyed-text);
+  font-size: calc(0.8rem * var(--font-size-multiplier));
+  color: var(--greyed-text);
 }
 
 .deleteButton {
-    background-color: #e62828;
-    color: white;
-    margin-top: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.4rem;
-    margin-bottom: 0.5rem;
-    transition:  0.2s ease;
-    padding: 0.5rem 1rem;
+  background-color: #e62828;
+  color: white;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.4rem;
+  margin-bottom: 0.5rem;
+  transition: 0.2s ease;
+  padding: 0.5rem 1rem;
 }
 
 .deleteButton:hover {
-    background-color: #b92b2b; 
+  background-color: #b92b2b;
 }
 
 .popupOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.changeOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .popupContent {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 0.4rem;
-    text-align: center;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 0.4rem;
+  text-align: center;
 }
-  
-.confirmButton,  .cancelButton {
-    cursor: pointer;
-    border-radius: 0.2rem;
-    margin-top: 1rem;
-    height: 2.5rem;
+
+.confirmButton,
+.cancelButton {
+  cursor: pointer;
+  border-radius: 0.2rem;
+  margin-top: 1rem;
+  height: 2.5rem;
 }
-  
+
 .confirmButton {
-    background-color: #e62828;
-    color: white;
-    border: none;
-    margin-left: 3%;
-    width: 27%;
-    transition:  0.2s ease;
+  background-color: #e62828;
+  color: white;
+  border: none;
+  margin-left: 3%;
+  width: 27%;
+  transition: 0.2s ease;
 }
 
 .confirmButton:hover {
-    background-color: #b92b2b; 
+  background-color: #b92b2b;
 }
-  
+
 .cancelButton {
-    background-color: #818686;
-    color: white;
-    border: none;
-    width: 100%;
-    transition:  0.2s ease;
+  background-color: #818686;
+  color: white;
+  border: none;
+  width: 100%;
+  transition: 0.2s ease;
 }
 
 .cancelButton:hover {
-    background-color: #666969; 
+  background-color: #666969;
 }

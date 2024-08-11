@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { LineChart } from '@tremor/react'; // Tremor-specific import
 import { PieChart, Pie, Tooltip, Cell, Legend } from 'recharts'; // Recharts-specific import
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useThemeSettings } from '../../useThemes';
 import { faMoneyBill, faBank, faChartPie, faHistory, faCalendarAlt, faListUl, faBullseye } from '@fortawesome/free-solid-svg-icons';
 import styles from './overview-page.module.css';
 import HealthBar from './HealthBar';
@@ -29,7 +30,7 @@ export function OverviewPage(props: OverviewPageProps) {
     type: string;
     uid: string;
   }
-
+useThemeSettings
   interface Transaction {
     date: string;
     amount: number;
@@ -130,7 +131,7 @@ export function OverviewPage(props: OverviewPageProps) {
   const hasAccounts = accounts.length > 0;
 
   return (
-    <div className={styles.mainPage}>
+    <div className='mainPage'>
       <div className={styles.header}>
         <div className={styles.accountTypeButtons}>
           {accounts.map(account => (
