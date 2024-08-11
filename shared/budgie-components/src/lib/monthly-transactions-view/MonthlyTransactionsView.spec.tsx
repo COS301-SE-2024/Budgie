@@ -57,25 +57,6 @@ describe('MonthlyTransactionsView', () => {
     });
   });
 
-  // it('displays transactions for the selected month and year', async () => {
-  //   render(
-  //     <UserContext.Provider value={mockUserContextValue}>
-  //       <MonthlyTransactionsView
-  //         account="test-account"
-  //         data={{ january: JSON.stringify([{ date: '2024/01/15', amount: 100, balance: 1000, description: 'Sample transaction', category: 'Income' }]) }}
-  //         availableYears={[2023, 2024]}
-  //       />
-  //     </UserContext.Provider>
-  //   );
-  
-  //   screen.debug(); // Print the HTML to the console
-  
-  //   await waitFor(() => {
-  //     expect(screen.getByText('Sample transaction')).toBeInTheDocument();
-  //     expect(screen.getByText('R100.00')).toBeInTheDocument();
-  //   });
-  // });
-
   it('changes the month and year when navigation buttons are clicked', async () => {
     render(
       <UserContext.Provider value={mockUserContextValue}>
@@ -100,23 +81,4 @@ describe('MonthlyTransactionsView', () => {
       );
     });
   });
-
-  // it('updates transaction category when selected from dropdown', async () => {
-  //   render(
-  //     <UserContext.Provider value={mockUserContextValue}>
-  //       <MonthlyTransactionsView
-  //         account="test-account"
-  //         data={{ january: JSON.stringify([{ date: '2024/01/15', amount: 100, balance: 1000, description: 'Sample transaction', category: 'Income' }]) }}
-  //         availableYears={[2023, 2024]}
-  //       />
-  //     </UserContext.Provider>
-  //   );
-
-  //   const dropdown = screen.getByRole('combobox');
-  //   fireEvent.change(dropdown, { target: { value: 'Entertainment' } });
-
-  //   await waitFor(() => {
-  //     expect(getDocs).toHaveBeenCalled();
-  //   });
-  // });
 });

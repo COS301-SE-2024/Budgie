@@ -339,6 +339,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
                           onChange={(event) => handleChange(event, index)}
                           id={`${transaction.date}-${transaction.description}`}
                           value={transaction.category}
+                          data-testid="category-dropdown"
                         >
                           <option value=""></option>
                           <option value="Income">Income</option>
