@@ -5,6 +5,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import AllTransactionsView from '../all-transactions-view/AllTransactionsView';
 import MonthlyTransactionsView from '../monthly-transactions-view/MonthlyTransactionsView';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
+import { useThemeSettings } from '../../useThemes';
 
 import '../../root.css';
 import styles from './Dashboard.module.css';
@@ -34,7 +35,7 @@ export function Dashboard(props: DashboardProps) {
   const [yearsWithData, setYearsWithData] = useState<number[]>([0]);
 
   const [hasAccount, setHasAccount] = useState('No');
-
+  useThemeSettings();
   useEffect(() => {
     const fetchAccounts = async () => {
       try {

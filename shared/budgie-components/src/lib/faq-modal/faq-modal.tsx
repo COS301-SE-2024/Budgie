@@ -17,7 +17,7 @@ export function FaqModal(props: FaqModalProps) {
           >
             arrow_back
           </span>
-          Display Settings
+          Faq
         </div>
         <div className="p-4 bg-gray-100">
           <h1 className="text-2xl font-bold text-green-600 mb-6">

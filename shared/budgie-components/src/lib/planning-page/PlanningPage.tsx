@@ -11,6 +11,7 @@ import {
   doc,
   getDoc,
 } from 'firebase/firestore';
+import { useThemeSettings } from '../../useThemes';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import AddGoalPopup from '../add-goal-popup/AddGoalPopup';
@@ -376,6 +377,7 @@ export function PlanningPage(props: PlanningPageProps) {
     target_date?: string;
     spending_limit?: number;
   }
+  useThemeSettings();
 
   useEffect(() => {
     const fetchGoals = async () => {
@@ -434,7 +436,7 @@ export function PlanningPage(props: PlanningPageProps) {
       </div>
       <div>
         <div>
-          {viewMode === 'goals' && Goals? (
+          {viewMode === 'goals' && Goals ? (
             <GoalsPage />
           ) : viewMode === 'all' ? (
             <GoalsPage />
