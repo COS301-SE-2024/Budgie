@@ -115,8 +115,5 @@ describe('AccountSettings', () => {
     await waitFor(() => {
       expect(deleteUser).toHaveBeenCalled();
     });
-  it('should render successfully', () => {
-    // const { baseElement } = render(<AccountSettings onClose={() => {}} />);
-    // expect(baseElement).toBeTruthy();
   });
 });

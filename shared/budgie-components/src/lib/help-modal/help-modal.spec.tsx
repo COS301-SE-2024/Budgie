@@ -47,9 +47,5 @@ describe('HelpModal Component', () => {
 
     fireEvent.click(screen.getByText('arrow_back'));
     expect(onCloseMock).toHaveBeenCalled();
-describe('HelpModal', () => {
-  it('should render successfully', () => {
-    // const { baseElement } = render(<HelpModal />);
-    // expect(baseElement).toBeTruthy();
   });
 });

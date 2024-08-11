@@ -72,10 +72,5 @@ describe('Support Component', () => {
 
     fireEvent.click(screen.getByText('arrow_back'));
     expect(onCloseMock).toHaveBeenCalled();
-    
-describe('Support', () => {
-  it('should render successfully', () => {
-    // const { baseElement } = render(<Support />);
-    // expect(baseElement).toBeTruthy();
   });
 });

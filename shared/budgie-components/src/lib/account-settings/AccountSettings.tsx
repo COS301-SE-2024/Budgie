@@ -103,10 +103,10 @@ export function AccountSettings(props: AccountSettingsProps) {
       await deleteUser(user);
       auth.signOut();
 
-      alert('User deleted.');
+      //alert('User deleted.');
     } catch (error) {
-      console.error('Error deleting user:', error);
-      alert('Failed to delete user: ' + (error as Error).message);
+      console.log('Error deleting user:', error);
+      //alert('Failed to delete user: ' + (error as Error).message);
     }
   };
   const [isPopupVisible, setPopupVisible] = useState(false);

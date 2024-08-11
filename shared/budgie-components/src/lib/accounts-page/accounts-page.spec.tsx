@@ -6,7 +6,6 @@ describe('AccountsPage', () => {
   it('should render successfully', () => {
     //const { baseElement } = render(<AccountsPage />);
     //expect(baseElement).toBeTruthy();
-=======
     // const { baseElement } = render(<AccountsPage />);
     // expect(baseElement).toBeTruthy();
   });

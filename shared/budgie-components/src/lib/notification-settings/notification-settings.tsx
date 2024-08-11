@@ -37,8 +37,6 @@ export function NotificationSettings(props: NotificationSettingsProps) {
     localStorage.setItem('goal', settings.goal.toString());
     localStorage.setItem('spending', settings.spending.toString());
     localStorage.setItem('csv', settings.csv.toString());
-
-    alert('Settings saved.');
   }
 
   function uncheckAll() {

@@ -58,8 +58,5 @@ describe('DisplaySettings', () => {
       'light-yellow'
     );
     expect(screen.getByText('✔')).toBeInTheDocument();
-  it('should render successfully', () => {
-    // const { baseElement } = render(<DisplaySettings />);
-    // expect(baseElement).toBeTruthy();
   });
 });
