@@ -22,6 +22,7 @@ import {
   UserContext,
 } from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 /* eslint-disable-next-line */
 export interface AddAccountsPageProps {}
@@ -316,7 +317,6 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
           let docSnap = querySnapshot.docs[0];
-          alert('exists already');
           for (const YearMonth of YearMonths) {
             let [Y, Month] = YearMonth.split('/');
             Month = getMonthName(Month);
@@ -370,13 +370,13 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
             }
           }
           //call categorize function
-          // const functions = getFunctions();
-          // const categoriseExpenses = httpsCallable(
-          //   functions,
-          //   'categoriseExpenses'
-          // );
-          // console.log('first run');
-          // categoriseExpenses({ year: Year });
+          const functions = getFunctions();
+          const categoriseExpenses = httpsCallable(
+            functions,
+            'categoriseExpenses'
+          );
+          console.log('first run');
+          categoriseExpenses({ year: Year });
         } else {
           //documents do not exist for this year can safely add to merged
           for (const YearMonth of YearMonths) {
@@ -425,14 +425,14 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               }
             }
           }
-          //call categorize function
-          // const functions = getFunctions();
-          // const categoriseExpenses = httpsCallable(
-          //   functions,
-          //   'categoriseExpenses'
-          // );
-          // console.log('first run');
-          // categoriseExpenses({ year: Year });
+          // call categorize function
+          const functions = getFunctions();
+          const categoriseExpenses = httpsCallable(
+            functions,
+            'categoriseExpenses'
+          );
+          console.log('first run');
+          categoriseExpenses({ year: Year });
         }
       }
     }

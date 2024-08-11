@@ -1,4 +1,5 @@
 /* eslint-disable */
+
 import { join } from 'path';
 export default {
   displayName: 'budgie-app',

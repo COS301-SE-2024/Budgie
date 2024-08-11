@@ -227,40 +227,51 @@ function useKnownList(description) {
 exports.categoriseExpenses = onCall(async (request) => {
   const year = request.data.year;
   const uid = request.auth.uid;
-  const doc = await getFirestore().doc(`transaction_data_${year}/${uid}`);
-  const docSnap = await doc.get();
+  // const doc = await getFirestore().doc(`transaction_data_${year}/${uid}`);
+  // const docSnap = await doc.get();
+  // .collection(db, `transaction_data_${year}`);
+  const db = getDatabase();
+  const accRef = getFirestore().collection(`transaction_data_${year}`);
+  const snapshot = await accRef.where('uid', '==', uid).get();
 
-  if (docSnap) {
+  // const q = getFirestore().query(accRef, where('uid', '==', user.uid));
+  // const querySnapshot = await getDocs(q);
+
+  snapshot.forEach(async (doc) => {
     let updateFlag = false;
     //can categorize and set
     for (month of Months) {
-      if (docSnap.data()[month]) {
-        const IncomingMonthData = JSON.parse(docSnap.data()[month]);
+      if (doc.data()[month]) {
+        const IncomingMonthData = JSON.parse(doc.data()[month]);
         for (transaction of IncomingMonthData) {
-          if (transaction.category === '') {
+          if (transaction.category == '') {
             updateFlag = true;
-            newCategory = useKnownList(transaction.description);
-            if (
-              newCategory == 'Fuel' &&
-              Math.abs(parseFloat(transaction.amount) < 100)
-            ) {
-              newCategory == 'Eating Out';
-            } else {
-              newCategory == 'Transport';
+            let newCategory = '';
+            if (transaction.amount > 0) {
+              newCategory = 'Income';
+            }
+            if (newCategory == '') {
+              newCategory = await useKnownList(transaction.description);
             }
             if (newCategory == '') {
               newCategory = await useModel(transaction.description);
             }
+            if (newCategory == 'Fuel') {
+              if (Math.abs(parseFloat(transaction.amount)) < 100) {
+                newCategory = 'Eating Out';
+              } else {
+                newCategory = 'Transport';
+              }
+            }
             transaction.category = newCategory;
           }
         }
-
         if (updateFlag) {
           await getFirestore()
-            .doc(`transaction_data_${year}/${uid}`)
+            .doc(`transaction_data_${year}/${doc.id}`)
             .update({ [month]: JSON.stringify(IncomingMonthData) });
         }
       }
     }
-  }
+  });
 });

@@ -1,0 +1,147 @@
+.addGoalPopup {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  z-index: 15;
+  align-items: center;
+  width: 85vw;
+  font-size: calc(1.2rem*var(--font-size-multiplier));
+}
+
+.popupContent {
+  background: var(--block-background);
+  padding: 20px;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+  text-align: center;
+  z-index: 2;
+  width: calc(35vw * var(--font-size-multiplier));
+  border-top: 4px solid var(--primary-1);
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-between;
+}
+
+.tabs button {
+  padding: 10px 20px;
+  border: none;
+  background-color: var(--block-background);
+  cursor: pointer;
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  width: 32%;
+}
+
+.tabs button.active {
+  background-color: var(--primary-1);
+  color: white;
+}
+
+.tabs button:hover {
+  filter: brightness(0.9);
+  transition: 0.3s ease;
+}
+
+.tabs button.active:hover {
+  filter: brightness(1);
+}
+
+.goalForm {
+  margin: 0 auto;
+  text-align: left;
+}
+
+.goalForm .formGroup {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  align-items: center;
+  position: relative;
+}
+
+.goalForm form {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+
+.goalForm label {
+  flex: 2;
+  text-align: left;
+  margin-left: 0.5rem;
+  font-weight: 200;
+}
+
+.goalForm input {
+  flex: 1;
+  padding: 5px;
+  color: black;
+  font-weight: 100;
+  line-height: calc(1.2rem * var(--font-size-multiplier));
+}
+
+.goalForm button {
+  padding: 10px;
+  background-color: var(--primary-1);
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-top: 2rem;
+  transition: 0.3s ease;
+  border: 1px solid var(--primary-1);
+}
+
+.goalForm button:hover {
+  filter: brightness(1.1);
+}
+
+.cancelButton {
+  padding: 10px;
+  background-color: var(--main-background);
+  color: var(--main-text);
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 0.5rem;
+  transition: 0.3s ease;
+  margin-top: 1rem;
+  border: 1px solid var(--main-background);
+}
+
+.cancelButton:hover {
+  filter: brightness(1.05);
+}
+
+.goalDescription {
+  color: var(--main-text);
+  margin-bottom: 2rem;
+  text-align: left;
+  font-weight: 100;
+}
+
+.popupText {
+  visibility: hidden;
+  background-color: var(--main-background);
+  color: var(--main-text);
+  text-align: center;
+  border-radius: 5px;
+  padding: 1rem;
+  z-index: 1000000;
+  position: fixed;
+  transform: translateX(calc(35vw * var(--font-size-multiplier)));
+  opacity: 0;
+  transition: opacity 0.3s;
+  width: 25vw;
+  font-weight: 200;
+}
+
+.icon:hover + .popupText {
+  visibility: visible;
+  opacity: 1;
+}
