@@ -193,10 +193,11 @@ function NoAccountsPage(props: NoAccountsPageProps) {
   useThemeSettings();
   return (
     <div className="mainPage">
-      <div className="flex items-center justify-center bg-BudgieGray h-full w-full">
+      <div className="flex items-center justify-center h-full w-full" style={{backgroundColor: 'var(--main-background)'}}>
         <div
           onClick={props.onAddClick}
           className="flex flex-col items-center justify-center bg-BudgieGray hover:bg-black hover:bg-opacity-5 h-80 w-80 border-dashed border-2 border-gray-400 border-opacity-40 hover:border-opacity-100 cursor-pointer  rounded-3xl"
+          style={{backgroundColor: 'var(--main-background)'}}
         >
           <span className="text-2xl text-gray-400 text-opacity-60">
             No Accounts Added Yet
@@ -226,13 +227,16 @@ function AccountUnit(props: AccountUnitProps) {
         router.push(`accounts/${props.account.number}`);
       }}
       className="w-[full] cursor-pointer shadow-md min-w-[23rem] max-w-[23rem] m-[1rem] rounded-[2rem] h-[21rem] flex flex-col items-center justify-center bg-BudgieWhite hover:shadow-2xl transition-shadow"
+      style={{ backgroundColor: "var(--block-background)"}}
     >
       {props.account.type == 'current' && (
         <span
           className="text-black material-symbols-outlined"
           style={{
             fontSize: '9rem',
+            color: "var(--main-text)"
           }}
+
         >
           account_balance
         </span>
@@ -455,10 +459,10 @@ export function AccountsPage(props: AccountsPageProps) {
       )}
       {!showNoAccounts && (
         <div className="mainPage">
-          <div className="w-full h-[10%] flex items-center justify-between shadow-md bg-BudgieWhite rounded-[2rem]">
+          <div className="w-full h-[10%] flex items-center justify-between shadow-md bg-BudgieWhite rounded-[2rem]" style={{backgroundColor: 'var(--block-background)'}}>
             <InfoSection xAxis={graphX} yAxis={graphY}></InfoSection>
           </div>
-          <div className="w-full h-[40%] mt-[1rem] fl shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center">
+          <div className="w-full h-[40%] mt-[1rem] fl shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center" style={{ backgroundColor: "var(--block-background)"}}>
             {graphX.length != 0 && graphY.length != 0 && (
               <GraphSection xAxis={graphX} yAxis={graphY}></GraphSection>
             )}

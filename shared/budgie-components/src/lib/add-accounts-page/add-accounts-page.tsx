@@ -50,7 +50,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
 
     return (
       <div className="mainPage">
-        <div className="flex items-center justify-center bg-BudgieGray h-full w-full">
+        <div className="flex items-center justify-center bg-BudgieGray h-full w-full" style={{backgroundColor: 'var(--main-background)', color:'black'}}>
           <div className="flex bg-black w-[72rem] h-3/4 rounded-[3rem] shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)]">
             <div
               onClick={() => OnAddAccountTypeClick('current')}
@@ -159,8 +159,9 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         <div
           className="flex flex-col items-center justify-start rounded-[2rem] w-96 h-96 bg-BudgieWhite "
           onClick={(e) => handleChildElementClick(e)}
+          style={{backgroundColor: 'var(--main-background)'}}
         >
-          <span className="text-2xl text-center mt-[5rem]">
+          <span className="text-2xl text-center mt-[5rem]" >
             Upload your transaction history <br /> in the form of a CSV <br />{' '}
             to auto-detect account information.
           </span>
@@ -545,16 +546,17 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         <div
           className="flex flex-col items-center justify-start rounded-[3rem] w-[45%] h-4/6 bg-BudgieGray "
           onClick={(e) => handleChildElementClick(e)}
+          style={{backgroundColor: 'var(--main-background)'}}
         >
-          <span className="mt-3 text-3xl font-TripSans font-medium">
+          <span className="mt-3 text-3xl font-TripSans font-medium" >
             Account Summary
           </span>
-          <div className="bg-BudgieWhite shadow-lg mt-6 py-8 px-6 rounded-3xl flex flex-col items-start justify-center">
+          <div className="bg-BudgieWhite shadow-lg mt-6 py-8 px-6 rounded-3xl flex flex-col items-start justify-center" style={{backgroundColor: 'var(--block-background)'}}>
             <div className="">
               <span className="mr-3 text-2xl font-TripSans font-medium">
                 Type:
               </span>
-              <span className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium">
+              <span className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium" style={{backgroundColor: 'var(--primary-1)'}}>
                 {accountType}
               </span>
             </div>
@@ -562,15 +564,15 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               <span className="mr-3 text-2xl font-TripSans font-medium">
                 Name:
               </span>
-              <span className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium">
+              <span className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium" style={{backgroundColor: 'var(--primary-1)'}}>
                 {accountName}
               </span>
             </div>
             <div className="mt-5">
-              <span className="mr-3 text-2xl font-TripSans font-medium">
+              <span className="mr-3 text-2xl font-TripSans font-medium" >
                 Account Number:
               </span>
-              <span className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium">
+              <span className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium" style={{backgroundColor: 'var(--primary-1)'}}>
                 {accountNumber}
               </span>
             </div>
@@ -589,6 +591,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
                   : 'bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-red-400 outline-none focus:border-2 focus:border-red-400'
               }`}
               type="text"
+              style={{color: 'black'}}
             />
           </div>
           <button
@@ -617,6 +620,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         <div
           className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
           onClick={(e) => handleChildElementClick(e)}
+          style={{backgroundColor: 'var(--block-background)'}}
         >
           <span className="text-center text-3xl font-TripSans font-bold">
             Account and financial <br />
@@ -681,6 +685,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         <div
           className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
           onClick={(e) => handleChildElementClick(e)}
+          style={{backgroundColor: 'var(--block-background)'}}
         >
           <div role="status">
             <svg

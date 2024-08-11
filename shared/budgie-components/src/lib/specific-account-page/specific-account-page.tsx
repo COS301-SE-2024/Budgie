@@ -544,7 +544,7 @@ function GraphSection(props: GraphSectionProps) {
     graphX.length != 0 &&
     graphY.length != 0 && (
       <>
-        <div>
+        <div style={{ backgroundColor: "var(--block-background)"}}>
           <span className="font-TripSans font-medium text-3xl">
             Account Balance
           </span>
@@ -616,13 +616,14 @@ function InfoSection(props: InfoSectionProps) {
   };
 
   return (
-    <div className="w-full h-[28%] flex flex-col items-center justify-start shadow-md bg-BudgieWhite rounded-[2rem]">
+    <div className="w-full h-[28%] flex flex-col items-center justify-start shadow-md bg-BudgieWhite rounded-[2rem]" style={{ backgroundColor: "var(--block-background)"}}>
       <div className="mt-4 w-full flex items-center justify-between">
         <span
           onClick={handleback}
           className="material-symbols-outlined ml-8 hover:bg-gray-200 p-1 transition-all rounded-xl text-black"
           style={{
             fontSize: '2rem',
+            color: 'var(--main-text)'
           }}
         >
           arrow_back
@@ -670,6 +671,7 @@ function InfoSection(props: InfoSectionProps) {
             <select
               className="font-TripSans focus:outline-none focus:border-BudgieGreen1 outline-none font-medium ml-2 rounded-xl py-1"
               onChange={handleTypeChange}
+              style={{ color: "black"}}
             >
               <option
                 selected={props.account.type == 'current'}
@@ -703,7 +705,7 @@ function SpinnerLoader() {
   };
 
   return (
-    <div onClick={handleExit} className={styles.mainPageBlurModal}>
+    <div onClick={handleExit} className={styles.mainPageBlurModal} style={{ backgroundColor: "var(--block-background)"}}>
       <div
         className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
         onClick={(e) => handleChildElementClick(e)}
@@ -873,6 +875,7 @@ function AreYouSure(props: AreYouSureProps) {
       <div
         className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-56 bg-BudgieWhite "
         onClick={(e) => handleChildElementClick(e)}
+        style={{ backgroundColor: "var(--block-background)"}}
       >
         <span className="text-center text-2xl font-TripSans font-medium">
           Are you sure you would <br /> like to remove this account permanently?
@@ -950,7 +953,7 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
           setShowEditAlias={setEditAliasModal}
           setAccount={setAccount}
         ></InfoSection>
-        <div className="w-full h-[65%] mt-[1rem] bg-BudgieWhite rounded-3xl flex flex-col items-center justify-center shadow-xl ">
+        <div className="w-full h-[65%] mt-[1rem] bg-BudgieWhite rounded-3xl flex flex-col items-center justify-center shadow-xl " style={{ backgroundColor: "var(--block-background)"}}>
           <GraphSection
             accNo={props.number}
             account={account}
