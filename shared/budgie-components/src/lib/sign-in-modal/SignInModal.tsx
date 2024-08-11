@@ -118,7 +118,7 @@ export function SignInModal(props: SignInModalProps) {
           </div>
         </div>
       )}
-      <div className="relative z-10 bg-BudgieBlue w-[794px] h-[521px] rounded-[61px]">
+      <div className="relative z-10 bg-BudgieBlue w-[794px] h-[521px] rounded-[61px] shadow-2xl">
         <div className="flex flex-col justify-start items-center bg-BudgieWhite w-[397px] h-[521px] rounded-[60px] rounded-tr-none rounded-br-none">
           <div className="pt-4 h-[55px] w-[55px]">
             <Image src={logo} alt="Logo" />
@@ -147,7 +147,7 @@ export function SignInModal(props: SignInModalProps) {
                 onChange={handlePasswordChange}
               />
             </div>
-            <div className="flex flex-col justify-start pt-6 items-center w-37 h-11">
+            <div className="flex flex-col justify-start pt-6 items-center">
               <button
                 className="font-TripSans font-medium rounded-[25px] w-36 h-10 bg-BudgieBlue text-BudgieWhite"
                 type="button"
@@ -159,9 +159,9 @@ export function SignInModal(props: SignInModalProps) {
             <div className="flex flex-col justify-start pt-3 items-center">
               <p className="text-BudgieBlue font-TripSans font-medium">OR</p>
             </div>
-            <div className="flex flex-col justify-start pt-3 items-center w-50 h-11">
+            <div className="flex flex-col justify-start pt-3 items-center">
               <button
-                className="flex items-center justify-center font-TripSans font-medium rounded-[25px] w-48 h-10 bg-BudgieBlue text-BudgieWhite"
+                className="flex items-center justify-center font-TripSans font-medium rounded-[25px] w-[12rem] h-[2.5rem] bg-BudgieBlue text-BudgieWhite"
                 type="button"
                 onClick={signInWithGoogle}
               >

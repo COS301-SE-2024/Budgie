@@ -116,7 +116,7 @@ export function SignUpModal(props: SignUpModalProps) {
 
   return (
     <>
-      <div className="bg-BudgieBlue w-[794px] h-[521px] rounded-[61px]">
+      <div className="bg-BudgieBlue w-[794px] h-[521px] rounded-[61px] shadow-2xl">
         <div className="flex flex-col justify-start items-center bg-BudgieWhite w-[397px] h-[521px] rounded-[60px] rounded-tr-none rounded-br-none ">
           <div className=" pt-4 h-[55px] w-[55px]">
             <Image src={logo} width={55} height={55} alt="Logo"></Image>
