@@ -202,6 +202,7 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
               <div className={styles.percentageDisplay}>
                 {`${calculateProgressPercentage(goal).toFixed(2)}%`}
               </div>
+              </div>
               <div
                 style={{
                   marginTop: '1rem',
@@ -235,7 +236,6 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
                   <span></span>
                 )}
               </div>
-            </div>
           </div>
         )}
 
@@ -267,6 +267,7 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
                   <Bar dataKey="amount" fill="var(--primary-1)" />
                 </BarChart>
               </ResponsiveContainer>
+              </div>
 
               <div
                 style={{
@@ -294,7 +295,6 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
                 </span>
               </div>
             </div>
-          </div>
         )}
 
         {goal.type === 'Debt' && (
@@ -309,6 +309,7 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
               />
               <div className={styles.percentageDisplay}>
                 {`${calculateProgressPercentage(goal).toFixed(2)}%`}
+              </div>
               </div>
               <div
                 style={{
@@ -344,7 +345,6 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
                 )}
               </div>
             </div>
-          </div>
         )}
 
         {goal.type === 'Debt' && goal.updates !== undefined && (
@@ -375,7 +375,7 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
                   <Bar dataKey="amount" fill="var(--primary-1)" />
                 </BarChart>
               </ResponsiveContainer>
-
+              </div>
               <div
                 style={{
                   marginTop: '1rem',
@@ -402,7 +402,6 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
                 </span>
               </div>
             </div>
-          </div>
         )}
 
         {goal.type === 'Spending' && (
@@ -424,6 +423,7 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
                 }}
               >
                 {`${calculateProgressPercentage(goal).toFixed(2)}%`}
+              </div>
               </div>
               <div
                 style={{
@@ -459,7 +459,6 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
                 )}
               </div>
             </div>
-          </div>
         )}
 
         {goal.type === 'Spending' && goal.updates !== undefined && (
@@ -491,7 +490,7 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
                   <Bar dataKey="excess" stackId="a" fill="red" />
                 </BarChart>
               </ResponsiveContainer>
-
+              </div>
               <div
                 style={{
                   marginTop: '1rem',
@@ -518,7 +517,6 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
                 </span>
               </div>
             </div>
-          </div>
         )}
       </div>
     </div>

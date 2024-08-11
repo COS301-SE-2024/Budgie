@@ -441,12 +441,11 @@ export function PlanningPage(props: PlanningPageProps) {
           ) : viewMode === 'all' ? (
             <GoalsPage />
           ) : (
-            <div className={styles.loadScreen}>
-              <div className={styles.loaderContainer}>
-                <div className={styles.loader}></div>
+            <div className={styles.underConstructionScreen}> 
+              <div className={styles.underConstructionText}>
+                This page is under construction.
               </div>
-              <div className={styles.loaderText}>Loading...</div>
-            </div>
+          </div>
           )}
         </div>
       </div>
