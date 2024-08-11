@@ -1,6 +1,7 @@
 .topBar {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   background-color: var(--block-background);
   width: 85vw;
   height: calc(6vh * var(--font-size-multiplier));
@@ -38,6 +39,8 @@
   text-align: right;
   text-align-last: right;
   transition: 0.2s ease;
+  height: calc(3rem * var(--font-size-multiplier));
+  line-height: calc(2rem * var(--font-size-multiplier));
 }
 
 .accountDropdown option {

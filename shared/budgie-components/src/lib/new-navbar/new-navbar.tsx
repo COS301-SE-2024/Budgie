@@ -100,6 +100,30 @@ export function NewNavbar(props: NavbarProps) {
             Transactions
           </li>
         </Link>
+        {/* Planning item */}
+        <Link href={'/planning'}>
+          <li
+            className={`${styles.navItem} ${
+              selectedItem === 'planning' ? styles.selected : ''
+            }`}
+            onClick={() => setSelectedItem('planning')}
+          >
+            <span
+              className="material-symbols-outlined"
+              style={{
+                marginRight: '0.3rem',
+                marginLeft: '0.3rem',
+                marginBottom: '0.2rem',
+                fontSize:
+                  'min(2rem, (calc(1.5rem * var(--font-size-multiplier))))',
+                fontWeight: 500,
+              }}
+            >
+            browse_activity
+            </span>
+            Planning
+          </li>
+        </Link>
         {/* Settings item */}
         <Link href={'/settings'}>
           <li

@@ -9,6 +9,8 @@ import {
   updateDoc,
   query,
   where,
+  query,
+  where,
 } from 'firebase/firestore';
 import { useThemeSettings } from '../../useThemes';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
@@ -30,6 +32,8 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   const user = useContext(UserContext);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [yearsWithData, setYearsWithData] = useState<number[]>([]);
+  const [LeftArrowStyle, setLeftArrowStyle] = useState('');
+  const [RightArrowStyle, setRightArrowStyle] = useState('');
   useThemeSettings();
   interface Transaction {
     date: string;
@@ -48,8 +52,10 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   };
 
   const handlePrevYear = () => {
-    setCurrentYear(currentYear - 1);
-    display();
+    if (currentYear != props.availableYears[0]) {
+      setCurrentYear(currentYear - 1);
+      display();
+    }
   };
 
   const monthNames = [
@@ -100,7 +106,55 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     fetchAvailableYears();
   }, []);
 
+  useEffect(() => {
+    if (currentYear == new Date().getFullYear()) {
+      setRightArrowStyle('Greyed');
+    } else {
+      setRightArrowStyle('Normal');
+    }
+
+    if (currentYear == yearsWithData[0]) {
+      setLeftArrowStyle('Greyed');
+    } else {
+      setLeftArrowStyle('Normal');
+    }
+  }, [yearsWithData]);
+
+  const getLeftArrowStyle = () => {
+    switch (LeftArrowStyle) {
+      case 'Normal':
+        return styles.leftNavButton;
+      case 'Greyed':
+        return styles.greyedleftNavButton;
+      default:
+        return styles.leftNavButton;
+    }
+  };
+
+  const getRightArrowStyle = () => {
+    switch (RightArrowStyle) {
+      case 'Normal':
+        return styles.rightNavButton;
+      case 'Greyed':
+        return styles.greyedrightNavButton;
+      default:
+        return styles.rightNavButton;
+    }
+  };
+
   const display = async () => {
+    if (currentYear == new Date().getFullYear()) {
+      setRightArrowStyle('Greyed');
+    } else {
+      setRightArrowStyle('Normal');
+    }
+
+    if (currentYear == yearsWithData[0]) {
+      setLeftArrowStyle('Greyed');
+    } else {
+      setLeftArrowStyle('Normal');
+    }
+
     if (Data != null) {
       let transactionsList: any[] = [];
       for (let i = 0; i < 12; i++) {
@@ -254,7 +308,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     <div className={styles.mainPage}>
       <div className={styles.header}>
         <div className={styles.monthNavigation}>
-          <button className={styles.navButton} onClick={handlePrevYear}>
+          <button className={`${getLeftArrowStyle()}`} onClick={handlePrevYear}>
             <span
               className="material-symbols-outlined"
               style={{
@@ -280,7 +334,10 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
             </select>
           </span>
 
-          <button className={styles.navButton} onClick={handleNextYear}>
+          <button
+            className={`${getRightArrowStyle()}`}
+            onClick={handleNextYear}
+          >
             <span
               className="material-symbols-outlined"
               style={{
