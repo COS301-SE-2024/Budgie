@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
-<coverage lines-valid="52" lines-covered="45" line-rate="0.8653" branches-valid="20" branches-covered="15" branch-rate="0.75" timestamp="1723470595222" complexity="0" version="0.1">
+<coverage lines-valid="60" lines-covered="52" line-rate="0.8665999999999999" branches-valid="24" branches-covered="18" branch-rate="0.75" timestamp="1723472347106" complexity="0" version="0.1">
   <sources>
     <source>/Users/jamesfitzsimons/Desktop/CapstoneRepo/apps/budgie-app</source>
   </sources>
@@ -11,11 +11,11 @@
           <methods>
           </methods>
           <lines>
-            <line number="6" hits="5" branch="false"/>
-            <line number="17" hits="5" branch="false"/>
-            <line number="19" hits="5" branch="false"/>
-            <line number="20" hits="5" branch="false"/>
-            <line number="21" hits="5" branch="false"/>
+            <line number="6" hits="6" branch="false"/>
+            <line number="17" hits="6" branch="false"/>
+            <line number="19" hits="6" branch="false"/>
+            <line number="20" hits="6" branch="false"/>
+            <line number="21" hits="6" branch="false"/>
           </lines>
         </class>
       </classes>
@@ -100,6 +100,34 @@
             <line number="16" hits="0" branch="false"/>
             <line number="18" hits="2" branch="false"/>
             <line number="22" hits="4" branch="true" condition-coverage="100% (2/2)"/>
+          </lines>
+        </class>
+      </classes>
+    </package>
+    <package name="src.app.(dashboard).overview" line-rate="0.875" branch-rate="0.75">
+      <classes>
+        <class name="page.tsx" filename="src/app/(dashboard)/overview/page.tsx" line-rate="0.875" branch-rate="0.75">
+          <methods>
+            <method name="overview" hits="11" signature="()V">
+              <lines>
+                <line number="10" hits="11"/>
+              </lines>
+            </method>
+            <method name="(anonymous_1)" hits="5" signature="()V">
+              <lines>
+                <line number="16" hits="5"/>
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="11" hits="11" branch="false"/>
+            <line number="13" hits="11" branch="false"/>
+            <line number="14" hits="10" branch="false"/>
+            <line number="16" hits="10" branch="false"/>
+            <line number="17" hits="5" branch="true" condition-coverage="50% (1/2)"/>
+            <line number="18" hits="0" branch="false"/>
+            <line number="20" hits="5" branch="false"/>
+            <line number="24" hits="10" branch="true" condition-coverage="100% (2/2)"/>
           </lines>
         </class>
       </classes>
