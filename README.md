@@ -20,15 +20,18 @@ Budgie is a financial management tool designed to help users take control of the
 ### Specifications
 - [Requirement Specification](https://docs.google.com/document/d/1IxhlKWYyOzyI6G7sqyuQpJhXvYi7qbDt/edit?usp=sharing&ouid=102754965567069782239&rtpof=true&sd=true)
 - [Architectural Design Specification](https://docs.google.com/document/d/1A5sNDeYOo9q0-vpzERKpAOi2K3Yqm1Qy/edit?usp=drive_link&ouid=102754965567069782239&rtpof=true&sd=true)
+
 <!-- - [Database Specification]()
 - [Testing Specification]()
 - [GitHub Specifications]()
-- [CI/CD]() 
+- [CI/CD]() -->
 
-### User Manual
-
+### Manuals
+- [User Manual](https://drive.google.com/file/d/1fWVP3CqVKVSiKAo3BaEBLlCwJOeam3gm/view?usp=drive_link)
+- [Technical Installation Manual](https://drive.google.com/file/d/1a1KIRG9aLB77wbKvydsLzZf70r1MS1VE/view?usp=drive_link)
+  
 ### Coding Standards
-- [Coding Standards]() -->
+- [Coding Standards](https://drive.google.com/file/d/1PPR6qOugaXNz273XWx4K8XcoZCQzrfXg/view?usp=drive_link)
 
 ### Project Board
 - [Budgie Project Board](https://github.com/orgs/COS301-SE-2024/projects/108)
