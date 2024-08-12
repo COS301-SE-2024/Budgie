@@ -1,7 +1,7 @@
 'use client';
 import styles from './AccountSettings.module.css';
 import '../../root.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   doc,
   getDoc,
@@ -11,6 +11,7 @@ import {
   getDocs,
 } from 'firebase/firestore';
 import { updatePassword } from 'firebase/auth';
+import { UserContext } from '@capstone-repo/shared/budgie-components';
 import { db, auth } from '../../../../../apps/budgie-app/firebase/clientApp';
 import {
   getAuth,
@@ -39,7 +40,8 @@ export function AccountSettings(props: AccountSettingsProps) {
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleChangePassword = async () => {
-    const user = auth.currentUser;
+    const user = useContext(UserContext);
+    // const user = auth.currentUser;
     setError(!error);
     setMessage('');
     if (!user) {
@@ -57,7 +59,7 @@ export function AccountSettings(props: AccountSettingsProps) {
     } catch (error) {
       console.log('Reauthentication failed');
       setError(true);
-      setErrorMessage(error.message);
+      setErrorMessage('error');
       return;
     }
     const r =
@@ -80,7 +82,7 @@ export function AccountSettings(props: AccountSettingsProps) {
     } catch (e) {
       console.log('Error setting new password');
       setError(true);
-      setErrorMessage(e.message);
+      setErrorMessage('error');
     }
   };
 
