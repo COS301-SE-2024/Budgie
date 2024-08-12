@@ -8,7 +8,7 @@ Budgie is a financial management tool designed to help users take control of the
 
 ## Documentation
 
-[![.github/workflows/build_app.yml](https://github.com/COS301-SE-2024/Budgie/actions/workflows/build_app.yml/badge.svg?branch=dev)](https://github.com/COS301-SE-2024/Budgie/actions/workflows/build_app.yml)
+[![.github/workflows/build_app.yml](https://github.com/COS301-SE-2024/Budgie/actions/workflows/build_app.yml/badge.svg)](https://github.com/COS301-SE-2024/Budgie/actions/workflows/build_app.yml)
 [![.github/workflows/test_components.yml](https://github.com/COS301-SE-2024/Budgie/actions/workflows/test_components.yml/badge.svg?branch=dev)](https://github.com/COS301-SE-2024/Budgie/actions/workflows/test_components.yml)
 [![.github/workflows/integration_tests.yml](https://github.com/COS301-SE-2024/Budgie/actions/workflows/integration_tests.yml/badge.svg)](https://github.com/COS301-SE-2024/Budgie/actions/workflows/integration_tests.yml)
 [![codecov](https://codecov.io/gh/COS301-SE-2024/Budgie/branch/dev/graph/badge.svg?token=AK71HN61B7)](https://codecov.io/gh/COS301-SE-2024/Budgie)
