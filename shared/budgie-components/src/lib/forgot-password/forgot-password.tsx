@@ -3,11 +3,12 @@ import { useState } from 'react';
 import styles from './forgot-password.module.css';
 import Image from 'next/image';
 import logo from '../../../public/images/BudgieNoBG.png';
-import { sendPasswordResetEmail, sendEmailVerification } from 'firebase/auth';
-import { getAuth } from 'firebase-admin/auth';
+import { sendPasswordResetEmail, getAuth } from 'firebase/auth';
 
 /* eslint-disable-next-line */
-export interface ForgotPasswordProps {}
+export interface ForgotPasswordProps {
+  onClose?: () => void;
+}
 
 export function ForgotPassword(props: ForgotPasswordProps) {
   const [email, setEmail] = useState('');
@@ -15,6 +16,13 @@ export function ForgotPassword(props: ForgotPasswordProps) {
   const [errorMessage, setErrorMessage] = useState('');
   const [sent, setSent] = useState(false);
 
+  const { onClose = () => {} } = props;
+
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === 'email') setEmail(value);
@@ -31,12 +39,29 @@ export function ForgotPassword(props: ForgotPasswordProps) {
       setErrorMessage('Please enter a valid email address.');
       return;
     }
+
+    const auth = getAuth();
+    try {
+      console.log(`Attempting to send reset email to: ${email}`);
+      await sendPasswordResetEmail(auth, email);
+      alert('Password reset email sent successfully');
+      setSent(true);
+      setError(false);
+      setErrorMessage('');
+      handleClose();
+    } catch (error: any) {
+      console.error('Error sending password reset email:', error);
+      setError(true);
+      setErrorMessage(
+        error.message || 'An error occurred while sending the reset email.'
+      );
+    }
   }
 
   return (
     <>
-      <div className="bg-BudgieBlue w-[794px] h-[521px] rounded-[61px]">
-        <div className="flex flex-col justify-start items-center bg-BudgieWhite w-[397px] h-[521px] rounded-[60px] rounded-tr-none rounded-br-none ">
+      <div className="relative z-10 bg-BudgieBlue w-[794px] h-[521px] rounded-[61px] shadow-2xl">
+        <div className="flex flex-col justify-start items-center bg-BudgieWhite w-[397px] h-[521px] rounded-[60px] rounded-tr-none rounded-br-none">
           <div className=" pt-4 h-[55px] w-[55px]">
             <Image src={logo} alt="Logo"></Image>
           </div>
@@ -71,7 +96,7 @@ export function ForgotPassword(props: ForgotPasswordProps) {
           )}
           {sent && (
             <div className="pt-2 text-red-600 font-TripSans font-medium">
-              The email reset email has been sent to your email {email}
+              The reset email has been sent to {email}.
             </div>
           )}
         </div>

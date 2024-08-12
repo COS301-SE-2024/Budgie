@@ -102,20 +102,14 @@ export function SignInModal(props: SignInModalProps) {
       }
     }
   };
-
+  const handleClose = () => {
+    setForgot(false);
+  };
   return (
     <>
       {forgot && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
-          <div className="relative z-60 bg-white p-6 rounded-lg shadow-lg">
-            <ForgotPassword />
-            <button
-              className="absolute top-2 right-2 text-xl font-bold"
-              onClick={() => setForgot(false)}
-            >
-              &times;
-            </button>
-          </div>
+          <ForgotPassword onClose={handleClose} />
         </div>
       )}
       <div className="relative z-10 bg-BudgieBlue w-[794px] h-[521px] rounded-[61px] shadow-2xl">
