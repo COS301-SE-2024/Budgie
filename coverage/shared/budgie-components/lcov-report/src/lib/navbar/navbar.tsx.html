@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">11.11% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/9</span>
+                <span class='fraction'>0/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/8</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">12.5% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/8</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">11.11% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/9</span>
+                <span class='fraction'>0/9</span>
             </div>
         
             
@@ -190,7 +190,8 @@
 <a name='L125'></a><a href='#L125'>125</a>
 <a name='L126'></a><a href='#L126'>126</a>
 <a name='L127'></a><a href='#L127'>127</a>
-<a name='L128'></a><a href='#L128'>128</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -214,27 +215,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -283,6 +264,27 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -340,24 +342,24 @@ function <span class="fstat-no" title="function not covered" >signout(</span>) {
     });
 }
 &nbsp;
-export function Navbar(props: NavbarProps) {
-  return (
+export function <span class="fstat-no" title="function not covered" >Navbar(</span>props: NavbarProps) {
+<span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;div className={styles.sidebar}&gt;
       &lt;ul className={styles.navList}&gt;
         {/* Home item doesn't have an icon */}
         &lt;li
           className={`${styles.navItem} ${
-            props.selectedItem === 'Home' ? <span class="branch-0 cbranch-no" title="branch not covered" >styles.selected </span>: ''
+            props.selectedItem === 'Home' ? styles.selected : ''
           }`}
           onClick={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >props.onNavigate('Home')}</span>
         &gt;
           &lt;span
             className="material-symbols-outlined"
             style={{
-              marginRight: '0.5rem',
-              marginLeft: '0.5rem',
-              fontSize: '1.2rem',
+              marginRight: '0.3rem',
+              marginLeft: '0.3rem',
               marginBottom: '0.2rem',
+              fontSize: 'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))'
             }}
           &gt;
             home
@@ -367,17 +369,17 @@ export function Navbar(props: NavbarProps) {
         {/* Dashboard item */}
         &lt;li
           className={`${styles.navItem} ${
-            props.selectedItem === 'Dashboard' ? <span class="branch-0 cbranch-no" title="branch not covered" >styles.selected </span>: ''
+            props.selectedItem === 'Dashboard' ? styles.selected : ''
           }`}
           onClick={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >props.onNavigate('Dashboard')}</span>
         &gt;
           &lt;span
             className="material-symbols-outlined"
             style={{
-              marginRight: '0.5rem',
-              marginLeft: '0.5rem',
-              fontSize: '1.2rem',
+              marginRight: '0.3rem',
+              marginLeft: '0.3rem',
               marginBottom: '0.2rem',
+              fontSize: 'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))'
             }}
           &gt;
             dashboard
@@ -387,17 +389,17 @@ export function Navbar(props: NavbarProps) {
         {/* Profile item */}
         &lt;li
           className={`${styles.navItem} ${
-            props.selectedItem === 'Profile' ? <span class="branch-0 cbranch-no" title="branch not covered" >styles.selected </span>: ''
+            props.selectedItem === 'Profile' ? styles.selected : ''
           }`}
           onClick={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >props.onNavigate('Profile')}</span>
         &gt;
           &lt;span
             className="material-symbols-outlined"
             style={{
-              marginRight: '0.5rem',
-              marginLeft: '0.5rem',
-              fontSize: '1.2rem',
+              marginRight: '0.3rem',
+              marginLeft: '0.3rem',
               marginBottom: '0.2rem',
+              fontSize: 'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))'
             }}
           &gt;
             account_circle
@@ -407,17 +409,17 @@ export function Navbar(props: NavbarProps) {
         {/* Settings item */}
         &lt;li
           className={`${styles.navItem} ${
-            props.selectedItem === 'Settings' ? <span class="branch-0 cbranch-no" title="branch not covered" >styles.selected </span>: ''
+            props.selectedItem === 'Settings' ? styles.selected : ''
           }`}
           onClick={<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >props.onNavigate('Settings')}</span>
         &gt;
           &lt;span
             className="material-symbols-outlined"
             style={{
-              marginRight: '0.5rem',
-              marginLeft: '0.5rem',
-              fontSize: '1.2rem',
+              marginRight: '0.3rem',
+              marginLeft: '0.3rem',
               marginBottom: '0.2rem',
+              fontSize: 'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))'
             }}
           &gt;
             settings
@@ -429,9 +431,10 @@ export function Navbar(props: NavbarProps) {
           &lt;span
             className="material-symbols-outlined"
             style={{
-              marginRight: '0.5rem',
-              marginLeft: '0.5rem',
-              fontSize: '1.2rem',
+              marginRight: '0.3rem',
+              marginLeft: '0.3rem',
+              marginBottom: '0.2rem',
+              fontSize: 'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))'
             }}
           &gt;
             logout
@@ -451,7 +454,7 @@ export default Navbar;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-06-23T09:53:53.647Z
+                at 2024-08-12T13:15:30.150Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
