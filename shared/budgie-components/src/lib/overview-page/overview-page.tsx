@@ -251,19 +251,14 @@ export function OverviewPage(props: OverviewPageProps) {
                       Upcoming Bills & Payments
                     </h2>
                   </div>
-                  <ul>
-                    <li>Car Instalment - Due in 15 days</li>
-                    <li>Bond Payment - Due in 27 days</li>
-                  </ul>
+                  Under Construction 
                 </div>
                 <div className={styles.gridItem}>
                   <div className={styles.gridTitleContainer}>
                     <FontAwesomeIcon icon={faListUl} className={styles.icon} />
                     <h2 className={styles.gridTitle}>Budget Status</h2>
                   </div>
-                  <p>Amount Targeted: R5000.00</p>
-                  <p>Amount Spent: R3000.00</p>
-                  <HealthBar progress={60} />
+                  Under Construction 
                 </div>
               </div>
             </div>
