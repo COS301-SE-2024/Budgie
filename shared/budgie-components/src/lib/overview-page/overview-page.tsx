@@ -84,7 +84,7 @@ export function OverviewPage(props: OverviewPageProps) {
   useEffect(() => {
     async function someFunction() {
       const account = await getAccounts();
-      if (account.length > 0) {
+      if (account?.length > 0) {
         setAccounts(account);
         setShowData(true);
         setSelectedAccountType(account[0].alias);
@@ -94,8 +94,11 @@ export function OverviewPage(props: OverviewPageProps) {
     someFunction();
 
     const storedTheme = localStorage.getItem('data-theme') || 'light';
-    if(storedTheme === 'dark') { setIsDarkMode(true);}
-    else {setIsDarkMode(false)}
+    if (storedTheme === 'dark') {
+      setIsDarkMode(true);
+    } else {
+      setIsDarkMode(false);
+    }
   }, [showData]);
 
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -138,7 +141,17 @@ export function OverviewPage(props: OverviewPageProps) {
     { name: 'Other', value: expenseByCategory[8] },
   ];
 
-  const CATEGORY_COLORS = ['#A98DFB', '#FDAD73', '#FD7575', '#4EB5FF', '#72F1E2', '#C1C1C1', '#FFCD4E', '#FB94F1', 'var(--main-text)',];
+  const CATEGORY_COLORS = [
+    '#A98DFB',
+    '#FDAD73',
+    '#FD7575',
+    '#4EB5FF',
+    '#72F1E2',
+    '#C1C1C1',
+    '#FFCD4E',
+    '#FB94F1',
+    'var(--main-text)',
+  ];
 
   const hasAccounts = accounts.length > 0;
 
@@ -251,14 +264,14 @@ export function OverviewPage(props: OverviewPageProps) {
                       Upcoming Bills & Payments
                     </h2>
                   </div>
-                  Under Construction 
+                  Under Construction
                 </div>
                 <div className={styles.gridItem}>
                   <div className={styles.gridTitleContainer}>
                     <FontAwesomeIcon icon={faListUl} className={styles.icon} />
                     <h2 className={styles.gridTitle}>Budget Status</h2>
                   </div>
-                  Under Construction 
+                  Under Construction
                 </div>
               </div>
             </div>
