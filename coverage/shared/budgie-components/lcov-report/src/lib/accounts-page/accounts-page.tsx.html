@@ -545,7 +545,15 @@
 <a name='L480'></a><a href='#L480'>480</a>
 <a name='L481'></a><a href='#L481'>481</a>
 <a name='L482'></a><a href='#L482'>482</a>
-<a name='L483'></a><a href='#L483'>483</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a>
+<a name='L486'></a><a href='#L486'>486</a>
+<a name='L487'></a><a href='#L487'>487</a>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -767,6 +775,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -818,7 +829,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1001,6 +1011,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1164,7 +1180,7 @@ function <span class="fstat-no" title="function not covered" >getMonthName(</spa
 <span class="cstat-no" title="statement not covered" >  return monthIndex &gt;= 0 &amp;&amp; monthIndex &lt; 12 ? monthNames[monthIndex] : '';</span>
 }
 &nbsp;
-async function <span class="fstat-no" title="function not covered" >getBalancesForMonthYears(</span>
+export async function <span class="fstat-no" title="function not covered" >getBalancesForMonthYears(</span>
   years: number[],
   rollingMonthYears: string[],
   user: any
@@ -1222,11 +1238,14 @@ function <span class="fstat-no" title="function not covered" >NoAccountsPage(</s
 <span class="cstat-no" title="statement not covered" >  useThemeSettings();</span>
 <span class="cstat-no" title="statement not covered" >  return (</span>
     &lt;div className="mainPage"&gt;
-      &lt;div className="flex items-center justify-center h-full w-full" style={{backgroundColor: 'var(--main-background)'}}&gt;
+      &lt;div
+        className="flex items-center justify-center h-full w-full"
+        style={{ backgroundColor: 'var(--main-background)' }}
+      &gt;
         &lt;div
           onClick={props.onAddClick}
           className="flex flex-col items-center justify-center bg-BudgieGray hover:bg-black hover:bg-opacity-5 h-80 w-80 border-dashed border-2 border-gray-400 border-opacity-40 hover:border-opacity-100 cursor-pointer  rounded-3xl"
-          style={{backgroundColor: 'var(--main-background)'}}
+          style={{ backgroundColor: 'var(--main-background)' }}
         &gt;
           &lt;span className="text-2xl text-gray-400 text-opacity-60"&gt;
             No Accounts Added Yet
@@ -1256,16 +1275,15 @@ function <span class="fstat-no" title="function not covered" >AccountUnit(</span
 <span class="cstat-no" title="statement not covered" >        router.push(`accounts/${props.account.number}`);</span>
       }}
       className="w-[full] cursor-pointer shadow-md min-w-[23rem] max-w-[23rem] m-[1rem] rounded-[2rem] h-[21rem] flex flex-col items-center justify-center bg-BudgieWhite hover:shadow-2xl transition-shadow"
-      style={{ backgroundColor: "var(--block-background)"}}
+      style={{ backgroundColor: 'var(--block-background)' }}
     &gt;
       {props.account.type == 'current' &amp;&amp; (
         &lt;span
           className="text-black material-symbols-outlined"
           style={{
             fontSize: '9rem',
-            color: "var(--main-text)"
+            color: 'var(--main-text)',
           }}
-&nbsp;
         &gt;
           account_balance
         &lt;/span&gt;
@@ -1488,10 +1506,16 @@ export function <span class="fstat-no" title="function not covered" >AccountsPag
       )}
       {!showNoAccounts &amp;&amp; (
         &lt;div className="mainPage"&gt;
-          &lt;div className="w-full h-[10%] flex items-center justify-between shadow-md bg-BudgieWhite rounded-[2rem]" style={{backgroundColor: 'var(--block-background)'}}&gt;
+          &lt;div
+            className="w-full h-[10%] flex items-center justify-between shadow-md bg-BudgieWhite rounded-[2rem]"
+            style={{ backgroundColor: 'var(--block-background)' }}
+          &gt;
             &lt;InfoSection xAxis={graphX} yAxis={graphY}&gt;&lt;/InfoSection&gt;
           &lt;/div&gt;
-          &lt;div className="w-full h-[40%] mt-[1rem] fl shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center" style={{ backgroundColor: "var(--block-background)"}}&gt;
+          &lt;div
+            className="w-full h-[40%] mt-[1rem] fl shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center"
+            style={{ backgroundColor: 'var(--block-background)' }}
+          &gt;
             {graphX.length != 0 &amp;&amp; graphY.length != 0 &amp;&amp; (
               &lt;GraphSection xAxis={graphX} yAxis={graphY}&gt;&lt;/GraphSection&gt;
             )}
@@ -1516,7 +1540,7 @@ export default AccountsPage;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-08-12T13:15:30.150Z
+                at 2024-08-12T13:49:24.740Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
