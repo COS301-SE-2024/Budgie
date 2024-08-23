@@ -187,6 +187,14 @@ function yearMonthToString(yearMonth: string): string {
   return `${name} ${year}`;
 }
 
+const formatTransactionValue = (value: number) => {
+  const formatter = new Intl.NumberFormat('en-ZA', {
+    style: 'decimal',
+    minimumFractionDigits: 2,
+  });
+  return formatter.format(value);
+};
+
 //---------------------------------
 //Components
 function NoAccountsPage(props: NoAccountsPageProps) {
@@ -320,7 +328,7 @@ function GraphSection(props: GraphSectionProps) {
 }
 
 function InfoSection(props: GraphSectionProps) {
-  let balanceTotal = 0;
+  let balanceTotal = 0.00;
   let balancePrev = 0;
   let recentMonth = props.xAxis[11];
   for (let i = 0; i < 12; i++) {
@@ -369,7 +377,7 @@ function InfoSection(props: GraphSectionProps) {
       <div className="mr-10 h-full flex flex-col items-start justify-center">
         <div className="flex items-center">
           <span className="font-TripSans font-bold text-3xl">
-            Total Balance: {balanceTotal}
+            Total Balance: R {formatTransactionValue(balanceTotal)}
           </span>
           <UpOrDown></UpOrDown>
         </div>
