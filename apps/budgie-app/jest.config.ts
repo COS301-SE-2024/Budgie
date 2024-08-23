@@ -13,6 +13,3 @@ export default {
   coverageReporters: ['text', 'lcov', 'clover', 'cobertura'],
   setupFilesAfterEnv: [join(__dirname, 'jest.setup.js')],
 };
-module.exports = {
-  setupFilesAfterEnv: ['<rootDir>/path/to/your/setupTests.ts'],
-};
