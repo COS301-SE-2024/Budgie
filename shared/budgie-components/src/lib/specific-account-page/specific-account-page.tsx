@@ -127,7 +127,7 @@ async function getBalancesForMonthYears(
   return returnData;
 }
 
-function getSeparateYearMonthsAsTransactionObjects(
+export function getSeparateYearMonthsAsTransactionObjects(
   DataLines: string[]
 ): Record<string, Transaction[]> {
   const linesByYearMonth: Record<string, Transaction[]> = {};
@@ -159,7 +159,7 @@ function getSeparateYearMonthsAsTransactionObjects(
   return linesByYearMonth;
 }
 
-function getUniqueYearMonths(DataLines: string[]): Record<string, string[]> {
+export function getUniqueYearMonths(DataLines: string[]): Record<string, string[]> {
   const yearMonthsRecord: Record<string, Set<string>> = {};
 
   for (const line of DataLines) {
