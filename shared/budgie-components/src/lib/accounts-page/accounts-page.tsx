@@ -49,7 +49,7 @@ interface GraphSectionProps {
 }
 //helpers
 
-function rollingYears(monthYear: string): number[] {
+export function rollingYears(monthYear: string): number[] {
   // Extract the month and year from the input string
   const currentMonth = parseInt(monthYear.slice(0, 2));
   const currentYear = parseInt(monthYear.slice(2, 6));
@@ -73,7 +73,7 @@ function rollingYears(monthYear: string): number[] {
   return Array.from(new Set(years)).sort();
 }
 
-function getCurrentMonthYear(): string {
+export function getCurrentMonthYear(): string {
   const now = new Date();
   const month = (now.getMonth() + 1).toString().padStart(2, '0'); // getMonth() returns 0-11, so add 1
   const year = now.getFullYear().toString();
@@ -81,7 +81,7 @@ function getCurrentMonthYear(): string {
   return `${month}${year}`;
 }
 
-function getRollingMonthYears(monthYear: string): string[] {
+export function getRollingMonthYears(monthYear: string): string[] {
   const currentMonth = parseInt(monthYear.slice(0, 2));
   const currentYear = parseInt(monthYear.slice(2, 6));
 
