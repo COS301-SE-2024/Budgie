@@ -198,7 +198,7 @@ const monthNames = [
   'december',
 ];
 
-function getMonthName(month: string): string {
+export function getMonthName(month: string): string {
   const monthIndex = parseInt(month, 10) - 1; // Months are zero-based
   if (monthIndex >= 0 && monthIndex < 12) {
     return monthNames[monthIndex];
@@ -207,7 +207,7 @@ function getMonthName(month: string): string {
   }
 }
 
-function isDuplicate(
+export function isDuplicate(
   transaction1: Transaction,
   transaction2: Transaction
 ): boolean {

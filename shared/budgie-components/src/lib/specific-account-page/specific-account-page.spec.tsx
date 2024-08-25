@@ -2,6 +2,8 @@ import {
   splitMonthYear,
   getSeparateYearMonthsAsTransactionObjects,
   getUniqueYearMonths,
+  getMonthName,
+  isDuplicate
 } from './specific-account-page';
 
 interface Transaction {
@@ -187,3 +189,81 @@ describe('getUniqueYearMonths', () => {
   });
 
 });
+
+
+describe('getMonthName', () => {
+  it('should return the correct month name for valid month strings', () => {
+    expect(getMonthName('01')).toBe('january');
+    expect(getMonthName('02')).toBe('february');
+    expect(getMonthName('03')).toBe('march');
+    expect(getMonthName('04')).toBe('april');
+    expect(getMonthName('05')).toBe('may');
+    expect(getMonthName('06')).toBe('june');
+    expect(getMonthName('07')).toBe('july');
+    expect(getMonthName('08')).toBe('august');
+    expect(getMonthName('09')).toBe('september');
+    expect(getMonthName('10')).toBe('october');
+    expect(getMonthName('11')).toBe('november');
+    expect(getMonthName('12')).toBe('december');
+  });
+});
+
+describe('isDuplicate', () => {
+  const transaction1: Transaction = {
+    date: '2024/08/25',
+    amount: 100.0,
+    balance: 500.0,
+    description: 'Grocery shopping',
+    category: ""
+  };
+
+  it('should return true for identical transactions', () => {
+    const transaction2: Transaction = { ...transaction1 };
+    expect(isDuplicate(transaction1, transaction2)).toBe(true);
+  });
+
+  it('should return false if dates are different', () => {
+    const transaction2: Transaction = { ...transaction1, date: '2024/08/26' };
+    expect(isDuplicate(transaction1, transaction2)).toBe(false);
+  });
+
+  it('should return false if amounts are different', () => {
+    const transaction2: Transaction = { ...transaction1, amount: 200.0 };
+    expect(isDuplicate(transaction1, transaction2)).toBe(false);
+  });
+
+  it('should return false if balances are different', () => {
+    const transaction2: Transaction = { ...transaction1, balance: 600.0 };
+    expect(isDuplicate(transaction1, transaction2)).toBe(false);
+  });
+
+  it('should return false if descriptions are different', () => {
+    const transaction2: Transaction = { ...transaction1, description: 'Rent payment' };
+    expect(isDuplicate(transaction1, transaction2)).toBe(false);
+  });
+
+  it('should return true if both transactions are empty objects', () => {
+    const emptyTransaction1: Transaction = {
+      date: '',
+      amount: 0,
+      balance: 0,
+      description: '',
+      category: ""
+    };
+    const emptyTransaction2: Transaction = { ...emptyTransaction1 };
+    expect(isDuplicate(emptyTransaction1, emptyTransaction2)).toBe(true);
+  });
+
+  it('should return false if one transaction is empty and the other is not', () => {
+    const emptyTransaction: Transaction = {
+      date: '',
+      amount: 0,
+      balance: 0,
+      description: '',
+      category: ""
+    };
+    expect(isDuplicate(transaction1, emptyTransaction)).toBe(false);
+  });
+});
+
+
