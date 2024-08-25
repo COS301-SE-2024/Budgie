@@ -3,6 +3,8 @@ import {
   getCurrentMonthYear, 
   rollingYears,
   getRollingMonthYears,
+  splitMonthYear,
+  getMonthName,
 } from './accounts-page';
 
 describe('rollingYears', () => {
@@ -89,5 +91,85 @@ describe('getRollingMonthYears', () => {
     const formattedResult = result.map(m => `${m.slice(0, 2)} ${m.slice(2)}`);
 
     expect(formattedResult).toEqual(expected);
+  });
+});
+
+
+describe('splitMonthYear', () => {
+  it('should correctly split a valid month-year string', () => {
+    const input = '082024'; // August 2024
+    const expected: [string, string] = ['08', '2024'];
+
+    const result = splitMonthYear(input);
+
+    expect(result).toEqual(expected);
+  });
+
+
+  it('should handle a month-year string with a single-digit month', () => {
+    const input = '12345'; // December 345
+    const expected: [string, string] = ['12', '345'];
+
+    const result = splitMonthYear(input);
+
+    expect(result).toEqual(expected);
+  });
+
+  it('should handle a month-year string with a single-digit year', () => {
+    const input = '0123'; // January 23
+    const expected: [string, string] = ['01', '23'];
+
+    const result = splitMonthYear(input);
+
+    expect(result).toEqual(expected);
+  });
+
+  it('should handle an empty input string', () => {
+    const input = ''; // Edge case with empty string
+    const expected: [string, string] = ['', ''];
+
+    const result = splitMonthYear(input);
+
+    expect(result).toEqual(expected);
+  });
+});
+
+describe('getMonthName', () => {
+  it('should return the correct month name for valid input', () => {
+    expect(getMonthName('01')).toBe('january');
+    expect(getMonthName('02')).toBe('february');
+    expect(getMonthName('03')).toBe('march');
+    expect(getMonthName('04')).toBe('april');
+    expect(getMonthName('05')).toBe('may');
+    expect(getMonthName('06')).toBe('june');
+    expect(getMonthName('07')).toBe('july');
+    expect(getMonthName('08')).toBe('august');
+    expect(getMonthName('09')).toBe('september');
+    expect(getMonthName('10')).toBe('october');
+    expect(getMonthName('11')).toBe('november');
+    expect(getMonthName('12')).toBe('december');
+  });
+
+  it('should return an empty string for invalid month input', () => {
+    expect(getMonthName('00')).toBe('');
+    expect(getMonthName('13')).toBe('');
+    expect(getMonthName('15')).toBe('');
+    expect(getMonthName('abc')).toBe('');
+    expect(getMonthName('')).toBe('');
+  });
+
+  it('should handle single-digit months without leading zero', () => {
+    expect(getMonthName('1')).toBe('january');
+    expect(getMonthName('2')).toBe('february');
+    expect(getMonthName('3')).toBe('march');
+    expect(getMonthName('4')).toBe('april');
+    expect(getMonthName('5')).toBe('may');
+    expect(getMonthName('6')).toBe('june');
+    expect(getMonthName('7')).toBe('july');
+    expect(getMonthName('8')).toBe('august');
+    expect(getMonthName('9')).toBe('september');
+    expect(getMonthName('10')).toBe('october');
+    expect(getMonthName('11')).toBe('november');
+    expect(getMonthName('12')).toBe('december');
   });
 });

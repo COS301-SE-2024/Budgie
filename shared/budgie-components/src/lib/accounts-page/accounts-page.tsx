@@ -104,14 +104,14 @@ export function getRollingMonthYears(monthYear: string): string[] {
   return rollingMonthYears.reverse();
 }
 
-function splitMonthYear(monthYear: string): [string, string] {
+export function splitMonthYear(monthYear: string): [string, string] {
   const month = monthYear.slice(0, 2); // Extracts the month (first 2 characters)
   const year = monthYear.slice(2); // Extracts the year (remaining characters)
 
   return [month, year];
 }
 
-function getMonthName(month: string): string {
+export function getMonthName(month: string): string {
   // Array of month names in all lowercase
   const monthNames = [
     'january',
