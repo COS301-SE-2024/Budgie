@@ -5,7 +5,26 @@ import {
   getRollingMonthYears,
   splitMonthYear,
   getMonthName,
+  getBalancesForMonthYears,
+  yearMonthToString,
+  formatTransactionValue,
 } from './accounts-page';
+import { collection, query, where, getDocs, getFirestore } from 'firebase/firestore';
+
+// Mock Firestore functions
+jest.mock('firebase/firestore', () => ({
+  collection: jest.fn(),
+  query: jest.fn(),
+  where: jest.fn(),
+  getDocs: jest.fn(),
+  getFirestore: jest.fn(),
+}));
+
+const mockCollection = collection as jest.Mock;
+const mockQuery = query as jest.Mock;
+const mockWhere = where as jest.Mock;
+const mockGetDocs = getDocs as jest.Mock;
+const mockGetFirestore = getFirestore as jest.Mock;
 
 describe('rollingYears', () => {
   it('should return an array with the correct years for a given month and year', () => {
@@ -171,5 +190,130 @@ describe('getMonthName', () => {
     expect(getMonthName('10')).toBe('october');
     expect(getMonthName('11')).toBe('november');
     expect(getMonthName('12')).toBe('december');
+  });
+});
+
+
+describe('getBalancesForMonthYears', () => {
+  const mockUser = { uid: 'test-uid' };
+
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
+
+  it('should handle empty years and month-years', async () => {
+    const years: number[] = [];
+    const rollingMonthYears: string[] = [];
+
+    const result = await getBalancesForMonthYears(years, rollingMonthYears, mockUser);
+
+    expect(result).toEqual({});
+  });
+
+
+  it('should handle invalid month-year formats gracefully', async () => {
+    const years = [2023];
+    const rollingMonthYears = ['invalid-format'];
+    const mockDocs = [
+      {
+        data: () => ({
+          January: JSON.stringify([{ balance: 100 }]),
+        }),
+      },
+    ];
+
+    mockCollection.mockReturnValue('mock-collection');
+    mockQuery.mockReturnValue('mock-query');
+    mockWhere.mockReturnValue('mock-where');
+    mockGetDocs.mockResolvedValue({
+      forEach: (callback: Function) => mockDocs.forEach(doc => callback(doc)),
+    } as any);
+    mockGetFirestore.mockReturnValue('mock-db');
+
+    const result = await getBalancesForMonthYears(years, rollingMonthYears, mockUser);
+
+    expect(result).toEqual({
+      'invalid-format': 0,
+    });
+  });
+});
+
+
+describe('yearMonthToString', () => {
+  beforeEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it('should return formatted string for valid month/year input', () => {
+
+    const result = yearMonthToString('012023');
+
+    expect(result).toBe('January 2023');
+  });
+
+  it('should handle different month/year inputs', () => {
+
+    const result = yearMonthToString('122024');
+
+    expect(result).toBe('December 2024');
+  });
+
+  it('should handle invalid month input gracefully', () => {
+
+    const result = yearMonthToString('232025');
+
+    expect(result).toBe(' 2025');
+  });
+
+  it('should handle input with uppercase month abbreviation', () => {
+
+    const result = yearMonthToString('032022');
+
+    expect(result).toBe('March 2022');
+  });
+
+  it('should handle input with lowercase month abbreviation', () => {
+
+    const result = yearMonthToString('072023');
+
+    expect(result).toBe('July 2023');
+  });
+});
+
+describe('formatTransactionValue', () => {
+  it('should format number with two decimal places', () => {
+    const result = formatTransactionValue(1234.5);
+    expect(result).toBe('1,234.50');
+  });
+
+  it('should format number with no decimal places', () => {
+    const result = formatTransactionValue(1234);
+    expect(result).toBe('1,234.00');
+  });
+
+  it('should handle negative numbers', () => {
+    const result = formatTransactionValue(-1234.57);
+    expect(result).toBe('-1,234.57');
+  });
+
+  it('should format large numbers correctly', () => {
+    const result = formatTransactionValue(123456789.123);
+    expect(result).toBe('123,456,789.12');
+  });
+
+  it('should handle small numbers', () => {
+    const result = formatTransactionValue(0.12345);
+    expect(result).toBe('0.12');
+  });
+
+  it('should handle zero value', () => {
+    const result = formatTransactionValue(0);
+    expect(result).toBe('0.00');
+  });
+
+  it('should format value with more than two decimal places by rounding', () => {
+    const result = formatTransactionValue(1234.5678);
+    expect(result).toBe('1,234.57');
   });
 });

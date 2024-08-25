@@ -178,7 +178,7 @@ export async function getBalancesForMonthYears(
   return returnData;
 }
 
-function yearMonthToString(yearMonth: string): string {
+export function yearMonthToString(yearMonth: string): string {
   const split = splitMonthYear(yearMonth);
   let name = getMonthName(split[0]);
   name = name.charAt(0).toUpperCase() + name.slice(1);
@@ -187,10 +187,11 @@ function yearMonthToString(yearMonth: string): string {
   return `${name} ${year}`;
 }
 
-const formatTransactionValue = (value: number) => {
-  const formatter = new Intl.NumberFormat('en-ZA', {
+export const formatTransactionValue = (value: number): string => {
+  const formatter = new Intl.NumberFormat('en-US', {
     style: 'decimal',
     minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   });
   return formatter.format(value);
 };
