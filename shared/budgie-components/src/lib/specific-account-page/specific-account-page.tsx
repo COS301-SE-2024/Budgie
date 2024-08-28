@@ -941,7 +941,7 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
     <>
       <div className="mainPage">
         <div className="w-full h-full flex flex-col items-center">
-          <div className="bg-BudgieWhite font-TripSans font-medium text-3xl w-full h-20 text-center rounded-2xl flex flex-col items-center justify-center">
+          <div className="bg-BudgieWhite shadow-md font-TripSans font-medium text-3xl w-full h-20 text-center rounded-2xl flex flex-col items-center justify-center">
             {account.alias}
           </div>
           <div className="w-full flex grow my-5">
