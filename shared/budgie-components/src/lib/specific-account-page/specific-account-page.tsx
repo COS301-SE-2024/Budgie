@@ -34,8 +34,7 @@ export interface SpecificAccountPageProps {
 interface GraphSectionProps {
   accNo: string | string[] | undefined;
   account: AccountInfo;
-  setUploadLoading: Dispatch<SetStateAction<boolean>>;
-  setShowSuccess: Dispatch<SetStateAction<boolean>>;
+  refresh: boolean;
 }
 
 interface Transaction {
@@ -58,6 +57,10 @@ interface InfoSectionProps {
   setShowAreYouSure: Dispatch<SetStateAction<boolean>>;
   setShowEditAlias: Dispatch<SetStateAction<boolean>>;
   setAccount: Dispatch<SetStateAction<AccountInfo>>;
+  setUploadLoading: Dispatch<SetStateAction<boolean>>;
+  setShowSuccess: Dispatch<SetStateAction<boolean>>;
+  refreshGraph: boolean;
+  setRefreshGraph: Dispatch<SetStateAction<boolean>>;
 }
 
 interface AreYouSureProps {
@@ -456,8 +459,6 @@ function GraphSection(props: GraphSectionProps) {
   const router = useRouter();
   const [graphX, setGraphX] = useState<string[]>([]);
   const [graphY, setGraphY] = useState<number[]>([]);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -486,7 +487,67 @@ function GraphSection(props: GraphSectionProps) {
       await fetchGraphData();
     };
     fetchData();
-  }, [refresh]);
+  }, [props.refresh]);
+
+  let dataset = [];
+
+  for (let i = 0; i < 12; i++) {
+    dataset.push({ monthyear: graphX[i], Balance: graphY[i] });
+  }
+  return (
+    graphX.length != 0 &&
+    graphY.length != 0 && (
+      <>
+        <span className="font-TripSans font-medium text-3xl">
+          Account Balance
+        </span>
+        <AreaChart
+          className=" w-[90%] h-[80%] "
+          data={dataset}
+          index="monthyear"
+          categories={['Balance']}
+          colors={['emerald']}
+          yAxisWidth={60}
+          showGridLines={false}
+          showLegend={true}
+          showAnimation={true}
+        />
+      </>
+    )
+  );
+}
+
+function InfoSection(props: InfoSectionProps) {
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const user = useContext(UserContext);
+
+  async function handleDelete() {
+    props.setShowAreYouSure(true);
+  }
+
+  const handleTypeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (e.target.value == props.account.type) {
+      return;
+    }
+
+    const q = query(
+      collection(db, 'accounts'),
+      where('uid', '==', user.uid),
+      where('account_number', '==', props.account.number)
+    );
+    const querySnapshot = await getDocs(q);
+    const doc = querySnapshot.docs[0];
+    await updateDoc(doc.ref, {
+      type: e.target.value,
+    });
+    props.setAccount({
+      name: props.account.name,
+      alias: props.account.alias,
+      type: e.target.value,
+      number: props.account.number,
+    });
+  };
 
   const handleButtonClick = () => {
     if (fileInputRef.current) {
@@ -522,7 +583,7 @@ function GraphSection(props: GraphSectionProps) {
             props.setShowSuccess(true);
             setTimeout(() => {
               props.setShowSuccess(false);
-              setRefresh(!refresh);
+              props.setRefreshGraph(!props.refreshGraph);
             }, 1000);
           });
         } else {
@@ -535,131 +596,35 @@ function GraphSection(props: GraphSectionProps) {
     reader.readAsText(file);
   };
 
-  let dataset = [];
-
-  for (let i = 0; i < 12; i++) {
-    dataset.push({ monthyear: graphX[i], Balance: graphY[i] });
-  }
-  return (
-    graphX.length != 0 &&
-    graphY.length != 0 && (
-      <>
-        <div style={{ backgroundColor: 'var(--block-background)' }}>
-          <span className="font-TripSans font-medium text-3xl">
-            Account Balance
-          </span>
-          <button
-            onClick={handleButtonClick}
-            className="font-TripSans ml-4 font-medium text-xl text-BudgieGreen3 bg-BudgieGreen1 bg-opacity-30 hover:text-BudgieWhite hover:bg-BudgieGreen1 hover:bg-opacity-100 transition-all ease-in duration-150 p-2 rounded-2xl"
-            // className="font-TripSans shadow-md font-medium text-xl text-BudgieBlue bg-BudgieAccentHover transition-all ease-in duration-200 hover:text-BudgieWhite hover:bg-BudgieAccentHover bg-opacity-60 p-2 rounded-2xl"
-          >
-            Upload Data
-          </button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            accept=".csv"
-            onChange={handleFileChange}
-          />
-        </div>
-        <AreaChart
-          className=" w-[90%] h-[80%] "
-          data={dataset}
-          index="monthyear"
-          categories={['Balance']}
-          colors={['emerald']}
-          yAxisWidth={60}
-          showGridLines={false}
-          showLegend={true}
-          showAnimation={true}
-        />
-      </>
-    )
-  );
-}
-
-function InfoSection(props: InfoSectionProps) {
-  const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const user = useContext(UserContext);
-
-  async function handleDelete() {
-    props.setShowAreYouSure(true);
-  }
-
-  function handleback() {
-    router.back();
-  }
-
-  const handleTypeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    if (e.target.value == props.account.type) {
-      return;
-    }
-
-    const q = query(
-      collection(db, 'accounts'),
-      where('uid', '==', user.uid),
-      where('account_number', '==', props.account.number)
-    );
-    const querySnapshot = await getDocs(q);
-    const doc = querySnapshot.docs[0];
-    await updateDoc(doc.ref, {
-      type: e.target.value,
-    });
-    props.setAccount({
-      name: props.account.name,
-      alias: props.account.alias,
-      type: e.target.value,
-      number: props.account.number,
-    });
-  };
-
   return (
     <div
-      className="w-full h-[28%] flex flex-col items-center justify-start shadow-md bg-BudgieWhite rounded-[2rem]"
+      className="w-[25%] h-full flex flex-col items-center justify-center shadow-md bg-BudgieWhite rounded-[2rem]"
       style={{ backgroundColor: 'var(--block-background)' }}
     >
-      <div className="mt-4 w-full flex items-center justify-between">
-        <span
-          onClick={handleback}
-          className="material-symbols-outlined ml-8 hover:bg-gray-200 p-1 transition-all rounded-xl text-black"
-          style={{
-            fontSize: '2rem',
-            color: 'var(--main-text)',
-          }}
-        >
-          arrow_back
+      <div className="w-full flex flex-col items-center justify-start">
+        <span className="font-TripSans w-full font-medium px-5 text-3xl text-center">
+          Account:
         </span>
-        <div>
-          <span className="font-TripSans font-medium mr-3 text-3xl">
-            {props.account.alias}
+        <div className="flex w-full mt-7 flex-col items-center justify-center">
+          <span className=" px-2 py-1 font-TripSans font-normal text-xl shadow-md rounded-lg bg-BudgieBlue2 text-BudgieWhite">
+            {props.account.name}
           </span>
-        </div>
-        <span
-          onClick={handleDelete}
-          className="material-symbols-outlined mr-8 hover:bg-red-400 hover:text-BudgieWhite p-1 transition-all rounded-xl text-red-600 bg-red-200"
-          style={{
-            fontSize: '2rem',
-          }}
-        >
-          delete_forever
-        </span>
-      </div>
-      <div className="w-full grow flex items-start justify-start">
-        <div className="bg-BudgieAccentHover h-[85%] ml-20 w-[0.5rem] rounded-lg"></div>
-        <div className="flex font-TripSans font-bold ml-2 text-xl text-Black flex-col items-start justify-center">
-          <span className=" p-1 rounded-lg">{props.account.name}</span>
-          <span className=" p-1 rounded-lg">{props.account.number}</span>
-          <div className="flex items-center justify-center">
-            <span className=" p-1 flex items-center justify-center rounded-lg">
-              Alias: {props.account.alias}
+          <span className="px-2 py-1 mt-3 font-TripSans font-normal text-xl shadow-md rounded-lg bg-BudgieBlue2 text-BudgieWhite">
+            {props.account.number}
+          </span>
+          <span className="flex mt-5 font-TripSans items-center text-3xl font-medium justify-center rounded-lg">
+            Alias:
+          </span>
+          <div className="flex mt-3 items-center justify-center">
+            <span className="px-2 py-1 font-TripSans font-normal text-xl shadow-md rounded-lg bg-BudgieBlue2 text-BudgieWhite">
+              {props.account.alias}
             </span>
             <span
               onClick={() => {
                 props.setShowEditAlias(true);
               }}
-              className="material-symbols-outlined ml-1 transition-all hover:bg-gray-200 p-1 rounded-xl text-BudgieAccentHover"
+              aria-label="edit"
+              className="material-symbols-outlined ml-1 transition-all bg-gray-200 p-1.5 hover:bg-gray-300 rounded-lg text-BudgieBlue2"
               style={{
                 fontSize: '1.5rem',
               }}
@@ -667,14 +632,14 @@ function InfoSection(props: InfoSectionProps) {
               edit
             </span>
           </div>
-          <div className="flex items-center justify-center">
-            <span className=" p-1 flex items-center justify-center rounded-lg">
-              Type:
-            </span>
+          <span className="flex mt-3 font-TripSans items-center text-3xl font-medium justify-center rounded-lg">
+            Type:
+          </span>
+          <div className="flex items-center mt-3 justify-center">
             <select
-              className="font-TripSans focus:outline-none focus:border-BudgieGreen1 outline-none font-medium ml-2 rounded-xl py-1"
+              className="font-TripSans font-normal text-xl shadow-md bg-BudgieBlue2 cursor-pointer text-BudgieWhite appearance-none border-none focus:border-none focus:outline-none outline-none rounded-xl py-1"
               onChange={handleTypeChange}
-              style={{ color: 'black' }}
+              style={{ color: 'white' }}
             >
               <option
                 selected={props.account.type == 'current'}
@@ -694,6 +659,26 @@ function InfoSection(props: InfoSectionProps) {
             </select>
           </div>
         </div>
+        <button
+          onClick={handleButtonClick}
+          className="font-TripSans py-2 px-7 mt-10 shadow-md font-medium text-xl text-BudgieGreen3 bg-BudgieGreen1 bg-opacity-30 hover:text-BudgieWhite hover:bg-BudgieGreen1 hover:bg-opacity-100 transition-all ease-in duration-150 rounded-2xl"
+          // className="font-TripSans shadow-md font-medium text-xl text-BudgieBlue bg-BudgieAccentHover transition-all ease-in duration-200 hover:text-BudgieWhite hover:bg-BudgieAccentHover bg-opacity-60 p-2 rounded-2xl"
+        >
+          Upload Data
+        </button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          accept=".csv"
+          onChange={handleFileChange}
+        />
+        <button
+          onClick={handleDelete}
+          className="font-TripSans mb-5 py-2 px-4 mt-10 shadow-md font-medium text-xl hover:bg-red-400 hover:text-BudgieWhite transition-all ease-in duration-150 text-red-600 bg-red-200 rounded-2xl"
+        >
+          Delete Account
+        </button>
       </div>
     </div>
   );
@@ -911,6 +896,7 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
   const [successModal, setSuccessModal] = useState(false);
   const [editAliasModal, setEditAliasModal] = useState(false);
   const [areYouSureModal, setShowAreYouSureModal] = useState(false);
+  const [refreshGraph, setRefreshGraph] = useState(false);
   const [account, setAccount] = useState<AccountInfo>({
     name: '',
     alias: '',
@@ -954,22 +940,29 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
   return (
     <>
       <div className="mainPage">
-        <InfoSection
-          account={account}
-          setShowAreYouSure={setShowAreYouSureModal}
-          setShowEditAlias={setEditAliasModal}
-          setAccount={setAccount}
-        ></InfoSection>
-        <div
-          className="w-full h-[65%] mt-[1rem] bg-BudgieWhite rounded-3xl flex flex-col items-center justify-center shadow-xl "
-          style={{ backgroundColor: 'var(--block-background)' }}
-        >
-          <GraphSection
-            accNo={props.number}
-            account={account}
-            setUploadLoading={setUploadLoading}
-            setShowSuccess={setSuccessModal}
-          ></GraphSection>
+        <div className="w-full h-full flex flex-col items-center">
+          <div className="bg-BudgieWhite font-TripSans font-medium text-3xl w-full h-20 text-center rounded-2xl flex flex-col items-center justify-center">
+            {account.alias}
+          </div>
+          <div className="w-full flex grow my-5">
+            <InfoSection
+              account={account}
+              setShowAreYouSure={setShowAreYouSureModal}
+              setShowEditAlias={setEditAliasModal}
+              setAccount={setAccount}
+              setUploadLoading={setUploadLoading}
+              setShowSuccess={setSuccessModal}
+              refreshGraph={refreshGraph}
+              setRefreshGraph={setRefreshGraph}
+            ></InfoSection>
+            <div className="bg-BudgieWhite grow shadow-md ml-5 rounded-3xl flex flex-col items-center justify-center">
+              <GraphSection
+                accNo={props.number}
+                account={account}
+                refresh={refreshGraph}
+              ></GraphSection>
+            </div>
+          </div>
         </div>
       </div>
       {uploadLoading && <SpinnerLoader></SpinnerLoader>}

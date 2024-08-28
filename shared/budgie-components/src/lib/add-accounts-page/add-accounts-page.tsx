@@ -466,6 +466,42 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
       }
     }
 
+    async function SetUploadDate(accountNo: string) {
+      if (accountNo.length == 0) {
+        return;
+      }
+      const getCurrentDateString = () => {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}/${month}/${day}`;
+      };
+
+      const q = query(
+        collection(db, 'upload_dates'),
+        where('uid', '==', user.uid),
+        where('account_number', '==', accountNo)
+      );
+
+      let currentDate = getCurrentDateString();
+
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        let doc = querySnapshot.docs[0];
+        let docRef = doc.ref;
+        await updateDoc(docRef, {
+          date: currentDate,
+        });
+      } else {
+        await addDoc(collection(db, 'upload_dates'), {
+          uid: user.uid,
+          account_number: accountNo,
+          date: currentDate,
+        });
+      }
+    }
+
     const UploadTransactions = async (file: File) => {
       const reader = new FileReader();
       reader.onload = async (event) => {
