@@ -2,6 +2,7 @@
 
 import { useContext, useEffect, useRef, useState } from 'react';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
+import fnb from '../../../public/images/FNB_Color.png';
 import {
   doc,
   setDoc,
@@ -20,6 +21,7 @@ import styles from './add-accounts-page.module.css';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import Image from 'next/image';
 
 /* eslint-disable-next-line */
 export interface AddAccountsPageProps {}
@@ -182,7 +184,12 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
             to auto-detect account information.
           </span>
           <div className="mt-7">
-            <button onClick={handleButtonClick}> Upload FNB</button>
+            <button
+              className="bg-BudgieWhite cursor-pointer rounded-3xl hover:bg-white hover:shadow-2xl transition-all ease-in"
+              onClick={handleButtonClick}
+            >
+              <Image src={fnb} width={150} alt="FNB"></Image>
+            </button>
             <input
               type="file"
               ref={fileInputRef}
@@ -620,8 +627,8 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               onChange={handleChange}
               className={`${
                 !aliasError
-                  ? 'bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-BudgiePrimary2 outline-none focus:border-2 focus:border-BudgieAccentHover'
-                  : 'bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-red-400 outline-none focus:border-2 focus:border-red-400'
+                  ? 'bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-[#07456F] outline-none focus:border-1 focus:border-BudgieAccentHover'
+                  : 'bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-red-400 outline-none focus:border-1 focus:border-red-400'
               }`}
               type="text"
               style={{ color: 'black' }}
@@ -629,7 +636,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
           </div>
           <button
             onClick={handleAddAccountClick}
-            className="mt-12 text-BudgieWhite text-2xl p-3 rounded-3xl font-bold bg-BudgiePrimary2 hover:bg-BudgieAccentHover transition-colors ease-in"
+            className="mt-12 bg-[#07456F] hover:shadow-2xl hover:bg-BudgieAccentHover  text-BudgieWhite text-2xl p-3 rounded-3xl font-bold transition-all ease-in"
           >
             Add Account
           </button>
