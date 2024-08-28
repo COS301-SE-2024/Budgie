@@ -526,6 +526,42 @@ function InfoSection(props: InfoSectionProps) {
     props.setShowAreYouSure(true);
   }
 
+  async function SetUploadDate(accountNo: string) {
+    if (accountNo.length == 0) {
+      return;
+    }
+    const getCurrentDateString = () => {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}/${month}/${day}`;
+    };
+
+    const q = query(
+      collection(db, 'upload_dates'),
+      where('uid', '==', user.uid),
+      where('account_number', '==', accountNo)
+    );
+
+    let currentDate = getCurrentDateString();
+
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      let doc = querySnapshot.docs[0];
+      let docRef = doc.ref;
+      await updateDoc(docRef, {
+        date: currentDate,
+      });
+    } else {
+      await addDoc(collection(db, 'upload_dates'), {
+        uid: user.uid,
+        account_number: accountNo,
+        date: currentDate,
+      });
+    }
+  }
+
   const handleTypeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (e.target.value == props.account.type) {
       return;
@@ -578,14 +614,17 @@ function InfoSection(props: InfoSectionProps) {
       if (InfoLine) {
         const InfoLineArray = InfoLine.split(',').map((item) => item.trim());
         if (InfoLineArray[1] == props.account.number) {
-          UploadTransactions(file, props.account.number, user).then(() => {
-            props.setUploadLoading(false);
-            props.setShowSuccess(true);
-            setTimeout(() => {
-              props.setShowSuccess(false);
-              props.setRefreshGraph(!props.refreshGraph);
-            }, 1000);
-          });
+          UploadTransactions(file, props.account.number, user).then(
+            async () => {
+              props.setUploadLoading(false);
+              await SetUploadDate(props.account.number);
+              props.setShowSuccess(true);
+              setTimeout(() => {
+                props.setShowSuccess(false);
+                props.setRefreshGraph(!props.refreshGraph);
+              }, 1000);
+            }
+          );
         } else {
           alert('error incorrect account');
         }

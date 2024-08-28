@@ -464,6 +464,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
           categoriseExpenses({ year: Year });
         }
       }
+      SetUploadDate(accountNumber);
     }
 
     async function SetUploadDate(accountNo: string) {
