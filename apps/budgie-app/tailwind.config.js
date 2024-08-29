@@ -29,6 +29,7 @@ module.exports = {
         BudgieGrayLight: '#EAEAEA',
         BudgieAccentHover: '#576A94',
         BudgiePrimary2: '#83A2B7',
+        BudgieBlue2: '#07456F',
 
         tremor: {
           brand: {

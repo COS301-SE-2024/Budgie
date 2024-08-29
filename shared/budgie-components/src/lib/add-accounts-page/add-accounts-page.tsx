@@ -1,7 +1,8 @@
 'use client';
 
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
+import fnb from '../../../public/images/FNB_Color.png';
 import {
   doc,
   setDoc,
@@ -17,12 +18,10 @@ import {
   DocumentReference,
 } from 'firebase/firestore';
 import styles from './add-accounts-page.module.css';
-import {
-  UploadStatementCSV,
-  UserContext,
-} from '@capstone-repo/shared/budgie-components';
+import { UserContext } from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import Image from 'next/image';
 
 /* eslint-disable-next-line */
 export interface AddAccountsPageProps {}
@@ -50,7 +49,10 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
 
     return (
       <div className="mainPage">
-        <div className="flex items-center justify-center bg-BudgieGray h-full w-full" style={{backgroundColor: 'var(--main-background)', color:'black'}}>
+        <div
+          className="flex items-center justify-center bg-BudgieGray h-full w-full"
+          style={{ backgroundColor: 'var(--main-background)', color: 'black' }}
+        >
           <div className="flex bg-black w-[72rem] h-3/4 rounded-[3rem] shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)]">
             <div
               onClick={() => OnAddAccountTypeClick('current')}
@@ -119,6 +121,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
   }
 
   function UploadCSVModal() {
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
     const handleExit = () => {
       setShowUploadCSVModal(!showUploadCSVModal);
     };
@@ -154,21 +157,46 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
       reader.readAsText(file);
     };
 
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const files = event.target.files;
+      if (files && files.length > 0) {
+        const file = files[0];
+        handleCSVUpload(file);
+        event.target.value = '';
+      }
+    };
+
+    const handleButtonClick = () => {
+      if (fileInputRef.current) {
+        fileInputRef.current.click();
+      }
+    };
+
     return (
       <div onClick={handleExit} className={styles.mainPageBlurModal}>
         <div
           className="flex flex-col items-center justify-start rounded-[2rem] w-96 h-96 bg-BudgieWhite "
           onClick={(e) => handleChildElementClick(e)}
-          style={{backgroundColor: 'var(--main-background)'}}
+          style={{ backgroundColor: 'var(--main-background)' }}
         >
-          <span className="text-2xl text-center mt-[5rem]" >
+          <span className="text-2xl text-center mt-[5rem]">
             Upload your transaction history <br /> in the form of a CSV <br />{' '}
             to auto-detect account information.
           </span>
           <div className="mt-7">
-            <UploadStatementCSV
-              onFileUpload={handleCSVUpload}
-            ></UploadStatementCSV>
+            <button
+              className="bg-BudgieWhite cursor-pointer rounded-3xl hover:bg-white hover:shadow-2xl transition-all ease-in"
+              onClick={handleButtonClick}
+            >
+              <Image src={fnb} width={150} alt="FNB"></Image>
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              accept=".csv"
+              onChange={handleFileChange}
+            />
           </div>
           {uploadError != '' && (
             <span className="font-TripSans mt-[1rem] font-medium text-red-500">
@@ -436,6 +464,43 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
           categoriseExpenses({ year: Year });
         }
       }
+      SetUploadDate(accountNumber);
+    }
+
+    async function SetUploadDate(accountNo: string) {
+      if (accountNo.length == 0) {
+        return;
+      }
+      const getCurrentDateString = () => {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}/${month}/${day}`;
+      };
+
+      const q = query(
+        collection(db, 'upload_dates'),
+        where('uid', '==', user.uid),
+        where('account_number', '==', accountNo)
+      );
+
+      let currentDate = getCurrentDateString();
+
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        let doc = querySnapshot.docs[0];
+        let docRef = doc.ref;
+        await updateDoc(docRef, {
+          date: currentDate,
+        });
+      } else {
+        await addDoc(collection(db, 'upload_dates'), {
+          uid: user.uid,
+          account_number: accountNo,
+          date: currentDate,
+        });
+      }
     }
 
     const UploadTransactions = async (file: File) => {
@@ -546,17 +611,23 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         <div
           className="flex flex-col items-center justify-start rounded-[3rem] w-[45%] h-4/6 bg-BudgieGray "
           onClick={(e) => handleChildElementClick(e)}
-          style={{backgroundColor: 'var(--main-background)'}}
+          style={{ backgroundColor: 'var(--main-background)' }}
         >
-          <span className="mt-3 text-3xl font-TripSans font-medium" >
+          <span className="mt-3 text-3xl font-TripSans font-medium">
             Account Summary
           </span>
-          <div className="bg-BudgieWhite shadow-lg mt-6 py-8 px-6 rounded-3xl flex flex-col items-start justify-center" style={{backgroundColor: 'var(--block-background)'}}>
+          <div
+            className="bg-BudgieWhite shadow-lg mt-6 py-8 px-6 rounded-3xl flex flex-col items-start justify-center"
+            style={{ backgroundColor: 'var(--block-background)' }}
+          >
             <div className="">
               <span className="mr-3 text-2xl font-TripSans font-medium">
                 Type:
               </span>
-              <span className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium" style={{backgroundColor: 'var(--primary-1)'}}>
+              <span
+                className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium"
+                style={{ backgroundColor: 'var(--primary-1)' }}
+              >
                 {accountType}
               </span>
             </div>
@@ -564,15 +635,21 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               <span className="mr-3 text-2xl font-TripSans font-medium">
                 Name:
               </span>
-              <span className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium" style={{backgroundColor: 'var(--primary-1)'}}>
+              <span
+                className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium"
+                style={{ backgroundColor: 'var(--primary-1)' }}
+              >
                 {accountName}
               </span>
             </div>
             <div className="mt-5">
-              <span className="mr-3 text-2xl font-TripSans font-medium" >
+              <span className="mr-3 text-2xl font-TripSans font-medium">
                 Account Number:
               </span>
-              <span className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium" style={{backgroundColor: 'var(--primary-1)'}}>
+              <span
+                className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium"
+                style={{ backgroundColor: 'var(--primary-1)' }}
+              >
                 {accountNumber}
               </span>
             </div>
@@ -587,16 +664,16 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               onChange={handleChange}
               className={`${
                 !aliasError
-                  ? 'bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-BudgiePrimary2 outline-none focus:border-2 focus:border-BudgieAccentHover'
-                  : 'bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-red-400 outline-none focus:border-2 focus:border-red-400'
+                  ? 'bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-[#07456F] outline-none focus:border-1 focus:border-BudgieAccentHover'
+                  : 'bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-red-400 outline-none focus:border-1 focus:border-red-400'
               }`}
               type="text"
-              style={{color: 'black'}}
+              style={{ color: 'black' }}
             />
           </div>
           <button
             onClick={handleAddAccountClick}
-            className="mt-12 text-BudgieWhite text-2xl p-3 rounded-3xl font-bold bg-BudgiePrimary2 hover:bg-BudgieAccentHover transition-colors ease-in"
+            className="mt-12 bg-[#07456F] hover:shadow-2xl hover:bg-BudgieAccentHover  text-BudgieWhite text-2xl p-3 rounded-3xl font-bold transition-all ease-in"
           >
             Add Account
           </button>
@@ -620,7 +697,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         <div
           className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
           onClick={(e) => handleChildElementClick(e)}
-          style={{backgroundColor: 'var(--block-background)'}}
+          style={{ backgroundColor: 'var(--block-background)' }}
         >
           <span className="text-center text-3xl font-TripSans font-bold">
             Account and financial <br />
@@ -685,7 +762,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         <div
           className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
           onClick={(e) => handleChildElementClick(e)}
-          style={{backgroundColor: 'var(--block-background)'}}
+          style={{ backgroundColor: 'var(--block-background)' }}
         >
           <div role="status">
             <svg
