@@ -2,7 +2,7 @@
 
 #misc
 apps/budgie-app/.env.local
-coverage/*
+coverage/
 
 #firebaseemulatorsuite
 firebase-debug.log
