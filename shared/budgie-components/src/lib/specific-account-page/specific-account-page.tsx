@@ -77,7 +77,7 @@ interface EditAliasModalProps {
 }
 //helpers
 
-function splitMonthYear(monthYear: string): [string, string] {
+export function splitMonthYear(monthYear: string): [string, string] {
   const month = monthYear.slice(0, 2); // Extracts the month (first 2 characters)
   const year = monthYear.slice(2); // Extracts the year (remaining characters)
 
@@ -130,7 +130,7 @@ async function getBalancesForMonthYears(
   return returnData;
 }
 
-function getSeparateYearMonthsAsTransactionObjects(
+export function getSeparateYearMonthsAsTransactionObjects(
   DataLines: string[]
 ): Record<string, Transaction[]> {
   const linesByYearMonth: Record<string, Transaction[]> = {};
@@ -162,7 +162,7 @@ function getSeparateYearMonthsAsTransactionObjects(
   return linesByYearMonth;
 }
 
-function getUniqueYearMonths(DataLines: string[]): Record<string, string[]> {
+export function getUniqueYearMonths(DataLines: string[]): Record<string, string[]> {
   const yearMonthsRecord: Record<string, Set<string>> = {};
 
   for (const line of DataLines) {
@@ -201,7 +201,7 @@ const monthNames = [
   'december',
 ];
 
-function getMonthName(month: string): string {
+export function getMonthName(month: string): string {
   const monthIndex = parseInt(month, 10) - 1; // Months are zero-based
   if (monthIndex >= 0 && monthIndex < 12) {
     return monthNames[monthIndex];
@@ -210,7 +210,7 @@ function getMonthName(month: string): string {
   }
 }
 
-function isDuplicate(
+export function isDuplicate(
   transaction1: Transaction,
   transaction2: Transaction
 ): boolean {

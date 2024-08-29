@@ -9,7 +9,7 @@ export interface SignUpPageProps {}
 export function SignUpPage(props: SignUpPageProps) {
   return (
     <>
-      <div className={styles.singUpPageContainer}>
+      <div className={styles.singUpPageContainer}  data-testid="signup-page-container">
         <div className={styles.waveTop}></div>
         <div className={styles.waveBottom}></div>
         <div className="z-20 absolute w-screen h-screen "></div>

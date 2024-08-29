@@ -49,7 +49,7 @@ interface GraphSectionProps {
 }
 //helpers
 
-function rollingYears(monthYear: string): number[] {
+export function rollingYears(monthYear: string): number[] {
   // Extract the month and year from the input string
   const currentMonth = parseInt(monthYear.slice(0, 2));
   const currentYear = parseInt(monthYear.slice(2, 6));
@@ -73,7 +73,7 @@ function rollingYears(monthYear: string): number[] {
   return Array.from(new Set(years)).sort();
 }
 
-function getCurrentMonthYear(): string {
+export function getCurrentMonthYear(): string {
   const now = new Date();
   const month = (now.getMonth() + 1).toString().padStart(2, '0'); // getMonth() returns 0-11, so add 1
   const year = now.getFullYear().toString();
@@ -81,7 +81,7 @@ function getCurrentMonthYear(): string {
   return `${month}${year}`;
 }
 
-function getRollingMonthYears(monthYear: string): string[] {
+export function getRollingMonthYears(monthYear: string): string[] {
   const currentMonth = parseInt(monthYear.slice(0, 2));
   const currentYear = parseInt(monthYear.slice(2, 6));
 
@@ -104,14 +104,14 @@ function getRollingMonthYears(monthYear: string): string[] {
   return rollingMonthYears.reverse();
 }
 
-function splitMonthYear(monthYear: string): [string, string] {
+export function splitMonthYear(monthYear: string): [string, string] {
   const month = monthYear.slice(0, 2); // Extracts the month (first 2 characters)
   const year = monthYear.slice(2); // Extracts the year (remaining characters)
 
   return [month, year];
 }
 
-function getMonthName(month: string): string {
+export function getMonthName(month: string): string {
   // Array of month names in all lowercase
   const monthNames = [
     'january',
@@ -178,7 +178,7 @@ export async function getBalancesForMonthYears(
   return returnData;
 }
 
-function yearMonthToString(yearMonth: string): string {
+export function yearMonthToString(yearMonth: string): string {
   const split = splitMonthYear(yearMonth);
   let name = getMonthName(split[0]);
   name = name.charAt(0).toUpperCase() + name.slice(1);
@@ -186,6 +186,15 @@ function yearMonthToString(yearMonth: string): string {
 
   return `${name} ${year}`;
 }
+
+export const formatTransactionValue = (value: number): string => {
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'decimal',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  return formatter.format(value);
+};
 
 //---------------------------------
 //Components
@@ -320,7 +329,7 @@ function GraphSection(props: GraphSectionProps) {
 }
 
 function InfoSection(props: GraphSectionProps) {
-  let balanceTotal = 0;
+  let balanceTotal = 0.00;
   let balancePrev = 0;
   let recentMonth = props.xAxis[11];
   for (let i = 0; i < 12; i++) {
@@ -369,7 +378,7 @@ function InfoSection(props: GraphSectionProps) {
       <div className="mr-10 h-full flex flex-col items-start justify-center">
         <div className="flex items-center">
           <span className="font-TripSans font-bold text-3xl">
-            Total Balance: {balanceTotal}
+            Total Balance: R {formatTransactionValue(balanceTotal)}
           </span>
           <UpOrDown></UpOrDown>
         </div>
