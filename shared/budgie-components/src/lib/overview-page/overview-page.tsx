@@ -27,7 +27,7 @@ import {
   getExpensesByCategory,
 } from '../overview-page/overviewServices';
 
-export interface OverviewPageProps {}
+export interface OverviewPageProps { }
 
 export function OverviewPage(props: OverviewPageProps) {
   interface Account {
@@ -162,9 +162,8 @@ export function OverviewPage(props: OverviewPageProps) {
           {accounts.map((account) => (
             <div
               key={account.alias}
-              className={`${styles.accountTypeText} ${
-                selectedAccountType === account.alias ? styles.active : ''
-              }`}
+              className={`${styles.accountTypeText} ${selectedAccountType === account.alias ? styles.active : ''
+                }`}
               onClick={() => {
                 setSelectedAccountType(account.alias);
                 getData(account.account_number);
@@ -179,9 +178,8 @@ export function OverviewPage(props: OverviewPageProps) {
         <div className={styles.accountStatus}>
           {moneyIn > 0 ? (
             <div
-              className={`${styles.metricsContainer} ${
-                isDarkMode ? styles.dark : styles.light
-              }`}
+              className={`${styles.metricsContainer} ${isDarkMode ? styles.dark : styles.light
+                }`}
             >
               {/*<button
                 className={`${styles.toggleButton} ${styles.greenButton}`}
@@ -232,17 +230,7 @@ export function OverviewPage(props: OverviewPageProps) {
                 </PieChart>
               </div>
               <div className={styles.gridContainer}>
-                <div className={styles.gridItem}>
-                  <div className={styles.gridTitleContainer}>
-                    <FontAwesomeIcon
-                      icon={faMoneyBill}
-                      className={styles.icon}
-                    />
-                    <h2 className={styles.gridTitle}>Total Balance for Year</h2>
-                  </div>
-                  <p>Total Money in: R {moneyIn}</p>
-                  <p>Total Money out: R {moneyOut}</p>
-                </div>
+
 
                 <div className={styles.gridItem}>
                   <div className={styles.gridTitleContainer}>
@@ -254,22 +242,11 @@ export function OverviewPage(props: OverviewPageProps) {
                   <p>Description: {lastTransaction.description}</p>
                   <p>Category: {lastTransaction.category}</p>
                 </div>
-                <div className={styles.gridItem}>
-                  <div className={styles.gridTitleContainer}>
-                    <FontAwesomeIcon
-                      icon={faCalendarAlt}
-                      className={styles.icon}
-                    />
-                    <h2 className={styles.gridTitle}>
-                      Upcoming Bills & Payments
-                    </h2>
-                  </div>
-                  Under Construction
-                </div>
+
                 <div className={styles.gridItem}>
                   <div className={styles.gridTitleContainer}>
                     <FontAwesomeIcon icon={faListUl} className={styles.icon} />
-                    <h2 className={styles.gridTitle}>Budget Status</h2>
+                    <h2 className={styles.gridTitle}>Financial Health Score</h2>
                   </div>
                   Under Construction
                 </div>
