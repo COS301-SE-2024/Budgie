@@ -187,6 +187,17 @@ export function OverviewPage(props: OverviewPageProps) {
               >
                 {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
               </button>*/}
+              {/* Summary container */}
+              <div className={styles.fullWidthChart}>
+                <div className={styles.chartTitleContainer}>
+                  <h3 className={styles.chartTitle}>Summary</h3>
+                </div>
+                <p>Net Worth: R245 754.48</p>
+                <p>Average Daily Spend: R2 759.57</p>
+                <p>Top Three Categories:Entertainment,utilities,Transport</p>
+
+              </div>
+
               <div className={styles.fullWidthChart}>
                 <div className={styles.chartTitleContainer}>
                   <h3 className={styles.chartTitle}>Net Worth Over Time</h3>
@@ -248,7 +259,7 @@ export function OverviewPage(props: OverviewPageProps) {
                     <FontAwesomeIcon icon={faListUl} className={styles.icon} />
                     <h2 className={styles.gridTitle}>Financial Health Score</h2>
                   </div>
-                  Under Construction
+                  Bracket Comparison summary and link to page
                 </div>
               </div>
             </div>
