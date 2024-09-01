@@ -194,8 +194,8 @@ export function OverviewPage(props: OverviewPageProps) {
                 </div>
                 <p>Net Worth: R245 754.48</p>
                 <p>Average Daily Spend: R2 759.57</p>
+                <h4>Top Three Categories:</h4>
                 <div>
-                  <h4>Top Three Categories:</h4>
                   <div className={styles.legendContainer}>
                     {categoryData
                       .sort((a, b) => b.value - a.value)
@@ -206,32 +206,16 @@ export function OverviewPage(props: OverviewPageProps) {
                             className={styles.legendColorBox}
                             style={{ backgroundColor: CATEGORY_COLORS[index] }}
                           />
-                          <span className={styles.legendText}>{category.name}</span>
+                          {/* Combine text with legend color box */}
+                          <span className={styles.legendText} style={{ color: CATEGORY_COLORS[index] }}>
+                            {category.name}
+                          </span>
                         </div>
                       ))}
                   </div>
                 </div>
               </div>
-
-
-              <div className={styles.fullWidthChart}>
-                <div className={styles.chartTitleContainer}>
-                  <h3 className={styles.chartTitle}>Net Worth Over Time</h3>
-                </div>
-                <LineChart
-                  className="h-80"
-                  data={spendingData}
-                  index="name"
-                  categories={['Income', 'Expenses']}
-                  colors={['green', 'red']}
-                  valueFormatter={(number: number) =>
-                    `R ${Intl.NumberFormat('en-ZA').format(number).toString()}`
-                  }
-                  yAxisWidth={60}
-                  onValueChange={(v) => console.log(v)}
-                />
-              </div>
-              <div className={styles.fullWidthChart}>
+              <div className={styles.gridItem}>
                 <div className={styles.chartTitleContainer}>
                   <h3 className={styles.chartTitle}>Spending by Category</h3>
                 </div>
@@ -256,6 +240,26 @@ export function OverviewPage(props: OverviewPageProps) {
                   <Legend />
                 </PieChart>
               </div>
+
+
+              <div className={styles.fullWidthChart}>
+                <div className={styles.chartTitleContainer}>
+                  <h3 className={styles.chartTitle}>Net Worth Over Time</h3>
+                </div>
+                <LineChart
+                  className="h-80"
+                  data={spendingData}
+                  index="name"
+                  categories={['Income', 'Expenses']}
+                  colors={['green', 'red']}
+                  valueFormatter={(number: number) =>
+                    `R ${Intl.NumberFormat('en-ZA').format(number).toString()}`
+                  }
+                  yAxisWidth={60}
+                  onValueChange={(v) => console.log(v)}
+                />
+              </div>
+
               <div className={styles.gridContainer}>
 
 
