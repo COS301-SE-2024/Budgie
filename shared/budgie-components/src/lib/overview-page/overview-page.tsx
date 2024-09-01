@@ -194,9 +194,25 @@ export function OverviewPage(props: OverviewPageProps) {
                 </div>
                 <p>Net Worth: R245 754.48</p>
                 <p>Average Daily Spend: R2 759.57</p>
-                <p>Top Three Categories:Entertainment,utilities,Transport</p>
-
+                <div>
+                  <h4>Top Three Categories:</h4>
+                  <div className={styles.legendContainer}>
+                    {categoryData
+                      .sort((a, b) => b.value - a.value)
+                      .slice(0, 3)
+                      .map((category, index) => (
+                        <div key={category.name} className={styles.legendItem}>
+                          <span
+                            className={styles.legendColorBox}
+                            style={{ backgroundColor: CATEGORY_COLORS[index] }}
+                          />
+                          <span className={styles.legendText}>{category.name}</span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
               </div>
+
 
               <div className={styles.fullWidthChart}>
                 <div className={styles.chartTitleContainer}>
