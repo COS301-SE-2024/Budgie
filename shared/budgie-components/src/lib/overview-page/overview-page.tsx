@@ -215,7 +215,26 @@ export function OverviewPage(props: OverviewPageProps) {
                   </div>
                 </div>
               </div>
-              <div className={styles.gridItem}>
+
+
+              <div className={styles.fullWidthChart}>
+                <div className={styles.chartTitleContainer}>
+                  <h3 className={styles.chartTitle}>Net Worth Over Time</h3>
+                </div>
+                <LineChart
+                  className="h-80"
+                  data={spendingData}
+                  index="name"
+                  categories={['Income', 'Expenses']}
+                  colors={['green', 'red']}
+                  valueFormatter={(number: number) =>
+                    `R ${Intl.NumberFormat('en-ZA').format(number).toString()}`
+                  }
+                  yAxisWidth={60}
+                  onValueChange={(v) => console.log(v)}
+                />
+              </div>
+              <div className={styles.fullWidthChart}>
                 <div className={styles.chartTitleContainer}>
                   <h3 className={styles.chartTitle}>Spending by Category</h3>
                 </div>
@@ -240,26 +259,6 @@ export function OverviewPage(props: OverviewPageProps) {
                   <Legend />
                 </PieChart>
               </div>
-
-
-              <div className={styles.fullWidthChart}>
-                <div className={styles.chartTitleContainer}>
-                  <h3 className={styles.chartTitle}>Net Worth Over Time</h3>
-                </div>
-                <LineChart
-                  className="h-80"
-                  data={spendingData}
-                  index="name"
-                  categories={['Income', 'Expenses']}
-                  colors={['green', 'red']}
-                  valueFormatter={(number: number) =>
-                    `R ${Intl.NumberFormat('en-ZA').format(number).toString()}`
-                  }
-                  yAxisWidth={60}
-                  onValueChange={(v) => console.log(v)}
-                />
-              </div>
-
               <div className={styles.gridContainer}>
 
 
