@@ -188,31 +188,58 @@ export function OverviewPage(props: OverviewPageProps) {
                 {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
               </button>*/}
               {/* Summary container */}
-              <div className={styles.fullWidthChart}>
-                <div className={styles.chartTitleContainer}>
-                  <h3 className={styles.chartTitle}>Summary</h3>
-                </div>
-                <p>Net Worth: R245 754.48</p>
-                <p>Average Daily Spend: R2 759.57</p>
-                <h4>Top Three Categories:</h4>
-                <div>
-                  <div className={styles.legendContainer}>
-                    {categoryData
-                      .sort((a, b) => b.value - a.value)
-                      .slice(0, 3)
-                      .map((category, index) => (
-                        <div key={category.name} className={styles.legendItem}>
-                          <span
-                            className={styles.legendColorBox}
-                            style={{ backgroundColor: CATEGORY_COLORS[index] }}
-                          />
-                          {/* Combine text with legend color box */}
-                          <span className={styles.legendText} style={{ color: CATEGORY_COLORS[index] }}>
-                            {category.name}
-                          </span>
-                        </div>
-                      ))}
+              <div className={styles.gridContainer}>
+                <div className={styles.gridItem}>
+                  <div className={styles.chartTitleContainer}>
+                    <h3 className={styles.chartTitle}>Summary</h3>
                   </div>
+                  <p>Net Worth: R245 754.48</p>
+                  <p>Average Daily Spend: R2 759.57</p>
+                  <h4>Top Three Categories:</h4>
+                  <div>
+                    <div className={styles.legendContainer}>
+                      {categoryData
+                        .sort((a, b) => b.value - a.value)
+                        .slice(0, 3)
+                        .map((category, index) => (
+                          <div key={category.name} className={styles.legendItem}>
+                            <span
+                              className={styles.legendColorBox}
+                              style={{ backgroundColor: CATEGORY_COLORS[index] }}
+                            />
+                            <span className={styles.legendText} style={{ color: CATEGORY_COLORS[index] }}>
+                              {category.name}
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.gridItem}>
+                  <div className={styles.chartTitleContainer}>
+                    <h3 className={styles.chartTitle}>Spending by Category</h3>
+                  </div>
+                  <PieChart width={500} height={300}>
+                    <Pie
+                      data={categoryData}
+                      cx={250}
+                      cy={150}
+                      labelLine={false}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {categoryData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
                 </div>
               </div>
 
@@ -234,31 +261,7 @@ export function OverviewPage(props: OverviewPageProps) {
                   onValueChange={(v) => console.log(v)}
                 />
               </div>
-              <div className={styles.fullWidthChart}>
-                <div className={styles.chartTitleContainer}>
-                  <h3 className={styles.chartTitle}>Spending by Category</h3>
-                </div>
-                <PieChart width={1000} height={300}>
-                  <Pie
-                    data={categoryData}
-                    cx={500}
-                    cy={150}
-                    labelLine={false}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {categoryData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </div>
+
               <div className={styles.gridContainer}>
 
 
