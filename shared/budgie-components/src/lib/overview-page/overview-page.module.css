@@ -250,27 +250,28 @@
   align-items: center;
   justify-content: center;
   background-color: var(--legend-bg-color);
-  border-radius: 8px;
-  padding: 8px;
-  width: 80px;
+  border-radius: 5px;
+  padding: 30px;
+  width: 50px;
   /* Adjust the width as needed */
-  height: 40px;
+  height: 55px;
   /* Adjust the height as needed */
+  text-align: center;
 }
 
 .legendColorBox {
-  width: 16px;
+  width: 25px;
   height: 16px;
   margin-right: 0;
   /* Remove margin to avoid extra space */
   background-color: inherit;
   /* Use the background color of the parent */
-  border-radius: 4px;
+  border-radius: 7px;
 }
 
 .legendText {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--legend-text-color);
-  margin-left: 4px;
+  margin-left: 3px;
   /* Add margin if necessary to separate text and color box */
 }

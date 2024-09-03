@@ -203,16 +203,13 @@ export function OverviewPage(props: OverviewPageProps) {
                         .slice(0, 3)
                         .map((category, index) => (
                           <div key={category.name} className={styles.legendItem}>
-                            <span
-                              className={styles.legendColorBox}
-                              style={{ backgroundColor: CATEGORY_COLORS[index] }}
-                            />
-                            <span className={styles.legendText} style={{ color: CATEGORY_COLORS[index] }}>
-                              {category.name}
-                            </span>
+                            <div className={styles.legendBox} style={{ backgroundColor: CATEGORY_COLORS[index] }}>
+                              <span className={styles.legendText}>{category.name}</span>
+                            </div>
                           </div>
                         ))}
                     </div>
+
                   </div>
                 </div>
 
