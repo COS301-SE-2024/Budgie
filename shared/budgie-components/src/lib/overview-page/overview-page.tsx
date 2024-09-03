@@ -65,6 +65,16 @@ export function OverviewPage(props: OverviewPageProps) {
   const [monthlyExpenses, setMonthlyExpenses] = useState([]);
   const [expenseByCategory, setExpenseByCategory] = useState([]);
   useThemeSettings();
+  
+  
+  const formatTransactionValue = (value: number) => {
+    const formatter = new Intl.NumberFormat('en-ZA', {
+      style: 'decimal',
+      minimumFractionDigits: 2,
+    });
+    return formatter.format(value);
+  };
+
   const getData = async (number: string) => {
     const transaction = await getTransactions(number);
     const moneyI = await getMoneyIn(transaction);
@@ -240,8 +250,8 @@ export function OverviewPage(props: OverviewPageProps) {
                     />
                     <h2 className={styles.gridTitle}>Total Balance for Year</h2>
                   </div>
-                  <p>Total Money in: R {moneyIn}</p>
-                  <p>Total Money out: R {moneyOut}</p>
+                  <p>Total Money in: R {formatTransactionValue(moneyIn)}</p>
+                  <p>Total Money out: R {formatTransactionValue(moneyOut)}</p>
                 </div>
 
                 <div className={styles.gridItem}>
@@ -250,7 +260,7 @@ export function OverviewPage(props: OverviewPageProps) {
                     <h2 className={styles.gridTitle}>Last Transaction</h2>
                   </div>
                   <p>Date: {lastTransaction.date}</p>
-                  <p>Amount: R {lastTransaction.amount}</p>
+                  <p>Amount: R {formatTransactionValue(lastTransaction.amount)}</p>
                   <p>Description: {lastTransaction.description}</p>
                   <p>Category: {lastTransaction.category}</p>
                 </div>

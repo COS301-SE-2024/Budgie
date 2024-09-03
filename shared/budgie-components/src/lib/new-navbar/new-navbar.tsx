@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import styles from './new-navbar.module.css';
+import styles from './new-new-navbar.module.css';
 import { getAuth, signOut } from 'firebase/auth';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -119,7 +119,7 @@ export function NewNavbar(props: NavbarProps) {
                 fontWeight: 500,
               }}
             >
-            browse_activity
+              browse_activity
             </span>
             Planning
           </li>
