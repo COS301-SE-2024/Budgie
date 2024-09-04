@@ -205,7 +205,7 @@ function useKnownList(description) {
 }
 
 exports.categoriseExpenses = onCall(
-  { memory: '512MiB', cpu: 2 },
+  { timeoutSeconds: 180, memory: '2GiB', cpu: 4 },
   async (request) => {
     await initialize();
 
@@ -218,6 +218,7 @@ exports.categoriseExpenses = onCall(
       let updateFlag = false;
       //can categorize and set
       for (month of Months) {
+        logger.info(month);
         if (doc.data()[month]) {
           const IncomingMonthData = JSON.parse(doc.data()[month]);
           for (transaction of IncomingMonthData) {
