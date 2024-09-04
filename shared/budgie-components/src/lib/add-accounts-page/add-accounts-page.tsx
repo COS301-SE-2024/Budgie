@@ -399,13 +399,17 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
             }
           }
           //call categorize function
-          const functions = getFunctions();
-          const categoriseExpenses = httpsCallable(
-            functions,
-            'categoriseExpenses'
-          );
-          console.log('first run');
-          categoriseExpenses({ year: Year });
+          try {
+            const functions = getFunctions();
+            const categoriseExpenses = httpsCallable(
+              functions,
+              'categoriseExpenses'
+            );
+            let res = await categoriseExpenses({ year: Year });
+            console.log(res);
+          } catch (error) {
+            alert('function error');
+          }
         } else {
           //documents do not exist for this year can safely add to merged
           for (const YearMonth of YearMonths) {
@@ -429,8 +433,6 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
             let [year, month] = YearMonth.split('/');
             const TransactionString = JSON.stringify(Merged[YearMonth]);
             const TransactionMonthString = getMonthName(month);
-            console.log(TransactionMonthString);
-            console.log(TransactionString);
             if (first) {
               first = false;
               //add to db
@@ -455,13 +457,17 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
             }
           }
           // call categorize function
-          const functions = getFunctions();
-          const categoriseExpenses = httpsCallable(
-            functions,
-            'categoriseExpenses'
-          );
-          console.log('first run');
-          categoriseExpenses({ year: Year });
+          try {
+            const functions = getFunctions();
+            const categoriseExpenses = httpsCallable(
+              functions,
+              'categoriseExpenses'
+            );
+            let res = await categoriseExpenses({ year: Year });
+            console.log(res);
+          } catch (error) {
+            alert('function error');
+          }
         }
       }
       SetUploadDate(accountNumber);

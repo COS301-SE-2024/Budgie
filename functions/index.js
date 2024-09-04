@@ -1,24 +1,28 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
-//   logger.info('Hello logs!', { structuredData: true });
-
 // Dependencies for callable functions.
 const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const { logger } = require('firebase-functions/v2');
 //dependencies
-const { getDatabase } = require('firebase-admin/database');
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
 
 initializeApp();
-let pipeline;
 let categoryEmbeddings;
+let pipe;
+
+async function initialize() {
+  const { pipeline } = await import('@xenova/transformers');
+  pipe = await pipeline('feature-extraction', 'Supabase/gte-small');
+  await initializeCategoryEmbeddings(pipe);
+}
+
+async function initializeCategoryEmbeddings(pipe) {
+  categoryEmbeddings = await Promise.all(
+    categories.map(async (category) => {
+      const output = await pipe(category, { pooling: 'mean', normalize: true });
+      return Array.from(output.data);
+    })
+  );
+}
 
 const Months = [
   'january',
@@ -49,16 +53,6 @@ const categories = [
 
 async function useModel(transactionDescription) {
   try {
-    if (!pipeline) {
-      await initializePipeline();
-    }
-
-    const pipe = await pipeline('feature-extraction', 'Supabase/gte-small');
-
-    if (!categoryEmbeddings) {
-      await initializeCategoryEmbeddings(pipe);
-    }
-
     // Generate embedding for the transaction description
     const descriptionOutput = await pipe(transactionDescription, {
       pooling: 'mean',
@@ -83,22 +77,8 @@ async function useModel(transactionDescription) {
 
     return closestCategory;
   } catch (error) {
-    logger.log(error);
+    logger.error('Error in useModel:', error);
   }
-}
-
-async function initializePipeline() {
-  const transformers = await import('@xenova/transformers');
-  pipeline = transformers.pipeline;
-}
-
-async function initializeCategoryEmbeddings(pipe) {
-  categoryEmbeddings = await Promise.all(
-    categories.map(async (category) => {
-      const output = await pipe(category, { pooling: 'mean', normalize: true });
-      return Array.from(output.data);
-    })
-  );
 }
 
 function cosineSimilarity(embedding1, embedding2) {
@@ -224,54 +204,52 @@ function useKnownList(description) {
   return '';
 }
 
-exports.categoriseExpenses = onCall(async (request) => {
-  const year = request.data.year;
-  const uid = request.auth.uid;
-  // const doc = await getFirestore().doc(`transaction_data_${year}/${uid}`);
-  // const docSnap = await doc.get();
-  // .collection(db, `transaction_data_${year}`);
-  const db = getDatabase();
-  const accRef = getFirestore().collection(`transaction_data_${year}`);
-  const snapshot = await accRef.where('uid', '==', uid).get();
+exports.categoriseExpenses = onCall(
+  { memory: '512MiB', cpu: 2 },
+  async (request) => {
+    await initialize();
 
-  // const q = getFirestore().query(accRef, where('uid', '==', user.uid));
-  // const querySnapshot = await getDocs(q);
+    const year = request.data.year;
+    const uid = request.auth.uid;
+    const accRef = getFirestore().collection(`transaction_data_${year}`);
+    const snapshot = await accRef.where('uid', '==', uid).get();
 
-  snapshot.forEach(async (doc) => {
-    let updateFlag = false;
-    //can categorize and set
-    for (month of Months) {
-      if (doc.data()[month]) {
-        const IncomingMonthData = JSON.parse(doc.data()[month]);
-        for (transaction of IncomingMonthData) {
-          if (transaction.category == '') {
-            updateFlag = true;
-            let newCategory = '';
-            if (transaction.amount > 0) {
-              newCategory = 'Income';
-            }
-            if (newCategory == '') {
-              newCategory = await useKnownList(transaction.description);
-            }
-            if (newCategory == '') {
-              newCategory = await useModel(transaction.description);
-            }
-            if (newCategory == 'Fuel') {
-              if (Math.abs(parseFloat(transaction.amount)) < 100) {
-                newCategory = 'Eating Out';
-              } else {
-                newCategory = 'Transport';
+    snapshot.forEach(async (doc) => {
+      let updateFlag = false;
+      //can categorize and set
+      for (month of Months) {
+        if (doc.data()[month]) {
+          const IncomingMonthData = JSON.parse(doc.data()[month]);
+          for (transaction of IncomingMonthData) {
+            if (transaction.category == '') {
+              updateFlag = true;
+              let newCategory = '';
+              if (transaction.amount > 0) {
+                newCategory = 'Income';
               }
+              if (newCategory == '') {
+                newCategory = await useKnownList(transaction.description);
+              }
+              if (newCategory == '') {
+                newCategory = await useModel(transaction.description);
+              }
+              if (newCategory == 'Fuel') {
+                if (Math.abs(parseFloat(transaction.amount)) < 100) {
+                  newCategory = 'Eating Out';
+                } else {
+                  newCategory = 'Transport';
+                }
+              }
+              transaction.category = newCategory;
             }
-            transaction.category = newCategory;
+          }
+          if (updateFlag) {
+            await getFirestore()
+              .doc(`transaction_data_${year}/${doc.id}`)
+              .update({ [month]: JSON.stringify(IncomingMonthData) });
           }
         }
-        if (updateFlag) {
-          await getFirestore()
-            .doc(`transaction_data_${year}/${doc.id}`)
-            .update({ [month]: JSON.stringify(IncomingMonthData) });
-        }
       }
-    }
-  });
-});
+    });
+  }
+);
