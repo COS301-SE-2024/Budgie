@@ -11,7 +11,7 @@ import {
   query,
   where,
   getDocs,
-  updateDoc,
+  updateDoc, 
   DocumentSnapshot,
   DocumentData,
   QueryDocumentSnapshot,

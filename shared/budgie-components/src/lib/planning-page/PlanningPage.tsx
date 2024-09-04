@@ -22,6 +22,7 @@ import UpdateGoalPopup, {
 } from '../update-goal-progress-popup/UpdateGoalProgressPopup';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import '../../root.css';
+import ComparisonPage from '../comparison-page/comparison-page';
 
 /* eslint-disable-next-line */
 export interface PlanningPageProps {}
@@ -440,12 +441,14 @@ export function PlanningPage(props: PlanningPageProps) {
             <GoalsPage />
           ) : viewMode === 'all' ? (
             <GoalsPage />
+          ) : viewMode === 'insights' ? (
+            <ComparisonPage />
           ) : (
-            <div className={styles.underConstructionScreen}> 
+            <div className={styles.underConstructionScreen}>
               <div className={styles.underConstructionText}>
                 This page is under construction.
               </div>
-          </div>
+            </div>
           )}
         </div>
       </div>
