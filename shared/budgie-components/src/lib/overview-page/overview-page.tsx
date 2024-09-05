@@ -281,6 +281,35 @@ export function OverviewPage(props: OverviewPageProps) {
                   Bracket Comparison summary and link to page
                 </div>
               </div>
+              <div className={styles.fullWidthChart}>
+                <div className={styles.chartTitleContainer}>
+                  <h3 className={styles.chartTitle}>Upcoming Payments</h3>
+                </div>
+                <div className={styles.paymentContainer}>
+                  <div className={styles.paymentBox}>
+                    <span className={styles.paymentDate}>2024/12/15</span>
+                    <span className={styles.paymentName}>Netflix</span>
+                    <span className={styles.paymentAmount}>-R175.4</span>
+                  </div>
+                  <div className={styles.paymentBox}>
+                    <span className={styles.paymentDate}>2024/12/20</span>
+                    <span className={styles.paymentName}>Spotify</span>
+                    <span className={styles.paymentAmount}>-R99.9</span>
+                  </div>
+                  <div className={styles.paymentBox}>
+                    <span className={styles.paymentDate}>2024/12/25</span>
+                    <span className={styles.paymentName}>Electricity</span>
+                    <span className={styles.paymentAmount}>-R350.0</span>
+                  </div>
+                  <div className={styles.paymentBox}>
+                    <span className={styles.paymentDate}>2024/12/30</span>
+                    <span className={styles.paymentName}>Internet</span>
+                    <span className={styles.paymentAmount}>-R250.0</span>
+                  </div>
+                </div>
+              </div>
+
+
             </div>
           ) : (
             <div className={styles.bodyText}>

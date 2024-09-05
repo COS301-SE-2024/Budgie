@@ -93,14 +93,16 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
-  margin-bottom: 40px;
+  margin-bottom: 80px;
+  padding-top: 20px;
+  /* Add space above the chart */
 }
 
 .chartItem {
   flex: 1;
   margin: 0 10px;
   background-color: var(--chart-bg-color);
-  padding: 20px;
+  padding: 40px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   height: 100%;
@@ -153,7 +155,7 @@
 .gridTitleContainer {
   display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(90, 89, 89, 0.2);
   /* Shaded background for title */
   padding: 10px;
   border-radius: 5px;
@@ -274,4 +276,43 @@
   color: var(--legend-text-color);
   margin-left: 3px;
   /* Add margin if necessary to separate text and color box */
+}
+
+.paymentContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  /* Add space between boxes */
+  width: 100%;
+  /* Ensure the container takes the full width */
+}
+
+.paymentBox {
+  background-color: #ffffff;
+  /* Lighter shade of green */
+  border: 2px solid #0664f0;
+  /* Darker green border */
+  border-radius: 8px;
+  padding: 15px;
+  width: 100%;
+  /* Make each box stretch to full width */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.paymentDate {
+  flex: 1;
+  text-align: left;
+}
+
+.paymentName {
+  flex: 2;
+  text-align: center;
+}
+
+.paymentAmount {
+  flex: 1;
+  text-align: right;
+  color: rgba(5, 5, 5, 0.897);
 }
