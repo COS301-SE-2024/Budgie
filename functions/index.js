@@ -297,7 +297,6 @@ exports.categoriseExpenses = onCall(
               return transaction;
             })
           );
-
           if (updateFlag) {
             await getFirestore()
               .doc(`transaction_data_${year}/${doc.id}`)
