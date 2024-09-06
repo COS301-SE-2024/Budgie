@@ -141,8 +141,6 @@ export async function getBalancesForMonthYears(
   user: any
 ): Promise<Record<string, number>> {
   let returnData: Record<string, number> = {};
-  console.log(years);
-  console.log(rollingMonthYears);
   for (const year of years) {
     const accRef = collection(db, `transaction_data_${year}`);
     const q = query(accRef, where('uid', '==', user.uid));
@@ -312,7 +310,6 @@ function GraphSection(props: GraphSectionProps) {
   for (let i = 0; i < 12; i++) {
     dataset.push({ monthyear: props.xAxis[i], Balance: props.yAxis[i] });
   }
-  console.log(dataset);
   return (
     <AreaChart
       className=" w-[90%] h-[85%] "
@@ -329,7 +326,7 @@ function GraphSection(props: GraphSectionProps) {
 }
 
 function InfoSection(props: GraphSectionProps) {
-  let balanceTotal = 0.00;
+  let balanceTotal = 0.0;
   let balancePrev = 0;
   let recentMonth = props.xAxis[11];
   for (let i = 0; i < 12; i++) {
