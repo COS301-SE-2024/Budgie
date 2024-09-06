@@ -1,0 +1,67 @@
+/* Main container for the Comparisons page */
+.comparisonsPage {
+    padding: 1rem;
+    background-color: #f5f5f5;
+    /* Light background color */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for the user info button */
+.userInfoButton {
+    display: flex;
+    align-items: center;
+    background-color: #003366;
+    /* Dark blue background */
+    color: #ffffff;
+    /* White text */
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+.userIcon {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+}
+
+/* Grid layout for the income sections */
+.incomeGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* Style for the left half section */
+.leftHalf {
+    background-color: #e0f7fa;
+    /* Light green background */
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+/* Style for the right half section */
+.rightHalf {
+    background-color: #b2dfdb;
+    /* Lighter shade of light green */
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+/* Style for the triangle (representing values) */
+.triangle {
+    background-color: #ffffff;
+    /* White background */
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+}

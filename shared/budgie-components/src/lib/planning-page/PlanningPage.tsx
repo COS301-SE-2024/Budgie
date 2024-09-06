@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useContext } from 'react';
+import ComparisonsPage from './ComparisonsPage';
 import styles from './PlanningPage.module.css';
 import {
   collection,
@@ -24,7 +25,7 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import '../../root.css';
 
 /* eslint-disable-next-line */
-export interface PlanningPageProps {}
+export interface PlanningPageProps { }
 
 export function GoalModal() {
   const [Goals, setGoals] = useState<Goal[]>([]);
@@ -61,7 +62,7 @@ export function GoalModal() {
           100,
           ((goal.initial_amount - goal.current_amount) /
             (goal.initial_amount - goal.target_amount)) *
-            100
+          100
         );
       } else {
         return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
@@ -405,18 +406,16 @@ export function PlanningPage(props: PlanningPageProps) {
       <div className={styles.topBar}>
         <div>
           <button
-            className={`${styles.button} ${
-              viewMode === 'goals' ? styles.activeButton : ''
-            }`}
+            className={`${styles.button} ${viewMode === 'goals' ? styles.activeButton : ''
+              }`}
             onClick={() => setViewMode('goals')}
           >
             Goals
           </button>
 
           <button
-            className={`${styles.button} ${
-              viewMode === 'insights' ? styles.activeButton : ''
-            }`}
+            className={`${styles.button} ${viewMode === 'insights' ? styles.activeButton : ''
+              }`}
             onClick={() => setViewMode('insights')}
             style={{ marginLeft: '5rem' }}
           >
@@ -424,9 +423,8 @@ export function PlanningPage(props: PlanningPageProps) {
           </button>
 
           <button
-            className={`${styles.button} ${
-              viewMode === 'upcoming' ? styles.activeButton : ''
-            }`}
+            className={`${styles.button} ${viewMode === 'upcoming' ? styles.activeButton : ''
+              }`}
             onClick={() => setViewMode('upcoming')}
             style={{ marginLeft: '5rem' }}
           >
@@ -438,14 +436,14 @@ export function PlanningPage(props: PlanningPageProps) {
         <div>
           {viewMode === 'goals' && Goals ? (
             <GoalsPage />
-          ) : viewMode === 'all' ? (
-            <GoalsPage />
+          ) : viewMode === 'insights' ? (
+            <ComparisonsPage />
           ) : (
-            <div className={styles.underConstructionScreen}> 
+            <div className={styles.underConstructionScreen}>
               <div className={styles.underConstructionText}>
                 This page is under construction.
               </div>
-          </div>
+            </div>
           )}
         </div>
       </div>
