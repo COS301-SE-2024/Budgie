@@ -1,67 +1,96 @@
-/* Main container for the Comparisons page */
 .comparisonsPage {
-    padding: 1rem;
-    background-color: #f5f5f5;
-    /* Light background color */
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
 }
 
-/* Style for the user info button */
 .userInfoButton {
-    display: flex;
-    align-items: center;
     background-color: #003366;
-    /* Dark blue background */
-    color: #ffffff;
-    /* White text */
+    /* Dark Blue */
+    color: white;
     border: none;
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
     cursor: pointer;
 }
 
 .userIcon {
-    margin-right: 0.5rem;
-    font-size: 1.2rem;
+    margin-right: 8px;
 }
 
-/* Grid layout for the income sections */
 .incomeGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    display: flex;
+    width: 100%;
+    margin-top: 20px;
 }
 
-/* Style for the left half section */
-.leftHalf {
-    background-color: #e0f7fa;
-    /* Light green background */
-    padding: 1rem;
-    border-radius: 8px;
-    text-align: center;
-}
-
-/* Style for the right half section */
+.leftHalf,
 .rightHalf {
-    background-color: #b2dfdb;
-    /* Lighter shade of light green */
-    padding: 1rem;
+    flex: 1;
+    padding: 20px;
     border-radius: 8px;
-    text-align: center;
+    margin: 0 10px;
+    color: #333;
 }
 
-/* Style for the triangle (representing values) */
+.leftHalf {
+    background-color: #d4edda;
+    /* Light Green */
+}
+
+.rightHalf {
+    background-color: #c3e6cb;
+    /* Lighter Light Green */
+}
+
 .triangle {
-    background-color: #ffffff;
-    /* White background */
-    padding: 1rem;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.gridContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+.gridItem {
+    background-color: var(--grid-bg-color);
+    padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-top: 1rem;
-    font-size: 1.5rem;
-    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 300px;
+    /* Set a minimum height to make grid items taller */
+    height: 100%;
+    /* Ensures all grid items have the same height */
+}
+
+.gridTitleContainer {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    /* Shaded background for title */
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+    width: 100%;
+}
+
+.gridTitle {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--grid-title-color);
 }
