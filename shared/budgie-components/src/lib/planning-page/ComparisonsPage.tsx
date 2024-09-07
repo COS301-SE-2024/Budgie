@@ -29,7 +29,7 @@ export function ComparisonsPage() {
             <div className={styles.incomeGrid}>
                 {/* Average Income Section */}
                 <div className={styles.leftHalf}>
-                    <h3>Average Income of an 30 Year Old</h3>
+                    <h3>Average Income of a 30 Year Old</h3>
                     <div className={styles.triangle}>R50,000</div>
                 </div>
 
@@ -44,7 +44,7 @@ export function ComparisonsPage() {
             <div className={styles.gridItem}>
                 <div className={styles.gridTitleContainer}>
                     <h3 className={styles.gridTitle}>
-                        How you compare to other people earning R50 000
+                        How you compare to other people earning R50,000
                     </h3>
                 </div>
                 <BarChart
@@ -69,23 +69,65 @@ export function ComparisonsPage() {
                 </BarChart>
             </div>
 
+            {/* Annual Salary Comparison According to Position */}
             <div className={styles.gridItem}>
                 <div className={styles.gridTitleContainer}>
-                    <h2 className={styles.gridTitle}>
+                    <h3 className={styles.gridTitle}>
                         Annual Salary according to Position
-                    </h2>
+                    </h3>
                 </div>
-                Under Construction
+                <div className={styles.comparisonContainer}>
+                    {/* Title at the top */}
+                    <h3 className={styles.positionTitle}>CEO</h3>
+
+                    {/* Status Bar/Bar Graph Comparison */}
+                    <div className={styles.statusBar}>
+                        <div className={styles.userBar}></div>
+                        <div className={styles.divider}></div>
+                        <div className={styles.marketBar}></div>
+                    </div>
+
+                    {/* Labels for the bars */}
+                    <div className={styles.labels}>
+                        <span className={styles.userLabel}>You</span>
+                        <span className={styles.userLabel}>R50 000</span>
+
+                        <span className={styles.marketLabel}>Market Avg</span>
+                        <span className={styles.userLabel}>R75 642</span>
+
+                    </div>
+                </div>
             </div>
 
+            {/* Annual Salary According to Experience */}
             <div className={styles.gridItem}>
                 <div className={styles.gridTitleContainer}>
-                    <h2 className={styles.gridTitle}>
-                        Annual Salary According to Experience
-                    </h2>
+                    <h3 className={styles.gridTitle}>
+                        Annual Salary According to Industry
+                    </h3>
                 </div>
-                Under Construction
+                <div className={styles.comparisonContainer}>
+                    {/* Title at the top */}
+                    <h3 className={styles.positionTitle}>5-6 Years</h3>
+
+                    {/* Status Bar/Bar Graph Comparison */}
+                    <div className={styles.statusBar}>
+                        <div className={styles.userBar}></div>
+                        <div className={styles.divider}></div>
+                        <div className={styles.marketBar}></div>
+                    </div>
+
+                    {/* Labels for the bars */}
+                    <div className={styles.labels}>
+                        <span className={styles.userLabel}>You</span>
+                        <span className={styles.userLabel}>R70 000</span>
+
+                        <span className={styles.marketLabel}>Market Avg</span>
+                        <span className={styles.userLabel}>R65 000</span>
+                    </div>
+                </div>
             </div>
+
         </div>
     );
 }
