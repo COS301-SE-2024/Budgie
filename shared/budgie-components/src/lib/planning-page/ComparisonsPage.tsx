@@ -2,30 +2,26 @@ import React, { useState } from 'react';
 import styles from './ComparisonsPage.module.css'; // CSS Module for styling
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons'; // Import the specific user icon
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts'; // Import recharts components
+import { BarChart, Bar, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts'; // Import recharts components
 
-// Dummy data for the bar chart with unique colors
+// Dummy data for the bar chart with unique colors and additional line data
 const data = [
-    { category: 'Groceries', amount: 3000, color: '#ff6f61' },
-    { category: 'Utilities', amount: 1500, color: '#ffcc00' },
-    { category: 'Entertainment', amount: 2000, color: '#00bfae' },
-    { category: 'Shopping', amount: 2500, color: '#8e44ad' },
-    { category: 'Eating Out', amount: 1800, color: '#3498db' },
-    { category: 'Transport', amount: 2200, color: '#e74c3c' },
-    { category: 'Medical Aid', amount: 3500, color: '#2ecc71' },
-    { category: 'Insurance', amount: 2700, color: '#e67e22' },
-    { category: 'Other', amount: 1000, color: '#9b59b6' }
+    { category: 'Groceries', amount: 3000, lineValue: 4000, color: '#ff6f61' },
+    { category: 'Utilities', amount: 1500, lineValue: 2000, color: '#ffcc00' },
+    { category: 'Entertainment', amount: 2000, lineValue: 2500, color: '#00bfae' },
+    { category: 'Shopping', amount: 2500, lineValue: 3000, color: '#8e44ad' },
+    { category: 'Eating Out', amount: 1800, lineValue: 2200, color: '#3498db' },
+    { category: 'Transport', amount: 2200, lineValue: 2700, color: '#e74c3c' },
+    { category: 'Medical Aid', amount: 3500, lineValue: 4000, color: '#2ecc71' },
+    { category: 'Insurance', amount: 2700, lineValue: 3200, color: '#e67e22' },
+    { category: 'Other', amount: 1000, lineValue: 1500, color: '#9b59b6' }
 ];
-
-// Dummy data for dropdown options
-const jobPositions = ['Developer', 'Manager', 'Analyst', 'Designer'];
-const industries = ['Technology', 'Finance', 'Healthcare', 'Education'];
 
 export function ComparisonsPage() {
     const [showForm, setShowForm] = useState(false);
     const [age, setAge] = useState('');
-    const [jobPosition, setJobPosition] = useState(jobPositions[0]);
-    const [industry, setIndustry] = useState(industries[0]);
+    const [jobPosition, setJobPosition] = useState('Developer');
+    const [industry, setIndustry] = useState('Technology');
 
     const handleShowForm = () => setShowForm(true);
     const handleCloseForm = () => setShowForm(false);
@@ -66,7 +62,7 @@ export function ComparisonsPage() {
                                     onChange={(e) => setJobPosition(e.target.value)}
                                     required
                                 >
-                                    {jobPositions.map((position) => (
+                                    {['Developer', 'Manager', 'Analyst', 'Designer'].map((position) => (
                                         <option key={position} value={position}>
                                             {position}
                                         </option>
@@ -80,7 +76,7 @@ export function ComparisonsPage() {
                                     onChange={(e) => setIndustry(e.target.value)}
                                     required
                                 >
-                                    {industries.map((industry) => (
+                                    {['Technology', 'Finance', 'Healthcare', 'Education'].map((industry) => (
                                         <option key={industry} value={industry}>
                                             {industry}
                                         </option>
@@ -109,7 +105,7 @@ export function ComparisonsPage() {
                 </div>
             </div>
 
-            {/* Comparison Bar Chart */}
+            {/* Comparison Bar Chart with Line Chart */}
             <div className={styles.gridItem}>
                 <div className={styles.gridTitleContainer}>
                     <h3 className={styles.gridTitle}>
@@ -135,6 +131,13 @@ export function ComparisonsPage() {
                             name={entry.category}
                         />
                     ))}
+                    <Line
+                        type="monotone"
+                        dataKey="lineValue"
+                        stroke="#ff7300"
+                        strokeWidth={2}
+                        dot={false}
+                    />
                 </BarChart>
             </div>
 
