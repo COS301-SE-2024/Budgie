@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './ComparisonsPage.module.css'; // CSS Module for styling
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons'; // Import the specific user icon
@@ -17,13 +17,82 @@ const data = [
     { category: 'Other', amount: 1000, color: '#9b59b6' }
 ];
 
+// Dummy data for dropdown options
+const jobPositions = ['Developer', 'Manager', 'Analyst', 'Designer'];
+const industries = ['Technology', 'Finance', 'Healthcare', 'Education'];
+
 export function ComparisonsPage() {
+    const [showForm, setShowForm] = useState(false);
+    const [age, setAge] = useState('');
+    const [jobPosition, setJobPosition] = useState(jobPositions[0]);
+    const [industry, setIndustry] = useState(industries[0]);
+
+    const handleShowForm = () => setShowForm(true);
+    const handleCloseForm = () => setShowForm(false);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // Handle form submission logic here
+        console.log('Submitted:', { age, jobPosition, industry });
+        handleCloseForm();
+    };
+
     return (
         <div className={styles.comparisonsPage}>
             {/* User Info Button */}
-            <button className={styles.userInfoButton}>
+            <button className={styles.userInfoButton} onClick={handleShowForm}>
                 <FontAwesomeIcon icon={faUser} className={styles.userIcon} /> User Info
             </button>
+
+            {/* Pop-up Form */}
+            {showForm && (
+                <div className={styles.popupForm}>
+                    <div className={styles.formContainer}>
+                        <h2>User Information</h2>
+                        <form onSubmit={handleSubmit}>
+                            <label>
+                                Age:
+                                <input
+                                    type="number"
+                                    value={age}
+                                    onChange={(e) => setAge(e.target.value)}
+                                    required
+                                />
+                            </label>
+                            <label>
+                                Job Position:
+                                <select
+                                    value={jobPosition}
+                                    onChange={(e) => setJobPosition(e.target.value)}
+                                    required
+                                >
+                                    {jobPositions.map((position) => (
+                                        <option key={position} value={position}>
+                                            {position}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                            <label>
+                                Industry:
+                                <select
+                                    value={industry}
+                                    onChange={(e) => setIndustry(e.target.value)}
+                                    required
+                                >
+                                    {industries.map((industry) => (
+                                        <option key={industry} value={industry}>
+                                            {industry}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                            <button type="submit">Submit</button>
+                            <button type="button" onClick={handleCloseForm}>Close</button>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             {/* Income Grid */}
             <div className={styles.incomeGrid}>
@@ -89,9 +158,9 @@ export function ComparisonsPage() {
                         {/* Labels for the bars */}
                         <div className={styles.labels}>
                             <span className={styles.userLabel}>You</span>
-                            <span className={styles.userLabel}>R50 000</span>
+                            <span className={styles.amount}>R50 000</span>
                             <span className={styles.marketLabel}>Market Avg</span>
-                            <span className={styles.userLabel}>R75 642</span>
+                            <span className={styles.amount}>R75 642</span>
                         </div>
                     </div>
                 </div>
@@ -115,14 +184,13 @@ export function ComparisonsPage() {
                         {/* Labels for the bars */}
                         <div className={styles.labels}>
                             <span className={styles.userLabel}>You</span>
-                            <span className={styles.userLabel}>R70 000</span>
+                            <span className={styles.amount}>R70 000</span>
                             <span className={styles.marketLabel}>Market Avg</span>
-                            <span className={styles.userLabel}>R65 000</span>
+                            <span className={styles.amount}>R65 000</span>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     );
 }
