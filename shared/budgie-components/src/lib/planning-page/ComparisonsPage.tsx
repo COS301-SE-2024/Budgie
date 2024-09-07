@@ -69,61 +69,56 @@ export function ComparisonsPage() {
                 </BarChart>
             </div>
 
-            {/* Annual Salary Comparison According to Position */}
-            <div className={styles.gridItem}>
-                <div className={styles.gridTitleContainer}>
-                    <h3 className={styles.gridTitle}>
-                        Annual Salary according to Position
-                    </h3>
-                </div>
-                <div className={styles.comparisonContainer}>
-                    {/* Title at the top */}
-                    <h3 className={styles.positionTitle}>CEO</h3>
-
-                    {/* Status Bar/Bar Graph Comparison */}
-                    <div className={styles.statusBar}>
-                        <div className={styles.userBar}></div>
-                        <div className={styles.divider}></div>
-                        <div className={styles.marketBar}></div>
+            <div className={styles.gridContainer}>
+                {/* Position Grid */}
+                <div className={styles.gridItem}>
+                    <div className={styles.gridTitleContainer}>
+                        <h3 className={styles.gridTitle}>Annual Salary according to Position</h3>
                     </div>
+                    <div className={styles.comparisonContainer}>
+                        {/* Title at the top and centered */}
+                        <h3 className={styles.centeredTitle}>CEO</h3>
 
-                    {/* Labels for the bars */}
-                    <div className={styles.labels}>
-                        <span className={styles.userLabel}>You</span>
-                        <span className={styles.userLabel}>R50 000</span>
+                        {/* Status Bar/Bar Graph Comparison */}
+                        <div className={styles.statusBar}>
+                            <div className={styles.userBar}></div>
+                            <div className={styles.divider}></div>
+                            <div className={styles.marketBar}></div>
+                        </div>
 
-                        <span className={styles.marketLabel}>Market Avg</span>
-                        <span className={styles.userLabel}>R75 642</span>
-
+                        {/* Labels for the bars */}
+                        <div className={styles.labels}>
+                            <span className={styles.userLabel}>You</span>
+                            <span className={styles.userLabel}>R50 000</span>
+                            <span className={styles.marketLabel}>Market Avg</span>
+                            <span className={styles.userLabel}>R75 642</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Annual Salary According to Experience */}
-            <div className={styles.gridItem}>
-                <div className={styles.gridTitleContainer}>
-                    <h3 className={styles.gridTitle}>
-                        Annual Salary According to Industry
-                    </h3>
-                </div>
-                <div className={styles.comparisonContainer}>
-                    {/* Title at the top */}
-                    <h3 className={styles.positionTitle}>5-6 Years</h3>
-
-                    {/* Status Bar/Bar Graph Comparison */}
-                    <div className={styles.statusBar}>
-                        <div className={styles.userBar}></div>
-                        <div className={styles.divider}></div>
-                        <div className={styles.marketBar}></div>
+                {/* Industry Grid */}
+                <div className={styles.gridItem}>
+                    <div className={styles.gridTitleContainer}>
+                        <h3 className={styles.gridTitle}>Annual Salary According to Industry</h3>
                     </div>
+                    <div className={styles.comparisonContainer}>
+                        {/* Title at the top and centered */}
+                        <h3 className={styles.centeredTitle}>5-6 Years</h3>
 
-                    {/* Labels for the bars */}
-                    <div className={styles.labels}>
-                        <span className={styles.userLabel}>You</span>
-                        <span className={styles.userLabel}>R70 000</span>
+                        {/* Status Bar/Bar Graph Comparison */}
+                        <div className={styles.statusBar}>
+                            <div className={styles.userBar}></div>
+                            <div className={styles.divider}></div>
+                            <div className={styles.marketBar}></div>
+                        </div>
 
-                        <span className={styles.marketLabel}>Market Avg</span>
-                        <span className={styles.userLabel}>R65 000</span>
+                        {/* Labels for the bars */}
+                        <div className={styles.labels}>
+                            <span className={styles.userLabel}>You</span>
+                            <span className={styles.userLabel}>R70 000</span>
+                            <span className={styles.marketLabel}>Market Avg</span>
+                            <span className={styles.userLabel}>R65 000</span>
+                        </div>
                     </div>
                 </div>
             </div>

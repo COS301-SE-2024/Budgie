@@ -36,7 +36,7 @@
 }
 
 .leftHalf {
-    background-color: #d4edda;
+    background-color: #73c786;
     /* Light Green */
 }
 
@@ -123,7 +123,7 @@
 .divider {
     width: 2px;
     /* Thicker line for better visibility */
-    height: 140%;
+    height: 100%;
     background-color: #000;
     position: absolute;
     left: 49%;
@@ -134,7 +134,8 @@
 
 .labels {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
     margin-top: 40px;
 }
@@ -143,4 +144,22 @@
 .marketLabel {
     font-size: 1.2rem;
     color: #2c2b2b;
+    text-align: center;
+    margin-bottom: 10px;
+    /* Space between label and amount */
+}
+
+.amount {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 20px;
+    /* Space between the amounts */
+}
+
+/* Center titles at the top */
+.centeredTitle {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+    /* Adjust font size as needed */
 }
