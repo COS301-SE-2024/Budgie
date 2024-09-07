@@ -30,8 +30,8 @@ export function ComparisonsPage() {
     const handleShowForm = () => setShowForm(true);
     const handleCloseForm = () => setShowForm(false);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSubmit = () => {
+        // e.preventDefault();
         // Handle form submission logic here
         console.log('Submitted:', { age, jobPosition, industry });
         handleCloseForm();
