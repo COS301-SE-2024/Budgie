@@ -8,7 +8,13 @@ import {
   query, 
   where
 } from 'firebase/firestore';
+import { faRandom } from '@fortawesome/free-solid-svg-icons';
 
+
+const monthDays = [
+  "31", "27", "31", "30", "31", "30",
+  "31", "31", "30", "31", "30", "31"
+];
 
 //get logged in users user id
 export function getUser(){
@@ -66,4 +72,20 @@ export async function getTransactions(accountNumber:string) {
 
   return transactions;
 }
+
+
+export async function getMonthlyIncome(transactions:any){
+  let balance = 0;
+
+  for(let i=0; i<transactions.length; i++){
+    const dateString = transactions[i].date;
+    const parts = dateString.split('/');
+    const month = parseInt(parts[1], 10);
+    if(month==7 && transactions[i].amount>0){
+      balance += transactions[i].amount;
+    }
+  }
+  return balance;
+}
+
 

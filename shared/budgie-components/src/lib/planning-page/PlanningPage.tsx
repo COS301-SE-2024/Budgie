@@ -416,12 +416,12 @@ export function PlanningPage(props: PlanningPageProps) {
 
           <button
             className={`${styles.button} ${
-              viewMode === 'insights' ? styles.activeButton : ''
+              viewMode === 'comparisons' ? styles.activeButton : ''
             }`}
-            onClick={() => setViewMode('insights')}
+            onClick={() => setViewMode('comparisons')}
             style={{ marginLeft: '5rem' }}
           >
-            Insights
+            Comparisons
           </button>
 
           <button
@@ -441,7 +441,7 @@ export function PlanningPage(props: PlanningPageProps) {
             <GoalsPage />
           ) : viewMode === 'all' ? (
             <GoalsPage />
-          ) : viewMode === 'insights' ? (
+          ) : viewMode === 'comparisons' ? (
             <ComparisonPage />
           ) : (
             <div className={styles.underConstructionScreen}>
