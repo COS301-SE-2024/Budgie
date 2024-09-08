@@ -9,10 +9,35 @@ import {
     getExpensesByCategory,
     getUser,
     addUserInfo,
+    getUserInfo,
 } from './services';
 
 
 export interface ComparisonPage {}
+
+export const calculateAge = (date : any) => {
+    // Calculate age from birth date
+    const birthDate = new Date(date);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    // Adjust if birthday hasn't occurred yet this year
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+
+    return age;
+}
+
+const formatCurrency = (value: number) => {
+    const formatter = new Intl.NumberFormat('en-ZA', {
+      style: 'currency',
+      currency: 'ZAR',
+      minimumFractionDigits: 2,
+    });
+    return formatter.format(value);
+};
 
 export function ComparisonPage(props: ComparisonPage) {
 
@@ -32,24 +57,28 @@ export function ComparisonPage(props: ComparisonPage) {
         category: string;
     }
 
-    const [accounts, setAccount] = useState<Account[]>([]);
     const [income, setIncome] = useState(0);
     const [age, setAge] = useState('');
     const [jobPosition, setJobPosition] = useState('');
     const [industry, setIndustry] = useState('');
-    const [positionValues, setPositionValues] = useState<(number | null)[]>([]);
-    const [industryValues, setIndustryValues] = useState<(number | null)[]>([]);
+    const [positionValues, setPositionValues] = useState<(number)[]>([]);
+    const [industryValues, setIndustryValues] = useState<(number)[]>([]);
     const [ageIncome, setAgeIncome] = useState(0);
     const [yourCategory, setYourCategory] = useState([0,0,0,0,0,0,0,0,0]);
     const [averageCategory, setAverageCategory] = useState([0,0,0,0,0,0,0,0,0]);
-    const [formAge, setFormAge] = useState('');
     const [formJobPosition, setFormJobPosition] = useState('');
     const [formIndustry, setFormIndustry] = useState('');
     const [formBirthDate, setFormBirthDate] = useState('');
 
+
     const getData = async () => {
+
+        //check if user has any accounts
         const account = await getAccounts();
-        setAccount(account);
+        //check if user filled in info 
+        let userInfo = await getUserInfo();
+
+        //calculate last months income, considering all current accounts
         let total = 0;
         let updatedCategory = [0,0,0,0,0,0,0,0,0];
         for (let i = 0; i < account.length; i++) {
@@ -61,42 +90,46 @@ export function ComparisonPage(props: ComparisonPage) {
                 updatedCategory[j] += category[j];
             }
         }
+        let age = calculateAge(userInfo.birthDate);
+
+        //set states 
         setYourCategory(updatedCategory);
         setIncome(total);
+        setAge(age.toString());
+        setFormBirthDate(userInfo.birthDate)
+        setJobPosition(userInfo.jobPosition)
+        setFormJobPosition(userInfo.jobPosition)
+        setIndustry(userInfo.industry);
+        setFormIndustry(userInfo.industry)
+
+        // Fetch data for job position and industry
+        let position = await getPosition(userInfo.jobPosition);
+        setPositionValues(position);
+        let JobIndustry = await getIndustry(userInfo.industry);
+        setIndustryValues(JobIndustry);
     };
 
     useEffect(() => {
         getData();
-    }, [age, jobPosition, industry]);
+    }, [income]);
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Set job position and industry
+        // Set job position and industry and age 
         setJobPosition(formJobPosition);
         setIndustry(formIndustry);
-    
-        // Calculate age from birth date
-        const birthDate = new Date(formBirthDate);
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
+        let age = calculateAge(formBirthDate)
+        setAge(age.toString()); 
         
-        // Adjust if birthday hasn't occurred yet this year
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-    
-        // Set the calculated age
-        setAge(age.toString());
-    
         // Fetch data for job position and industry
         let position = await getPosition(formJobPosition);
         setPositionValues(position);
-    
         let JobIndustry = await getIndustry(formIndustry);
         setIndustryValues(JobIndustry);
 
+        //set user info on database
         let user = await getUser();
         if(user){
             const userData = {
@@ -198,39 +231,39 @@ export function ComparisonPage(props: ComparisonPage) {
             </form>
 
             <br />
-            <p>Your income: {income}</p>
-            <p>Average income of a {age} year old: {ageIncome}</p>
+            <p>Your income: {formatCurrency(income)}</p>
+            <p>Average income of a {age} year old: {formatCurrency(ageIncome)}</p>
             <br/>
-            <p>Average groceries: {averageCategory[0]}</p>
-            <p>Your groceries: {yourCategory[0]}</p>
-            <p>Average Utilities: {averageCategory[1]}</p>
-            <p>Your Utilities: {yourCategory[1]}</p>
-            <p>Average Entertainment: {averageCategory[2]}</p>
-            <p>Your Entertainment: {yourCategory[2]}</p>
-            <p>Average Transport: {averageCategory[3]}</p>
-            <p>Your Transport: {yourCategory[3]}</p>
-            <p>Average Insurance: {averageCategory[4]}</p>
-            <p>Your Insurance: {yourCategory[4]}</p>
-            <p>Average Medical Aid: {averageCategory[5]}</p>
-            <p>Your Medical Aid: {yourCategory[5]}</p>
-            <p>Average Eating Out: {averageCategory[6]}</p>
-            <p>Your Eating Out: {yourCategory[6]}</p>
-            <p>Average Shopping: {averageCategory[7]}</p>
-            <p>Your Shopping: {yourCategory[7]}</p>
-            <p>Average Other: {averageCategory[8]}</p>
-            <p>Your Other: {yourCategory[8]}</p>
+            <p>Average groceries: {formatCurrency(averageCategory[0])}</p>
+            <p>Your groceries: {formatCurrency(yourCategory[0])}</p>
+            <p>Average Utilities: {formatCurrency(averageCategory[1])}</p>
+            <p>Your Utilities: {formatCurrency(yourCategory[1])}</p>
+            <p>Average Entertainment: {formatCurrency(averageCategory[2])}</p>
+            <p>Your Entertainment: {formatCurrency(yourCategory[2])}</p>
+            <p>Average Transport: {formatCurrency(averageCategory[3])}</p>
+            <p>Your Transport: {formatCurrency(yourCategory[3])}</p>
+            <p>Average Insurance: {formatCurrency(averageCategory[4])}</p>
+            <p>Your Insurance: {formatCurrency(yourCategory[4])}</p>
+            <p>Average Medical Aid: {formatCurrency(averageCategory[5])}</p>
+            <p>Your Medical Aid: {formatCurrency(yourCategory[5])}</p>
+            <p>Average Eating Out: {formatCurrency(averageCategory[6])}</p>
+            <p>Your Eating Out: {formatCurrency(yourCategory[6])}</p>
+            <p>Average Shopping: {formatCurrency(averageCategory[7])}</p>
+            <p>Your Shopping: {formatCurrency(yourCategory[7])}</p>
+            <p>Average Other: {formatCurrency(averageCategory[8])}</p>
+            <p>Your Other: {formatCurrency(yourCategory[8])}</p>
             <br/>
             <p>{jobPosition}:</p>
-            <p>Minimum salary according to position: {positionValues[0]}</p>
-            <p>Average salary according to position: {positionValues[1]}</p>
-            <p>Maximum salary according to position: {positionValues[2]}</p>
-            <p>Your salary account to position: {income}</p>
+            <p>Minimum salary according to position: {formatCurrency(positionValues[0])}</p>
+            <p>Average salary according to position: {formatCurrency(positionValues[1])}</p>
+            <p>Maximum salary according to position: {formatCurrency(positionValues[2])}</p>
+            <p>Your salary account to position: {formatCurrency(income)}</p>
             <br/>
             <p>{industry}:</p>
-            <p>Minimum salary according to industry: {industryValues[0]}</p>
-            <p>Average salary according to industry: {industryValues[1]}</p>
-            <p>Maximum salary according to industry: {industryValues[2]}</p>
-            <p>Your salary account to industry: {income}</p>
+            <p>Minimum salary according to industry: {formatCurrency(industryValues[0])}</p>
+            <p>Average salary according to industry: {formatCurrency(industryValues[1])}</p>
+            <p>Maximum salary according to industry: {formatCurrency(industryValues[2])}</p>
+            <p>Your salary account to industry: {formatCurrency(income)}</p>
         </div>
     );
 }

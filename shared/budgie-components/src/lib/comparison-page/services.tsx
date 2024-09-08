@@ -197,3 +197,30 @@ export async function addUserInfo(userData : any){
   }
 }
 
+
+export async function getUserInfo(){
+  let user = getUser();
+
+  if (user) {
+    try {
+      const userInfoQuery = query(
+        collection(db, 'user_info'),
+        where('uid', '==', user)
+      );
+
+      const querySnapshot = await getDocs(userInfoQuery);
+
+      let userInfo: any = null;
+      querySnapshot.forEach((doc) => {
+        userInfo = doc.data();
+      });
+      return userInfo;
+      
+    } catch (error) {
+      alert(error);
+    }
+  } else {
+    alert('User is not authenticated');
+  }
+}
+
