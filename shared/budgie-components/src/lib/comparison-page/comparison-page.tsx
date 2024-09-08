@@ -74,35 +74,49 @@ export function ComparisonPage(props: ComparisonPage) {
 
 
     const getData = async () => {
-
-        //check if user has any accounts
-        const account = await getAccounts();
-        //check if user filled in info 
-        let userInfo = await getUserInfo();
-
-        //calculate last months income, considering all current accounts
+        // Start all the promises simultaneously
+        const accountPromise = getAccounts();
+        const userInfoPromise = getUserInfo();
+        const spendingCategoryPromise = getSpendingByCategory();
+        
+        // Wait for accounts and userInfo to resolve
+        const [account, userInfo, averageCategory] = await Promise.all([accountPromise, userInfoPromise, spendingCategoryPromise]);
+      
+        // Fetch transactions in parallel for all accounts
+        const transactionPromises = account.map((acc: Account) => getTransactions(acc.account_number));
+        const transactions = await Promise.all(transactionPromises);
+      
+        // Calculate monthly income and update categories in parallel
         let total = 0;
         let updatedCategory = [0,0,0,0,0,0,0,0,0];
-        for (let i = 0; i < account.length; i++) {
-            let transaction = await getTransactions(account[i].account_number);
-            let balance = await getMonthlyIncome(transaction);
+        const monthlyIncomePromises = transactions.map(async (transaction) => {
+            const balance = await getMonthlyIncome(transaction);
             total += balance;
-            let category = await getExpensesByCategory(transaction);
-            for(let j=0; j<9; j++){
-                updatedCategory[j] += category[j];
-            }
+      
+            // Update categories
+            const category = await getExpensesByCategory(transaction);
+            category.forEach((cat: number, i: number) => {
+                updatedCategory[i] += cat;
+              });
+        });
+        await Promise.all(monthlyIncomePromises);
+        
+        // Normalize the updated categories
+        for (let i = 0; i < 9; i++) {
+          if (updatedCategory[i] !== 0) {
+            updatedCategory[i] = (updatedCategory[i] / total) * 100;
+          }
         }
-        for(let i=0; i<9; i++){
-            if(updatedCategory[i]!=0){
-                updatedCategory[i] = updatedCategory[i]/total*100;
-            }
-        }
-        let age = calculateAge(userInfo.birthDate);
-        let incomeByAge = await getIncomeByAge(age);
-        let AverageCategory = await getSpendingByCategory();
-
-        //set states 
-        setAgeIncome(incomeByAge);       
+      
+        // Fetch position, industry, and ageIncome in parallel
+        const age = calculateAge(userInfo.birthDate);
+        const incomeByAgePromise = getIncomeByAge(age);
+        const positionPromise = getPosition(userInfo.jobPosition);
+        const industryPromise = getIndustry(userInfo.industry);
+        const [incomeByAge, position, industry] = await Promise.all([incomeByAgePromise, positionPromise, industryPromise]);
+      
+        // Set states after all the data is fetched
+        setAgeIncome(incomeByAge);
         setYourCategory(updatedCategory);
         setIncome(total);
         setAge(age.toString());
@@ -111,14 +125,10 @@ export function ComparisonPage(props: ComparisonPage) {
         setFormJobPosition(userInfo.jobPosition);
         setIndustry(userInfo.industry);
         setFormIndustry(userInfo.industry);
-        setAverageCategory(AverageCategory);
-
-        // Fetch data for job position and industry
-        let position = await getPosition(userInfo.jobPosition);
+        setAverageCategory(averageCategory);
         setPositionValues(position);
-        let JobIndustry = await getIndustry(userInfo.industry);
-        setIndustryValues(JobIndustry);
-    };
+        setIndustryValues(industry);
+    };  
 
     useEffect(() => {
         getData();
