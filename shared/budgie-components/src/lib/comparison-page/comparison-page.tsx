@@ -7,7 +7,10 @@ import {
     getPosition,
     getIndustry,
     getExpensesByCategory,
+    getUser,
+    addUserInfo,
 } from './services';
+
 
 export interface ComparisonPage {}
 
@@ -42,6 +45,7 @@ export function ComparisonPage(props: ComparisonPage) {
     const [formAge, setFormAge] = useState('');
     const [formJobPosition, setFormJobPosition] = useState('');
     const [formIndustry, setFormIndustry] = useState('');
+    const [formBirthDate, setFormBirthDate] = useState('');
 
     const getData = async () => {
         const account = await getAccounts();
@@ -61,20 +65,50 @@ export function ComparisonPage(props: ComparisonPage) {
         setIncome(total);
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setAge(formAge);
-        setJobPosition(formJobPosition);
-        setIndustry(formIndustry);
-        let position = await getPosition(formJobPosition);
-        setPositionValues(position);
-        let JobIndustry = await getIndustry(formIndustry);
-        setIndustryValues(JobIndustry);
-    };
-
     useEffect(() => {
         getData();
     }, [age, jobPosition, industry]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Set job position and industry
+        setJobPosition(formJobPosition);
+        setIndustry(formIndustry);
+    
+        // Calculate age from birth date
+        const birthDate = new Date(formBirthDate);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        
+        // Adjust if birthday hasn't occurred yet this year
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+    
+        // Set the calculated age
+        setAge(age.toString());
+    
+        // Fetch data for job position and industry
+        let position = await getPosition(formJobPosition);
+        setPositionValues(position);
+    
+        let JobIndustry = await getIndustry(formIndustry);
+        setIndustryValues(JobIndustry);
+
+        let user = await getUser();
+        if(user){
+            const userData = {
+                birthDate: formBirthDate,  
+                jobPosition: formJobPosition,
+                industry: formIndustry,
+                uid : user
+            };
+            addUserInfo(userData)
+        }
+
+    };
 
     return (
         <div className={styles.container}>
@@ -82,14 +116,14 @@ export function ComparisonPage(props: ComparisonPage) {
 
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="age">Age:</label>
-                    <input
-                        type="number"
-                        id="age"
-                        value={formAge}
-                        onChange={(e) => setFormAge(e.target.value)}
-                        required
-                    />
+                <label htmlFor="birthDate">Birth Date:</label>
+                <input
+                    type="date"
+                    id="birthDate"
+                    value={formBirthDate} 
+                    onChange={(e) => setFormBirthDate(e.target.value)} 
+                    required
+                />
                 </div>
                 <div>
                     <label htmlFor="jobPosition">Job Position:</label>

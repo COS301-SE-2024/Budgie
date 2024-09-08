@@ -7,7 +7,8 @@ import {
   getDoc,
   updateDoc,
   query, 
-  where
+  where,
+  setDoc,
 } from 'firebase/firestore';
 import { faRandom } from '@fortawesome/free-solid-svg-icons';
 
@@ -180,5 +181,19 @@ export async function getExpensesByCategory(transactions:any){
     }
   }
   return result;
+}
+
+
+export async function addUserInfo(userData : any){
+  let uid = getUser();
+
+  if(uid){
+    try {
+      await setDoc(doc(db, 'user_info', uid), userData);
+      console.log('User info successfully saved to Firestore');
+    } catch (error) {
+        console.error('Error saving user info to Firestore:', error);
+    }
+  }
 }
 
