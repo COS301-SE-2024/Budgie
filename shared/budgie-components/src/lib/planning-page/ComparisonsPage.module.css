@@ -24,6 +24,8 @@
     display: flex;
     width: 100%;
     margin-top: 20px;
+    flex-wrap: wrap;
+    /* Added to ensure responsiveness on smaller screens */
 }
 
 .leftHalf,
@@ -31,8 +33,11 @@
     flex: 1;
     padding: 20px;
     border-radius: 8px;
-    margin: 0 10px;
+    margin: 10px;
+    /* Adjusted margins for better spacing */
     color: #333;
+    min-width: 300px;
+    /* Ensures elements don't shrink too small on small screens */
 }
 
 .leftHalf {
@@ -62,7 +67,8 @@
 }
 
 .gridItem {
-    background-color: var(--grid-bg-color);
+    background-color: var(--grid-bg-color, #f9f9f9);
+    /* Fallback color if the variable is undefined */
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -72,9 +78,8 @@
     justify-content: flex-start;
     width: 100%;
     min-height: 300px;
-    /* Set a minimum height to make grid items taller */
+    /* Ensures all grid items are at least 300px tall */
     height: 100%;
-    /* Ensures all grid items have the same height */
 }
 
 .gridTitleContainer {
@@ -92,14 +97,14 @@
 .gridTitle {
     margin: 0;
     font-size: 1.2rem;
-    color: var(--grid-title-color);
+    color: var(--grid-title-color, #000);
+    /* Fallback color */
 }
 
 .statusBar {
     display: flex;
     align-items: flex-end;
     height: 100px;
-    /* Increased height for better visualization */
     width: 300px;
     position: relative;
 }
@@ -107,7 +112,7 @@
 .userBar {
     width: 190px;
     height: 40px;
-    /* Increased height for the user's salary */
+    /* Adjusted height for clarity */
     background-color: #78f77d;
     /* Green for user */
 }
@@ -115,21 +120,19 @@
 .marketBar {
     width: 190px;
     height: 40px;
-    /* Shorter height for market average */
+    /* Adjusted height for clarity */
     background-color: #84f0a4;
     /* Yellow for market */
 }
 
 .divider {
     width: 2px;
-    /* Thicker line for better visibility */
     height: 100%;
     background-color: #000;
     position: absolute;
-    left: 49%;
-    /* Properly centered */
-    transform: translateX(-30%);
-    /* Adjust to center perfectly */
+    left: 50%;
+    transform: translateX(-50%);
+    /* Proper centering */
 }
 
 .labels {
@@ -146,22 +149,18 @@
     color: #2c2b2b;
     text-align: center;
     margin-bottom: 10px;
-    /* Space between label and amount */
 }
 
 .amount {
     font-size: 1.1rem;
     color: #555;
     margin-bottom: 20px;
-    /* Space between the amounts */
 }
 
-/* Center titles at the top */
 .centeredTitle {
     text-align: center;
     margin-bottom: 20px;
     font-size: 1.3rem;
-    /* Adjust font size as needed */
 }
 
 .popupForm {
@@ -182,6 +181,8 @@
     padding: 20px;
     border-radius: 12px;
     width: 400px;
+    max-width: 90%;
+    /* Ensures it’s responsive on smaller screens */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 

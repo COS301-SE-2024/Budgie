@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styles from './ComparisonsPage.module.css'; // CSS Module for styling
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons'; // Import the specific user icon
-import { BarChart, Bar, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts'; // Import recharts components
+import { BarChart, Bar, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Cell } from 'recharts'; // Import recharts components
 
 // Dummy data for the bar chart with unique colors and additional line data
 const data = [
@@ -123,20 +123,20 @@ export function ComparisonsPage() {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    {data.map((entry) => (
-                        <Bar
-                            key={entry.category}
-                            dataKey="amount"
-                            fill={entry.color}
-                            name={entry.category}
-                        />
-                    ))}
+
+                    <Bar dataKey="amount" fill="#8884d8">
+                        {data.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                    </Bar>
                     <Line
                         type="monotone"
                         dataKey="lineValue"
-                        stroke="#ff7300"
+                        stroke="#0000ff"
                         strokeWidth={2}
                         dot={false}
+                        width={1000} // Try reducing the width
+                        height={400}
                     />
                 </BarChart>
             </div>
