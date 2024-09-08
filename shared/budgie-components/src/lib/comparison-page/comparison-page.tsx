@@ -4,6 +4,9 @@ import {
     getAccounts,
     getTransactions,
     getMonthlyIncome,
+    getPosition,
+    getIndustry,
+    getExpensesByCategory,
 } from './services';
 
 export interface ComparisonPage {}
@@ -31,28 +34,47 @@ export function ComparisonPage(props: ComparisonPage) {
     const [age, setAge] = useState('');
     const [jobPosition, setJobPosition] = useState('');
     const [industry, setIndustry] = useState('');
+    const [positionValues, setPositionValues] = useState<(number | null)[]>([]);
+    const [industryValues, setIndustryValues] = useState<(number | null)[]>([]);
+    const [ageIncome, setAgeIncome] = useState(0);
+    const [yourCategory, setYourCategory] = useState([0,0,0,0,0,0,0,0,0]);
+    const [averageCategory, setAverageCategory] = useState([0,0,0,0,0,0,0,0,0]);
+    const [formAge, setFormAge] = useState('');
+    const [formJobPosition, setFormJobPosition] = useState('');
+    const [formIndustry, setFormIndustry] = useState('');
 
     const getData = async () => {
         const account = await getAccounts();
         setAccount(account);
         let total = 0;
+        let updatedCategory = [0,0,0,0,0,0,0,0,0];
         for (let i = 0; i < account.length; i++) {
             let transaction = await getTransactions(account[i].account_number);
             let balance = await getMonthlyIncome(transaction);
             total += balance;
+            let category = await getExpensesByCategory(transaction);
+            for(let j=0; j<9; j++){
+                updatedCategory[j] += category[j];
+            }
         }
+        setYourCategory(updatedCategory);
         setIncome(total);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // You can add logic here to process or send the form data somewhere
-        alert(JSON.stringify({ age, jobPosition, industry }));
+        setAge(formAge);
+        setJobPosition(formJobPosition);
+        setIndustry(formIndustry);
+        let position = await getPosition(formJobPosition);
+        setPositionValues(position);
+        let JobIndustry = await getIndustry(formIndustry);
+        setIndustryValues(JobIndustry);
     };
 
     useEffect(() => {
         getData();
-    }, [accounts]);
+    }, [age, jobPosition, industry]);
 
     return (
         <div className={styles.container}>
@@ -64,8 +86,8 @@ export function ComparisonPage(props: ComparisonPage) {
                     <input
                         type="number"
                         id="age"
-                        value={age}
-                        onChange={(e) => setAge(e.target.value)}
+                        value={formAge}
+                        onChange={(e) => setFormAge(e.target.value)}
                         required
                     />
                 </div>
@@ -73,8 +95,8 @@ export function ComparisonPage(props: ComparisonPage) {
                     <label htmlFor="jobPosition">Job Position:</label>
                     <select
                         id="jobPosition"
-                        value={jobPosition}
-                        onChange={(e) => setJobPosition(e.target.value)}
+                        value={formJobPosition}
+                        onChange={(e) => setFormJobPosition(e.target.value)}
                         required
                     >
                         <option value="">Select your job position</option>
@@ -96,14 +118,15 @@ export function ComparisonPage(props: ComparisonPage) {
                         <option value="Sales Manager">Sales Manager</option>
                         <option value="Self-employed">Self-employed</option>
                         <option value="Senior Manager">Senior Manager</option>
+                        <option value="Student">Student</option>
                     </select>
                 </div>
                 <div>
-                    <label htmlFor="experience">Industry:</label>
+                    <label htmlFor="industry">Industry:</label>
                     <select
                       id="industry"
-                      value={industry}
-                      onChange={(e) => setIndustry(e.target.value)}
+                      value={formIndustry}
+                      onChange={(e) => setFormIndustry(e.target.value)}
                       required
                   >
                       <option value="">Select your industry</option>
@@ -133,6 +156,7 @@ export function ComparisonPage(props: ComparisonPage) {
                       <option value="Transport / Logistics">Transport / Logistics</option>
                       <option value="Travel / Tourism / Lodging">Travel / Tourism / Lodging</option>
                       <option value="Utilities / Parastatals">Utilities / Parastatals</option>
+                      <option value="Student">Student</option>
                   </select>
 
                 </div>
@@ -141,6 +165,38 @@ export function ComparisonPage(props: ComparisonPage) {
 
             <br />
             <p>Your income: {income}</p>
+            <p>Average income of a {age} year old: {ageIncome}</p>
+            <br/>
+            <p>Average groceries: {averageCategory[0]}</p>
+            <p>Your groceries: {yourCategory[0]}</p>
+            <p>Average Utilities: {averageCategory[1]}</p>
+            <p>Your Utilities: {yourCategory[1]}</p>
+            <p>Average Entertainment: {averageCategory[2]}</p>
+            <p>Your Entertainment: {yourCategory[2]}</p>
+            <p>Average Transport: {averageCategory[3]}</p>
+            <p>Your Transport: {yourCategory[3]}</p>
+            <p>Average Insurance: {averageCategory[4]}</p>
+            <p>Your Insurance: {yourCategory[4]}</p>
+            <p>Average Medical Aid: {averageCategory[5]}</p>
+            <p>Your Medical Aid: {yourCategory[5]}</p>
+            <p>Average Eating Out: {averageCategory[6]}</p>
+            <p>Your Eating Out: {yourCategory[6]}</p>
+            <p>Average Shopping: {averageCategory[7]}</p>
+            <p>Your Shopping: {yourCategory[7]}</p>
+            <p>Average Other: {averageCategory[8]}</p>
+            <p>Your Other: {yourCategory[8]}</p>
+            <br/>
+            <p>{jobPosition}:</p>
+            <p>Minimum salary according to position: {positionValues[0]}</p>
+            <p>Average salary according to position: {positionValues[1]}</p>
+            <p>Maximum salary according to position: {positionValues[2]}</p>
+            <p>Your salary account to position: {income}</p>
+            <br/>
+            <p>{industry}:</p>
+            <p>Minimum salary according to industry: {industryValues[0]}</p>
+            <p>Average salary according to industry: {industryValues[1]}</p>
+            <p>Maximum salary according to industry: {industryValues[2]}</p>
+            <p>Your salary account to industry: {income}</p>
         </div>
     );
 }
