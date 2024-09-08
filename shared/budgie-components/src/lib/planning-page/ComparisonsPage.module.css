@@ -137,24 +137,43 @@
 
 .labels {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: space-between;
     width: 100%;
-    margin-top: 40px;
+    margin-top: 20px;
 }
 
-.userLabel,
+.userLabel {
+    font-size: 1.2rem;
+    color: #2c2b2b;
+    margin-right: 10px;
+    text-align: right;
+    flex: 1;
+    /* Ensures proper spacing */
+}
+
 .marketLabel {
     font-size: 1.2rem;
     color: #2c2b2b;
-    text-align: center;
-    margin-bottom: 10px;
+    margin-left: 10px;
+    text-align: left;
+    flex: 1;
+    /* Ensures proper spacing */
 }
 
 .amount {
     font-size: 1.1rem;
     color: #555;
-    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+.userAmount {
+    text-align: right;
+    margin-right: 10px;
+}
+
+.marketAmount {
+    text-align: left;
+    margin-left: 10px;
 }
 
 .centeredTitle {
