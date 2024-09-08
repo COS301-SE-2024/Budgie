@@ -31,7 +31,11 @@ export function getUser(){
 export async function getAccounts() {
   let uid = getUser();
   const accounts:any = [];
-  const a = query(collection(db, `accounts`), where('uid', '==', uid), where('type', '==', 'current'));
+  const a = query(
+    collection(db, `accounts`), 
+    where('uid', '==', uid), 
+    where('type', '==', 'current')
+  );
   const result = await getDocs(a);
   
   result.forEach(doc => {
@@ -92,10 +96,13 @@ export async function getMonthlyIncome(transactions:any){
 }
 
 export async function getPosition(position : string){
-  const stats: (number | null)[] = [null, null, null];
+  const stats: (number)[] = [-1, -1, -1];
 
   try {
-    const q = query(collection(db, 'job_positions'), where('type', '==', position));
+    const q = query(
+      collection(db, 'job_positions'), 
+      where('type', '==', position)
+    );
     const result = await getDocs(q);
 
     if (result.empty) {
@@ -117,10 +124,13 @@ export async function getPosition(position : string){
 
 
 export async function getIndustry(type : string){
-  const stats: (number | null)[] = [null, null, null];
+  const stats: (number)[] = [-1, -1, -1];
 
   try {
-    const q = query(collection(db, 'industry'), where('type', '==', type));
+    const q = query(
+      collection(db, 'industry'), 
+      where('type', '==', type)
+    );
     const result = await getDocs(q);
 
     if (result.empty) {
@@ -141,10 +151,8 @@ export async function getIndustry(type : string){
 
 
 export async function getExpensesByCategory(transactions:any){
-  let result:any = [9];
-  for(let i=0; i<9; i++){
-    result[i] = 0;
-  }
+  let result:any = Array(9).fill(0);
+
   const currentMonth = new Date().getMonth();
   for(let i=0; i<transactions.length; i++){
     const dateString = transactions[i].date;
@@ -215,12 +223,70 @@ export async function getUserInfo(){
         userInfo = doc.data();
       });
       return userInfo;
-      
+
     } catch (error) {
       alert(error);
     }
   } else {
     alert('User is not authenticated');
+  }
+}
+
+export async function getIncomeByAge(age : number){
+  let amount = 0;
+
+  try {
+    const q = query(
+      collection(db, 'income_by_age'), 
+      where('from', '<=', age), 
+      where('to', '>=', age));
+    const result = await getDocs(q);
+
+    if (result.empty) {
+      return amount; 
+    }
+
+    result.forEach(doc => {
+      const data = doc.data(); 
+      amount = Math.round(data.average / 12 / 100) * 100;
+    });
+    return amount;
+
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+
+export async function getSpendingByCategory(){
+  const category: number[] = Array(9).fill(0);
+  try {
+    const q = query(
+      collection(db, 'spending_by_category'), 
+    );
+    const result = await getDocs(q);
+
+    if (result.empty) {
+      return category; 
+    }
+
+    result.forEach(doc => {
+      const data = doc.data(); 
+      category[0] = data.Groceries;
+      category[1] = data.Utilities;
+      category[2] = data.Entertainment;
+      category[3] = data.Transport;
+      category[4] = data.Insurance;
+      category[5] = data.MedicalAid;
+      category[6] = data.EatingOut;
+      category[7] = data.Shopping;
+      category[8] = data.Other;
+    });
+    return category;
+
+  } catch (error) {
+    throw error;
   }
 }
 

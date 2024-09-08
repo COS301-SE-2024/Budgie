@@ -10,6 +10,8 @@ import {
     getUser,
     addUserInfo,
     getUserInfo,
+    getIncomeByAge,
+    getSpendingByCategory
 } from './services';
 
 
@@ -90,17 +92,26 @@ export function ComparisonPage(props: ComparisonPage) {
                 updatedCategory[j] += category[j];
             }
         }
+        for(let i=0; i<9; i++){
+            if(updatedCategory[i]!=0){
+                updatedCategory[i] = updatedCategory[i]/total*100;
+            }
+        }
         let age = calculateAge(userInfo.birthDate);
+        let incomeByAge = await getIncomeByAge(age);
+        let AverageCategory = await getSpendingByCategory();
 
         //set states 
+        setAgeIncome(incomeByAge);       
         setYourCategory(updatedCategory);
         setIncome(total);
         setAge(age.toString());
-        setFormBirthDate(userInfo.birthDate)
-        setJobPosition(userInfo.jobPosition)
-        setFormJobPosition(userInfo.jobPosition)
+        setFormBirthDate(userInfo.birthDate);
+        setJobPosition(userInfo.jobPosition);
+        setFormJobPosition(userInfo.jobPosition);
         setIndustry(userInfo.industry);
-        setFormIndustry(userInfo.industry)
+        setFormIndustry(userInfo.industry);
+        setAverageCategory(AverageCategory);
 
         // Fetch data for job position and industry
         let position = await getPosition(userInfo.jobPosition);
@@ -121,7 +132,9 @@ export function ComparisonPage(props: ComparisonPage) {
         setJobPosition(formJobPosition);
         setIndustry(formIndustry);
         let age = calculateAge(formBirthDate)
-        setAge(age.toString()); 
+        setAge(age.toString());
+        let incomeByAge = await getIncomeByAge(age);
+        setAgeIncome(incomeByAge); 
         
         // Fetch data for job position and industry
         let position = await getPosition(formJobPosition);
@@ -234,24 +247,24 @@ export function ComparisonPage(props: ComparisonPage) {
             <p>Your income: {formatCurrency(income)}</p>
             <p>Average income of a {age} year old: {formatCurrency(ageIncome)}</p>
             <br/>
-            <p>Average groceries: {formatCurrency(averageCategory[0])}</p>
-            <p>Your groceries: {formatCurrency(yourCategory[0])}</p>
-            <p>Average Utilities: {formatCurrency(averageCategory[1])}</p>
-            <p>Your Utilities: {formatCurrency(yourCategory[1])}</p>
-            <p>Average Entertainment: {formatCurrency(averageCategory[2])}</p>
-            <p>Your Entertainment: {formatCurrency(yourCategory[2])}</p>
-            <p>Average Transport: {formatCurrency(averageCategory[3])}</p>
-            <p>Your Transport: {formatCurrency(yourCategory[3])}</p>
-            <p>Average Insurance: {formatCurrency(averageCategory[4])}</p>
-            <p>Your Insurance: {formatCurrency(yourCategory[4])}</p>
-            <p>Average Medical Aid: {formatCurrency(averageCategory[5])}</p>
-            <p>Your Medical Aid: {formatCurrency(yourCategory[5])}</p>
-            <p>Average Eating Out: {formatCurrency(averageCategory[6])}</p>
-            <p>Your Eating Out: {formatCurrency(yourCategory[6])}</p>
-            <p>Average Shopping: {formatCurrency(averageCategory[7])}</p>
-            <p>Your Shopping: {formatCurrency(yourCategory[7])}</p>
-            <p>Average Other: {formatCurrency(averageCategory[8])}</p>
-            <p>Your Other: {formatCurrency(yourCategory[8])}</p>
+            <p>Average groceries: {averageCategory[0]}%</p>
+            <p>Your groceries: {yourCategory[0]}%</p>
+            <p>Average Utilities: {averageCategory[1]}%</p>
+            <p>Your Utilities: {yourCategory[1]}%</p>
+            <p>Average Entertainment: {averageCategory[2]}%</p>
+            <p>Your Entertainment: {yourCategory[2]}%</p>
+            <p>Average Transport: {averageCategory[3]}%</p>
+            <p>Your Transport: {yourCategory[3]}%</p>
+            <p>Average Insurance: {averageCategory[4]}%</p>
+            <p>Your Insurance: {yourCategory[4]}%</p>
+            <p>Average Medical Aid: {averageCategory[5]}%</p>
+            <p>Your Medical Aid: {yourCategory[5]}%</p>
+            <p>Average Eating Out: {averageCategory[6]}%</p>
+            <p>Your Eating Out: {yourCategory[6]}%</p>
+            <p>Average Shopping: {averageCategory[7]}%</p>
+            <p>Your Shopping: {yourCategory[7]}%</p>
+            <p>Average Other: {averageCategory[8]}%</p>
+            <p>Your Other: {yourCategory[8]}%</p>
             <br/>
             <p>{jobPosition}:</p>
             <p>Minimum salary according to position: {formatCurrency(positionValues[0])}</p>
