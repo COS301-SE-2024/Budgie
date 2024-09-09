@@ -1,88 +1,195 @@
-/* Grid container */
+/* General Styles for Insights Page */
 .insightsContainer {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    /* Two equal columns at the top */
+    /* Two columns per row */
     gap: 20px;
-    padding: 20px;
+    /* Space between grid items */
 }
 
-/* Each grid item */
+/* Style for each grid item */
 .gridItem {
-    background-color: var(--block-background, #ffffff);
-    /* Default to white if variable is not defined */
+    background-color: #ffffff;
+    /* White background for grid items */
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Rounded corners for grid items */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow */
+    padding: 16px;
+    /* Padding inside the grid item */
     display: flex;
     flex-direction: column;
 }
 
-/* Title box styling */
+/* Title box for grid items */
 .gridItemTitleBox {
     background-color: #dcdcdc;
-    /* Grey background */
-    padding: 10px;
-    border-radius: 8px 8px 0 0;
-    /* Rounded corners at the top */
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 10px;
-    /* Space between heading and content */
+    /* Grey background for title box */
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    /* Space below the title box */
 }
 
-/* Title styling within the title box */
+/* Title styling */
 .gridItemTitle {
     margin: 0;
-    font-size: 1.2rem;
-    color: #000;
-    /* Black text */
+    font-size: 1.5em;
     text-align: center;
 }
 
-/* Table styling for each type */
-.table,
-.bankInsightsContainer,
-.propertyTable,
-.transportTable,
-.utilityTable {
-    padding: 10px;
+/* Petrol Prices Grid */
+.table {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    /* Define the column sizes */
+    gap: 0;
+    /* No gap between columns */
+    border-collapse: collapse;
+    /* Ensure proper alignment */
 }
 
-/* Table Header */
+/* Table header styling */
 .tableHeader {
-    display: flex;
-    justify-content: space-between;
+    display: contents;
+    /* Allow header to align with grid */
+    background-color: #dcdcdc;
+    /* Grey background for header */
     font-weight: bold;
-    margin-bottom: 10px;
+    text-align: center;
+    /* Center align header text */
 }
 
-/* Table Row */
-.tableRow,
-.propertyRow,
-.transportRow,
-.utilityRow {
+/* Table header items styling */
+.tableHeader span {
+    padding: 8px;
+    border-bottom: 2px solid #ccc;
+    /* Border under the header */
+}
+
+/* Table row styling */
+.tableRow {
+    display: contents;
+    /* Align rows with grid layout */
+}
+
+/* Styling for product names in table rows */
+.productName {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    /* Border under each row */
+    text-align: left;
+    /* Align text to the left */
+}
+
+/* Icon styling inside table rows */
+.icon {
+    margin-right: 8px;
+}
+
+/* Styling for table row entries */
+.tableRow span {
+    padding: 8px;
+    text-align: center;
+    /* Center align text in the columns */
+}
+
+/* Bank Insights Grid */
+.bankInsightsContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    /* Space below navigation */
+}
+
+.arrow {
+    font-size: 1.5em;
+    margin: 0 16px;
+}
+
+.bankInfo {
+    display: flex;
     align-items: center;
 }
 
-/* Icon styling */
-.icon {
-    margin-right: 10px;
+.bankIcon {
+    margin-right: 8px;
 }
 
-/* Responsive Design Adjustments */
-@media (max-width: 768px) {
-    .insightsContainer {
-        grid-template-columns: repeat(1, 1fr);
-        /* Single column layout for smaller screens */
-    }
+.prosConsContainer {
+    display: flex;
+    justify-content: space-between;
 }
 
-@media (max-width: 480px) {
-    .insightsContainer {
-        grid-template-columns: 1fr;
-        /* Single column layout for very small screens */
-    }
+.pros,
+.cons {
+    width: 45%;
+}
+
+.underline {
+    height: 2px;
+    background-color: #000;
+    margin-bottom: 8px;
+}
+
+/* Property and Rent Grid */
+.propertyTable {
+    display: flex;
+    flex-direction: column;
+}
+
+.propertyRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.propertyRow span {
+    margin-left: 8px;
+}
+
+/* Transport Prices Grid */
+.transportTable {
+    display: flex;
+    flex-direction: column;
+}
+
+.transportRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.transportRow span {
+    margin-left: 8px;
+}
+
+/* Utility Prices Grid */
+.utilityTable {
+    display: flex;
+    flex-direction: column;
+}
+
+.utilityRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.utilityRow span {
+    margin-left: 8px;
 }

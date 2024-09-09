@@ -135,7 +135,6 @@ export function InsightsPage() {
                 </div>
             </div>
         </div>
-
     );
 }
 
