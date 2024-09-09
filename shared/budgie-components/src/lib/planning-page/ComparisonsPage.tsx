@@ -26,7 +26,7 @@ export function ComparisonsPage() {
     const handleShowForm = () => setShowForm(true);
     const handleCloseForm = () => setShowForm(false);
 
-    const handleSubmit = () => {
+    const handleSubmit = () => { //commented out the 'e' parameter inside,needs to be there
         //e.preventDefault();
         // Handle form submission logic here
         console.log('Submitted:', { age, jobPosition, industry });
@@ -62,7 +62,7 @@ export function ComparisonsPage() {
                                     onChange={(e) => setJobPosition(e.target.value)}
                                     required
                                 >
-                                    {['Developer', 'Manager', 'Analyst', 'Designer'].map((position) => (
+                                    {['Developer', 'Manager', 'Analyst', 'Designer', 'CEO', 'Project Manager'].map((position) => (
                                         <option key={position} value={position}>
                                             {position}
                                         </option>
@@ -114,7 +114,7 @@ export function ComparisonsPage() {
                 </div>
                 <ComposedChart
                     width={1200} // Increased width for better spacing
-                    height={400}
+                    height={325}
                     data={data}
                     margin={{ top: 20, right: 70, left: 80, bottom: 80 }} // Adjust margins
                 >
