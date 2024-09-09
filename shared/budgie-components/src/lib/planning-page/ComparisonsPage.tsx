@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styles from './ComparisonsPage.module.css'; // CSS Module for styling
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons'; // Import the specific user icon
-import { BarChart, Bar, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Cell } from 'recharts'; // Import recharts components
+import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Cell } from 'recharts'; // Import recharts components
 
 // Dummy data for the bar chart with unique colors and additional line data
 const data = [
@@ -112,7 +112,7 @@ export function ComparisonsPage() {
                         How you compare to other people earning R50,000
                     </h3>
                 </div>
-                <BarChart
+                <ComposedChart
                     width={1200} // Increased width for better spacing
                     height={400}
                     data={data}
@@ -135,10 +135,8 @@ export function ComparisonsPage() {
                         stroke="#0000ff"
                         strokeWidth={2}
                         dot={false}
-                        width={1000} // Try reducing the width
-                        height={400}
                     />
-                </BarChart>
+                </ComposedChart>
             </div>
 
             <div className={styles.gridContainer}>
