@@ -1,32 +1,88 @@
-/* Container for the grid */
+/* Grid container */
 .insightsContainer {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    /* 5 equal columns */
+    grid-template-columns: repeat(2, 1fr);
+    /* Two equal columns at the top */
     gap: 20px;
-    /* Spacing between the grid items */
     padding: 20px;
-    /* Padding around the grid */
-    width: 100%;
-    justify-items: center;
-    align-items: start;
 }
 
-/* Styling for each grid item */
+/* Each grid item */
 .gridItem {
-    background-color: var(--block-background);
-    /* Use your theme variables */
-    padding: 20px;
+    background-color: var(--block-background, #ffffff);
+    /* Default to white if variable is not defined */
+    padding: 0;
+    /* Remove padding to avoid space around heading */
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Title box styling */
+.gridItemTitleBox {
+    background-color: #aaa5a5;
+    /* Grey background */
+    padding: 10px;
+    border-radius: 8px 8px 0 0;
+    /* Rounded corners at the top */
     width: 100%;
-    height: auto;
+    box-sizing: border-box;
+}
+
+/* Title styling within the title box */
+.gridItemTitle {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #000;
+    /* Black text */
     text-align: center;
 }
 
-.gridItem h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: var(--primary-text);
-    /* Use theme variable */
+/* Table styling for each type */
+.table,
+.bankInsightsContainer,
+.propertyTable,
+.transportTable,
+.utilityTable {
+    padding: 10px;
+}
+
+/* Table Header */
+.tableHeader {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Table Row */
+.tableRow,
+.propertyRow,
+.transportRow,
+.utilityRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+/* Icon styling */
+.icon {
+    margin-right: 10px;
+}
+
+/* Responsive Design Adjustments */
+@media (max-width: 768px) {
+    .insightsContainer {
+        grid-template-columns: repeat(1, 1fr);
+        /* Single column layout for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .insightsContainer {
+        grid-template-columns: 1fr;
+        /* Single column layout for very small screens */
+    }
 }
