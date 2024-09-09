@@ -1,0 +1,32 @@
+/* Container for the grid */
+.insightsContainer {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    /* 5 equal columns */
+    gap: 20px;
+    /* Spacing between the grid items */
+    padding: 20px;
+    /* Padding around the grid */
+    width: 100%;
+    justify-items: center;
+    align-items: start;
+}
+
+/* Styling for each grid item */
+.gridItem {
+    background-color: var(--block-background);
+    /* Use your theme variables */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: auto;
+    text-align: center;
+}
+
+.gridItem h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--primary-text);
+    /* Use theme variable */
+}
