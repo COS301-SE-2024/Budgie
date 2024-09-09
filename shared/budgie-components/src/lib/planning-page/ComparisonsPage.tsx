@@ -120,10 +120,10 @@ export function ComparisonsPage() {
                 >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="category">
-                        <Label value="Category" offset={0} position="insideBottom" />
+                        <Label value="Category" offset={-29} position="insideBottom" />
                     </XAxis>
                     <YAxis>
-                        <Label value="Amount" angle={-90} position="insideLeft" />
+                        <Label value="Amount" offset={-29} angle={-90} position="insideLeft" />
                     </YAxis>
                     <Tooltip />
                     {/* Remove the default Legend by providing a custom content */}
