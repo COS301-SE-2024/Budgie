@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styles from './ComparisonsPage.module.css'; // CSS Module for styling
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons'; // Import the specific user icon
-import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Cell } from 'recharts'; // Import recharts components
+import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, CartesianGrid, Cell, Label, Legend } from 'recharts'; // Import recharts components
 
 // Dummy data for the bar chart with unique colors and additional line data
 const data = [
@@ -27,7 +27,7 @@ export function ComparisonsPage() {
     const handleCloseForm = () => setShowForm(false);
 
     const handleSubmit = () => {
-        // e.preventDefault();
+        //e.preventDefault();
         // Handle form submission logic here
         console.log('Submitted:', { age, jobPosition, industry });
         handleCloseForm();
@@ -119,10 +119,15 @@ export function ComparisonsPage() {
                     margin={{ top: 20, right: 70, left: 80, bottom: 80 }} // Adjust margins
                 >
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="category" />
-                    <YAxis />
+                    <XAxis dataKey="category">
+                        <Label value="Category" offset={0} position="insideBottom" />
+                    </XAxis>
+                    <YAxis>
+                        <Label value="Amount" angle={-90} position="insideLeft" />
+                    </YAxis>
                     <Tooltip />
-                    <Legend />
+                    {/* Remove the default Legend by providing a custom content */}
+                    <Legend content={() => null} />
 
                     <Bar dataKey="amount" fill="#8884d8">
                         {data.map((entry, index) => (
