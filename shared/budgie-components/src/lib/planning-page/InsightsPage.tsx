@@ -8,15 +8,15 @@ export function InsightsPage() {
         <div className={styles.insightsContainer}>
             {/* Petrol Prices Grid */}
             <div className={styles.gridItem}>
-                <h2>Petrol Prices</h2>
+                <div className={styles.gridItemTitleBox}>
+                    <h2 className={styles.gridItemTitle}>Petrol Prices</h2>
+                </div>
                 <div className={styles.table}>
                     <div className={styles.tableHeader}>
                         <span>Product Name</span>
                         <span>Coastal</span>
                         <span>Inland</span>
                     </div>
-
-                    {/* First row entry */}
                     <div className={styles.tableRow}>
                         <div className={styles.productName}>
                             <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
@@ -25,8 +25,6 @@ export function InsightsPage() {
                         <span>cpl 23.32</span>
                         <span>cpl 23.22</span>
                     </div>
-
-                    {/* Second row entry */}
                     <div className={styles.tableRow}>
                         <div className={styles.productName}>
                             <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
@@ -40,7 +38,9 @@ export function InsightsPage() {
 
             {/* Bank Insights Grid */}
             <div className={styles.gridItem}>
-                <h2>Bank Insights</h2>
+                <div className={styles.gridItemTitleBox}>
+                    <h2 className={styles.gridItemTitle}>Bank Insights</h2>
+                </div>
                 <div className={styles.bankInsightsContainer}>
                     <div className={styles.navigation}>
                         <span className={styles.arrow}>&lt;</span>
@@ -50,7 +50,6 @@ export function InsightsPage() {
                         </div>
                         <span className={styles.arrow}>&gt;</span>
                     </div>
-
                     <div className={styles.prosConsContainer}>
                         <div className={styles.pros}>
                             <h3>Pros</h3>
@@ -70,7 +69,9 @@ export function InsightsPage() {
 
             {/* Property and Rent Grid */}
             <div className={styles.gridItem}>
-                <h2>Property and Rent</h2>
+                <div className={styles.gridItemTitleBox}>
+                    <h2 className={styles.gridItemTitle}>Property and Rent</h2>
+                </div>
                 <div className={styles.propertyTable}>
                     <div className={styles.propertyRow}>
                         <FontAwesomeIcon icon={faHome} className={styles.icon} />
@@ -102,7 +103,9 @@ export function InsightsPage() {
 
             {/* Transport Prices Grid */}
             <div className={styles.gridItem}>
-                <h2>Transport Prices</h2>
+                <div className={styles.gridItemTitleBox}>
+                    <h2 className={styles.gridItemTitle}>Transport Prices</h2>
+                </div>
                 <div className={styles.transportTable}>
                     <div className={styles.transportRow}>
                         <FontAwesomeIcon icon={faBus} className={styles.icon} />
@@ -119,7 +122,9 @@ export function InsightsPage() {
 
             {/* Utility Prices Grid */}
             <div className={styles.gridItem}>
-                <h2>Utility Prices</h2>
+                <div className={styles.gridItemTitleBox}>
+                    <h2 className={styles.gridItemTitle}>Utility Prices</h2>
+                </div>
                 <div className={styles.utilityTable}>
                     <div className={styles.utilityRow}>
                         <FontAwesomeIcon icon={faLightbulb} className={styles.icon} />
@@ -130,6 +135,7 @@ export function InsightsPage() {
                 </div>
             </div>
         </div>
+
     );
 }
 
