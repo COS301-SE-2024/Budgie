@@ -288,9 +288,9 @@
 }
 
 .paymentBox {
-  background-color: #ffffff;
+  background-color: #b9bbba;
   /* Lighter shade of green */
-  border: 2px solid #0664f0;
+  border: 2px solid #f1f2f3;
   /* Darker green border */
   border-radius: 8px;
   padding: 15px;
