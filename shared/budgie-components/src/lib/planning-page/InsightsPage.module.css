@@ -11,8 +11,6 @@
 .gridItem {
     background-color: var(--block-background, #ffffff);
     /* Default to white if variable is not defined */
-    padding: 0;
-    /* Remove padding to avoid space around heading */
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
@@ -21,13 +19,15 @@
 
 /* Title box styling */
 .gridItemTitleBox {
-    background-color: #aaa5a5;
+    background-color: #dcdcdc;
     /* Grey background */
     padding: 10px;
     border-radius: 8px 8px 0 0;
     /* Rounded corners at the top */
     width: 100%;
     box-sizing: border-box;
+    margin-bottom: 10px;
+    /* Space between heading and content */
 }
 
 /* Title styling within the title box */
