@@ -109,11 +109,11 @@ export function ComparisonsPage() {
             <div className={styles.gridItem}>
                 <div className={styles.gridTitleContainer}>
                     <h3 className={styles.gridTitle}>
-                        How you compare to other people earning R50,000
+                        AVERAGE SPENDING BY CATEGORY COMPARED TO YOU
                     </h3>
                 </div>
                 <ComposedChart
-                    width={1200} // Increased width for better spacing
+                    width={1600} // Increased width for better spacing
                     height={325}
                     data={data}
                     margin={{ top: 20, right: 70, left: 80, bottom: 80 }} // Adjust margins
