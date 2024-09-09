@@ -221,7 +221,7 @@ export function OverviewPage(props: OverviewPageProps) {
                     <Pie
                       data={categoryData}
                       cx={250}
-                      cy={150}
+                      cy={95}
                       labelLine={false}
                       outerRadius={100}
                       fill="#8884d8"
