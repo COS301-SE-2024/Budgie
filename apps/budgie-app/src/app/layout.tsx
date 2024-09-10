@@ -23,9 +23,9 @@ export default function RootLayout({
     <html lang="en">
       <head></head>
       <body className="bg-BudgieWhite">
-        <Providers>
-          <main>{children}</main>
-        </Providers>
+        <main>
+          <Providers>{children}</Providers>
+        </main>
       </body>
     </html>
   );
