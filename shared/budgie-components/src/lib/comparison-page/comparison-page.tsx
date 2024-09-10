@@ -13,9 +13,24 @@ import {
     getIncomeByAge,
     getSpendingByCategory
 } from './services';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons'; // Import the specific user icon
+import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, CartesianGrid, Cell, Label, Legend } from 'recharts';
 
 
 export interface ComparisonPage {}
+
+const data = [
+    { category: 'Groceries', amount: 3000, lineValue: 4000, color: '#ff6f61' },
+    { category: 'Utilities', amount: 1500, lineValue: 2000, color: '#ffcc00' },
+    { category: 'Entertainment', amount: 2000, lineValue: 2500, color: '#00bfae' },
+    { category: 'Shopping', amount: 2500, lineValue: 3000, color: '#8e44ad' },
+    { category: 'Eating Out', amount: 1800, lineValue: 2200, color: '#3498db' },
+    { category: 'Transport', amount: 2200, lineValue: 2700, color: '#e74c3c' },
+    { category: 'Medical Aid', amount: 3500, lineValue: 4000, color: '#2ecc71' },
+    { category: 'Insurance', amount: 2700, lineValue: 3200, color: '#e67e22' },
+    { category: 'Other', amount: 1000, lineValue: 1500, color: '#9b59b6' }
+];
 
 export const calculateAge = (date : any) => {
     // Calculate age from birth date
@@ -60,9 +75,9 @@ export function ComparisonPage(props: ComparisonPage) {
     }
 
     const [income, setIncome] = useState(0);
-    const [age, setAge] = useState('');
-    const [jobPosition, setJobPosition] = useState('');
-    const [industry, setIndustry] = useState('');
+    // const [age, setAge] = useState('');
+    // const [jobPosition, setJobPosition] = useState('');
+    // const [industry, setIndustry] = useState('');
     const [positionValues, setPositionValues] = useState<(number)[]>([]);
     const [industryValues, setIndustryValues] = useState<(number)[]>([]);
     const [ageIncome, setAgeIncome] = useState(0);
@@ -71,6 +86,13 @@ export function ComparisonPage(props: ComparisonPage) {
     const [formJobPosition, setFormJobPosition] = useState('');
     const [formIndustry, setFormIndustry] = useState('');
     const [formBirthDate, setFormBirthDate] = useState('');
+    const [showForm, setShowForm] = useState(false);
+    const [age, setAge] = useState('');
+    const [jobPosition, setJobPosition] = useState('Developer');
+    const [industry, setIndustry] = useState('Technology');
+
+    const handleShowForm = () => setShowForm(true);
+    const handleCloseForm = () => setShowForm(false);
 
 
     const getData = async () => {
@@ -167,128 +189,295 @@ export function ComparisonPage(props: ComparisonPage) {
     };
 
     return (
-        <div className={styles.container}>
-            <h2>User Information</h2>
+        <div className={styles.comparisonsPage}>
+            {/* User Info Button */}
+            <button className={styles.userInfoButton} onClick={handleShowForm}>
+                <FontAwesomeIcon icon={faUser} className={styles.userIcon} /> User Info
+            </button>
 
-            <form onSubmit={handleSubmit}>
-                <div>
-                <label htmlFor="birthDate">Birth Date:</label>
-                <input
-                    type="date"
-                    id="birthDate"
-                    value={formBirthDate} 
-                    onChange={(e) => setFormBirthDate(e.target.value)} 
-                    required
-                />
+            {/* Pop-up Form */}
+            {showForm && (
+                <div className={styles.popupForm}>
+                    <div className={styles.formContainer}>
+                        <h2>User Information</h2>
+                        <form onSubmit={handleSubmit}>
+                            <label>
+                                Age:
+                                <input
+                                    type="number"
+                                    value={age}
+                                    onChange={(e) => setAge(e.target.value)}
+                                    required
+                                />
+                            </label>
+                            <label>
+                                Job Position:
+                                <select
+                                    value={jobPosition}
+                                    onChange={(e) => setJobPosition(e.target.value)}
+                                    required
+                                >
+                                    {['Developer', 'Manager', 'Analyst', 'Designer', 'CEO', 'Project Manager'].map((position) => (
+                                        <option key={position} value={position}>
+                                            {position}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                            <label>
+                                Industry:
+                                <select
+                                    value={industry}
+                                    onChange={(e) => setIndustry(e.target.value)}
+                                    required
+                                >
+                                    {['Technology', 'Finance', 'Healthcare', 'Education'].map((industry) => (
+                                        <option key={industry} value={industry}>
+                                            {industry}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                            <button type="submit">Submit</button>
+                            <button type="button" onClick={handleCloseForm}>Close</button>
+                        </form>
+                    </div>
                 </div>
-                <div>
-                    <label htmlFor="jobPosition">Job Position:</label>
-                    <select
-                        id="jobPosition"
-                        value={formJobPosition}
-                        onChange={(e) => setFormJobPosition(e.target.value)}
-                        required
-                    >
-                        <option value="">Select your job position</option>
-                        <option value="Academic">Academic</option>
-                        <option value="Accountant">Accountant</option>
-                        <option value="Analyst">Analyst</option>
-                        <option value="CEO">CEO</option>
-                        <option value="Consultant">Consultant</option>
-                        <option value="COO">COO</option>
-                        <option value="Engineer">Engineer</option>
-                        <option value="Executive/Director">Executive/Director</option>
-                        <option value="Financial Manager">Financial Manager</option>
-                        <option value="General Manager">General Manager</option>
-                        <option value="Head of Department">Head of Department</option>
-                        <option value="HR Manager">HR Manager</option>
-                        <option value="Managing Director">Managing Director</option>
-                        <option value="Marketing Director/Manager">Marketing Director/Manager</option>
-                        <option value="Project Manager">Project Manager</option>
-                        <option value="Sales Manager">Sales Manager</option>
-                        <option value="Self-employed">Self-employed</option>
-                        <option value="Senior Manager">Senior Manager</option>
-                        <option value="Student">Student</option>
-                    </select>
-                </div>
-                <div>
-                    <label htmlFor="industry">Industry:</label>
-                    <select
-                      id="industry"
-                      value={formIndustry}
-                      onChange={(e) => setFormIndustry(e.target.value)}
-                      required
-                  >
-                      <option value="">Select your industry</option>
-                      <option value="Advertising / Marketing / Public Relations">Advertising / Marketing / Public Relations</option>
-                      <option value="Agriculture">Agriculture</option>
-                      <option value="Arts / Entertainment">Arts / Entertainment</option>
-                      <option value="Automotive">Automotive</option>
-                      <option value="Construction / Architecture">Construction / Architecture</option>
-                      <option value="Consulting">Consulting</option>
-                      <option value="Education / Training">Education / Training</option>
-                      <option value="Engineering">Engineering</option>
-                      <option value="Environment">Environment</option>
-                      <option value="Finance / Banking / Insurance / Accounting">Finance / Banking / Insurance / Accounting</option>
-                      <option value="Government">Government</option>
-                      <option value="Information Technology">Information Technology</option>
-                      <option value="Legal">Legal</option>
-                      <option value="Manufacturing">Manufacturing</option>
-                      <option value="Media / Publishing / Broadcasting">Media / Publishing / Broadcasting</option>
-                      <option value="Medical / Dental / Healthcare / Pharmaceutical">Medical / Dental / Healthcare / Pharmaceutical</option>
-                      <option value="Mining / Petrochemical">Mining / Petrochemical</option>
-                      <option value="Non-Governmental Organisation">Non-Governmental Organisation (non-profit)</option>
-                      <option value="Real Estate / Property">Real Estate / Property</option>
-                      <option value="Retail / Wholesale">Retail / Wholesale</option>
-                      <option value="Service">Service</option>
-                      <option value="Sports">Sports</option>
-                      <option value="Telecommunications">Telecommunications</option>
-                      <option value="Transport / Logistics">Transport / Logistics</option>
-                      <option value="Travel / Tourism / Lodging">Travel / Tourism / Lodging</option>
-                      <option value="Utilities / Parastatals">Utilities / Parastatals</option>
-                      <option value="Student">Student</option>
-                  </select>
+            )}
 
+            {/* Income Grid */}
+            <div className={styles.incomeGrid}>
+                {/* Average Income Section */}
+                <div className={styles.leftHalf}>
+                    <h3>Average Income of a 30 Year Old</h3>
+                    <div className={styles.triangle}>R50,000</div>
                 </div>
-                <button type="submit">Submit</button>
-            </form>
 
-            <br />
-            <p>Your income: {formatCurrency(income)}</p>
-            <p>Average income of a {age} year old: {formatCurrency(ageIncome)}</p>
-            <br/>
-            <p>Average groceries: {averageCategory[0]}%</p>
-            <p>Your groceries: {yourCategory[0]}%</p>
-            <p>Average Utilities: {averageCategory[1]}%</p>
-            <p>Your Utilities: {yourCategory[1]}%</p>
-            <p>Average Entertainment: {averageCategory[2]}%</p>
-            <p>Your Entertainment: {yourCategory[2]}%</p>
-            <p>Average Transport: {averageCategory[3]}%</p>
-            <p>Your Transport: {yourCategory[3]}%</p>
-            <p>Average Insurance: {averageCategory[4]}%</p>
-            <p>Your Insurance: {yourCategory[4]}%</p>
-            <p>Average Medical Aid: {averageCategory[5]}%</p>
-            <p>Your Medical Aid: {yourCategory[5]}%</p>
-            <p>Average Eating Out: {averageCategory[6]}%</p>
-            <p>Your Eating Out: {yourCategory[6]}%</p>
-            <p>Average Shopping: {averageCategory[7]}%</p>
-            <p>Your Shopping: {yourCategory[7]}%</p>
-            <p>Average Other: {averageCategory[8]}%</p>
-            <p>Your Other: {yourCategory[8]}%</p>
-            <br/>
-            <p>{jobPosition}:</p>
-            <p>Minimum salary according to position: {formatCurrency(positionValues[0])}</p>
-            <p>Average salary according to position: {formatCurrency(positionValues[1])}</p>
-            <p>Maximum salary according to position: {formatCurrency(positionValues[2])}</p>
-            <p>Your salary account to position: {formatCurrency(income)}</p>
-            <br/>
-            <p>{industry}:</p>
-            <p>Minimum salary according to industry: {formatCurrency(industryValues[0])}</p>
-            <p>Average salary according to industry: {formatCurrency(industryValues[1])}</p>
-            <p>Maximum salary according to industry: {formatCurrency(industryValues[2])}</p>
-            <p>Your salary account to industry: {formatCurrency(income)}</p>
+                {/* Your Income Section */}
+                <div className={styles.rightHalf}>
+                    <h3>Your Income</h3>
+                    <div className={styles.triangle}>R60,000</div>
+                </div>
+            </div>
+
+            {/* Comparison Bar Chart with Line Chart */}
+            <div className={styles.gridItem}>
+                <div className={styles.gridTitleContainer}>
+                    <h3 className={styles.gridTitle}>
+                        AVERAGE SPENDING BY CATEGORY COMPARED TO YOU
+                    </h3>
+                </div>
+                <ComposedChart
+                    width={1600} // Increased width for better spacing
+                    height={325}
+                    data={data}
+                    margin={{ top: 20, right: 70, left: 80, bottom: 80 }} // Adjust margins
+                >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="category">
+                        <Label value="Category" offset={-29} position="insideBottom" />
+                    </XAxis>
+                    <YAxis>
+                        <Label value="Amount" offset={-29} angle={-90} position="insideLeft" />
+                    </YAxis>
+                    <Tooltip />
+                    {/* Remove the default Legend by providing a custom content */}
+                    <Legend content={() => null} />
+
+                    <Bar dataKey="amount" fill="#8884d8">
+                        {data.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                    </Bar>
+                    <Line
+                        type="monotone"
+                        dataKey="lineValue"
+                        stroke="#0000ff"
+                        strokeWidth={2}
+                        dot={false}
+                    />
+                </ComposedChart>
+            </div>
+
+            <div className={styles.gridContainer}>
+                {/* Position Grid */}
+                <div className={styles.gridItem}>
+                    <div className={styles.gridTitleContainer}>
+                        <h3 className={styles.gridTitle}>Annual Salary according to Position</h3>
+                    </div>
+                    <div className={styles.comparisonContainer}>
+                        {/* Title at the top and centered */}
+                        <h3 className={styles.centeredTitle}>CEO</h3>
+
+                        {/* Status Bar/Bar Graph Comparison */}
+                        <div className={styles.statusBar}>
+                            <div className={styles.userBar}></div>
+                            <div className={styles.divider}></div>
+                            <div className={styles.marketBar}></div>
+                        </div>
+
+                        {/* Labels for the bars */}
+                        <div className={styles.labels}>
+                            <span className={styles.userLabel}>You</span>
+                            <span className={styles.amount}>R50 000</span>
+                            <span className={styles.marketLabel}>Market Avg</span>
+                            <span className={styles.amount}>R75 642</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Industry Grid */}
+                <div className={styles.gridItem}>
+                    <div className={styles.gridTitleContainer}>
+                        <h3 className={styles.gridTitle}>Annual Salary According to Industry</h3>
+                    </div>
+                    <div className={styles.comparisonContainer}>
+                        {/* Title at the top and centered */}
+                        <h3 className={styles.centeredTitle}>5-6 Years</h3>
+
+                        {/* Status Bar/Bar Graph Comparison */}
+                        <div className={styles.statusBar}>
+                            <div className={styles.userBar}></div>
+                            <div className={styles.divider}></div>
+                            <div className={styles.marketBar}></div>
+                        </div>
+
+                        {/* Labels for the bars */}
+                        <div className={styles.labels}>
+                            <span className={styles.userLabel}>You</span>
+                            <span className={styles.amount}>R70 000</span>
+                            <span className={styles.marketLabel}>Market Avg</span>
+                            <span className={styles.amount}>R65 000</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
+
+    // return (
+    //     <div className={styles.container}>
+    //         <h2>User Information</h2>
+
+    //         <form onSubmit={handleSubmit}>
+    //             <div>
+    //             <label htmlFor="birthDate">Birth Date:</label>
+    //             <input
+    //                 type="date"
+    //                 id="birthDate"
+    //                 value={formBirthDate} 
+    //                 onChange={(e) => setFormBirthDate(e.target.value)} 
+    //                 required
+    //             />
+    //             </div>
+    //             <div>
+    //                 <label htmlFor="jobPosition">Job Position:</label>
+    //                 <select
+    //                     id="jobPosition"
+    //                     value={formJobPosition}
+    //                     onChange={(e) => setFormJobPosition(e.target.value)}
+    //                     required
+    //                 >
+    //                     <option value="">Select your job position</option>
+    //                     <option value="Academic">Academic</option>
+    //                     <option value="Accountant">Accountant</option>
+    //                     <option value="Analyst">Analyst</option>
+    //                     <option value="CEO">CEO</option>
+    //                     <option value="Consultant">Consultant</option>
+    //                     <option value="COO">COO</option>
+    //                     <option value="Engineer">Engineer</option>
+    //                     <option value="Executive/Director">Executive/Director</option>
+    //                     <option value="Financial Manager">Financial Manager</option>
+    //                     <option value="General Manager">General Manager</option>
+    //                     <option value="Head of Department">Head of Department</option>
+    //                     <option value="HR Manager">HR Manager</option>
+    //                     <option value="Managing Director">Managing Director</option>
+    //                     <option value="Marketing Director/Manager">Marketing Director/Manager</option>
+    //                     <option value="Project Manager">Project Manager</option>
+    //                     <option value="Sales Manager">Sales Manager</option>
+    //                     <option value="Self-employed">Self-employed</option>
+    //                     <option value="Senior Manager">Senior Manager</option>
+    //                     <option value="Student">Student</option>
+    //                 </select>
+    //             </div>
+    //             <div>
+    //                 <label htmlFor="industry">Industry:</label>
+    //                 <select
+    //                   id="industry"
+    //                   value={formIndustry}
+    //                   onChange={(e) => setFormIndustry(e.target.value)}
+    //                   required
+    //               >
+    //                   <option value="">Select your industry</option>
+    //                   <option value="Advertising / Marketing / Public Relations">Advertising / Marketing / Public Relations</option>
+    //                   <option value="Agriculture">Agriculture</option>
+    //                   <option value="Arts / Entertainment">Arts / Entertainment</option>
+    //                   <option value="Automotive">Automotive</option>
+    //                   <option value="Construction / Architecture">Construction / Architecture</option>
+    //                   <option value="Consulting">Consulting</option>
+    //                   <option value="Education / Training">Education / Training</option>
+    //                   <option value="Engineering">Engineering</option>
+    //                   <option value="Environment">Environment</option>
+    //                   <option value="Finance / Banking / Insurance / Accounting">Finance / Banking / Insurance / Accounting</option>
+    //                   <option value="Government">Government</option>
+    //                   <option value="Information Technology">Information Technology</option>
+    //                   <option value="Legal">Legal</option>
+    //                   <option value="Manufacturing">Manufacturing</option>
+    //                   <option value="Media / Publishing / Broadcasting">Media / Publishing / Broadcasting</option>
+    //                   <option value="Medical / Dental / Healthcare / Pharmaceutical">Medical / Dental / Healthcare / Pharmaceutical</option>
+    //                   <option value="Mining / Petrochemical">Mining / Petrochemical</option>
+    //                   <option value="Non-Governmental Organisation">Non-Governmental Organisation (non-profit)</option>
+    //                   <option value="Real Estate / Property">Real Estate / Property</option>
+    //                   <option value="Retail / Wholesale">Retail / Wholesale</option>
+    //                   <option value="Service">Service</option>
+    //                   <option value="Sports">Sports</option>
+    //                   <option value="Telecommunications">Telecommunications</option>
+    //                   <option value="Transport / Logistics">Transport / Logistics</option>
+    //                   <option value="Travel / Tourism / Lodging">Travel / Tourism / Lodging</option>
+    //                   <option value="Utilities / Parastatals">Utilities / Parastatals</option>
+    //                   <option value="Student">Student</option>
+    //               </select>
+
+    //             </div>
+    //             <button type="submit">Submit</button>
+    //         </form>
+
+    //         <br />
+    //         <p>Your income: {formatCurrency(income)}</p>
+    //         <p>Average income of a {age} year old: {formatCurrency(ageIncome)}</p>
+    //         <br/>
+    //         <p>Average groceries: {averageCategory[0]}%</p>
+    //         <p>Your groceries: {yourCategory[0]}%</p>
+    //         <p>Average Utilities: {averageCategory[1]}%</p>
+    //         <p>Your Utilities: {yourCategory[1]}%</p>
+    //         <p>Average Entertainment: {averageCategory[2]}%</p>
+    //         <p>Your Entertainment: {yourCategory[2]}%</p>
+    //         <p>Average Transport: {averageCategory[3]}%</p>
+    //         <p>Your Transport: {yourCategory[3]}%</p>
+    //         <p>Average Insurance: {averageCategory[4]}%</p>
+    //         <p>Your Insurance: {yourCategory[4]}%</p>
+    //         <p>Average Medical Aid: {averageCategory[5]}%</p>
+    //         <p>Your Medical Aid: {yourCategory[5]}%</p>
+    //         <p>Average Eating Out: {averageCategory[6]}%</p>
+    //         <p>Your Eating Out: {yourCategory[6]}%</p>
+    //         <p>Average Shopping: {averageCategory[7]}%</p>
+    //         <p>Your Shopping: {yourCategory[7]}%</p>
+    //         <p>Average Other: {averageCategory[8]}%</p>
+    //         <p>Your Other: {yourCategory[8]}%</p>
+    //         <br/>
+    //         <p>{jobPosition}:</p>
+    //         <p>Minimum salary according to position: {formatCurrency(positionValues[0])}</p>
+    //         <p>Average salary according to position: {formatCurrency(positionValues[1])}</p>
+    //         <p>Maximum salary according to position: {formatCurrency(positionValues[2])}</p>
+    //         <p>Your salary account to position: {formatCurrency(income)}</p>
+    //         <br/>
+    //         <p>{industry}:</p>
+    //         <p>Minimum salary according to industry: {formatCurrency(industryValues[0])}</p>
+    //         <p>Average salary according to industry: {formatCurrency(industryValues[1])}</p>
+    //         <p>Maximum salary according to industry: {formatCurrency(industryValues[2])}</p>
+    //         <p>Your salary account to industry: {formatCurrency(income)}</p>
+    //     </div>
+    // );
 }
 
 export default ComparisonPage;
