@@ -105,20 +105,22 @@ export function GoalModal() {
   };
 
   const fetchGoals = async () => {
-    try {
-      const goalsCollection = collection(db, 'goals');
-      const goalsQuery = query(goalsCollection, where('uid', '==', user.uid));
-      const goalsSnapshot = await getDocs(goalsQuery);
-      const goalsList = goalsSnapshot.docs.map((doc) => {
-        const data = doc.data() as Omit<Goal, 'id'>;
-        return {
-          id: doc.id,
-          ...data,
-        };
-      });
-      setGoals(goalsList);
-    } catch (error) {
-      console.error('Error getting bank statement document:', error);
+    if (user && user.uid) {
+      try {
+        const goalsCollection = collection(db, 'goals');
+        const goalsQuery = query(goalsCollection, where('uid', '==', user.uid));
+        const goalsSnapshot = await getDocs(goalsQuery);
+        const goalsList = goalsSnapshot.docs.map((doc) => {
+          const data = doc.data() as Omit<Goal, 'id'>;
+          return {
+            id: doc.id,
+            ...data,
+          };
+        });
+        setGoals(goalsList);
+      } catch (error) {
+        console.error('Error getting bank statement document:', error);
+      }
     }
   };
 
@@ -381,20 +383,25 @@ export function PlanningPage(props: PlanningPageProps) {
 
   useEffect(() => {
     const fetchGoals = async () => {
-      try {
-        const goalsCollection = collection(db, 'goals');
-        const goalsQuery = query(goalsCollection, where('uid', '==', user.uid));
-        const goalsSnapshot = await getDocs(goalsQuery);
-        const goalsList = goalsSnapshot.docs.map((doc) => {
-          const data = doc.data() as Omit<Goal, 'id'>;
-          return {
-            id: doc.id,
-            ...data,
-          };
-        });
-        setGoals(goalsList);
-      } catch (error) {
-        console.error('Error getting bank statement document:', error);
+      if (user && user.uid) {
+        try {
+          const goalsCollection = collection(db, 'goals');
+          const goalsQuery = query(
+            goalsCollection,
+            where('uid', '==', user.uid)
+          );
+          const goalsSnapshot = await getDocs(goalsQuery);
+          const goalsList = goalsSnapshot.docs.map((doc) => {
+            const data = doc.data() as Omit<Goal, 'id'>;
+            return {
+              id: doc.id,
+              ...data,
+            };
+          });
+          setGoals(goalsList);
+        } catch (error) {
+          console.error('Error getting bank statement document:', error);
+        }
       }
     };
     fetchGoals();
@@ -441,11 +448,11 @@ export function PlanningPage(props: PlanningPageProps) {
           ) : viewMode === 'all' ? (
             <GoalsPage />
           ) : (
-            <div className={styles.underConstructionScreen}> 
+            <div className={styles.underConstructionScreen}>
               <div className={styles.underConstructionText}>
                 This page is under construction.
               </div>
-          </div>
+            </div>
           )}
         </div>
       </div>

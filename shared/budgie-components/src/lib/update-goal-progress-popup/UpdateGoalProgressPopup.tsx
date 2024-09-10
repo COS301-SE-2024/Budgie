@@ -158,74 +158,76 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    if (user && user.uid) {
+      e.preventDefault();
 
-    const goalData: any = {
-      type: props.activeTab,
-      name: goalName,
-      start_date: startDate,
-      uid: user.uid,
-    };
-
-    if (props.activeTab === 'Savings' || props.activeTab === 'Debt') {
-      goalData.current_amount =
-        props.activeTab === 'Debt'
-          ? currentAmount - updateAmount
-          : currentAmount + updateAmount;
-      goalData.target_amount = targetAmount;
-      goalData.target_date = props.goal.target_date;
-    } else if (props.activeTab === 'Spending') {
-      goalData.spending_limit = spendingLimit;
-    }
-
-    try {
-      const goalDocRef = doc(db, 'goals', props.goal.id);
-      const goalDoc = await getDoc(goalDocRef);
-
-      //updates-------------------------------------------------------------------------
-      const existingUpdates = goalDoc.exists()
-        ? goalDoc.data()?.updates || '[]'
-        : '[]';
-      const updatesArray = JSON.parse(existingUpdates);
-
-      const newUpdate = {
-        amount: updateAmount,
-        date: updateDate,
-      };
-      updatesArray.push(newUpdate);
-      const existingMonthlyUpdates = goalDoc.exists()
-        ? goalDoc.data()?.monthly_updates || []
-        : [];
-
-      const newMonthlyUpdate = {
-        amount: updateAmount,
-        month: getMonthName(updateDate) + ' ' + getYear(updateDate),
+      const goalData: any = {
+        type: props.activeTab,
+        name: goalName,
+        start_date: startDate,
+        uid: user.uid,
       };
 
-      const updatedMonthlyUpdatesArray = Array.isArray(existingMonthlyUpdates)
-        ? existingMonthlyUpdates
-        : JSON.parse(existingMonthlyUpdates);
-
-      const existingEntryIndex = updatedMonthlyUpdatesArray.findIndex(
-        (entry: { month: string }) => entry.month === newMonthlyUpdate.month
-      );
-
-      if (existingEntryIndex >= 0) {
-        updatedMonthlyUpdatesArray[existingEntryIndex].amount +=
-          newMonthlyUpdate.amount;
-      } else {
-        updatedMonthlyUpdatesArray.push(newMonthlyUpdate);
+      if (props.activeTab === 'Savings' || props.activeTab === 'Debt') {
+        goalData.current_amount =
+          props.activeTab === 'Debt'
+            ? currentAmount - updateAmount
+            : currentAmount + updateAmount;
+        goalData.target_amount = targetAmount;
+        goalData.target_date = props.goal.target_date;
+      } else if (props.activeTab === 'Spending') {
+        goalData.spending_limit = spendingLimit;
       }
 
-      await updateDoc(goalDocRef, {
-        ...goalData,
-        monthly_updates: JSON.stringify(updatedMonthlyUpdatesArray),
-        updates: JSON.stringify(updatesArray),
-      });
+      try {
+        const goalDocRef = doc(db, 'goals', props.goal.id);
+        const goalDoc = await getDoc(goalDocRef);
 
-      props.togglePopup();
-    } catch (error) {
-      console.error('Error saving goal:', error);
+        //updates-------------------------------------------------------------------------
+        const existingUpdates = goalDoc.exists()
+          ? goalDoc.data()?.updates || '[]'
+          : '[]';
+        const updatesArray = JSON.parse(existingUpdates);
+
+        const newUpdate = {
+          amount: updateAmount,
+          date: updateDate,
+        };
+        updatesArray.push(newUpdate);
+        const existingMonthlyUpdates = goalDoc.exists()
+          ? goalDoc.data()?.monthly_updates || []
+          : [];
+
+        const newMonthlyUpdate = {
+          amount: updateAmount,
+          month: getMonthName(updateDate) + ' ' + getYear(updateDate),
+        };
+
+        const updatedMonthlyUpdatesArray = Array.isArray(existingMonthlyUpdates)
+          ? existingMonthlyUpdates
+          : JSON.parse(existingMonthlyUpdates);
+
+        const existingEntryIndex = updatedMonthlyUpdatesArray.findIndex(
+          (entry: { month: string }) => entry.month === newMonthlyUpdate.month
+        );
+
+        if (existingEntryIndex >= 0) {
+          updatedMonthlyUpdatesArray[existingEntryIndex].amount +=
+            newMonthlyUpdate.amount;
+        } else {
+          updatedMonthlyUpdatesArray.push(newMonthlyUpdate);
+        }
+
+        await updateDoc(goalDocRef, {
+          ...goalData,
+          monthly_updates: JSON.stringify(updatedMonthlyUpdatesArray),
+          updates: JSON.stringify(updatesArray),
+        });
+
+        props.togglePopup();
+      } catch (error) {
+        console.error('Error saving goal:', error);
+      }
     }
   };
 

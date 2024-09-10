@@ -43,7 +43,7 @@ const LearnMore: React.FC<LearnMoreProps> = ({ onClose }) => {
             <h3 className="text-xl font-semibold mb-4 text-white">
               How It Works
             </h3>
-            <p className="mb-2 text-BudgieGreen3 text-white text-sm">
+            <p className="mb-2  text-white text-sm">
               Follow these simple steps to get started:
             </p>
             <ol className="list-decimal list-inside ml-4 text-white text-sm">
