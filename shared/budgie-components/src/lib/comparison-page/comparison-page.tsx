@@ -20,18 +20,6 @@ import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, CartesianGrid, Cell, L
 
 export interface ComparisonPage {}
 
-const data = [
-    { category: 'Groceries', amount: 3000, lineValue: 4000, color: '#ff6f61' },
-    { category: 'Utilities', amount: 1500, lineValue: 2000, color: '#ffcc00' },
-    { category: 'Entertainment', amount: 2000, lineValue: 2500, color: '#00bfae' },
-    { category: 'Shopping', amount: 2500, lineValue: 3000, color: '#8e44ad' },
-    { category: 'Eating Out', amount: 1800, lineValue: 2200, color: '#3498db' },
-    { category: 'Transport', amount: 2200, lineValue: 2700, color: '#e74c3c' },
-    { category: 'Medical Aid', amount: 3500, lineValue: 4000, color: '#2ecc71' },
-    { category: 'Insurance', amount: 2700, lineValue: 3200, color: '#e67e22' },
-    { category: 'Other', amount: 1000, lineValue: 1500, color: '#9b59b6' }
-];
-
 export const calculateAge = (date : any) => {
     // Calculate age from birth date
     const birthDate = new Date(date);
@@ -93,6 +81,18 @@ export function ComparisonPage(props: ComparisonPage) {
 
     const handleShowForm = () => setShowForm(true);
     const handleCloseForm = () => setShowForm(false);
+
+    const data = [
+        { category: 'Groceries', amount: averageCategory[0], lineValue: yourCategory[0], color: '#ff6f61' },
+        { category: 'Utilities', amount: averageCategory[1], lineValue: yourCategory[1], color: '#ffcc00' },
+        { category: 'Entertainment', amount: averageCategory[2], lineValue: yourCategory[2], color: '#00bfae' },
+        { category: 'Transport', amount: averageCategory[3], lineValue: yourCategory[3], color: '#e74c3c' },
+        { category: 'Insurance', amount: averageCategory[4], lineValue: yourCategory[4], color: '#e67e22' },
+        { category: 'Medical Aid', amount: averageCategory[5], lineValue: yourCategory[5], color: '#2ecc71' },
+        { category: 'Eating Out', amount: averageCategory[6], lineValue: yourCategory[6], color: '#3498db' },
+        { category: 'Shopping', amount: averageCategory[7], lineValue: yourCategory[7], color: '#8e44ad' },
+        { category: 'Other', amount: averageCategory[8], lineValue: yourCategory[8], color: '#9b59b6' }
+    ];
 
 
     const getData = async () => {
@@ -158,34 +158,36 @@ export function ComparisonPage(props: ComparisonPage) {
 
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+        // e.preventDefault();
 
-        // Set job position and industry and age 
-        setJobPosition(formJobPosition);
-        setIndustry(formIndustry);
-        let age = calculateAge(formBirthDate)
-        setAge(age.toString());
-        let incomeByAge = await getIncomeByAge(age);
-        setAgeIncome(incomeByAge); 
+        // // Set job position and industry and age 
+        // setJobPosition(formJobPosition);
+        // setIndustry(formIndustry);
+        // let age = calculateAge(formBirthDate)
+        // setAge(age.toString());
+        // let incomeByAge = await getIncomeByAge(age);
+        // setAgeIncome(incomeByAge); 
         
-        // Fetch data for job position and industry
-        let position = await getPosition(formJobPosition);
-        setPositionValues(position);
-        let JobIndustry = await getIndustry(formIndustry);
-        setIndustryValues(JobIndustry);
+        // // Fetch data for job position and industry
+        // let position = await getPosition(formJobPosition);
+        // setPositionValues(position);
+        // let JobIndustry = await getIndustry(formIndustry);
+        // setIndustryValues(JobIndustry);
 
-        //set user info on database
-        let user = await getUser();
-        if(user){
-            const userData = {
-                birthDate: formBirthDate,  
-                jobPosition: formJobPosition,
-                industry: formIndustry,
-                uid : user
-            };
-            addUserInfo(userData)
-        }
-
+        // //set user info on database
+        // let user = await getUser();
+        // if(user){
+        //     const userData = {
+        //         birthDate: formBirthDate,  
+        //         jobPosition: formJobPosition,
+        //         industry: formIndustry,
+        //         uid : user
+        //     };
+        //     addUserInfo(userData)
+        // }
+        alert(formBirthDate)
+        alert(jobPosition)
+        alert(industry)
     };
 
     return (
@@ -201,15 +203,14 @@ export function ComparisonPage(props: ComparisonPage) {
                     <div className={styles.formContainer}>
                         <h2>User Information</h2>
                         <form onSubmit={handleSubmit}>
-                            <label>
-                                Age:
-                                <input
-                                    type="number"
-                                    value={age}
-                                    onChange={(e) => setAge(e.target.value)}
-                                    required
-                                />
-                            </label>
+                            <label htmlFor="birthDate">Birth Date:</label>
+                            <input
+                                type="date"
+                                id="birthDate"
+                                value={formBirthDate} 
+                                onChange={(e) => setFormBirthDate(e.target.value)} 
+                                required
+                            />
                             <label>
                                 Job Position:
                                 <select
@@ -217,7 +218,27 @@ export function ComparisonPage(props: ComparisonPage) {
                                     onChange={(e) => setJobPosition(e.target.value)}
                                     required
                                 >
-                                    {['Developer', 'Manager', 'Analyst', 'Designer', 'CEO', 'Project Manager'].map((position) => (
+                                    {['Select your job position',
+                                        'Academic',
+                                        'Accountant',
+                                        'Analyst',
+                                        'CEO',
+                                        'Consultant',
+                                        'COO',
+                                        'Engineer',
+                                        'Executive/Director',
+                                        'Financial Manager',
+                                        'General Manager',
+                                        'Head of Department',
+                                        'HR Manager',
+                                        'Managing Director',
+                                        'Marketing Director/Manager',
+                                        'Project Manager',
+                                        'Sales Manager',
+                                        'Self-employed',
+                                        'Senior Manager',
+                                        'Student' 
+                                    ].map((position) => (
                                         <option key={position} value={position}>
                                             {position}
                                         </option>
@@ -231,7 +252,35 @@ export function ComparisonPage(props: ComparisonPage) {
                                     onChange={(e) => setIndustry(e.target.value)}
                                     required
                                 >
-                                    {['Technology', 'Finance', 'Healthcare', 'Education'].map((industry) => (
+                                    {['Select your industry',
+                                        'Advertising / Marketing / Public Relations',
+                                        'Agriculture',
+                                        'Arts / Entertainment',
+                                        'Automotive',
+                                        'Construction / Architecture',
+                                        'Consulting',
+                                        'Education / Training',
+                                        'Engineering',
+                                        'Environment',
+                                        'Finance / Banking / Insurance / Accounting',
+                                        'Government',
+                                        'Information Technology',
+                                        'Legal',
+                                        'Manufacturing',
+                                        'Media / Publishing / Broadcasting',
+                                        'Medical / Dental / Healthcare / Pharmaceutical',
+                                        'Mining / Petrochemical',
+                                        'Non-Governmental Organisation (non-profit)',
+                                        'Real Estate / Property',
+                                        'Retail / Wholesale',
+                                        'Service',
+                                        'Sports',
+                                        'Telecommunications',
+                                        'Transport / Logistics',
+                                        'Travel / Tourism / Lodging',
+                                        'Utilities / Parastatals',
+                                        'Student'
+                                    ].map((industry) => (
                                         <option key={industry} value={industry}>
                                             {industry}
                                         </option>
@@ -249,14 +298,14 @@ export function ComparisonPage(props: ComparisonPage) {
             <div className={styles.incomeGrid}>
                 {/* Average Income Section */}
                 <div className={styles.leftHalf}>
-                    <h3>Average Income of a 30 Year Old</h3>
-                    <div className={styles.triangle}>R50,000</div>
+                    <h3>Average monthly income of a {age} Year Old</h3>
+                    <div className={styles.triangle}>{formatCurrency(ageIncome)}</div>
                 </div>
 
                 {/* Your Income Section */}
                 <div className={styles.rightHalf}>
-                    <h3>Your Income</h3>
-                    <div className={styles.triangle}>R60,000</div>
+                    <h3>Your monthly income</h3>
+                    <div className={styles.triangle}>{formatCurrency(income)}</div>
                 </div>
             </div>
 
@@ -294,7 +343,7 @@ export function ComparisonPage(props: ComparisonPage) {
                         dataKey="lineValue"
                         stroke="#0000ff"
                         strokeWidth={2}
-                        dot={false}
+                        dot={true}
                     />
                 </ComposedChart>
             </div>
