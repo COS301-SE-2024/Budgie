@@ -37,80 +37,86 @@ export function Dashboard(props: DashboardProps) {
   const [hasAccount, setHasAccount] = useState('No');
   useThemeSettings();
   useEffect(() => {
-    const fetchAccounts = async () => {
-      try {
-        const q = query(
-          collection(db, 'accounts'),
-          where('uid', '==', user.uid)
-        );
-        const querySnapshot = await getDocs(q);
-        const accountOptionsList = querySnapshot.docs.map((doc) => ({
-          alias: doc.data().alias,
-          accountNumber: doc.data().account_number,
-        }));
-        setAccountOptions(accountOptionsList);
+    if (user && user.uid) {
+      const fetchAccounts = async () => {
+        try {
+          const q = query(
+            collection(db, 'accounts'),
+            where('uid', '==', user.uid)
+          );
+          const querySnapshot = await getDocs(q);
+          const accountOptionsList = querySnapshot.docs.map((doc) => ({
+            alias: doc.data().alias,
+            accountNumber: doc.data().account_number,
+          }));
+          setAccountOptions(accountOptionsList);
 
-        if (accountOptionsList.length > 0) {
-          setSelectedAlias(accountOptionsList[0].alias);
-          setCurrentAccountNumber(accountOptionsList[0].accountNumber);
-          setHasAccount('Yes');
-        } else {
-          setHasAccount('No');
+          if (accountOptionsList.length > 0) {
+            setSelectedAlias(accountOptionsList[0].alias);
+            setCurrentAccountNumber(accountOptionsList[0].accountNumber);
+            setHasAccount('Yes');
+          } else {
+            setHasAccount('No');
+          }
+        } catch (error) {
+          console.error('Error fetching aliases: ', error);
         }
-      } catch (error) {
-        console.error('Error fetching aliases: ', error);
-      }
-    };
+      };
 
-    fetchAccounts();
+      fetchAccounts();
+    }
   }, []);
 
   useEffect(() => {
     const getYearlyTransactions = async () => {
-      try {
-        if (currentAccountNumber) {
-          const q = query(
-            collection(db, `transaction_data_${currentYear}`),
-            where('uid', '==', user.uid),
-            where('account_number', '==', currentAccountNumber)
-          );
-          const querySnapshot = await getDocs(q);
-          const transactionList = querySnapshot.docs.map((doc) => doc.data());
-          setData(transactionList[0]);
+      if (user && user.uid) {
+        try {
+          if (currentAccountNumber) {
+            const q = query(
+              collection(db, `transaction_data_${currentYear}`),
+              where('uid', '==', user.uid),
+              where('account_number', '==', currentAccountNumber)
+            );
+            const querySnapshot = await getDocs(q);
+            const transactionList = querySnapshot.docs.map((doc) => doc.data());
+            setData(transactionList[0]);
+          }
+        } catch (error) {
+          console.error('Error getting bank statement document:', error);
         }
-      } catch (error) {
-        console.error('Error getting bank statement document:', error);
       }
-    };
 
-    getYearlyTransactions();
-  }, [currentYear, currentAccountNumber, user.uid]);
+      getYearlyTransactions();
+    };
+  }, [currentYear, currentAccountNumber, user]);
 
   useEffect(() => {
     const fetchAvailableYears = async () => {
-      try {
-        const currentYear = new Date().getFullYear();
-        const years: number[] = [];
+      if (user && user.uid) {
+        try {
+          const currentYear = new Date().getFullYear();
+          const years: number[] = [];
 
-        for (let year = 2000; year <= currentYear; year++) {
-          const q = query(
-            collection(db, `transaction_data_${year}`),
-            where('uid', '==', user.uid),
-            where('account_number', '==', currentAccountNumber)
-          );
-          const querySnapshot = await getDocs(q);
+          for (let year = 2000; year <= currentYear; year++) {
+            const q = query(
+              collection(db, `transaction_data_${year}`),
+              where('uid', '==', user.uid),
+              where('account_number', '==', currentAccountNumber)
+            );
+            const querySnapshot = await getDocs(q);
 
-          if (!querySnapshot.empty) {
-            years.push(year);
+            if (!querySnapshot.empty) {
+              years.push(year);
+            }
           }
+          setYearsWithData(years);
+        } catch (error) {
+          console.error('Error fetching years with data:', error);
         }
-        setYearsWithData(years);
-      } catch (error) {
-        console.error('Error fetching years with data:', error);
       }
-    };
 
-    fetchAvailableYears();
+      fetchAvailableYears();
+    };
   }, [currentAccountNumber]);
 
   const handleAccountDropdownChange = (

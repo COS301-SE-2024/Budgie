@@ -334,43 +334,68 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
       UniqueYearMonths: Record<string, string[]>
     ) {
       //determine merged record
-      for (const Year in UniqueYearMonths) {
-        let Merged: Record<string, Transaction[]> = {};
-        const YearMonths: string[] = UniqueYearMonths[Year];
-        //check if exists
-        const q = query(
-          collection(db, `transaction_data_${Year}`),
-          where('uid', '==', user.uid),
-          where('account_number', '==', accountNumber)
-        );
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) {
-          let docSnap = querySnapshot.docs[0];
-          for (const YearMonth of YearMonths) {
-            let [Y, Month] = YearMonth.split('/');
-            Month = getMonthName(Month);
-            if (docSnap.data()[Month]) {
-              //month already contains data
-              const Incoming: Transaction[] = JSON.parse(docSnap.data()[Month]);
-              const Outgoing: Transaction[] = YearMonthLinesRecord[YearMonth];
-              //merge data duplicate removal
-              const filteredOutgoing = Outgoing.filter(
-                (outgoingTransaction) =>
-                  !Incoming.some((incomingTransaction) =>
-                    isDuplicate(outgoingTransaction, incomingTransaction)
-                  )
-              );
+      if (user && user.uid) {
+        for (const Year in UniqueYearMonths) {
+          let Merged: Record<string, Transaction[]> = {};
+          const YearMonths: string[] = UniqueYearMonths[Year];
+          //check if exists
+          const q = query(
+            collection(db, `transaction_data_${Year}`),
+            where('uid', '==', user.uid),
+            where('account_number', '==', accountNumber)
+          );
+          const querySnapshot = await getDocs(q);
+          if (!querySnapshot.empty) {
+            let docSnap = querySnapshot.docs[0];
+            for (const YearMonth of YearMonths) {
+              let [Y, Month] = YearMonth.split('/');
+              Month = getMonthName(Month);
+              if (docSnap.data()[Month]) {
+                //month already contains data
+                const Incoming: Transaction[] = JSON.parse(
+                  docSnap.data()[Month]
+                );
+                const Outgoing: Transaction[] = YearMonthLinesRecord[YearMonth];
+                //merge data duplicate removal
+                const filteredOutgoing = Outgoing.filter(
+                  (outgoingTransaction) =>
+                    !Incoming.some((incomingTransaction) =>
+                      isDuplicate(outgoingTransaction, incomingTransaction)
+                    )
+                );
 
-              if (filteredOutgoing.length != 0) {
-                //there are some non duplicates merge and sort and update
-                const combinedTransactions = [...Incoming, ...filteredOutgoing];
-                combinedTransactions.sort((a, b) => {
+                if (filteredOutgoing.length != 0) {
+                  //there are some non duplicates merge and sort and update
+                  const combinedTransactions = [
+                    ...Incoming,
+                    ...filteredOutgoing,
+                  ];
+                  combinedTransactions.sort((a, b) => {
+                    const dateA = new Date(a.date);
+                    const dateB = new Date(b.date);
+
+                    return dateB.getTime() - dateA.getTime();
+                  });
+                  const TransactionString =
+                    JSON.stringify(combinedTransactions);
+                  try {
+                    await updateDoc(docSnap.ref, {
+                      [Month]: TransactionString,
+                    });
+                  } catch (error) {
+                    console.log(error);
+                  }
+                }
+              } else {
+                //empty month can just merge
+                const Outgoing: Transaction[] = YearMonthLinesRecord[YearMonth];
+                Outgoing.sort((a, b) => {
                   const dateA = new Date(a.date);
                   const dateB = new Date(b.date);
 
                   return dateB.getTime() - dateA.getTime();
                 });
-                const TransactionString = JSON.stringify(combinedTransactions);
+                const TransactionString = JSON.stringify(Outgoing);
                 try {
                   await updateDoc(docSnap.ref, {
                     [Month]: TransactionString,
@@ -379,133 +404,118 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
                   console.log(error);
                 }
               }
-            } else {
-              //empty month can just merge
-              const Outgoing: Transaction[] = YearMonthLinesRecord[YearMonth];
-              Outgoing.sort((a, b) => {
+            }
+            //call categorize function
+            try {
+              const functions = getFunctions();
+              const categoriseExpenses = httpsCallable(
+                functions,
+                'categoriseExpenses'
+              );
+              let res = await categoriseExpenses({ year: Year });
+              console.log(res);
+            } catch (error) {
+              alert('function error');
+            }
+          } else {
+            //documents do not exist for this year can safely add to merged
+            for (const YearMonth of YearMonths) {
+              Merged[YearMonth] = YearMonthLinesRecord[YearMonth];
+            }
+            // TODO: sort merged on date
+            for (const YearMonth in Merged) {
+              const MonthlyTransactions: Transaction[] = Merged[YearMonth];
+              MonthlyTransactions.sort((a, b) => {
                 const dateA = new Date(a.date);
                 const dateB = new Date(b.date);
 
                 return dateB.getTime() - dateA.getTime();
               });
-              const TransactionString = JSON.stringify(Outgoing);
-              try {
-                await updateDoc(docSnap.ref, {
-                  [Month]: TransactionString,
-                });
-              } catch (error) {
-                console.log(error);
-              }
             }
-          }
-          //call categorize function
-          try {
-            const functions = getFunctions();
-            const categoriseExpenses = httpsCallable(
-              functions,
-              'categoriseExpenses'
-            );
-            let res = await categoriseExpenses({ year: Year });
-            console.log(res);
-          } catch (error) {
-            alert('function error');
-          }
-        } else {
-          //documents do not exist for this year can safely add to merged
-          for (const YearMonth of YearMonths) {
-            Merged[YearMonth] = YearMonthLinesRecord[YearMonth];
-          }
-          // TODO: sort merged on date
-          for (const YearMonth in Merged) {
-            const MonthlyTransactions: Transaction[] = Merged[YearMonth];
-            MonthlyTransactions.sort((a, b) => {
-              const dateA = new Date(a.date);
-              const dateB = new Date(b.date);
-
-              return dateB.getTime() - dateA.getTime();
-            });
-          }
-          //upload merged!document does not exist must first set then update
-          let first = true;
-          let docRef: DocumentReference<DocumentData, DocumentData> | null =
-            null;
-          for (const YearMonth in Merged) {
-            let [year, month] = YearMonth.split('/');
-            const TransactionString = JSON.stringify(Merged[YearMonth]);
-            const TransactionMonthString = getMonthName(month);
-            if (first) {
-              first = false;
-              //add to db
-              docRef = await addDoc(
-                collection(db, `transaction_data_${year}`),
-                {
-                  uid: user.uid,
-                  account_number: accountNumber,
-                  [TransactionMonthString]: TransactionString,
-                }
-              );
-            } else {
-              if (docRef != null) {
-                try {
-                  await updateDoc(docRef, {
+            //upload merged!document does not exist must first set then update
+            let first = true;
+            let docRef: DocumentReference<DocumentData, DocumentData> | null =
+              null;
+            for (const YearMonth in Merged) {
+              let [year, month] = YearMonth.split('/');
+              const TransactionString = JSON.stringify(Merged[YearMonth]);
+              const TransactionMonthString = getMonthName(month);
+              if (first) {
+                first = false;
+                //add to db
+                docRef = await addDoc(
+                  collection(db, `transaction_data_${year}`),
+                  {
+                    uid: user.uid,
+                    account_number: accountNumber,
                     [TransactionMonthString]: TransactionString,
-                  });
-                } catch (error) {
-                  console.log(error);
+                  }
+                );
+              } else {
+                if (docRef != null) {
+                  try {
+                    await updateDoc(docRef, {
+                      [TransactionMonthString]: TransactionString,
+                    });
+                  } catch (error) {
+                    console.log(error);
+                  }
                 }
               }
             }
-          }
-          // call categorize function
-          try {
-            const functions = getFunctions();
-            const categoriseExpenses = httpsCallable(
-              functions,
-              'categoriseExpenses'
-            );
-            let res = await categoriseExpenses({ year: Year });
-            console.log(res);
-          } catch (error) {
-            alert('function error');
+            // call categorize function
+            try {
+              const functions = getFunctions();
+              const categoriseExpenses = httpsCallable(
+                functions,
+                'categoriseExpenses'
+              );
+              let res = await categoriseExpenses({ year: Year });
+              console.log(res);
+            } catch (error) {
+              alert('function error');
+            }
           }
         }
+        SetUploadDate(accountNumber);
       }
-      SetUploadDate(accountNumber);
     }
 
     async function SetUploadDate(accountNo: string) {
-      if (accountNo.length == 0) {
-        return;
-      }
-      const getCurrentDateString = () => {
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}/${month}/${day}`;
-      };
+      if (user && user.uid) {
+        if (accountNo.length == 0) {
+          return;
+        }
+        const getCurrentDateString = () => {
+          const date = new Date();
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          return `${year}/${month}/${day}`;
+        };
 
-      const q = query(
-        collection(db, 'upload_dates'),
-        where('uid', '==', user.uid),
-        where('account_number', '==', accountNo)
-      );
+        const q = query(
+          collection(db, 'upload_dates'),
+          where('uid', '==', user.uid),
+          where('account_number', '==', accountNo)
+        );
 
-      let currentDate = getCurrentDateString();
+        let currentDate = getCurrentDateString();
 
-      const querySnapshot = await getDocs(q);
-      if (!querySnapshot.empty) {
-        let doc = querySnapshot.docs[0];
-        let docRef = doc.ref;
-        await updateDoc(docRef, {
-          date: currentDate,
-        });
-      } else {
-        await addDoc(collection(db, 'upload_dates'), {
-          uid: user.uid,
-          account_number: accountNo,
-          date: currentDate,
-        });
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          let doc = querySnapshot.docs[0];
+          let docRef = doc.ref;
+          await updateDoc(docRef, {
+            date: currentDate,
+          });
+        } else {
+          await addDoc(collection(db, 'upload_dates'), {
+            uid: user.uid,
+            account_number: accountNo,
+            date: currentDate,
+          });
+        }
       }
     }
 
@@ -564,52 +574,54 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
       new Promise((resolve) => setTimeout(resolve, ms));
 
     const handleAddAccountClick = async () => {
-      if (inputValue == '') {
-        setAliasError(true);
-        return;
-      }
-      //add account to database
-      //set spinner
-      setShowAccountInfoModal(false);
-      setLoader(true);
-      if (
-        accountType != '' &&
-        accountName != '' &&
-        accountNumber != '' &&
-        inputValue != '' &&
-        csvFile != null
-      ) {
-        let exists = await AccountAlreadyTracked(user.uid, accountNumber);
-        if (exists) {
-          await delay(1000);
-          setLoader(false);
-          setShowAccountAlreadyTracked(true);
-          setTimeout(() => {
-            setShowAccountAlreadyTracked(false);
-          }, 1500);
+      if (user && user.uid) {
+        if (inputValue == '') {
+          setAliasError(true);
           return;
-        } else {
-          //add financial data to db
-          await UploadTransactions(csvFile);
-          //add account after
-          const docRef = await addDoc(collection(db, 'accounts'), {
-            uid: user.uid,
-            name: accountName,
-            account_number: accountNumber,
-            type: accountType,
-            alias: inputValue,
-          });
-          //TODO:success modal for upload success
-          await delay(1000);
-          setLoader(false);
-          setShowSuccessModal(true);
-          setTimeout(() => {
-            setShowSuccessModal(false);
-            router.push('/accounts');
-          }, 2000);
         }
+        //add account to database
+        //set spinner
+        setShowAccountInfoModal(false);
+        setLoader(true);
+        if (
+          accountType != '' &&
+          accountName != '' &&
+          accountNumber != '' &&
+          inputValue != '' &&
+          csvFile != null
+        ) {
+          let exists = await AccountAlreadyTracked(user.uid, accountNumber);
+          if (exists) {
+            await delay(1000);
+            setLoader(false);
+            setShowAccountAlreadyTracked(true);
+            setTimeout(() => {
+              setShowAccountAlreadyTracked(false);
+            }, 1500);
+            return;
+          } else {
+            //add financial data to db
+            await UploadTransactions(csvFile);
+            //add account after
+            const docRef = await addDoc(collection(db, 'accounts'), {
+              uid: user.uid,
+              name: accountName,
+              account_number: accountNumber,
+              type: accountType,
+              alias: inputValue,
+            });
+            //TODO:success modal for upload success
+            await delay(1000);
+            setLoader(false);
+            setShowSuccessModal(true);
+            setTimeout(() => {
+              setShowSuccessModal(false);
+              router.push('/accounts');
+            }, 2000);
+          }
+        }
+        //stop spinner
       }
-      //stop spinner
     };
 
     return (

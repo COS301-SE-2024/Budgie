@@ -1,3 +1,5 @@
+'use client';
+
 import { NewNavbar } from '@capstone-repo/shared/budgie-components';
 import styles from './page.module.css';
 
