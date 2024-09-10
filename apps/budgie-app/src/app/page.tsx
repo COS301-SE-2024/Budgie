@@ -8,7 +8,6 @@ import { UserContext } from '@capstone-repo/shared/budgie-components';
 
 export default function Index() {
   const user = useContext(UserContext);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -17,7 +16,5 @@ export default function Index() {
     }
   }, [user, router]);
 
-  // If user is null (not logged in), show the Landing component
-  // If user is undefined (still loading), show nothing or a loading indicator
   return user === null ? <Landing /> : user ? null : <div>Loading...</div>;
 }
