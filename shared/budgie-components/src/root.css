@@ -1,3 +1,5 @@
+@import url(https://db.onlinewebfonts.com/c/076abc8ba1bb38a0713dec3b63b880e4?family=Trip+Sans);
+
 * {
   font-family: 'Trip Sans', sans-serif;
 }
@@ -159,6 +161,14 @@ body {
   --primary-1: #00ba7c;
   --primary-2: #b3ffe6;
   --complementary: #f91880;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=block');
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  cursor: pointer;
 }
 
 .mainPage {
