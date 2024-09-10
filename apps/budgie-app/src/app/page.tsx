@@ -14,10 +14,10 @@ export default function Index() {
   useEffect(() => {
     if (user) {
       router.push('/overview');
-    } else {
-      setLoading(false);
     }
-  }, [user]);
+  }, [user, router]);
 
-  return <>{!loading && <Landing></Landing>}</>;
+  // If user is null (not logged in), show the Landing component
+  // If user is undefined (still loading), show nothing or a loading indicator
+  return user === null ? <Landing /> : user ? null : <div>Loading...</div>;
 }
