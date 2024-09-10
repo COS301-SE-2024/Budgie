@@ -1,21 +1,12 @@
 'use client';
-
 import React, { useEffect, useState, useContext } from 'react';
+import ComparisonsPage from './ComparisonsPage';
+import InsightsPage from './InsightsPage';
 import styles from './PlanningPage.module.css';
-import {
-  collection,
-  getDocs,
-  updateDoc,
-  query,
-  where,
-  doc,
-  getDoc,
-} from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { useThemeSettings } from '../../useThemes';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
-import AddGoalPopup from '../add-goal-popup/AddGoalPopup';
-import EditGoalPopup from '../edit-goal-popup/EditGoalPopup';
 import GoalsPage from '../goals-page/GoalsPage';
 import UpdateGoalPopup, {
   UpdateGoalProgressPopup,
@@ -378,6 +369,7 @@ export function PlanningPage(props: PlanningPageProps) {
     target_date?: string;
     spending_limit?: number;
   }
+
   useThemeSettings();
 
   useEffect(() => {
@@ -395,20 +387,18 @@ export function PlanningPage(props: PlanningPageProps) {
         });
         setGoals(goalsList);
       } catch (error) {
-        console.error('Error getting bank statement document:', error);
+        console.error('Error getting goals document:', error);
       }
     };
     fetchGoals();
-  }, []);
+  }, [user.uid]);
 
   return (
     <div>
       <div className={styles.topBar}>
         <div>
           <button
-            className={`${styles.button} ${
-              viewMode === 'goals' ? styles.activeButton : ''
-            }`}
+            className={`${styles.button} ${viewMode === 'goals' ? styles.activeButton : ''}`}
             onClick={() => setViewMode('goals')}
           >
             Goals
@@ -425,9 +415,7 @@ export function PlanningPage(props: PlanningPageProps) {
           </button>
 
           <button
-            className={`${styles.button} ${
-              viewMode === 'upcoming' ? styles.activeButton : ''
-            }`}
+            className={`${styles.button} ${viewMode === 'upcoming' ? styles.activeButton : ''}`}
             onClick={() => setViewMode('upcoming')}
             style={{ marginLeft: '5rem' }}
           >
@@ -445,9 +433,11 @@ export function PlanningPage(props: PlanningPageProps) {
             <ComparisonPage />
           ) : (
             <div className={styles.underConstructionScreen}>
+            <div className={styles.underConstructionScreen}>
               <div className={styles.underConstructionText}>
                 This page is under construction.
               </div>
+            </div>
             </div>
           )}
         </div>
