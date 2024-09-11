@@ -15,8 +15,7 @@ import {
 } from './services';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons'; // Import the specific user icon
-import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, CartesianGrid, Cell, Label, Legend } from 'recharts';
-
+import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, CartesianGrid, Cell, Label, Legend, ResponsiveContainer, BarChart} from 'recharts';
 
 export interface ComparisonPage {}
 
@@ -83,16 +82,32 @@ export function ComparisonPage(props: ComparisonPage) {
     const handleCloseForm = () => setShowForm(false);
 
     const data = [
-        { category: 'Groceries', amount: averageCategory[0], lineValue: yourCategory[0], color: '#ff6f61' },
-        { category: 'Utilities', amount: averageCategory[1], lineValue: yourCategory[1], color: '#ffcc00' },
-        { category: 'Entertainment', amount: averageCategory[2], lineValue: yourCategory[2], color: '#00bfae' },
-        { category: 'Transport', amount: averageCategory[3], lineValue: yourCategory[3], color: '#e74c3c' },
-        { category: 'Insurance', amount: averageCategory[4], lineValue: yourCategory[4], color: '#e67e22' },
-        { category: 'Medical Aid', amount: averageCategory[5], lineValue: yourCategory[5], color: '#2ecc71' },
-        { category: 'Eating Out', amount: averageCategory[6], lineValue: yourCategory[6], color: '#3498db' },
-        { category: 'Shopping', amount: averageCategory[7], lineValue: yourCategory[7], color: '#8e44ad' },
-        { category: 'Other', amount: averageCategory[8], lineValue: yourCategory[8], color: '#9b59b6' }
+        { category: 'Groceries', average: averageCategory[0], you: yourCategory[0], color: '#ff6f61' },
+        { category: 'Utilities', average: averageCategory[1], you: yourCategory[1], color: '#ffcc00' },
+        { category: 'Entertainment', average: averageCategory[2], you: yourCategory[2], color: '#00bfae' },
+        { category: 'Transport', average: averageCategory[3], you: yourCategory[3], color: '#e74c3c' },
+        { category: 'Insurance', average: averageCategory[4], you: yourCategory[4], color: '#e67e22' },
+        { category: 'Medical Aid', average: averageCategory[5], you: yourCategory[5], color: '#2ecc71' },
+        { category: 'Eating Out', average: averageCategory[6], you: yourCategory[6], color: '#3498db' },
+        { category: 'Shopping', average: averageCategory[7], you: yourCategory[7], color: '#8e44ad' },
+        { category: 'Other', average: averageCategory[8], you: yourCategory[8], color: '#9b59b6' }
     ];
+
+    const positionData = [
+        { level: "You", income: income },
+        { level: "Minimum", income: positionValues[0] },
+        { level: "Median", income: positionValues[1] },
+        { level: "Maximum", income: positionValues[2] },
+    ];
+    const sortedPositionData = positionData.sort((a, b) => a.income - b.income);
+
+    const industryData = [
+        { level: "You", income: income },
+        { level: "Minimum", income: industryValues[0] },
+        { level: "Median", income: industryValues[1] },
+        { level: "Maximum", income: industryValues[2] },
+          ];
+    const sortedIndustryData = industryData.sort((a, b) => a.income - b.income);
 
 
     const getData = async () => {
@@ -158,36 +173,32 @@ export function ComparisonPage(props: ComparisonPage) {
 
 
     const handleSubmit = async (e: React.FormEvent) => {
-        // e.preventDefault();
+        setShowForm(false);
+        e.preventDefault();
 
-        // // Set job position and industry and age 
-        // setJobPosition(formJobPosition);
-        // setIndustry(formIndustry);
-        // let age = calculateAge(formBirthDate)
-        // setAge(age.toString());
-        // let incomeByAge = await getIncomeByAge(age);
-        // setAgeIncome(incomeByAge); 
+        // Set age 
+        let age = calculateAge(formBirthDate)
+        setAge(age.toString());
+        let incomeByAge = await getIncomeByAge(age);
+        setAgeIncome(incomeByAge); 
         
-        // // Fetch data for job position and industry
-        // let position = await getPosition(formJobPosition);
-        // setPositionValues(position);
-        // let JobIndustry = await getIndustry(formIndustry);
-        // setIndustryValues(JobIndustry);
+        // Fetch data for job position and industry
+        let position = await getPosition(jobPosition);
+        setPositionValues(position);
+        let JobIndustry = await getIndustry(industry);
+        setIndustryValues(JobIndustry);
 
-        // //set user info on database
-        // let user = await getUser();
-        // if(user){
-        //     const userData = {
-        //         birthDate: formBirthDate,  
-        //         jobPosition: formJobPosition,
-        //         industry: formIndustry,
-        //         uid : user
-        //     };
-        //     addUserInfo(userData)
-        // }
-        alert(formBirthDate)
-        alert(jobPosition)
-        alert(industry)
+        //set user info on database
+        let user = await getUser();
+        if(user){
+            const userData = {
+                birthDate: formBirthDate,  
+                jobPosition: jobPosition,
+                industry: industry,
+                uid : user
+            };
+            addUserInfo(userData)
+        }
     };
 
     return (
@@ -327,20 +338,20 @@ export function ComparisonPage(props: ComparisonPage) {
                         <Label value="Category" offset={-29} position="insideBottom" />
                     </XAxis>
                     <YAxis>
-                        <Label value="Amount" offset={-29} angle={-90} position="insideLeft" />
+                        <Label value="percent of income" offset={-29} angle={-90} position="insideLeft" />
                     </YAxis>
                     <Tooltip />
                     {/* Remove the default Legend by providing a custom content */}
                     <Legend content={() => null} />
 
-                    <Bar dataKey="amount" fill="#8884d8">
+                    <Bar dataKey="average" fill="#8884d8">
                         {data.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                     </Bar>
                     <Line
                         type="monotone"
-                        dataKey="lineValue"
+                        dataKey="you"
                         stroke="#0000ff"
                         strokeWidth={2}
                         dot={true}
@@ -356,22 +367,25 @@ export function ComparisonPage(props: ComparisonPage) {
                     </div>
                     <div className={styles.comparisonContainer}>
                         {/* Title at the top and centered */}
-                        <h3 className={styles.centeredTitle}>CEO</h3>
-
-                        {/* Status Bar/Bar Graph Comparison */}
-                        <div className={styles.statusBar}>
-                            <div className={styles.userBar}></div>
-                            <div className={styles.divider}></div>
-                            <div className={styles.marketBar}></div>
-                        </div>
-
-                        {/* Labels for the bars */}
-                        <div className={styles.labels}>
-                            <span className={styles.userLabel}>You</span>
-                            <span className={styles.amount}>R50 000</span>
-                            <span className={styles.marketLabel}>Market Avg</span>
-                            <span className={styles.amount}>R75 642</span>
-                        </div>
+                        <h3 className={styles.centeredTitle}>{jobPosition}</h3>
+                             {/* Recharts BarChart */}
+                             <ResponsiveContainer width="101%" height={300}>
+                                <BarChart data={sortedPositionData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="level" />
+                                    <YAxis />
+                                    <Tooltip 
+                                     formatter={(value) => `Income: ${formatCurrency(income)}`}/>
+                                    <Bar dataKey="income" fill="black">
+                                    {positionData.map((entry, index) => (
+                                        <Cell
+                                        key={`cell-${index}`}
+                                        fill={entry.level === "You" ? "#003366" : "#73c786"} // Highlight the "You" bar
+                                        />
+                                    ))}
+                                    </Bar>
+                                </BarChart>
+                                </ResponsiveContainer>
                     </div>
                 </div>
 
@@ -382,22 +396,24 @@ export function ComparisonPage(props: ComparisonPage) {
                     </div>
                     <div className={styles.comparisonContainer}>
                         {/* Title at the top and centered */}
-                        <h3 className={styles.centeredTitle}>5-6 Years</h3>
+                        <h3 className={styles.centeredTitle}>{industry}</h3>
 
-                        {/* Status Bar/Bar Graph Comparison */}
-                        <div className={styles.statusBar}>
-                            <div className={styles.userBar}></div>
-                            <div className={styles.divider}></div>
-                            <div className={styles.marketBar}></div>
-                        </div>
-
-                        {/* Labels for the bars */}
-                        <div className={styles.labels}>
-                            <span className={styles.userLabel}>You</span>
-                            <span className={styles.amount}>R70 000</span>
-                            <span className={styles.marketLabel}>Market Avg</span>
-                            <span className={styles.amount}>R65 000</span>
-                        </div>
+                        <ResponsiveContainer width="101%" height={300}>
+                                <BarChart data={sortedIndustryData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="level" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Bar dataKey="income" fill="black">
+                                    {industryData.map((entry, index) => (
+                                        <Cell
+                                        key={`cell-${index}`}
+                                        fill={entry.level === "You" ? "#003366" : "#73c786"} // Highlight the "You" bar
+                                        />
+                                    ))}
+                                    </Bar>
+                                </BarChart>
+                                </ResponsiveContainer>
                     </div>
                 </div>
             </div>
