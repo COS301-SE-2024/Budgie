@@ -62,7 +62,7 @@ export function ComparisonPage(props: ComparisonPage) {
     }
 
     const [isAccount, setIsAccount] = useState(false);
-    const [isUserInfo, srtIsUserInfo] = useState(false);
+    const [isUserInfo, setIsUserInfo] = useState(false);
     const [income, setIncome] = useState(0);
     const [positionValues, setPositionValues] = useState<(number)[]>([]);
     const [industryValues, setIndustryValues] = useState<(number)[]>([]);
@@ -118,61 +118,66 @@ export function ComparisonPage(props: ComparisonPage) {
         
         if (account.length !== 0) {
             setIsAccount(true);
+            
+            if(userInfo!==null){
+                alert(userInfo)
+                setIsUserInfo(true);
+
+                
+                // Fetch transactions in parallel for all accounts
+                const transactionPromises = account.map((acc: Account) => getTransactions(acc.account_number));
+                const transactions = await Promise.all(transactionPromises);
+                
+                // Calculate monthly income and update categories in parallel
+                const resultPromises = transactions.map(async (transaction) => {
+                    const [balance, category] = await Promise.all([
+                        getMonthlyIncome(transaction), // Get monthly income
+                        getExpensesByCategory(transaction) // Get category expenses
+                    ]);
+                
+                    return { balance, category };
+                });
+                
+                // Wait for all the results to resolve
+                const results = await Promise.all(resultPromises);
+                
+                // Calculate totals and updated categories
+                let total = 0;
+                let updatedCategory = Array(9).fill(0); // Initial category array
+                
+                results.forEach(({ balance, category }) => {
+                    total += balance;
+                
+                    // Update categories in a non-blocking way
+                    category.forEach((cat: number, i: number) => {
+                        updatedCategory[i] += cat;
+                    });
+                });
+                
+                // Normalize the updated categories
+                updatedCategory = updatedCategory.map(cat => cat !== 0 ? (cat / total) * 100 : 0);
+
+                // Fetch position, industry, and ageIncome in parallel
+                const age = calculateAge(userInfo.birthDate);
+                const [incomeByAge, position, industry] = await Promise.all([
+                    getIncomeByAge(age),
+                    getPosition(userInfo.jobPosition),
+                    getIndustry(userInfo.industry)
+                ]);
+
+                // Batch state updates to minimize re-renders
+                setAgeIncome(incomeByAge);
+                setYourCategory(updatedCategory);
+                setIncome(total);
+                setAge(age.toString());
+                setFormBirthDate(userInfo.birthDate);
+                setJobPosition(userInfo.jobPosition);
+                setIndustry(userInfo.industry);
+                setAverageCategory(averageCategory);
+                setPositionValues(position);
+                setIndustryValues(industry);
+            }
         }
-
-        
-        // Fetch transactions in parallel for all accounts
-        const transactionPromises = account.map((acc: Account) => getTransactions(acc.account_number));
-        const transactions = await Promise.all(transactionPromises);
-        
-        // Calculate monthly income and update categories in parallel
-        const resultPromises = transactions.map(async (transaction) => {
-            const [balance, category] = await Promise.all([
-                getMonthlyIncome(transaction), // Get monthly income
-                getExpensesByCategory(transaction) // Get category expenses
-            ]);
-        
-            return { balance, category };
-        });
-        
-        // Wait for all the results to resolve
-        const results = await Promise.all(resultPromises);
-        
-        // Calculate totals and updated categories
-        let total = 0;
-        let updatedCategory = Array(9).fill(0); // Initial category array
-        
-        results.forEach(({ balance, category }) => {
-            total += balance;
-        
-            // Update categories in a non-blocking way
-            category.forEach((cat: number, i: number) => {
-                updatedCategory[i] += cat;
-            });
-        });
-        
-        // Normalize the updated categories
-        updatedCategory = updatedCategory.map(cat => cat !== 0 ? (cat / total) * 100 : 0);
-
-        // Fetch position, industry, and ageIncome in parallel
-        const age = calculateAge(userInfo.birthDate);
-        const [incomeByAge, position, industry] = await Promise.all([
-            getIncomeByAge(age),
-            getPosition(userInfo.jobPosition),
-            getIndustry(userInfo.industry)
-        ]);
-
-        // Batch state updates to minimize re-renders
-        setAgeIncome(incomeByAge);
-        setYourCategory(updatedCategory);
-        setIncome(total);
-        setAge(age.toString());
-        setFormBirthDate(userInfo.birthDate);
-        setJobPosition(userInfo.jobPosition);
-        setIndustry(userInfo.industry);
-        setAverageCategory(averageCategory);
-        setPositionValues(position);
-        setIndustryValues(industry);
     };  
 
     useEffect(() => {
@@ -315,126 +320,120 @@ export function ComparisonPage(props: ComparisonPage) {
                 </div>
             )}
 
-            {/* Income Grid */}
-            <div className={styles.incomeGrid}>
-                {/* Average Income Section */}
-                <div className={styles.leftHalf}>
-                    <h3>Average monthly income of a {age} Year Old</h3>
-                    <div className={styles.triangle}>{formatCurrency(ageIncome)}</div>
-                </div>
+                {isUserInfo ? (
+                <>
+                    {/* Income Grid */}
+                    <div className={styles.incomeGrid}>
+                        {/* Average Income Section */}
+                        <div className={styles.leftHalf}>
+                            <h3>Average monthly income of a {age} Year Old</h3>
+                            <div className={styles.triangle}>{formatCurrency(ageIncome)}</div>
+                        </div>
 
-                {/* Your Income Section */}
-                <div className={styles.rightHalf}>
-                    <h3>Your monthly income</h3>
-                    <div className={styles.triangle}>{formatCurrency(income)}</div>
-                </div>
-            </div>
-
-            {/* Comparison Bar Chart with Line Chart */}
-            <div className={styles.gridItem}>
-                <div className={styles.gridTitleContainer}>
-                    <h3 className={styles.gridTitle}>
-                        AVERAGE SPENDING BY CATEGORY COMPARED TO YOU
-                    </h3>
-                </div>
-                <ComposedChart
-                    width={1600} // Increased width for better spacing
-                    height={325}
-                    data={data}
-                    margin={{ top: 20, right: 70, left: 80, bottom: 80 }} // Adjust margins
-                >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="category">
-                        <Label value="Category" offset={-29} position="insideBottom" />
-                    </XAxis>
-                    <YAxis>
-                        <Label value="percent of income" offset={-29} angle={-90} position="insideLeft" />
-                    </YAxis>
-                    <Tooltip />
-                    {/* Remove the default Legend by providing a custom content */}
-                    <Legend content={() => null} />
-
-                    <Bar dataKey="average" fill="#8884d8">
-                        {data.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                    </Bar>
-                    <Line
-                        type="monotone"
-                        dataKey="you"
-                        stroke="#0000ff"
-                        strokeWidth={2}
-                        dot={true}
-                    />
-                </ComposedChart>
-            </div>
-
-            <div className={styles.gridContainer}>
-                {/* Position Grid */}
-                <div className={styles.gridItem}>
-                    <div className={styles.gridTitleContainer}>
-                        <h3 className={styles.gridTitle}>Annual Salary according to Position</h3>
+                        {/* Your Income Section */}
+                        <div className={styles.rightHalf}>
+                            <h3>Your monthly income</h3>
+                            <div className={styles.triangle}>{formatCurrency(income)}</div>
+                        </div>
                     </div>
-                    <div className={styles.comparisonContainer}>
-                        {/* Title at the top and centered */}
-                        <h3 className={styles.centeredTitle}>{jobPosition}</h3>
-                             {/* Recharts BarChart */}
-                             <ResponsiveContainer width="101%" height={300}>
+
+                    {/* Comparison Bar Chart with Line Chart */}
+                    <div className={styles.gridItem}>
+                        <div className={styles.gridTitleContainer}>
+                            <h3 className={styles.gridTitle}>
+                                AVERAGE SPENDING BY CATEGORY COMPARED TO YOU
+                            </h3>
+                        </div>
+                        <ComposedChart
+                            width={1600} // Increased width for better spacing
+                            height={325}
+                            data={data}
+                            margin={{ top: 20, right: 70, left: 80, bottom: 80 }} // Adjust margins
+                        >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="category">
+                                <Label value="Category" offset={-29} position="insideBottom" />
+                            </XAxis>
+                            <YAxis>
+                                <Label value="percent of income" offset={-29} angle={-90} position="insideLeft" />
+                            </YAxis>
+                            <Tooltip />
+                            <Legend content={() => null} />
+                            <Bar dataKey="average" fill="#8884d8">
+                                {data.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                            </Bar>
+                            <Line
+                                type="monotone"
+                                dataKey="you"
+                                stroke="#0000ff"
+                                strokeWidth={2}
+                                dot={true}
+                            />
+                        </ComposedChart>
+                    </div>
+
+                    {/* Position and Industry Grids */}
+                    {/* Position Grid */}
+                    <div className={styles.gridItem}>
+                        <div className={styles.gridTitleContainer}>
+                            <h3 className={styles.gridTitle}>Annual Salary according to Position</h3>
+                        </div>
+                        <div className={styles.comparisonContainer}>
+                            <h3 className={styles.centeredTitle}>{jobPosition}</h3>
+                            <ResponsiveContainer width="101%" height={300}>
                                 <BarChart data={sortedPositionData}>
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="level" />
                                     <YAxis />
                                     <Tooltip />
                                     <Bar dataKey="income" fill="black">
-                                    {positionData.map((entry, index) => (
-                                        <Cell
-                                        key={`cell-${index}`}
-                                        fill={entry.level === "You" ? "#003366" : "#73c786"} // Highlight the "You" bar
-                                        />
-                                    ))}
+                                        {positionData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.level === "You" ? "#003366" : "#73c786"} />
+                                        ))}
                                     </Bar>
                                 </BarChart>
-                                </ResponsiveContainer>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
-                </div>
 
-                {/* Industry Grid */}
-                <div className={styles.gridItem}>
-                    <div className={styles.gridTitleContainer}>
-                        <h3 className={styles.gridTitle}>Annual Salary According to Industry</h3>
-                    </div>
-                    <div className={styles.comparisonContainer}>
-                        {/* Title at the top and centered */}
-                        <h3 className={styles.centeredTitle}>{industry}</h3>
-
-                        <ResponsiveContainer width="101%" height={300}>
+                    {/* Industry Grid */}
+                    <div className={styles.gridItem}>
+                        <div className={styles.gridTitleContainer}>
+                            <h3 className={styles.gridTitle}>Annual Salary According to Industry</h3>
+                        </div>
+                        <div className={styles.comparisonContainer}>
+                            <h3 className={styles.centeredTitle}>{industry}</h3>
+                            <ResponsiveContainer width="101%" height={300}>
                                 <BarChart data={sortedIndustryData}>
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="level" />
                                     <YAxis />
                                     <Tooltip />
                                     <Bar dataKey="income" fill="black">
-                                    {industryData.map((entry, index) => (
-                                        <Cell
-                                        key={`cell-${index}`}
-                                        fill={entry.level === "You" ? "#003366" : "#73c786"} // Highlight the "You" bar
-                                        />
-                                    ))}
+                                        {industryData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.level === "You" ? "#003366" : "#73c786"} />
+                                        ))}
                                     </Bar>
                                 </BarChart>
-                                </ResponsiveContainer>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
-                </div>
-            </div>
-            </>
-            ):(        
-                <div className={styles.noAccountsMessage}>
-                <p>You have no accounts. <br />
-                Head to the accounts section to create new accounts.</p>
+                </>
+            ) : (
+                <div className={styles.fillUserInfoMessage}>
+                    <p>Please fill in your user information to see comparisons.</p>
                 </div>
             )}
-        </div>
-
+            </>
+        ) : (
+            <div className={styles.noAccountsMessage}>
+                <p>You have no accounts. <br />
+                Head to the accounts section to create new accounts.</p>
+            </div>
+        )}
+    </div>
     );
 
 }
