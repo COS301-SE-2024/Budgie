@@ -2,7 +2,7 @@
 import styles from './page.module.css';
 import React, { useContext, useEffect, useState } from 'react';
 import {
-  OverviewPage,
+  OverviewPageRevised,
   UserContext,
 } from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';
@@ -21,5 +21,5 @@ export default function overview() {
     }
   }, [user]);
 
-  return <>{!loading && <OverviewPage></OverviewPage>}</>;
+  return <>{!loading && <OverviewPageRevised></OverviewPageRevised>}</>;
 }
