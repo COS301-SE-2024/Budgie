@@ -260,4 +260,16 @@
     background-color: #6c757d;
     color: white;
 }
+
+.noAccountsMessage {
+    color: rgb(31, 30, 30); /* Change text color */
+    font-size: 20px;
+    height: 70vh; /* Full viewport height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    text-align: center;         
+  }
+  
   

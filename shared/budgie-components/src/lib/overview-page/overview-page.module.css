@@ -183,7 +183,7 @@
 }
 
 .bodyText {
-  color: rgb(135, 135, 135); /* Change text color */
+  color: rgb(37, 37, 37); /* Change text color */
   font-size: 20px;
   height: 70vh; /* Full viewport height */
   display: flex;
