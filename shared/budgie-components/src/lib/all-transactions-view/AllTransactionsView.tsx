@@ -71,17 +71,19 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   ];
   useEffect(() => {
     const getYearlyTransactions = async () => {
-      try {
-        const q = query(
-          collection(db, `transaction_data_${currentYear}`),
-          where('uid', '==', user.uid),
-          where('account_number', '==', props.account)
-        );
-        const querySnapshot = await getDocs(q);
-        const transactionList = querySnapshot.docs.map((doc) => doc.data());
-        setData(transactionList[0]);
-      } catch (error) {
-        console.error('Error getting bank statement document:', error);
+      if (user && user.uid) {
+        try {
+          const q = query(
+            collection(db, `transaction_data_${currentYear}`),
+            where('uid', '==', user.uid),
+            where('account_number', '==', props.account)
+          );
+          const querySnapshot = await getDocs(q);
+          const transactionList = querySnapshot.docs.map((doc) => doc.data());
+          setData(transactionList[0]);
+        } catch (error) {
+          console.error('Error getting bank statement document:', error);
+        }
       }
     };
     const auth = getAuth();
@@ -190,38 +192,44 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     event: React.ChangeEvent<HTMLSelectElement>,
     index: number
   ) => {
-    const selectedCategory = event.target.value;
-    const transactionMonth = parseInt(event.target.id.substring(5, 7), 10) - 1;
+    if (user && user.uid) {
+      const selectedCategory = event.target.value;
+      const transactionMonth =
+        parseInt(event.target.id.substring(5, 7), 10) - 1;
 
-    if (selectedCategory === 'Add category') {
-      alert('under construction');
-    } else {
-      const updatedTransactions = transactions.map((transaction, i) =>
-        i === index
-          ? { ...transaction, category: selectedCategory }
-          : transaction
-      );
+      if (selectedCategory === 'Add category') {
+        alert('under construction');
+      } else {
+        const updatedTransactions = transactions.map((transaction, i) =>
+          i === index
+            ? { ...transaction, category: selectedCategory }
+            : transaction
+        );
 
-      const filteredTransactions = updatedTransactions.filter((transaction) => {
-        const transactionDate = new Date(transaction.date);
-        return transactionDate.getMonth() === transactionMonth;
-      });
+        const filteredTransactions = updatedTransactions.filter(
+          (transaction) => {
+            const transactionDate = new Date(transaction.date);
+            return transactionDate.getMonth() === transactionMonth;
+          }
+        );
 
-      const q = query(
-        collection(db, `transaction_data_${currentYear}`),
-        where('uid', '==', user.uid),
-        where('account_number', '==', props.account)
-      );
-      const querySnapshot = await getDocs(q);
+        const q = query(
+          collection(db, `transaction_data_${currentYear}`),
+          where('uid', '==', user.uid),
+          where('account_number', '==', props.account)
+        );
+        const querySnapshot = await getDocs(q);
 
-      if (!querySnapshot.empty) {
-        const docRef = querySnapshot.docs[0].ref;
-        await updateDoc(docRef, {
-          [monthNames[transactionMonth]]: JSON.stringify(filteredTransactions),
-        });
+        if (!querySnapshot.empty) {
+          const docRef = querySnapshot.docs[0].ref;
+          await updateDoc(docRef, {
+            [monthNames[transactionMonth]]:
+              JSON.stringify(filteredTransactions),
+          });
+        }
+
+        setTransactions(updatedTransactions);
       }
-
-      setTransactions(updatedTransactions);
     }
   };
 
@@ -277,27 +285,29 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   };
 
   const fetchAvailableYears = async () => {
-    try {
-      const currentYear = new Date().getFullYear();
-      const years: number[] = [];
+    if (user && user.uid) {
+      try {
+        const currentYear = new Date().getFullYear();
+        const years: number[] = [];
 
-      // Adjust this range based on your needs
-      for (let year = 2000; year <= currentYear; year++) {
-        const q = query(
-          collection(db, `transaction_data_${year}`),
-          where('uid', '==', user.uid),
-          where('account_number', '==', props.account)
-        );
-        const querySnapshot = await getDocs(q);
+        // Adjust this range based on your needs
+        for (let year = 2000; year <= currentYear; year++) {
+          const q = query(
+            collection(db, `transaction_data_${year}`),
+            where('uid', '==', user.uid),
+            where('account_number', '==', props.account)
+          );
+          const querySnapshot = await getDocs(q);
 
-        if (!querySnapshot.empty) {
-          years.push(year);
+          if (!querySnapshot.empty) {
+            years.push(year);
+          }
         }
-      }
 
-      setYearsWithData(years);
-    } catch (error) {
-      console.error('Error fetching years with data:', error);
+        setYearsWithData(years);
+      } catch (error) {
+        console.error('Error fetching years with data:', error);
+      }
     }
   };
 
@@ -385,9 +395,10 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
                       {formatTransactionValue(transaction.amount)}
                     </div>
                     <select
-                        className={`${styles.categoryDropdown} ${getCategoryStyle(transaction.category)}`}
-                        data-testid="category-dropdown-income"
-                      
+                      className={`${styles.categoryDropdown} ${getCategoryStyle(
+                        transaction.category
+                      )}`}
+                      data-testid="category-dropdown-income"
                       onChange={(event) => handleChange(event, index)}
                       id={`${transaction.date}-${transaction.description}`}
                       value={transaction.category}

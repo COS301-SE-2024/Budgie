@@ -162,7 +162,9 @@ export function getSeparateYearMonthsAsTransactionObjects(
   return linesByYearMonth;
 }
 
-export function getUniqueYearMonths(DataLines: string[]): Record<string, string[]> {
+export function getUniqueYearMonths(
+  DataLines: string[]
+): Record<string, string[]> {
   const yearMonthsRecord: Record<string, Set<string>> = {};
 
   for (const line of DataLines) {
@@ -527,62 +529,66 @@ function InfoSection(props: InfoSectionProps) {
   }
 
   async function SetUploadDate(accountNo: string) {
-    if (accountNo.length == 0) {
-      return;
-    }
-    const getCurrentDateString = () => {
-      const date = new Date();
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}/${month}/${day}`;
-    };
+    if (user && user.uid) {
+      if (accountNo.length == 0) {
+        return;
+      }
+      const getCurrentDateString = () => {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}/${month}/${day}`;
+      };
 
-    const q = query(
-      collection(db, 'upload_dates'),
-      where('uid', '==', user.uid),
-      where('account_number', '==', accountNo)
-    );
+      const q = query(
+        collection(db, 'upload_dates'),
+        where('uid', '==', user.uid),
+        where('account_number', '==', accountNo)
+      );
 
-    let currentDate = getCurrentDateString();
+      let currentDate = getCurrentDateString();
 
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      let doc = querySnapshot.docs[0];
-      let docRef = doc.ref;
-      await updateDoc(docRef, {
-        date: currentDate,
-      });
-    } else {
-      await addDoc(collection(db, 'upload_dates'), {
-        uid: user.uid,
-        account_number: accountNo,
-        date: currentDate,
-      });
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        let doc = querySnapshot.docs[0];
+        let docRef = doc.ref;
+        await updateDoc(docRef, {
+          date: currentDate,
+        });
+      } else {
+        await addDoc(collection(db, 'upload_dates'), {
+          uid: user.uid,
+          account_number: accountNo,
+          date: currentDate,
+        });
+      }
     }
   }
 
   const handleTypeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    if (e.target.value == props.account.type) {
-      return;
-    }
+    if (user && user.uid) {
+      if (e.target.value == props.account.type) {
+        return;
+      }
 
-    const q = query(
-      collection(db, 'accounts'),
-      where('uid', '==', user.uid),
-      where('account_number', '==', props.account.number)
-    );
-    const querySnapshot = await getDocs(q);
-    const doc = querySnapshot.docs[0];
-    await updateDoc(doc.ref, {
-      type: e.target.value,
-    });
-    props.setAccount({
-      name: props.account.name,
-      alias: props.account.alias,
-      type: e.target.value,
-      number: props.account.number,
-    });
+      const q = query(
+        collection(db, 'accounts'),
+        where('uid', '==', user.uid),
+        where('account_number', '==', props.account.number)
+      );
+      const querySnapshot = await getDocs(q);
+      const doc = querySnapshot.docs[0];
+      await updateDoc(doc.ref, {
+        type: e.target.value,
+      });
+      props.setAccount({
+        name: props.account.name,
+        alias: props.account.alias,
+        type: e.target.value,
+        number: props.account.number,
+      });
+    }
   };
 
   const handleButtonClick = () => {
@@ -815,30 +821,32 @@ function EditAliasModal(props: EditAliasModalProps) {
   };
 
   const submitAlias = async () => {
-    if (inputValue == '') {
-      setAliasError(true);
-      return;
-    }
-    props.setShow(false);
-    props.setSpinner(true);
+    if (user && user.uid) {
+      if (inputValue == '') {
+        setAliasError(true);
+        return;
+      }
+      props.setShow(false);
+      props.setSpinner(true);
 
-    const q = query(
-      collection(db, 'accounts'),
-      where('uid', '==', user.uid),
-      where('account_number', '==', props.account.number)
-    );
-    const querySnapshot = await getDocs(q);
-    const doc = querySnapshot.docs[0];
-    await updateDoc(doc.ref, {
-      alias: inputValue,
-    });
-    props.setAccount({
-      name: props.account.name,
-      alias: inputValue,
-      type: props.account.type,
-      number: props.account.number,
-    });
-    props.setSpinner(false);
+      const q = query(
+        collection(db, 'accounts'),
+        where('uid', '==', user.uid),
+        where('account_number', '==', props.account.number)
+      );
+      const querySnapshot = await getDocs(q);
+      const doc = querySnapshot.docs[0];
+      await updateDoc(doc.ref, {
+        alias: inputValue,
+      });
+      props.setAccount({
+        name: props.account.name,
+        alias: inputValue,
+        type: props.account.type,
+        number: props.account.number,
+      });
+      props.setSpinner(false);
+    }
   };
 
   return (
@@ -885,19 +893,21 @@ function AreYouSure(props: AreYouSureProps) {
   };
 
   async function handleDeleteConfirm() {
-    props.setShow(false);
-    props.setSpinner(true);
-    const accRef = collection(db, 'accounts');
-    const q = query(
-      accRef,
-      where('uid', '==', user.uid),
-      where('account_number', '==', props.account.number)
-    );
-    const querySnapshot = await getDocs(q);
-    const doc = querySnapshot.docs[0].ref;
-    await deleteDoc(doc).then(() => {
-      router.push('/accounts');
-    });
+    if (user && user.uid) {
+      props.setShow(false);
+      props.setSpinner(true);
+      const accRef = collection(db, 'accounts');
+      const q = query(
+        accRef,
+        where('uid', '==', user.uid),
+        where('account_number', '==', props.account.number)
+      );
+      const querySnapshot = await getDocs(q);
+      const doc = querySnapshot.docs[0].ref;
+      await deleteDoc(doc).then(() => {
+        router.push('/accounts');
+      });
+    }
     // TODO delete finance info potentially not, to allow account persistence if re-tracked
   }
 
@@ -948,29 +958,31 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const getInfoData = async () => {
-        const accRef = collection(db, 'accounts');
-        const q = query(
-          accRef,
-          where('uid', '==', user.uid),
-          where('account_number', '==', props.number)
-        );
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) {
-          const doc = querySnapshot.docs[0];
-          const data = doc.data();
-          const account: AccountInfo = {
-            name: data.name,
-            alias: data.alias,
-            type: data.type,
-            number: data.account_number,
-          };
-          setAccount(account);
-        } else {
-          alert('problem fetching account');
-        }
-      };
-      getInfoData();
+      if (user && user.uid) {
+        const getInfoData = async () => {
+          const accRef = collection(db, 'accounts');
+          const q = query(
+            accRef,
+            where('uid', '==', user.uid),
+            where('account_number', '==', props.number)
+          );
+          const querySnapshot = await getDocs(q);
+          if (!querySnapshot.empty) {
+            const doc = querySnapshot.docs[0];
+            const data = doc.data();
+            const account: AccountInfo = {
+              name: data.name,
+              alias: data.alias,
+              type: data.type,
+              number: data.account_number,
+            };
+            setAccount(account);
+          } else {
+            alert('problem fetching account');
+          }
+        };
+        getInfoData();
+      }
     };
 
     fetchData();
