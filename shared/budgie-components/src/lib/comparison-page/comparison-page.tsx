@@ -16,6 +16,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons'; // Import the specific user icon
 import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, CartesianGrid, Cell, Label, Legend, ResponsiveContainer, BarChart} from 'recharts';
+import { Link } from 'react-router-dom';
 
 export interface ComparisonPage {}
 
@@ -120,7 +121,6 @@ export function ComparisonPage(props: ComparisonPage) {
             setIsAccount(true);
             
             if(userInfo!==null){
-                alert(userInfo)
                 setIsUserInfo(true);
 
                 
@@ -188,6 +188,7 @@ export function ComparisonPage(props: ComparisonPage) {
     const handleSubmit = async (e: React.FormEvent) => {
         setShowForm(false);
         e.preventDefault();
+    
 
         // Set age 
         let age = calculateAge(formBirthDate)
@@ -211,6 +212,9 @@ export function ComparisonPage(props: ComparisonPage) {
                 uid : user
             };
             addUserInfo(userData)
+        }
+        if(!isUserInfo){
+            getData();
         }
     };
 
@@ -354,12 +358,12 @@ export function ComparisonPage(props: ComparisonPage) {
                             <XAxis dataKey="category">
                                 <Label value="Category" offset={-29} position="insideBottom" />
                             </XAxis>
-                            <YAxis>
-                                <Label value="percent of income" offset={-29} angle={-90} position="insideLeft" />
+                            <YAxis tickFormatter={(tick) => `${tick}%`}>
+                                <Label value="percent of income" offset={-29} angle={-90} position="insideLeft" dy={50}/>
                             </YAxis>
-                            <Tooltip />
+                            <Tooltip formatter={(value) => `${value}%`}/>
                             <Legend content={() => null} />
-                            <Bar dataKey="average" fill="#8884d8">
+                            <Bar dataKey="average">
                                 {data.map((entry, index) => (
                                     <Cell key={`cell-${index}`} fill={entry.color} />
                                 ))}
@@ -373,21 +377,22 @@ export function ComparisonPage(props: ComparisonPage) {
                             />
                         </ComposedChart>
                     </div>
-
+                    
+                    <div className={styles.gridContainer}>
                     {/* Position and Industry Grids */}
                     {/* Position Grid */}
                     <div className={styles.gridItem}>
                         <div className={styles.gridTitleContainer}>
-                            <h3 className={styles.gridTitle}>Annual Salary according to Position</h3>
+                            <h3 className={styles.gridTitle}>Monthly income according to Position</h3>
                         </div>
                         <div className={styles.comparisonContainer}>
                             <h3 className={styles.centeredTitle}>{jobPosition}</h3>
                             <ResponsiveContainer width="101%" height={300}>
-                                <BarChart data={sortedPositionData}>
+                                <BarChart data={sortedPositionData} margin={{ top: 20, right: 20, left: 40, bottom: 20 }}>
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="level" />
-                                    <YAxis />
-                                    <Tooltip />
+                                    <YAxis tickFormatter={(tick) => `${formatCurrency(tick)}`} />
+                                    <Tooltip formatter={(value: number) => `${formatCurrency(value)}`}/>
                                     <Bar dataKey="income" fill="black">
                                         {positionData.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.level === "You" ? "#003366" : "#73c786"} />
@@ -401,16 +406,16 @@ export function ComparisonPage(props: ComparisonPage) {
                     {/* Industry Grid */}
                     <div className={styles.gridItem}>
                         <div className={styles.gridTitleContainer}>
-                            <h3 className={styles.gridTitle}>Annual Salary According to Industry</h3>
+                            <h3 className={styles.gridTitle}>Monthly income According to Industry</h3>
                         </div>
                         <div className={styles.comparisonContainer}>
                             <h3 className={styles.centeredTitle}>{industry}</h3>
                             <ResponsiveContainer width="101%" height={300}>
-                                <BarChart data={sortedIndustryData}>
+                                <BarChart data={sortedIndustryData} margin={{ top: 20, right: 20, left: 45, bottom: 20 }}>
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="level" />
-                                    <YAxis />
-                                    <Tooltip />
+                                    <YAxis tickFormatter={(tick) => `${formatCurrency(tick)}`}/>
+                                    <Tooltip formatter={(value: number) => `${formatCurrency(value)}`}/>
                                     <Bar dataKey="income" fill="black">
                                         {industryData.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.level === "You" ? "#003366" : "#73c786"} />
@@ -419,6 +424,7 @@ export function ComparisonPage(props: ComparisonPage) {
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
+                    </div>
                     </div>
                 </>
             ) : (
