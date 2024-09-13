@@ -636,8 +636,8 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                 ))}
               </select>
             </div>
-            <div className="h-1/2 mt-3 w-full flex items-center justify-center">
-              <div className="p-2 flex flex-col items-center justify-start mr-3 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl w-[50%] h-full">
+            <div className="h-1/2 mt-5 w-full flex items-center justify-center">
+              <div className="p-2 flex flex-col items-center justify-start mr-5 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl w-[50%] h-full">
                 <div className="bg-BudgieGrayLight w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
                   <span>Summary</span>
                 </div>
@@ -705,7 +705,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                 </div>
               </div>
             </div>
-            <div className=" p-2 w-full h-1/2 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl mt-3">
+            <div className=" p-2 mt-5 w-full h-1/2 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl">
               <div className="bg-BudgieGrayLight w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
                 <span>Income vs Expenses</span>
               </div>
@@ -721,8 +721,8 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                 ></AreaChart>
               </div>
             </div>
-            <div className="h-[40%] mt-3 w-full flex items-center justify-center">
-              <div className=" p-2 mr-3 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl w-1/3 h-full">
+            <div className="h-[40%] mt-5 w-full flex items-center justify-center">
+              <div className=" p-2 mr-5 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl w-1/3 h-full">
                 <div className="bg-BudgieGrayLight w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
                   <span>Latest Transaction</span>
                 </div>
