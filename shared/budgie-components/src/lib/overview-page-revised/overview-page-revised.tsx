@@ -5,7 +5,8 @@ import { UserContext } from '@capstone-repo/shared/budgie-components';
 import { collection, getDocs, query, where } from '@firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { useRouter } from 'next/navigation';
-import { Balance } from '@mui/icons-material';
+import { PieChart, Pie, Tooltip, Cell, Legend } from 'recharts';
+import { AreaChart } from '@tremor/react';
 
 /* eslint-disable-next-line */
 export interface OverviewPageRevisedProps {}
@@ -41,6 +42,31 @@ type summaryData = {
   net: number;
   averageDaily: number;
   topThree: string[];
+};
+
+type CategoryCell = {
+  name: string;
+  value: number;
+};
+
+type pieChartData = {
+  data: CategoryCell[];
+};
+
+type IncomeExpenseUnitData = {
+  date: string;
+  Income: number;
+  Expenses: number;
+};
+
+type IncomeExpensesData = {
+  data: IncomeExpenseUnitData[];
+};
+
+type pageData = {
+  summary: summaryData;
+  pieChart: pieChartData;
+  incomeExpense: IncomeExpensesData;
 };
 
 export function getCurrentMonthYear(): string {
@@ -127,12 +153,88 @@ function getYear(monthYear: string): number {
   return parseInt(monthYear.slice(2, 6), 10);
 }
 
-function getSummaryAll(data: allAccData): summaryData | null {
+function getIncome(transactions: Transaction[]): number {
+  let totalIncome = 0;
+  for (const transaction of transactions) {
+    if (transaction.category == 'Income' && transaction.amount > 0) {
+      totalIncome += transaction.amount;
+    }
+  }
+
+  return parseFloat(totalIncome.toFixed(2));
+}
+
+function getExpenses(transactions: Transaction[]): number {
+  let totalExpenses = 0;
+  for (const transaction of transactions) {
+    if (transaction.amount < 0 && transaction.category != 'Transfer') {
+      totalExpenses += Math.abs(transaction.amount);
+    }
+  }
+
+  return parseFloat(totalExpenses.toFixed(2));
+}
+
+function getMonthYearString(monthyear: string): string {
+  // Check if the input is valid
+  if (monthyear.length !== 6) {
+    throw new Error('Invalid input format. Expected MMYYYY.');
+  }
+
+  // Extract month and year
+  const month = parseInt(monthyear.substring(0, 2), 10);
+  const year = monthyear.substring(2);
+
+  // Array of month names (index 0 = January, 11 = December)
+  const monthNames = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  // Ensure the month is valid
+  if (month < 1 || month > 12) {
+    throw new Error('Invalid month value.');
+  }
+
+  // Return the formatted string
+  return `${monthNames[month - 1]} ${year}`;
+}
+
+function getSummaryAll(data: allAccData): pageData | null {
   const currMonthYear = getCurrentMonthYear();
   const affectedYears = rollingYears(currMonthYear);
   const affectedMonthYears = getRollingMonthYears(currMonthYear);
-
+  const pieDataInit = [
+    { name: 'Transport', value: 0 },
+    { name: 'Eating Out', value: 0 },
+    { name: 'Groceries', value: 0 },
+    { name: 'Entertainment', value: 0 },
+    { name: 'Shopping', value: 0 },
+    { name: 'Insurance', value: 0 },
+    { name: 'Utilities', value: 0 },
+    { name: 'Medical Aid', value: 0 },
+    { name: 'Other', value: 0 },
+  ];
   let summary: summaryData = { net: 0, averageDaily: 0, topThree: [] };
+  let pieChart: pieChartData = { data: pieDataInit };
+  let incomeExpense: IncomeExpensesData = { data: [] };
+
+  let pageData: pageData = {
+    summary: summary,
+    pieChart: pieChart,
+    incomeExpense: incomeExpense,
+  };
+  //summary data vars
   let net = 0;
   let averageSum = 0;
   let averageDivisor = 30;
@@ -140,6 +242,14 @@ function getSummaryAll(data: allAccData): summaryData | null {
   let catMap = new Map<string, number>();
 
   if (data.accounts && data.transactionMonthYears) {
+    let i = 0;
+    for (const monthYear of affectedMonthYears) {
+      incomeExpense.data[i++] = {
+        date: getMonthYearString(monthYear),
+        Income: 0,
+        Expenses: 0,
+      };
+    }
     for (const account of data.accounts) {
       let lastMonthYear = '';
       for (const monthYear of affectedMonthYears) {
@@ -148,10 +258,17 @@ function getSummaryAll(data: allAccData): summaryData | null {
           let Transactions = yearMonthMap.get(monthYear);
           if (Transactions) {
             lastMonthYear = monthYear;
+            const foundElement = incomeExpense.data.find(
+              (item) => item.date === getMonthYearString(monthYear)
+            );
+            if (foundElement) {
+              foundElement.date = getMonthYearString(monthYear);
+              foundElement.Income += getIncome(Transactions);
+              foundElement.Expenses += getExpenses(Transactions);
+            }
           }
         }
       }
-
       if (lastMonthYear != '') {
         let lastMonthYearTransactions = data.transactionMonthYears
           .get(account.number)
@@ -173,6 +290,19 @@ function getSummaryAll(data: allAccData): summaryData | null {
               } else {
                 catMap.set(transaction.category, Math.abs(transaction.amount));
               }
+
+              if (transaction.category != 'Income') {
+                const categoryCell = pieChart.data.find(
+                  (cell) => cell.name === transaction.category
+                );
+                if (categoryCell) {
+                  categoryCell.value = parseFloat(
+                    (categoryCell.value + Math.abs(transaction.amount)).toFixed(
+                      2
+                    )
+                  );
+                }
+              }
             }
           }
         }
@@ -192,14 +322,20 @@ function getSummaryAll(data: allAccData): summaryData | null {
       .map((entry) => entry[0]);
 
     summary = { net: net, averageDaily: average, topThree: topThree };
-    console.log(summary);
-    return summary;
+    pageData = {
+      ...pageData,
+      pieChart: pieChart,
+      summary: summary,
+      incomeExpense: incomeExpense,
+    };
+    console.log(pageData);
+    return pageData;
   }
 
   return null;
 }
 
-function getSummarySpecific(data: specificAccData): summaryData | null {
+function getSummarySpecific(data: specificAccData): pageData | null {
   const currMonthYear = getCurrentMonthYear();
   const affectedYears = rollingYears(currMonthYear);
   const affectedMonthYears = getRollingMonthYears(currMonthYear);
@@ -239,6 +375,18 @@ const getCategoryStyle = (category: string | undefined) => {
   }
 };
 
+const CATEGORY_COLORS = [
+  '#4EB5FF',
+  '#FFCD4E',
+  '#A98DFB',
+  '#FD7575',
+  '#FB94F1',
+  '#72F1E2',
+  '#FDAD73',
+  '#C1C1C1',
+  'var(--main-text)',
+];
+
 export function OverviewPageRevised(props: OverviewPageRevisedProps) {
   const [selectedAccount, setSelectedAccount] = useState('All Accounts');
   const [allAccountData, setAllAccountData] = useState<allAccData | null>(null);
@@ -249,13 +397,13 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
   const [decisionMade, setDecisionMade] = useState(false);
   const user = useContext(UserContext);
   const router = useRouter();
-  let summaryData: summaryData | null = null;
+  let pageData: pageData | null = null;
 
   if (selectedAccount == 'All Accounts' && allAccountData != null) {
-    summaryData = getSummaryAll(allAccountData);
+    pageData = getSummaryAll(allAccountData);
   }
   if (selectedAccount != 'All Accounts' && specificAccountData != null) {
-    summaryData = getSummarySpecific(specificAccountData);
+    pageData = getSummarySpecific(specificAccountData);
   }
 
   useEffect(() => {
@@ -397,7 +545,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
   if (decisionMade) {
     return (
       <>
-        {dataLoading && (summaryData == null || false) ? (
+        {dataLoading || pageData == null ? (
           <div className="mainPage">
             {allAccountData != null ? (
               <div className="w-full h-16  shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] rounded-3xl bg-BudgieWhite flex flex-col items-center justify-center">
@@ -473,17 +621,17 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                   <span>Summary</span>
                 </div>
                 <div className="grow">
-                  <div className="flex flex-col items-start h-1/2 justify-around text-3xl font-medium">
+                  <div className="flex flex-col items-start h-1/2 justify-center text-3xl font-medium">
                     <div>
                       <span className="mr-5">Net Worth :</span>
-                      <span className=" bg-BudgieBlue2 px-3 py-1 rounded-lg text-BudgieWhite">
-                        R {summaryData?.net?.toFixed(2)}
+                      <span className="shadow-md bg-BudgieBlue2 px-3 py-1 rounded-lg text-BudgieWhite">
+                        R {pageData?.summary?.net?.toFixed(2)}
                       </span>
                     </div>
-                    <div>
+                    <div className="mt-7">
                       <span className="mr-5">Average Daily Spend :</span>
-                      <span className=" bg-BudgieBlue2 px-3 py-1 rounded-lg text-BudgieWhite">
-                        R {summaryData?.averageDaily?.toFixed(2)}
+                      <span className="shadow-md bg-BudgieBlue2 px-3 py-1 rounded-lg text-BudgieWhite">
+                        R {pageData?.summary?.averageDaily?.toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -492,7 +640,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                       Top Categories:{' '}
                     </span>
                     <div className="flex items-center justify-around w-full font-medium text-2xl">
-                      {summaryData?.topThree.map((category, index) => (
+                      {pageData?.summary?.topThree.map((category, index) => (
                         <div
                           key={index}
                           className={`p-2 w-[30%] shadow-lg text-center rounded-xl ${getCategoryStyle(
@@ -510,9 +658,48 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                 <div className="bg-BudgieGrayLight w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
                   <span>Spending by Category</span>
                 </div>
+                <div className="grow w-full flex flex-col items-center justify-center">
+                  <PieChart width={500} height={270}>
+                    <Pie
+                      data={pageData.pieChart.data}
+                      cx={250}
+                      cy={95}
+                      labelLine={false}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                      className="cursor-pointer border-none"
+                    >
+                      {pageData.pieChart.data.map((entry, index) => (
+                        <Cell
+                          className="border-none outline-none ring-0"
+                          key={`cell-${index}`}
+                          fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </div>
               </div>
             </div>
-            <div className="w-full h-1/2 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl mt-3"></div>
+            <div className=" p-2 w-full h-1/2 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl mt-3">
+              <div className="bg-BudgieGrayLight w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
+                <span>Income vs Expenses</span>
+              </div>
+              <div className="grow flex items-center justify-center">
+                <AreaChart
+                  data={pageData.incomeExpense.data}
+                  index="date"
+                  categories={['Income', 'Expenses']}
+                  colors={['emerald', 'red-400']}
+                  showGridLines={false}
+                  showLegend={true}
+                  showAnimation={true}
+                ></AreaChart>
+              </div>
+            </div>
             <div className="h-[40%] mt-3 w-full flex items-center justify-center">
               <div className="mr-3 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl w-1/3 h-full"></div>
               <div className="shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl w-2/3 h-full"></div>
