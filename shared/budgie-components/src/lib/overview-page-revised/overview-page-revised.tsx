@@ -67,6 +67,7 @@ type pageData = {
   summary: summaryData;
   pieChart: pieChartData;
   incomeExpense: IncomeExpensesData;
+  latestTransaction: Transaction;
 };
 
 export function getCurrentMonthYear(): string {
@@ -228,12 +229,21 @@ function getSummaryAll(data: allAccData): pageData | null {
   let summary: summaryData = { net: 0, averageDaily: 0, topThree: [] };
   let pieChart: pieChartData = { data: pieDataInit };
   let incomeExpense: IncomeExpensesData = { data: [] };
+  let latestTransaction: Transaction = {
+    date: '',
+    amount: 0,
+    balance: 0,
+    description: '',
+    category: '',
+  };
 
   let pageData: pageData = {
     summary: summary,
     pieChart: pieChart,
     incomeExpense: incomeExpense,
+    latestTransaction: latestTransaction,
   };
+
   //summary data vars
   let net = 0;
   let averageSum = 0;
@@ -275,6 +285,16 @@ function getSummaryAll(data: allAccData): pageData | null {
           ?.get(lastMonthYear);
 
         if (lastMonthYearTransactions) {
+          if (latestTransaction.date == '') {
+            latestTransaction = lastMonthYearTransactions[0];
+          } else {
+            const parsedDate1 = new Date(latestTransaction.date);
+            const parsedDate2 = new Date(lastMonthYearTransactions[0].date);
+
+            if (parsedDate2 > parsedDate1) {
+              latestTransaction = lastMonthYearTransactions[0];
+            }
+          }
           net += lastMonthYearTransactions[0].balance;
 
           for (const transaction of lastMonthYearTransactions) {
@@ -327,6 +347,7 @@ function getSummaryAll(data: allAccData): pageData | null {
       pieChart: pieChart,
       summary: summary,
       incomeExpense: incomeExpense,
+      latestTransaction: latestTransaction,
     };
     console.log(pageData);
     return pageData;
@@ -701,8 +722,39 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
               </div>
             </div>
             <div className="h-[40%] mt-3 w-full flex items-center justify-center">
-              <div className="mr-3 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl w-1/3 h-full"></div>
-              <div className="shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl w-2/3 h-full"></div>
+              <div className=" p-2 mr-3 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl w-1/3 h-full">
+                <div className="bg-BudgieGrayLight w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
+                  <span>Latest Transaction</span>
+                </div>
+                <div className="grow flex items-center justify-center">
+                  <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center">
+                    <div className="text-3xl font-bold mb-4">
+                      R {Math.abs(pageData.latestTransaction.amount).toFixed(2)}
+                    </div>
+                    <div className="text-xl mb-3 px-4">
+                      {pageData.latestTransaction.description}
+                    </div>
+                    <div
+                      className={`text-lg px-4 py-2 rounded-full ${getCategoryStyle(
+                        pageData.latestTransaction.category
+                      )} mb-3`}
+                    >
+                      {pageData.latestTransaction.category}
+                    </div>
+                    <div className="text-md text-gray-600">
+                      {new Date(
+                        pageData.latestTransaction.date
+                      ).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className=" p-2 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl w-2/3 h-full">
+                <div className="bg-BudgieGrayLight w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
+                  <span>Financial Health Score</span>
+                </div>
+                <div className="grow flex items-center justify-center"></div>
+              </div>
             </div>
           </div>
         )}
