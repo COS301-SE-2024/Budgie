@@ -405,7 +405,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                   id="dropdown"
                   value={selectedAccount}
                   onChange={handleSelectAccount}
-                  className="text-center rounded-xl  border-none text-xl bg-BudgieGrayLight cursor-pointer focus:ring-0"
+                  className="text-center rounded-xl shadow-md  border-none text-xl bg-BudgieGrayLight cursor-pointer focus:ring-0"
                 >
                   <option key="All Accounts" value="All Accounts">
                     All Accounts
@@ -455,7 +455,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                 id="dropdown"
                 value={selectedAccount}
                 onChange={handleSelectAccount}
-                className="text-center rounded-xl font-medium  border-none text-xl bg-BudgieGrayLight cursor-pointer focus:ring-0"
+                className=" shadow-md text-center rounded-xl font-medium  border-none text-xl bg-BudgieGrayLight cursor-pointer focus:ring-0"
               >
                 <option key="All Accounts" value="All Accounts">
                   All Accounts
@@ -469,7 +469,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
             </div>
             <div className="h-1/2 mt-3 w-full flex items-center justify-center">
               <div className="p-2 flex flex-col items-center justify-start mr-3 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl w-[50%] h-full">
-                <div className="bg-BudgieGrayLight shadow-lg w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
+                <div className="bg-BudgieGrayLight w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
                   <span>Summary</span>
                 </div>
                 <div className="grow">
@@ -507,7 +507,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                 </div>
               </div>
               <div className="p-2 flex flex-col items-center justify-start shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl w-[50%] h-full">
-                <div className="bg-BudgieGrayLight shadow-lg w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
+                <div className="bg-BudgieGrayLight w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
                   <span>Spending by Category</span>
                 </div>
               </div>
