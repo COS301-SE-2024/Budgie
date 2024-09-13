@@ -360,11 +360,127 @@ function getSummarySpecific(data: specificAccData): pageData | null {
   const currMonthYear = getCurrentMonthYear();
   const affectedYears = rollingYears(currMonthYear);
   const affectedMonthYears = getRollingMonthYears(currMonthYear);
-
+  const pieDataInit = [
+    { name: 'Transport', value: 0 },
+    { name: 'Eating Out', value: 0 },
+    { name: 'Groceries', value: 0 },
+    { name: 'Entertainment', value: 0 },
+    { name: 'Shopping', value: 0 },
+    { name: 'Insurance', value: 0 },
+    { name: 'Utilities', value: 0 },
+    { name: 'Medical Aid', value: 0 },
+    { name: 'Other', value: 0 },
+  ];
   let summary: summaryData = { net: 0, averageDaily: 0, topThree: [] };
+  let pieChart: pieChartData = { data: pieDataInit };
+  let incomeExpense: IncomeExpensesData = { data: [] };
+  let latestTransaction: Transaction = {
+    date: '',
+    amount: 0,
+    balance: 0,
+    description: '',
+    category: '',
+  };
+
+  let pageData: pageData = {
+    summary: summary,
+    pieChart: pieChart,
+    incomeExpense: incomeExpense,
+    latestTransaction: latestTransaction,
+  };
+
+  //summary data vars
   let net = 0;
-  let average = 0;
+  let averageSum = 0;
+  let averageDivisor = 30;
   let topThree: string[] = [];
+  let catMap = new Map<string, number>();
+
+  if (data.account && data.transactionMonthYears) {
+    let i = 0;
+    for (const monthYear of affectedMonthYears) {
+      incomeExpense.data[i++] = {
+        date: getMonthYearString(monthYear),
+        Income: 0,
+        Expenses: 0,
+      };
+    }
+
+    let lastMonthYear = '';
+    for (const monthYear of affectedMonthYears) {
+      let transactions = data.transactionMonthYears.get(monthYear);
+      if (transactions) {
+        lastMonthYear = monthYear;
+        const foundElement = incomeExpense.data.find(
+          (item) => item.date === getMonthYearString(monthYear)
+        );
+        if (foundElement) {
+          foundElement.date = getMonthYearString(monthYear);
+          foundElement.Income += getIncome(transactions);
+          foundElement.Expenses += getExpenses(transactions);
+        }
+      }
+    }
+
+    if (lastMonthYear != '') {
+      let lastMonthYearTransactions =
+        data.transactionMonthYears.get(lastMonthYear);
+
+      if (lastMonthYearTransactions) {
+        latestTransaction = lastMonthYearTransactions[0];
+        net = lastMonthYearTransactions[0].balance;
+
+        for (const transaction of lastMonthYearTransactions) {
+          if (transaction.amount < 0 && transaction.category != 'Transfer') {
+            averageSum += Math.abs(transaction.amount);
+
+            if (catMap.get(transaction.category)) {
+              let prev = catMap.get(transaction.category) || 0;
+              catMap.set(
+                transaction.category,
+                Math.abs(transaction.amount) + prev
+              );
+            } else {
+              catMap.set(transaction.category, Math.abs(transaction.amount));
+            }
+
+            if (transaction.category != 'Income') {
+              const categoryCell = pieChart.data.find(
+                (cell) => cell.name === transaction.category
+              );
+              if (categoryCell) {
+                categoryCell.value = parseFloat(
+                  (categoryCell.value + Math.abs(transaction.amount)).toFixed(2)
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+
+    let average;
+    if (averageDivisor === 0) {
+      average = 0;
+    } else {
+      average = averageSum / averageDivisor;
+    }
+
+    topThree = Array.from(catMap.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map((entry) => entry[0]);
+
+    summary = { net: net, averageDaily: average, topThree: topThree };
+    pageData = {
+      pieChart: pieChart,
+      summary: summary,
+      incomeExpense: incomeExpense,
+      latestTransaction: latestTransaction,
+    };
+
+    return pageData;
+  }
 
   return null;
 }
