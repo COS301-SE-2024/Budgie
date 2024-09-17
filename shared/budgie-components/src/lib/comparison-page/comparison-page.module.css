@@ -1,0 +1,286 @@
+.container {
+    background-color: var(--main-background);
+    width: 85vw;
+    height: calc(100vh - (6vh * var(--font-size-multiplier)));
+    padding-left: calc(1.5rem * var(--font-size-multiplier));
+    padding-right: 2rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+  }
+
+
+  .scrollableSection {
+    width: 100%;
+    height: 100%;
+    /* Ensure it takes up the full height of the comparisonsPage */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    /* Make the section scrollable */
+    padding-top: 5vh;
+}
+
+.userInfoButton {
+    background-color: #003366;
+    /* Dark Blue */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.userIcon {
+    margin-right: 8px;
+}
+
+.incomeGrid {
+    display: flex;
+    width: 100%;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    /* Added to ensure responsiveness on smaller screens */
+}
+
+.leftHalf,
+.rightHalf {
+    flex: 1;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 10px;
+    /* Adjusted margins for better spacing */
+    color: #333;
+    min-width: 300px;
+    /* Ensures elements don't shrink too small on small screens */
+}
+
+.leftHalf {
+    background-color: #73c786;
+    /* Light Green */
+}
+
+.rightHalf {
+    background-color: #c3e6cb;
+    /* Lighter Light Green */
+}
+
+.triangle {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.gridContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    width: 100%;
+    margin-bottom: 20px;
+    /* Space below the grid container */
+}
+
+.gridItem {
+    background-color: var(--grid-bg-color, #f9f9f9);
+    /* Fallback color */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 400px;
+    /* Ensures all grid items are at least 300px tall */
+    height: auto;
+    /* Adjusts height based on content */
+}
+
+.gridTitleContainer {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    /* Shaded background for title */
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+    width: 100%;
+}
+
+.gridTitle {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--grid-title-color, #000);
+    /* Fallback color */
+}
+
+.statusBar {
+    display: flex;
+    align-items: flex-end;
+    height: 100px;
+    width: 300px;
+    position: relative;
+}
+
+.userBar {
+    width: 190px;
+    height: 40px;
+    /* Adjusted height for clarity */
+    background-color: #78f77d;
+    /* Green for user */
+}
+
+.marketBar {
+    width: 190px;
+    height: 40px;
+    /* Adjusted height for clarity */
+    background-color: #84f0a4;
+    /* Yellow for market */
+}
+
+.divider {
+    width: 2px;
+    height: 100%;
+    background-color: #000;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    /* Proper centering */
+}
+
+.labels {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.userLabel {
+    font-size: 1.2rem;
+    color: #2c2b2b;
+    margin-right: 10px;
+    text-align: right;
+    flex: 1;
+    /* Ensures proper spacing */
+}
+
+.marketLabel {
+    font-size: 1.2rem;
+    color: #2c2b2b;
+    margin-left: 10px;
+    text-align: left;
+    flex: 1;
+    /* Ensures proper spacing */
+}
+
+.amount {
+    font-size: 1.1rem;
+    color: #555;
+    margin-top: 10px;
+}
+
+.userAmount {
+    text-align: right;
+    margin-right: 10px;
+}
+
+.marketAmount {
+    text-align: left;
+    margin-left: 10px;
+}
+
+.centeredTitle {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+}
+
+.popupForm {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.formContainer {
+    background: rgb(219, 218, 218);
+    padding: 20px;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90%;
+    /* Ensures it’s responsive on smaller screens */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.formContainer h2 {
+    margin-bottom: 20px;
+}
+
+.formContainer label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.formContainer input,
+.formContainer select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.formContainer button {
+    margin-top: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.formContainer button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+}
+
+.formContainer button[type="button"] {
+    background-color: #6c757d;
+    color: white;
+}
+
+.noAccountsMessage {
+    color: rgb(31, 30, 30); /* Change text color */
+    font-size: 20px;
+    height: 70vh; /* Full viewport height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    text-align: center;         
+  }
+
+.fillUserInfoMessage{
+    color: rgb(31, 30, 30); /* Change text color */
+    font-size: 20px;
+    height: 70vh; /* Full viewport height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    text-align: center; 
+}
+  
+  

@@ -1,0 +1,229 @@
+/* General Styles for Insights Page */
+.insightsContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* Two columns per row */
+    gap: 20px;
+    /* Space between grid items */
+    width: 100vw;
+    /* Full viewport width */
+    max-width: 100%;
+    /* Max width to prevent overflow */
+    height: 100vh;
+    /* Full viewport height */
+    overflow-y: auto;
+    /* Vertical scrolling */
+    overflow-x: hidden;
+    /* Hide horizontal scrolling */
+    padding: 20px;
+    /* Padding inside container */
+    box-sizing: border-box;
+    /* Include padding in the width/height calculations */
+}
+
+/* Style for each grid item */
+.gridItem {
+    background-color: #ffffff;
+    /* White background for grid items */
+    border-radius: 8px;
+    /* Rounded corners for grid items */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow */
+    padding: 16px;
+    /* Padding inside the grid item */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* Prevent overflow within each grid item */
+}
+
+/* Title box for grid items */
+.gridItemTitleBox {
+    background-color: #dcdcdc;
+    /* Grey background for title box */
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    /* Space below the title box */
+}
+
+/* Title styling */
+.gridItemTitle {
+    margin: 0;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+/* Petrol Prices Grid */
+.table {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    /* Define the column sizes */
+    gap: 0;
+    /* No gap between columns */
+    border-collapse: collapse;
+    /* Ensure proper alignment */
+    width: 100%;
+    /* Ensure table fills the grid item */
+}
+
+/* Table header styling */
+.tableHeader {
+    display: contents;
+    /* Allow header to align with grid */
+    background-color: #dcdcdc;
+    /* Grey background for header */
+    font-weight: bold;
+    text-align: center;
+    /* Center align header text */
+}
+
+/* Table header items styling */
+.tableHeader span {
+    padding: 8px;
+    border-bottom: 2px solid #ccc;
+    /* Border under the header */
+    display: inline-block;
+    /* Ensure proper alignment */
+}
+
+/* Table row styling */
+.tableRow {
+    display: contents;
+    /* Align rows with grid layout */
+}
+
+/* Styling for product names in table rows */
+.productName {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    /* Border under each row */
+    text-align: left;
+    /* Align text to the left */
+    box-sizing: border-box;
+    /* Include padding in the width calculations */
+}
+
+/* Icon styling inside table rows */
+.icon {
+    margin-right: 8px;
+}
+
+/* Styling for table row entries */
+.tableRow span {
+    padding: 8px;
+    text-align: center;
+    /* Center align text in the columns */
+    box-sizing: border-box;
+    /* Include padding in the width calculations */
+}
+
+/* Bank Insights Grid */
+.bankInsightsContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    /* Ensure container fills grid item */
+}
+
+.navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    /* Space below navigation */
+}
+
+.arrow {
+    font-size: 1.5em;
+    margin: 0 16px;
+}
+
+.bankInfo {
+    display: flex;
+    align-items: center;
+}
+
+.bankIcon {
+    margin-right: 8px;
+}
+
+.prosConsContainer {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    /* Ensure container fills grid item */
+}
+
+.pros,
+.cons {
+    width: 45%;
+}
+
+.underline {
+    height: 2px;
+    background-color: #000;
+    margin-bottom: 8px;
+}
+
+/* Property and Rent Grid */
+.propertyTable {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    /* Ensure table fills grid item */
+}
+
+.propertyRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.propertyRow span {
+    margin-left: 8px;
+}
+
+/* Transport Prices Grid */
+.transportTable {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    /* Ensure table fills grid item */
+}
+
+.transportRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.transportRow span {
+    margin-left: 8px;
+}
+
+/* Utility Prices Grid */
+.utilityTable {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    /* Ensure table fills grid item */
+}
+
+.utilityRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.utilityRow span {
+    margin-left: 8px;
+}

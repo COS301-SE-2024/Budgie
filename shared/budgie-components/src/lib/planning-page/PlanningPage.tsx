@@ -22,6 +22,8 @@ import UpdateGoalPopup, {
 } from '../update-goal-progress-popup/UpdateGoalProgressPopup';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import '../../root.css';
+import ComparisonPage from '../comparison-page/comparison-page';
+import InsightsPage from '../insight-page/InsightsPage';
 
 /* eslint-disable-next-line */
 export interface PlanningPageProps {}
@@ -422,19 +424,19 @@ export function PlanningPage(props: PlanningPageProps) {
 
           <button
             className={`${styles.button} ${
-              viewMode === 'insights' ? styles.activeButton : ''
+              viewMode === 'comparisons' ? styles.activeButton : ''
             }`}
-            onClick={() => setViewMode('insights')}
+            onClick={() => setViewMode('comparisons')}
             style={{ marginLeft: '5rem' }}
           >
-            Insights
+            Comparisons
           </button>
 
           <button
             className={`${styles.button} ${
-              viewMode === 'upcoming' ? styles.activeButton : ''
+              viewMode === 'insight' ? styles.activeButton : ''
             }`}
-            onClick={() => setViewMode('upcoming')}
+            onClick={() => setViewMode('insight')}
             style={{ marginLeft: '5rem' }}
           >
             Upcoming
@@ -447,12 +449,12 @@ export function PlanningPage(props: PlanningPageProps) {
             <GoalsPage />
           ) : viewMode === 'all' ? (
             <GoalsPage />
-          ) : (
-            <div className={styles.underConstructionScreen}>
-              <div className={styles.underConstructionText}>
-                This page is under construction.
-              </div>
-            </div>
+          ) : viewMode === 'comparisons' ? (
+            <ComparisonPage />
+          ) : viewMode === 'insight' ?(
+            <InsightsPage />
+          ): (
+            null 
           )}
         </div>
       </div>
