@@ -130,9 +130,38 @@ export function InsightsPage() {
                 <div className={styles.utilityTable}>
                     <div className={styles.utilityRow}>
                         <FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} />
-                        <span>Basic electricity, water</span>
-                        <span>R1,880.14</span>
-                        <span>Range: 1,000.00 - 4,500.00</span>
+                        <span>Up to R216,200</span>
+                        <span>18%</span>
+                    </div>
+                    <div className={styles.utilityRow}>
+                        <FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} />
+                        <span>Up to R337,800</span>
+                        <span>26% on income above R216,200</span>
+                    </div>
+                    <div className={styles.utilityRow}>
+                        <FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} />
+                        <span>Up to R467,500</span>
+                        <span>31% on income above R337,800</span>
+                    </div>
+                    <div className={styles.utilityRow}>
+                        <FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} />
+                        <span>Up to R613,600r</span>
+                        <span>36% on income above R467,500</span>
+                    </div>
+                    <div className={styles.utilityRow}>
+                        <FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} />
+                        <span>Up to R782,200</span>
+                        <span>39% on income above R613,600</span>
+                    </div>
+                    <div className={styles.utilityRow}>
+                        <FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} />
+                        <span>Up to R1,656,600</span>
+                        <span>41% on income above R782,200</span>
+                    </div>
+                    <div className={styles.utilityRow}>
+                        <FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} />
+                        <span>Over R1,656,601</span>
+                        <span>45% on income above R1,656,600</span>
                     </div>
                 </div>
             </div>
@@ -145,9 +174,21 @@ export function InsightsPage() {
                 <div className={styles.utilityTable}>
                     <div className={styles.utilityRow}>
                         <FontAwesomeIcon icon={faLightbulb} className={styles.icon} />
-                        <span>Basic electricity, water</span>
-                        <span>R1,880.14</span>
-                        <span>Range: 1,000.00 - 4,500.00</span>
+                        <span>Basic (Electricity, Heating, Cooling, Water, Garbage) for 85m2 Apartment</span>
+                        <span>R1,878.91</span>
+                        <span>Range: 1,000.00-3,500.00</span>
+                    </div>
+                    <div className={styles.utilityRow}>
+                        <FontAwesomeIcon icon={faLightbulb} className={styles.icon} />
+                        <span>Mobile Phone Monthly Plan with Calls and 10GB+ Data</span>
+                        <span>R589.95 </span>
+                        <span>Range: 300.00-1,000.00</span>
+                    </div>
+                    <div className={styles.utilityRow}>
+                        <FontAwesomeIcon icon={faLightbulb} className={styles.icon} />
+                        <span>Internet (60 Mbps or More, Unlimited Data, Cable/ADSL)</span>
+                        <span>R750.58</span>
+                        <span>Range: 540.00-1,000.00</span>
                     </div>
                 </div>
             </div>
