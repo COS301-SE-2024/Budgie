@@ -1,9 +1,19 @@
 import React from 'react';
 import styles from './InsightsPage.module.css'; // Import the CSS module for styling
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGasPump, faBank, faHome, faBus, faLightbulb } from '@fortawesome/free-solid-svg-icons'; // Icons for petrol, bank, home, transport, utilities
+import { faGasPump, faBank, faHome, faBus, faLightbulb, faFileInvoiceDollar } from '@fortawesome/free-solid-svg-icons'; // Icons for petrol, bank, home, transport, utilities
 
 export function InsightsPage() {
+
+    const formatCurrency = (value: number) => {
+        const formatter = new Intl.NumberFormat('en-ZA', {
+          style: 'currency',
+          currency: 'ZAR',
+          minimumFractionDigits: 2,
+        });
+        return formatter.format(value);
+    };
+
     return (
         <div className={styles.insightsContainer}>
             {/* Petrol Prices Grid */}
@@ -75,47 +85,54 @@ export function InsightsPage() {
                 <div className={styles.propertyTable}>
                     <div className={styles.propertyRow}>
                         <FontAwesomeIcon icon={faHome} className={styles.icon} />
-                        <span>Apartment (1 bedroom) in City Central</span>
-                        <span>R7588.00</span>
+                        <span>Apartment (1 bedroom) in City Centre</span>
+                        <span>R8,104.34</span>
+                        <span>Range: 1,000.00 - 4,500.00</span>
                     </div>
                     <div className={styles.propertyRow}>
                         <FontAwesomeIcon icon={faHome} className={styles.icon} />
-                        <span>Apartment (2 bedroom) in Suburban Area</span>
-                        <span>R8900.00</span>
+                        <span>Apartment (1 bedroom) Outside of Centre</span>
+                        <span>R6,494.41</span>
+                        <span>Range: 1,000.00 - 4,500.00</span>
                     </div>
                     <div className={styles.propertyRow}>
                         <FontAwesomeIcon icon={faHome} className={styles.icon} />
-                        <span>Studio Apartment in City Outskirts</span>
-                        <span>R6200.00</span>
+                        <span>Apartment (3 bedrooms) in City Centre</span>
+                        <span>R16,140.77 </span>
+                        <span>Range: 1,000.00 - 4,500.00</span>
                     </div>
                     <div className={styles.propertyRow}>
                         <FontAwesomeIcon icon={faHome} className={styles.icon} />
-                        <span>Luxury Apartment in City Central</span>
-                        <span>R12500.00</span>
+                        <span>Apartment (3 bedrooms) Outside of Centre</span>
+                        <span>R12,568.71</span>
+                        <span>Range: 1,000.00 - 4,500.00</span>
                     </div>
                     <div className={styles.propertyRow}>
                         <FontAwesomeIcon icon={faHome} className={styles.icon} />
-                        <span>Shared Room in Suburban Area</span>
-                        <span>R4500.00</span>
+                        <span>Price per Square Meter to Buy Apartment in City Centre</span>
+                        <span>R18,673.75</span>
+                        <span>Range: 1,000.00 - 4,500.00</span>
+                    </div>
+                    <div className={styles.propertyRow}>
+                        <FontAwesomeIcon icon={faHome} className={styles.icon} />
+                        <span>Price per Square Meter to Buy Apartment Outside of Centre</span>
+                        <span>R14,157.36</span>
+                        <span>Range: 1,000.00 - 4,500.00</span>
                     </div>
                 </div>
             </div>
 
-            {/* Transport Prices Grid */}
+            {/* Tax brackets */}
             <div className={styles.gridItem}>
                 <div className={styles.gridItemTitleBox}>
-                    <h2 className={styles.gridItemTitle}>Transport Prices</h2>
+                    <h2 className={styles.gridItemTitle}>Tax Brackets</h2>
                 </div>
-                <div className={styles.transportTable}>
-                    <div className={styles.transportRow}>
-                        <FontAwesomeIcon icon={faBus} className={styles.icon} />
-                        <span>One-way Ticket (Local Transport)</span>
-                        <span>R15.00</span>
-                    </div>
-                    <div className={styles.transportRow}>
-                        <FontAwesomeIcon icon={faBus} className={styles.icon} />
-                        <span>Monthly Pass (Regular Price)</span>
-                        <span>R450.00</span>
+                <div className={styles.utilityTable}>
+                    <div className={styles.utilityRow}>
+                        <FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} />
+                        <span>Basic electricity, water</span>
+                        <span>R1,880.14</span>
+                        <span>Range: 1,000.00 - 4,500.00</span>
                     </div>
                 </div>
             </div>
@@ -131,6 +148,39 @@ export function InsightsPage() {
                         <span>Basic electricity, water</span>
                         <span>R1,880.14</span>
                         <span>Range: 1,000.00 - 4,500.00</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Transport Prices Grid */}
+            <div className={styles.gridItem}>
+                <div className={styles.gridItemTitleBox}>
+                    <h2 className={styles.gridItemTitle}>Transport Prices</h2>
+                </div>
+                <div className={styles.transportTable}>
+                    <div className={styles.transportRow}>
+                        <FontAwesomeIcon icon={faBus} className={styles.icon} />
+                        <span>One-way Ticket (Local Transport)</span>
+                        <span>R30.00</span>
+                        <span>Range: 15.00-65.00</span>
+                    </div>
+                    <div className={styles.transportRow}>
+                        <FontAwesomeIcon icon={faBus} className={styles.icon} />
+                        <span>Monthly Pass (Regular Price)</span>
+                        <span>R825.00</span>
+                        <span>Range: 460.00-2,000.00</span>
+                    </div>
+                    <div className={styles.transportRow}>
+                        <FontAwesomeIcon icon={faBus} className={styles.icon} />
+                        <span>Taxi 1km (Normal Tariff)</span>
+                        <span>R20.00</span>
+                        <span>Range: 10.00-30.00</span>
+                    </div>
+                    <div className={styles.transportRow}>
+                        <FontAwesomeIcon icon={faBus} className={styles.icon} />
+                        <span>Taxi 1hour Waiting (Normal Tariff)</span>
+                        <span>R487.50</span>
+                        <span>Range: 55.82-150.00</span>
                     </div>
                 </div>
             </div>
