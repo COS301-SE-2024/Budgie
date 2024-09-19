@@ -50,18 +50,20 @@ export function AccountSettings(props: AccountSettingsProps) {
       setErrorMessage('No user is currently logged in.');
       return;
     }
+    if (user.email) {
+      const credential = EmailAuthProvider.credential(user.email, OldPassword);
 
-    const credential = EmailAuthProvider.credential(user.email, OldPassword);
-
-    try {
-      await reauthenticateWithCredential(user, credential);
-      console.log('Authenticated successfully');
-    } catch (error) {
-      console.log('Reauthentication failed');
-      setError(true);
-      setErrorMessage('error');
-      return;
+      try {
+        await reauthenticateWithCredential(user, credential);
+        console.log('Authenticated successfully');
+      } catch (error) {
+        console.log('Reauthentication failed');
+        setError(true);
+        setErrorMessage('error');
+        return;
+      }
     }
+
     const r =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 

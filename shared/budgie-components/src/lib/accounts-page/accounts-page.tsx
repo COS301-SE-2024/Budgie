@@ -405,26 +405,28 @@ export function AccountsPage(props: AccountsPageProps) {
   useEffect(() => {
     const fetchData = async () => {
       const fetchAccounts = async () => {
-        const accRef = collection(db, 'accounts');
-        const q = query(accRef, where('uid', '==', user.uid));
-        const querySnapshot = await getDocs(q);
-        // Do something with querySnapshot
-        if (querySnapshot.docs.length == 0) {
-          setShowNoAccounts(true);
-        } else {
-          let acc: Account[] = [];
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const account: Account = {
-              name: data.name,
-              alias: data.alias,
-              type: data.type,
-              number: data.account_number,
-            };
-            acc.push(account);
-          });
-          SetAccountsArray(acc);
-          setShowNoAccounts(false);
+        if (user && user.uid) {
+          const accRef = collection(db, 'accounts');
+          const q = query(accRef, where('uid', '==', user.uid));
+          const querySnapshot = await getDocs(q);
+          // Do something with querySnapshot
+          if (querySnapshot.docs.length == 0) {
+            setShowNoAccounts(true);
+          } else {
+            let acc: Account[] = [];
+            querySnapshot.forEach((doc) => {
+              const data = doc.data();
+              const account: Account = {
+                name: data.name,
+                alias: data.alias,
+                type: data.type,
+                number: data.account_number,
+              };
+              acc.push(account);
+            });
+            SetAccountsArray(acc);
+            setShowNoAccounts(false);
+          }
         }
       };
 

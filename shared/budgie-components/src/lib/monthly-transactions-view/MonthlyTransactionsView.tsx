@@ -92,17 +92,19 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
 
   useEffect(() => {
     const getYearlyTransactions = async () => {
-      try {
-        const q = query(
-          collection(db, `transaction_data_${currentYear}`),
-          where('uid', '==', user.uid),
-          where('account_number', '==', props.account)
-        );
-        const querySnapshot = await getDocs(q);
-        const transactionList = querySnapshot.docs.map((doc) => doc.data());
-        setData(transactionList[0]);
-      } catch (error) {
-        console.error('Error getting bank statement document:', error);
+      if (user && user.uid) {
+        try {
+          const q = query(
+            collection(db, `transaction_data_${currentYear}`),
+            where('uid', '==', user.uid),
+            where('account_number', '==', props.account)
+          );
+          const querySnapshot = await getDocs(q);
+          const transactionList = querySnapshot.docs.map((doc) => doc.data());
+          setData(transactionList[0]);
+        } catch (error) {
+          console.error('Error getting bank statement document:', error);
+        }
       }
     };
 
@@ -184,35 +186,37 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     event: React.ChangeEvent<HTMLSelectElement>,
     index: number
   ) => {
-    const selectedCategory = event.target.value;
-    if (selectedCategory === 'Add category') {
-      alert('under construction');
-    } else {
-      const updatedTransactions = transactions.map((transaction, i) =>
-        i === index
-          ? { ...transaction, category: selectedCategory }
-          : transaction
-      );
+    if (user && user.uid) {
+      const selectedCategory = event.target.value;
+      if (selectedCategory === 'Add category') {
+        alert('under construction');
+      } else {
+        const updatedTransactions = transactions.map((transaction, i) =>
+          i === index
+            ? { ...transaction, category: selectedCategory }
+            : transaction
+        );
 
-      const q = query(
-        collection(db, `transaction_data_${currentYear}`),
-        where('uid', '==', user.uid),
-        where('account_number', '==', props.account)
-      );
-      const querySnapshot = await getDocs(q);
+        const q = query(
+          collection(db, `transaction_data_${currentYear}`),
+          where('uid', '==', user.uid),
+          where('account_number', '==', props.account)
+        );
+        const querySnapshot = await getDocs(q);
 
-      if (!querySnapshot.empty) {
-        const docRef = querySnapshot.docs[0].ref;
-        await updateDoc(docRef, {
-          [monthNames[currentMonth.getMonth()]]:
-            JSON.stringify(updatedTransactions),
-        });
+        if (!querySnapshot.empty) {
+          const docRef = querySnapshot.docs[0].ref;
+          await updateDoc(docRef, {
+            [monthNames[currentMonth.getMonth()]]:
+              JSON.stringify(updatedTransactions),
+          });
 
-        const querySnapshot2 = await getDocs(q);
-        const transactionList = querySnapshot2.docs.map((doc) => doc.data());
-        setData(transactionList[0]);
+          const querySnapshot2 = await getDocs(q);
+          const transactionList = querySnapshot2.docs.map((doc) => doc.data());
+          setData(transactionList[0]);
+        }
+        setTransactions(updatedTransactions);
       }
-      setTransactions(updatedTransactions);
     }
   };
 

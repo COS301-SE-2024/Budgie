@@ -8,16 +8,13 @@ import { UserContext } from '@capstone-repo/shared/budgie-components';
 
 export default function Index() {
   const user = useContext(UserContext);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     if (user) {
       router.push('/overview');
-    } else {
-      setLoading(false);
     }
-  }, [user]);
+  }, [user, router]);
 
-  return <>{!loading && <Landing></Landing>}</>;
+  return user === null ? <Landing /> : user ? null : <div>Loading...</div>;
 }

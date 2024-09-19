@@ -79,29 +79,31 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   const user = useContext(UserContext);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    if (user && user.uid) {
+      e.preventDefault();
 
-    const goalData: any = {
-      type: props.activeTab,
-      name: goalName,
-      start_date: startDate,
-      uid: user.uid,
-    };
+      const goalData: any = {
+        type: props.activeTab,
+        name: goalName,
+        start_date: startDate,
+        uid: user.uid,
+      };
 
-    if (props.activeTab === 'Savings' || props.activeTab === 'Debt') {
-      goalData.current_amount = currentAmount;
-      goalData.target_amount = targetAmount;
-      goalData.target_date = targetDate;
-    } else if (props.activeTab === 'Spending') {
-      goalData.spending_limit = spendingLimit;
-    }
+      if (props.activeTab === 'Savings' || props.activeTab === 'Debt') {
+        goalData.current_amount = currentAmount;
+        goalData.target_amount = targetAmount;
+        goalData.target_date = targetDate;
+      } else if (props.activeTab === 'Spending') {
+        goalData.spending_limit = spendingLimit;
+      }
 
-    try {
-      const goalDocRef = doc(db, 'goals', props.goal.id);
-      await updateDoc(goalDocRef, goalData);
-      props.togglePopup();
-    } catch (error) {
-      console.error('Error saving goal:', error);
+      try {
+        const goalDocRef = doc(db, 'goals', props.goal.id);
+        await updateDoc(goalDocRef, goalData);
+        props.togglePopup();
+      } catch (error) {
+        console.error('Error saving goal:', error);
+      }
     }
   };
 
@@ -139,12 +141,12 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   return (
     <div className={styles.goalForm}>
       <form onSubmit={handleSubmit}>
-      <p className={styles.goalDescription}>
-              Edit {props.goal.name} below:
-              <button className={styles.deleteButton} onClick={handleDelete}>
-                Delete Goal
-              </button>
-            </p>
+        <p className={styles.goalDescription}>
+          Edit {props.goal.name} below:
+          <button className={styles.deleteButton} onClick={handleDelete}>
+            Delete Goal
+          </button>
+        </p>
         {props.activeTab === 'Savings' && (
           <>
             <div className={styles.formGroup}>
