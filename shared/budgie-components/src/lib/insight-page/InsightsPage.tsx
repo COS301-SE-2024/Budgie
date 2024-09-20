@@ -254,41 +254,47 @@ export function InsightsPage() {
                     <h2 className={styles.gridItemTitle}>Property and Rent</h2>
                 </div>
                 <div className={styles.propertyTable}>
+                    <div className={styles.utilityHeader}>
+                        <span></span>
+                        <span></span>
+                        <span>Price</span>
+                        <span>Range</span>
+                    </div>
                     <div className={styles.propertyRow}>
-                        <FontAwesomeIcon icon={faHome} className={styles.icon} />
+                        <span><FontAwesomeIcon icon={faHome} className={styles.icon} /></span>
                         <span>Apartment (1 bedroom) in City Centre</span>
                         <span>R8,104.34</span>
-                        <span>Range: 1,000.00 - 4,500.00</span>
+                        <span>R5,000.00 - R15,000.00</span>
                     </div>
                     <div className={styles.propertyRow}>
-                        <FontAwesomeIcon icon={faHome} className={styles.icon} />
+                        <span><FontAwesomeIcon icon={faHome} className={styles.icon} /></span>
                         <span>Apartment (1 bedroom) Outside of Centre</span>
                         <span>R6,494.41</span>
-                        <span>Range: 1,000.00 - 4,500.00</span>
+                        <span>R4,500.00 - R10,000.00</span>
                     </div>
                     <div className={styles.propertyRow}>
-                        <FontAwesomeIcon icon={faHome} className={styles.icon} />
+                        <span><FontAwesomeIcon icon={faHome} className={styles.icon} /></span>
                         <span>Apartment (3 bedrooms) in City Centre</span>
                         <span>R16,140.77 </span>
-                        <span>Range: 1,000.00 - 4,500.00</span>
+                        <span>R9,500.00 - R30,000.00</span>
                     </div>
                     <div className={styles.propertyRow}>
-                        <FontAwesomeIcon icon={faHome} className={styles.icon} />
+                        <span><FontAwesomeIcon icon={faHome} className={styles.icon} /></span>
                         <span>Apartment (3 bedrooms) Outside of Centre</span>
                         <span>R12,568.71</span>
-                        <span>Range: 1,000.00 - 4,500.00</span>
+                        <span>R8,500.00 - R20,000.00</span>
                     </div>
                     <div className={styles.propertyRow}>
-                        <FontAwesomeIcon icon={faHome} className={styles.icon} />
+                        <span><FontAwesomeIcon icon={faHome} className={styles.icon} /></span>
                         <span>Price per Square Meter to Buy Apartment in City Centre</span>
                         <span>R18,673.75</span>
-                        <span>Range: 1,000.00 - 4,500.00</span>
+                        <span>R8,000.00 - R36,000.00</span>
                     </div>
                     <div className={styles.propertyRow}>
-                        <FontAwesomeIcon icon={faHome} className={styles.icon} />
+                        <span><FontAwesomeIcon icon={faHome} className={styles.icon} /></span>
                         <span>Price per Square Meter to Buy Apartment Outside of Centre</span>
                         <span>R14,157.36</span>
-                        <span>Range: 1,000.00 - 4,500.00</span>
+                        <span>R9,000.00 - R28,000.00</span>
                     </div>
                 </div>
             </div>
@@ -298,39 +304,39 @@ export function InsightsPage() {
                 <div className={styles.gridItemTitleBox}>
                     <h2 className={styles.gridItemTitle}>Tax Brackets</h2>
                 </div>
-                <div className={styles.utilityTable}>
-                    <div className={styles.utilityRow}>
-                        <FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} />
+                <div className={styles.taxTable}>
+                    <div className={styles.taxRow}>
+                        <span><FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} /></span>
                         <span>Up to R216,200</span>
                         <span>18%</span>
                     </div>
-                    <div className={styles.utilityRow}>
-                        <FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} />
+                    <div className={styles.taxRow}>
+                        <span><FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} /></span>
                         <span>Up to R337,800</span>
                         <span>26% on income above R216,200</span>
                     </div>
-                    <div className={styles.utilityRow}>
-                        <FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} />
+                    <div className={styles.taxRow}>
+                        <span><FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} /></span>
                         <span>Up to R467,500</span>
                         <span>31% on income above R337,800</span>
                     </div>
-                    <div className={styles.utilityRow}>
-                        <FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} />
-                        <span>Up to R613,600r</span>
+                    <div className={styles.taxRow}>
+                        <span><FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} /></span>
+                        <span>Up to R613,600</span>
                         <span>36% on income above R467,500</span>
                     </div>
-                    <div className={styles.utilityRow}>
-                        <FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} />
+                    <div className={styles.taxRow}>
+                        <span><FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} /></span>
                         <span>Up to R782,200</span>
                         <span>39% on income above R613,600</span>
                     </div>
-                    <div className={styles.utilityRow}>
-                        <FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} />
+                    <div className={styles.taxRow}>
+                        <span><FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} /></span>
                         <span>Up to R1,656,600</span>
                         <span>41% on income above R782,200</span>
                     </div>
-                    <div className={styles.utilityRow}>
-                        <FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} />
+                    <div className={styles.taxRow}>
+                        <span><FontAwesomeIcon icon={faFileInvoiceDollar} className={styles.icon} /></span>
                         <span>Over R1,656,601</span>
                         <span>45% on income above R1,656,600</span>
                     </div>
@@ -343,23 +349,29 @@ export function InsightsPage() {
                     <h2 className={styles.gridItemTitle}>Utility Prices</h2>
                 </div>
                 <div className={styles.utilityTable}>
+                    <div className={styles.utilityHeader}>
+                        <span></span>
+                        <span></span>
+                        <span>Price</span>
+                        <span>Range</span>
+                    </div>
                     <div className={styles.utilityRow}>
-                        <FontAwesomeIcon icon={faLightbulb} className={styles.icon} />
+                        <span><FontAwesomeIcon icon={faLightbulb} className={styles.icon} /></span>
                         <span>Basic (Electricity, Heating, Cooling, Water, Garbage) for 85m2 Apartment</span>
                         <span>R1,878.91</span>
-                        <span>Range: 1,000.00-3,500.00</span>
+                        <span>R1,000.00 - R3,500.00</span>
                     </div>
                     <div className={styles.utilityRow}>
-                        <FontAwesomeIcon icon={faLightbulb} className={styles.icon} />
+                        <span><FontAwesomeIcon icon={faLightbulb} className={styles.icon} /></span>
                         <span>Mobile Phone Monthly Plan with Calls and 10GB+ Data</span>
                         <span>R589.95 </span>
-                        <span>Range: 300.00-1,000.00</span>
+                        <span>R300.00 - R1,000.00</span>
                     </div>
                     <div className={styles.utilityRow}>
-                        <FontAwesomeIcon icon={faLightbulb} className={styles.icon} />
+                        <span><FontAwesomeIcon icon={faLightbulb} className={styles.icon} /></span>
                         <span>Internet (60 Mbps or More, Unlimited Data, Cable/ADSL)</span>
                         <span>R750.58</span>
-                        <span>Range: 540.00-1,000.00</span>
+                        <span>R540.00 - R1,000.00</span>
                     </div>
                 </div>
             </div>
@@ -370,29 +382,35 @@ export function InsightsPage() {
                     <h2 className={styles.gridItemTitle}>Transport Prices</h2>
                 </div>
                 <div className={styles.transportTable}>
+                    <div className={styles.utilityHeader}>
+                        <span></span>
+                        <span></span>
+                        <span>Price</span>
+                        <span>Range</span>
+                    </div>
                     <div className={styles.transportRow}>
-                        <FontAwesomeIcon icon={faBus} className={styles.icon} />
+                        <span><FontAwesomeIcon icon={faBus} className={styles.icon} /></span>
                         <span>One-way Ticket (Local Transport)</span>
                         <span>R30.00</span>
-                        <span>Range: 15.00-65.00</span>
+                        <span>R15.00 - R65.00</span>
                     </div>
                     <div className={styles.transportRow}>
-                        <FontAwesomeIcon icon={faBus} className={styles.icon} />
+                        <span><FontAwesomeIcon icon={faBus} className={styles.icon} /></span>
                         <span>Monthly Pass (Regular Price)</span>
                         <span>R825.00</span>
-                        <span>Range: 460.00-2,000.00</span>
+                        <span>R460.00 - R2,000.00</span>
                     </div>
                     <div className={styles.transportRow}>
-                        <FontAwesomeIcon icon={faBus} className={styles.icon} />
+                        <span><FontAwesomeIcon icon={faBus} className={styles.icon} /></span>
                         <span>Taxi 1km (Normal Tariff)</span>
                         <span>R20.00</span>
-                        <span>Range: 10.00-30.00</span>
+                        <span>R10.00 - R30.00</span>
                     </div>
                     <div className={styles.transportRow}>
-                        <FontAwesomeIcon icon={faBus} className={styles.icon} />
+                        <span><FontAwesomeIcon icon={faBus} className={styles.icon} /></span>
                         <span>Taxi 1hour Waiting (Normal Tariff)</span>
                         <span>R487.50</span>
-                        <span>Range: 55.82-150.00</span>
+                        <span>R55.82 - R150.00</span>
                     </div>
                 </div>
             </div>
