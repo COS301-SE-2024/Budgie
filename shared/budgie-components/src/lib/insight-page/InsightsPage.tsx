@@ -2,8 +2,15 @@ import React from 'react';
 import styles from './InsightsPage.module.css'; // Import the CSS module for styling
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGasPump, faBank, faHome, faBus, faLightbulb, faFileInvoiceDollar } from '@fortawesome/free-solid-svg-icons'; // Icons for petrol, bank, home, transport, utilities
+import fnb from '../../../public/images/FNB_Color.png';
+import absa from '../../../public/images/absa-logo.png';
+import sb from '../../../public/images/Standard-Bank-Logo.png';
+import Image from 'next/image';
+import { useState } from 'react';
 
 export function InsightsPage() {
+
+    const [currentBank, setCurrentBank] = useState("fnb");
 
     const formatCurrency = (value: number) => {
         const formatter = new Intl.NumberFormat('en-ZA', {
@@ -13,6 +20,7 @@ export function InsightsPage() {
         });
         return formatter.format(value);
     };
+
 
     return (
         <div className={styles.insightsContainer}>
@@ -46,19 +54,29 @@ export function InsightsPage() {
                 </div>
             </div>
 
-            {/* Bank Insights Grid */}
+
+            {currentBank=="fnb" && (
+            //Bank Insights Grid 
             <div className={styles.gridItem}>
                 <div className={styles.gridItemTitleBox}>
                     <h2 className={styles.gridItemTitle}>Bank Insights</h2>
                 </div>
                 <div className={styles.bankInsightsContainer}>
                     <div className={styles.navigation}>
-                        <span className={styles.arrow}>&lt;</span>
+                        <span className={styles.arrow} onClick={() => setCurrentBank("sb")}>&lt;</span>
                         <div className={styles.bankInfo}>
-                            <FontAwesomeIcon icon={faBank} className={styles.bankIcon} />
-                            <span>FNB</span>
+                            <span><Image 
+                                src={fnb} 
+                                width={150} 
+                                alt="FNB"     
+                                style={{ 
+                                    width: '120px', 
+                                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
+                                    borderRadius: '8px' 
+                                }}>
+                            </Image></span>
                         </div>
-                        <span className={styles.arrow}>&gt;</span>
+                        <span className={styles.arrow} onClick={() => setCurrentBank("absa")}>&gt;</span>
                     </div>
                     <div className={styles.prosConsContainer}>
                         <div className={styles.pros}>
@@ -76,6 +94,89 @@ export function InsightsPage() {
                     </div>
                 </div>
             </div>
+            )}
+
+            {currentBank=="absa" && (
+             //Bank Insights Grid 
+             <div className={styles.gridItem}>
+                <div className={styles.gridItemTitleBox}>
+                    <h2 className={styles.gridItemTitle}>Bank Insights</h2>
+                </div>
+                <div className={styles.bankInsightsContainer}>
+                    <div className={styles.navigation}>
+                        <span className={styles.arrow} onClick={() => setCurrentBank("fnb")}>&lt;</span>
+                        <div className={styles.bankInfo}>
+                        <span><Image 
+                                src={absa} 
+                                width={150} 
+                                alt="Absa"     
+                                style={{ 
+                                    width: '120px', 
+                                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
+                                    borderRadius: '8px' 
+                                }}>
+                            </Image></span>
+                        </div>
+                        <span className={styles.arrow} onClick={() => setCurrentBank("sb")}>&gt;</span>
+                    </div>
+                    <div className={styles.prosConsContainer}>
+                        <div className={styles.pros}>
+                            <h3>Pros</h3>
+                            <div className={styles.underline}></div>
+                            <div className={styles.prosItem}>Bank Fees: R50</div>
+                            <div className={styles.prosItem}>Earn Ebucks</div>
+                        </div>
+                        <div className={styles.cons}>
+                            <h3>Cons</h3>
+                            <div className={styles.underline}></div>
+                            <div className={styles.consItem}>Limited Branches</div>
+                            <div className={styles.consItem}>High Interest on Loans</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            )}
+
+            {currentBank=="sb" && (
+             //Bank Insights Grid 
+             <div className={styles.gridItem}>
+                <div className={styles.gridItemTitleBox}>
+                    <h2 className={styles.gridItemTitle}>Bank Insights</h2>
+                </div>
+                <div className={styles.bankInsightsContainer}>
+                    <div className={styles.navigation}>
+                        <span className={styles.arrow} onClick={() => setCurrentBank("absa")}>&lt;</span>
+                        <div className={styles.bankInfo}>
+                        <span><Image 
+                                src={sb} 
+                                width={150} 
+                                alt="Standard Bank"     
+                                style={{ 
+                                    width: '120px', 
+                                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
+                                    borderRadius: '8px' 
+                                }}>
+                            </Image></span>
+                        </div>
+                        <span className={styles.arrow} onClick={() => setCurrentBank("fnb")}>&gt;</span>
+                    </div>
+                    <div className={styles.prosConsContainer}>
+                        <div className={styles.pros}>
+                            <h3>Pros</h3>
+                            <div className={styles.underline}></div>
+                            <div className={styles.prosItem}>Bank Fees: R50</div>
+                            <div className={styles.prosItem}>Earn Ebucks</div>
+                        </div>
+                        <div className={styles.cons}>
+                            <h3>Cons</h3>
+                            <div className={styles.underline}></div>
+                            <div className={styles.consItem}>Limited Branches</div>
+                            <div className={styles.consItem}>High Interest on Loans</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            )}
 
             {/* Property and Rent Grid */}
             <div className={styles.gridItem}>
