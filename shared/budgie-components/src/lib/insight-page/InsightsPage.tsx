@@ -31,14 +31,14 @@ export function InsightsPage() {
                 </div>
                 <div className={styles.table}>
                     <div className={styles.tableHeader}>
-                        <span>Product Name</span>
+                        <span>Last month</span>
                         <span>Coastal</span>
                         <span>Inland</span>
                     </div>
                     <div className={styles.tableRow}>
                         <div className={styles.productName}>
                             <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
-                            <span>95 Unleaded Petrol with Techkron</span>
+                            <span>95 Unleaded Petrol</span>
                         </div>
                         <span>cpl 23.32</span>
                         <span>cpl 23.22</span>
@@ -46,7 +46,77 @@ export function InsightsPage() {
                     <div className={styles.tableRow}>
                         <div className={styles.productName}>
                             <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
-                            <span>93 Unleaded Petrol with Techkron</span>
+                            <span>93 Unleaded Petrol</span>
+                        </div>
+                        <span>cpl 22.45</span>
+                        <span>cpl 22.35</span>
+                    </div>
+                    <div className={styles.tableRow}>
+                        <div className={styles.productName}>
+                            <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
+                            <span>Diesel 50ppm</span>
+                        </div>
+                        <span>cpl 22.45</span>
+                        <span>cpl 22.35</span>
+                    </div>
+                </div>
+                <div className={styles.table}>
+                    <div className={styles.tableHeader}>
+                        <span>This month</span>
+                        <span>Coastal</span>
+                        <span>Inland</span>
+                    </div>
+                    <div className={styles.tableRow}>
+                        <div className={styles.productName}>
+                            <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
+                            <span>95 Unleaded Petrol</span>
+                        </div>
+                        <span>cpl 23.32</span>
+                        <span>cpl 23.22</span>
+                    </div>
+                    <div className={styles.tableRow}>
+                        <div className={styles.productName}>
+                            <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
+                            <span>93 Unleaded Petrol</span>
+                        </div>
+                        <span>cpl 22.45</span>
+                        <span>cpl 22.35</span>
+                    </div>
+                    <div className={styles.tableRow}>
+                        <div className={styles.productName}>
+                            <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
+                            <span>Diesel 50ppm</span>
+                        </div>
+                        <span>cpl 22.45</span>
+                        <span>cpl 22.35</span>
+                    </div>
+                </div>
+                <div className={styles.table}>
+                    <div className={styles.tableHeader}>
+                        <span>Next month</span>
+                        <span>Coastal</span>
+                        <span>Inland</span>
+                    </div>
+                    <div className={styles.tableRow}>
+                        <div className={styles.productName}>
+                            <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
+                            <span>95 Unleaded Petrol</span>
+                        </div>
+                        <span>cpl 23.32</span>
+                        <span>cpl 23.22</span>
+                    </div>
+                    <div className={styles.tableRow}>
+                        <div className={styles.productName}>
+                            <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
+                            <span>93 Unleaded Petrol</span>
+                        </div>
+                        <span>cpl 22.45</span>
+                        <span>cpl 22.35</span>
+                    </div>
+                    <div className={styles.tableRow}>
+                        <div className={styles.productName}>
+                            <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
+                            <span>Diesel 50ppm</span>
                         </div>
                         <span>cpl 22.45</span>
                         <span>cpl 22.35</span>
