@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './new-new-navbar.module.css';
 import { getAuth, signOut } from 'firebase/auth';
 import { usePathname } from 'next/navigation';
@@ -24,6 +24,10 @@ export function NewNavbar(props: NavbarProps) {
   const [selectedItem, setSelectedItem] = useState<string>(
     getFirstSubstring(pathname)
   );
+
+  useEffect(() => {
+    setSelectedItem(getFirstSubstring(pathname));
+  }, [pathname]);
 
   return (
     <div className={styles.sidebar}>

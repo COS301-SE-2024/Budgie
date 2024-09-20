@@ -2,6 +2,7 @@
 import styles from './page.module.css';
 import React, { useContext, useEffect, useState } from 'react';
 import {
+  OverviewPageRevised,
   OverviewPage,
   UserContext,
 } from '@capstone-repo/shared/budgie-components';
@@ -21,5 +22,5 @@ export default function overview() {
     }
   }, [user]);
 
-  return <>{!loading && <OverviewPage></OverviewPage>}</>;
+  return <>{!loading && <OverviewPageRevised></OverviewPageRevised>}</>;
 }
