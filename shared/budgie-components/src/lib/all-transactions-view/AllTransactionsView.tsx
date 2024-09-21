@@ -255,6 +255,8 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
         return styles.medicalAid;
       case 'Other':
         return styles.other;
+      case 'Transfer':
+        return styles.transfer;
       default:
         return styles.default;
     }
@@ -413,6 +415,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
                       <option value="Insurance">Insurance</option>
                       <option value="Utilities">Utilities</option>
                       <option value="Medical Aid">Medical Aid</option>
+                      <option value="Transfer">Transfer</option>
                       <option value="Other">Other</option>
                     </select>
                   </div>

@@ -40,6 +40,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
   const [loader, setLoader] = useState(false);
   const user = useContext(UserContext);
   const router = useRouter();
+  //bank state to pass to account addition phase
 
   function AddAccountModal() {
     function OnAddAccountTypeClick(type: string) {

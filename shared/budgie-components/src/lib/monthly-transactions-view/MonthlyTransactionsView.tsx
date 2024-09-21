@@ -242,6 +242,8 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         return styles.medicalAid;
       case 'Other':
         return styles.other;
+      case 'Transfer':
+        return styles.transfer;
       default:
         return styles.default;
     }
@@ -459,6 +461,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
                     <option value="Insurance">Insurance</option>
                     <option value="Utilities">Utilities</option>
                     <option value="Medical Aid">Medical Aid</option>
+                    <option value="Transfer">Transfer</option>
                     <option value="Other">Other</option>
                   </select>
                 </div>
