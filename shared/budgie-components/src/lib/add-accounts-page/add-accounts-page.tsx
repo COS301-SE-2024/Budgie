@@ -11,7 +11,7 @@ import {
   query,
   where,
   getDocs,
-  updateDoc, 
+  updateDoc,
   DocumentSnapshot,
   DocumentData,
   QueryDocumentSnapshot,
@@ -329,6 +329,33 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
       );
     }
 
+    async function updateYears(year: string) {
+      if (user && user.uid) {
+        const q = query(
+          collection(db, 'years_uploaded'),
+          where('uid', '==', user.uid)
+        );
+
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+          await addDoc(collection(db, 'years_uploaded'), {
+            uid: user.uid,
+            years: JSON.stringify([year]),
+          });
+        } else {
+          let doc = querySnapshot.docs[0];
+          const data = doc.data();
+          let years: string[] = JSON.parse(data.years).map(String);
+          if (!years.includes(year)) {
+            years.push(year);
+          }
+          await updateDoc(doc.ref, {
+            years: JSON.stringify(years),
+          });
+        }
+      }
+    }
+
     async function MergeTransactions(
       YearMonthLinesRecord: Record<string, Transaction[]>,
       UniqueYearMonths: Record<string, string[]>
@@ -476,6 +503,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               alert('function error');
             }
           }
+          updateYears(Year);
         }
         SetUploadDate(accountNumber);
       }

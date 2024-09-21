@@ -224,6 +224,33 @@ export function isDuplicate(
   );
 }
 
+async function updateYears(year: string, user: any) {
+  if (user && user.uid) {
+    const q = query(
+      collection(db, 'years_uploaded'),
+      where('uid', '==', user.uid)
+    );
+
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+      await addDoc(collection(db, 'years_uploaded'), {
+        uid: user.uid,
+        years: JSON.stringify([year]),
+      });
+    } else {
+      let doc = querySnapshot.docs[0];
+      const data = doc.data();
+      let years: string[] = JSON.parse(data.years).map(String);
+      if (!years.includes(year)) {
+        years.push(year);
+      }
+      await updateDoc(doc.ref, {
+        years: JSON.stringify(years),
+      });
+    }
+  }
+}
+
 async function MergeTransactions(
   YearMonthLinesRecord: Record<string, Transaction[]>,
   UniqueYearMonths: Record<string, string[]>,
@@ -232,6 +259,7 @@ async function MergeTransactions(
 ) {
   //determine merged record
   for (const Year in UniqueYearMonths) {
+    updateYears(Year, user);
     let Merged: Record<string, Transaction[]> = {};
     const YearMonths: string[] = UniqueYearMonths[Year];
     //check if exists
@@ -908,7 +936,7 @@ function AreYouSure(props: AreYouSureProps) {
         router.push('/accounts');
       });
     }
-    // TODO delete finance info potentially not, to allow account persistence if re-tracked
+    // TODO delete finance info
   }
 
   return (
