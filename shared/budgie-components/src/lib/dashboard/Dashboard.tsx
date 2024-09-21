@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import AllTransactionsView from '../all-transactions-view/AllTransactionsView';
@@ -28,8 +28,52 @@ export function Dashboard(props: DashboardProps) {
   );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showNoData, setShowNoData] = useState(false);
 
   useThemeSettings();
+
+  const fetchData = useCallback(async () => {
+    if (user && user.uid && currentAccountNumber) {
+      setIsLoading(true);
+      setError(null);
+      setShowNoData(false);
+      try {
+        // Fetch yearly transactions
+        const yearlyQ = query(
+          collection(db, `transaction_data_${currentYear}`),
+          where('uid', '==', user.uid),
+          where('account_number', '==', currentAccountNumber)
+        );
+        const yearlySnapshot = await getDocs(yearlyQ);
+        const yearlyData = yearlySnapshot.docs.map((doc) => doc.data());
+        setData(yearlyData[0] || null);
+
+        // Fetch available years
+        const years: number[] = [];
+        for (let year = 2000; year <= currentYear; year++) {
+          const yearQ = query(
+            collection(db, `transaction_data_${year}`),
+            where('uid', '==', user.uid),
+            where('account_number', '==', currentAccountNumber)
+          );
+          const yearSnapshot = await getDocs(yearQ);
+          if (!yearSnapshot.empty) {
+            years.push(year);
+          }
+        }
+        setYearsWithData(years);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setError('Failed to fetch data. Please try again later.');
+      } finally {
+        setIsLoading(false);
+        // Delay showing the "No data" message
+        setTimeout(() => {
+          setShowNoData(true);
+        }, 500); // 500ms delay
+      }
+    }
+  }, [user, currentAccountNumber, currentYear]);
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -56,8 +100,6 @@ export function Dashboard(props: DashboardProps) {
         } catch (error) {
           console.error('Error fetching aliases: ', error);
           setError('Failed to fetch accounts. Please try again later.');
-        } finally {
-          setIsLoading(false);
         }
       }
     };
@@ -66,61 +108,8 @@ export function Dashboard(props: DashboardProps) {
   }, [user]);
 
   useEffect(() => {
-    const getYearlyTransactions = async () => {
-      if (user && user.uid && currentAccountNumber) {
-        setIsLoading(true);
-        setError(null);
-        try {
-          const q = query(
-            collection(db, `transaction_data_${currentYear}`),
-            where('uid', '==', user.uid),
-            where('account_number', '==', currentAccountNumber)
-          );
-          const querySnapshot = await getDocs(q);
-          const transactionList = querySnapshot.docs.map((doc) => doc.data());
-          setData(transactionList[0] || null);
-        } catch (error) {
-          console.error('Error getting bank statement document:', error);
-          setError('Failed to fetch transactions. Please try again later.');
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    getYearlyTransactions();
-  }, [currentYear, currentAccountNumber, user]);
-
-  useEffect(() => {
-    const fetchAvailableYears = async () => {
-      if (user && user.uid && currentAccountNumber) {
-        setIsLoading(true);
-        setError(null);
-        try {
-          const years: number[] = [];
-          for (let year = 2000; year <= currentYear; year++) {
-            const q = query(
-              collection(db, `transaction_data_${year}`),
-              where('uid', '==', user.uid),
-              where('account_number', '==', currentAccountNumber)
-            );
-            const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) {
-              years.push(year);
-            }
-          }
-          setYearsWithData(years);
-        } catch (error) {
-          console.error('Error fetching years with data:', error);
-          setError('Failed to fetch available years. Please try again later.');
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchAvailableYears();
-  }, [currentAccountNumber, user, currentYear]);
+    fetchData();
+  }, [fetchData]);
 
   const handleAccountDropdownChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -133,28 +122,9 @@ export function Dashboard(props: DashboardProps) {
       setSelectedAlias(selected);
       setCurrentAccountNumber(selectedOption.accountNumber);
       setData(null);
-      setIsLoading(true);
+      setShowNoData(false);
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className={styles.loadScreen}>
-        <div className={styles.loaderContainer}>
-          <div className={styles.loader}></div>
-        </div>
-        <div className={styles.loaderText}>Loading...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.errorScreen}>
-        <div className={styles.errorText}>{error}</div>
-      </div>
-    );
-  }
 
   if (hasAccount === 'No') {
     return (
@@ -208,7 +178,18 @@ export function Dashboard(props: DashboardProps) {
       </div>
 
       <div>
-        {viewMode === 'monthly' && data && yearsWithData.length > 0 ? (
+        {isLoading ? (
+          <div className={styles.loadScreen}>
+            <div className={styles.loaderContainer}>
+              <div className={styles.loader}></div>
+            </div>
+            <div className={styles.loaderText}>Loading...</div>
+          </div>
+        ) : error ? (
+          <div className={styles.errorScreen}>
+            <div className={styles.errorText}>{error}</div>
+          </div>
+        ) : viewMode === 'monthly' && data && yearsWithData.length > 0 ? (
           <MonthlyTransactionsView
             account={currentAccountNumber}
             data={data}
@@ -219,13 +200,13 @@ export function Dashboard(props: DashboardProps) {
             account={currentAccountNumber}
             availableYears={yearsWithData}
           />
-        ) : (
+        ) : showNoData ? (
           <div className={styles.noDataScreen}>
             <div className={styles.noDataText}>
               No transaction data available for the selected account.
             </div>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
