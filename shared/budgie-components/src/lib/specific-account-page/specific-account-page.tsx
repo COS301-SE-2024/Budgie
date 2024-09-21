@@ -932,11 +932,46 @@ function AreYouSure(props: AreYouSureProps) {
       );
       const querySnapshot = await getDocs(q);
       const doc = querySnapshot.docs[0].ref;
+
+      //delete finance info
+      const yearRef = collection(db, 'years_uploaded');
+      const qYear = query(yearRef, where('uid', '==', user.uid));
+      const queryYearSnapshot = await getDocs(qYear);
+      const docYear = queryYearSnapshot.docs[0];
+      const uploadedYearData: string[] = JSON.parse(docYear.data().years);
+
+      for (const year of uploadedYearData) {
+        const collectionRef = collection(db, `transaction_data_${year}`);
+        const q = query(
+          collectionRef,
+          where('uid', '==', user.uid),
+          where('account_number', '==', props.account.number)
+        );
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach(async (doc) => {
+            await deleteDoc(doc.ref);
+          });
+        }
+      }
+      //delete upload_dates
+      const uploadDateRef = collection(db, 'upload_dates');
+      const qDates = query(
+        uploadDateRef,
+        where('uid', '==', user.uid),
+        where('account_number', '==', props.account.number)
+      );
+      const queryDatesSnapshot = await getDocs(qDates);
+      if (!queryDatesSnapshot.empty) {
+        queryDatesSnapshot.forEach(async (doc) => {
+          await deleteDoc(doc.ref);
+        });
+      }
+
       await deleteDoc(doc).then(() => {
         router.push('/accounts');
       });
     }
-    // TODO delete finance info
   }
 
   return (
