@@ -1,4 +1,14 @@
 @import url(https://db.onlinewebfonts.com/c/076abc8ba1bb38a0713dec3b63b880e4?family=Trip+Sans);
+@font-face {
+  font-family: "Trip Sans";
+  src: url("https://db.onlinewebfonts.com/t/076abc8ba1bb38a0713dec3b63b880e4.eot");
+  src: url("https://db.onlinewebfonts.com/t/076abc8ba1bb38a0713dec3b63b880e4.eot?#iefix")format("embedded-opentype"),
+  url("https://db.onlinewebfonts.com/t/076abc8ba1bb38a0713dec3b63b880e4.woff2")format("woff2"),
+  url("https://db.onlinewebfonts.com/t/076abc8ba1bb38a0713dec3b63b880e4.woff")format("woff"),
+  url("https://db.onlinewebfonts.com/t/076abc8ba1bb38a0713dec3b63b880e4.ttf")format("truetype"),
+  url("https://db.onlinewebfonts.com/t/076abc8ba1bb38a0713dec3b63b880e4.svg#Trip Sans")format("svg");
+}
+
 
 * {
   font-family: 'Trip Sans', sans-serif;
