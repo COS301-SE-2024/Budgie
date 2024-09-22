@@ -224,6 +224,33 @@ export function isDuplicate(
   );
 }
 
+async function updateYears(year: string, user: any) {
+  if (user && user.uid) {
+    const q = query(
+      collection(db, 'years_uploaded'),
+      where('uid', '==', user.uid)
+    );
+
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+      await addDoc(collection(db, 'years_uploaded'), {
+        uid: user.uid,
+        years: JSON.stringify([year]),
+      });
+    } else {
+      let doc = querySnapshot.docs[0];
+      const data = doc.data();
+      let years: string[] = JSON.parse(data.years).map(String);
+      if (!years.includes(year)) {
+        years.push(year);
+      }
+      await updateDoc(doc.ref, {
+        years: JSON.stringify(years),
+      });
+    }
+  }
+}
+
 async function MergeTransactions(
   YearMonthLinesRecord: Record<string, Transaction[]>,
   UniqueYearMonths: Record<string, string[]>,
@@ -232,6 +259,7 @@ async function MergeTransactions(
 ) {
   //determine merged record
   for (const Year in UniqueYearMonths) {
+    updateYears(Year, user);
     let Merged: Record<string, Transaction[]> = {};
     const YearMonths: string[] = UniqueYearMonths[Year];
     //check if exists
@@ -904,11 +932,46 @@ function AreYouSure(props: AreYouSureProps) {
       );
       const querySnapshot = await getDocs(q);
       const doc = querySnapshot.docs[0].ref;
+
+      //delete finance info
+      const yearRef = collection(db, 'years_uploaded');
+      const qYear = query(yearRef, where('uid', '==', user.uid));
+      const queryYearSnapshot = await getDocs(qYear);
+      const docYear = queryYearSnapshot.docs[0];
+      const uploadedYearData: string[] = JSON.parse(docYear.data().years);
+
+      for (const year of uploadedYearData) {
+        const collectionRef = collection(db, `transaction_data_${year}`);
+        const q = query(
+          collectionRef,
+          where('uid', '==', user.uid),
+          where('account_number', '==', props.account.number)
+        );
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach(async (doc) => {
+            await deleteDoc(doc.ref);
+          });
+        }
+      }
+      //delete upload_dates
+      const uploadDateRef = collection(db, 'upload_dates');
+      const qDates = query(
+        uploadDateRef,
+        where('uid', '==', user.uid),
+        where('account_number', '==', props.account.number)
+      );
+      const queryDatesSnapshot = await getDocs(qDates);
+      if (!queryDatesSnapshot.empty) {
+        queryDatesSnapshot.forEach(async (doc) => {
+          await deleteDoc(doc.ref);
+        });
+      }
+
       await deleteDoc(doc).then(() => {
         router.push('/accounts');
       });
     }
-    // TODO delete finance info potentially not, to allow account persistence if re-tracked
   }
 
   return (

@@ -11,7 +11,7 @@ import {
   query,
   where,
   getDocs,
-  updateDoc, 
+  updateDoc,
   DocumentSnapshot,
   DocumentData,
   QueryDocumentSnapshot,
@@ -40,6 +40,8 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
   const [loader, setLoader] = useState(false);
   const user = useContext(UserContext);
   const router = useRouter();
+  //bank state to pass to account addition phase
+  const bankRef = useRef('');
 
   function AddAccountModal() {
     function OnAddAccountTypeClick(type: string) {
@@ -166,7 +168,8 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
       }
     };
 
-    const handleButtonClick = () => {
+    const handleButtonClick = (bank: string) => {
+      bankRef.current = bank;
       if (fileInputRef.current) {
         fileInputRef.current.click();
       }
@@ -186,7 +189,9 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
           <div className="mt-7">
             <button
               className="bg-BudgieWhite cursor-pointer rounded-3xl hover:bg-white hover:shadow-2xl transition-all ease-in"
-              onClick={handleButtonClick}
+              onClick={() => {
+                handleButtonClick('FNB');
+              }}
             >
               <Image src={fnb} width={150} alt="FNB"></Image>
             </button>
@@ -327,6 +332,33 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         transaction1.balance === transaction2.balance &&
         transaction1.description === transaction2.description
       );
+    }
+
+    async function updateYears(year: string) {
+      if (user && user.uid) {
+        const q = query(
+          collection(db, 'years_uploaded'),
+          where('uid', '==', user.uid)
+        );
+
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+          await addDoc(collection(db, 'years_uploaded'), {
+            uid: user.uid,
+            years: JSON.stringify([year]),
+          });
+        } else {
+          let doc = querySnapshot.docs[0];
+          const data = doc.data();
+          let years: string[] = JSON.parse(data.years).map(String);
+          if (!years.includes(year)) {
+            years.push(year);
+          }
+          await updateDoc(doc.ref, {
+            years: JSON.stringify(years),
+          });
+        }
+      }
     }
 
     async function MergeTransactions(
@@ -476,6 +508,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               alert('function error');
             }
           }
+          updateYears(Year);
         }
         SetUploadDate(accountNumber);
       }
@@ -570,6 +603,24 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
       return flag ? true : false;
     };
 
+    const AliasTaken = async (
+      uid: string,
+      accNo: string,
+      alias: string
+    ): Promise<boolean> => {
+      const accRef = collection(db, 'accounts');
+      const q = query(accRef, where('uid', '==', uid));
+      const querySnapshot = await getDocs(q);
+      let flag = false;
+      querySnapshot.forEach((doc) => {
+        if (doc.data().alias == alias) {
+          flag = true;
+        }
+      });
+
+      return flag;
+    };
+
     const delay = (ms: number | undefined) =>
       new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -578,6 +629,12 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         if (inputValue == '') {
           setAliasError(true);
           return;
+        } else {
+          let taken = await AliasTaken(user.uid, accountNumber, inputValue);
+          if (taken) {
+            setAliasError(true);
+            return;
+          }
         }
         //add account to database
         //set spinner
@@ -609,6 +666,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               account_number: accountNumber,
               type: accountType,
               alias: inputValue,
+              bank: bankRef,
             });
             //TODO:success modal for upload success
             await delay(1000);

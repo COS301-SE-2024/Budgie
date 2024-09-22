@@ -160,51 +160,57 @@
 }
 
 .income {
-  background-color: #76EE92;
+  background-color: #76ee92;
   border: none;
 }
 
 .transport {
-  background-color: #4EB5FF;
+  background-color: #4eb5ff;
   border: none;
 }
 
 .eatingOut {
-  background-color: #FFCD4E;
+  background-color: #ffcd4e;
   border: none;
 }
 
 .groceries {
-  background-color: #A98DFB;
+  background-color: #a98dfb;
   border: none;
 }
 
 .entertainment {
-  background-color: #FD7575;
+  background-color: #fd7575;
   border: none;
 }
 
 .shopping {
-  background-color: #FB94F1;
+  background-color: #fb94f1;
   border: none;
 }
 
 .insurance {
-  background-color: #72F1E2;
+  background-color: #72f1e2;
   border: none;
 }
 
 .utilities {
-  background-color: #FDAD73;
+  background-color: #fdad73;
   border: none;
 }
 
 .medicalAid {
-  background-color: #C1C1C1;
+  background-color: #9a9a9a;
   border: none;
 }
 
 .other {
+  background-color: #d6d6d6;
+  color: rgb(0, 0, 0);
+  border: none;
+}
+
+.transfer {
   background-color: #000000;
   color: white;
   border: none;
@@ -248,7 +254,7 @@
   -webkit-appearance: none;
   -moz-appearance: none;
   background-image: none;
-  text-align: left; 
+  text-align: left;
   transition: 0.2s ease;
   padding: 0 5px;
   border: none;
@@ -273,4 +279,3 @@
   color: var(--greyed-text);
   font-size: calc(1.4rem * var(--font-size-multiplier));
 }
-
