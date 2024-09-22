@@ -666,7 +666,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               account_number: accountNumber,
               type: accountType,
               alias: inputValue,
-              bank: bankRef,
+              bank: bankRef.current,
             });
             //TODO:success modal for upload success
             await delay(1000);
