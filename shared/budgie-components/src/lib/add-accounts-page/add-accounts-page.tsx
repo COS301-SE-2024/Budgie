@@ -41,7 +41,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
   const user = useContext(UserContext);
   const router = useRouter();
   //bank state to pass to account addition phase
-  const [bank, setBank] = useState('');
+  const bankRef = useRef('');
 
   function AddAccountModal() {
     function OnAddAccountTypeClick(type: string) {
@@ -169,10 +169,10 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     const handleButtonClick = (bank: string) => {
+      bankRef.current = bank;
       if (fileInputRef.current) {
         fileInputRef.current.click();
       }
-      setBank(bank);
     };
 
     return (
@@ -189,7 +189,9 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
           <div className="mt-7">
             <button
               className="bg-BudgieWhite cursor-pointer rounded-3xl hover:bg-white hover:shadow-2xl transition-all ease-in"
-              onClick={() => handleButtonClick('FNB')}
+              onClick={() => {
+                handleButtonClick('FNB');
+              }}
             >
               <Image src={fnb} width={150} alt="FNB"></Image>
             </button>
@@ -601,6 +603,24 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
       return flag ? true : false;
     };
 
+    const AliasTaken = async (
+      uid: string,
+      accNo: string,
+      alias: string
+    ): Promise<boolean> => {
+      const accRef = collection(db, 'accounts');
+      const q = query(accRef, where('uid', '==', uid));
+      const querySnapshot = await getDocs(q);
+      let flag = false;
+      querySnapshot.forEach((doc) => {
+        if (doc.data().alias == alias) {
+          flag = true;
+        }
+      });
+
+      return flag;
+    };
+
     const delay = (ms: number | undefined) =>
       new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -609,6 +629,12 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         if (inputValue == '') {
           setAliasError(true);
           return;
+        } else {
+          let taken = await AliasTaken(user.uid, accountNumber, inputValue);
+          if (taken) {
+            setAliasError(true);
+            return;
+          }
         }
         //add account to database
         //set spinner
@@ -640,7 +666,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               account_number: accountNumber,
               type: accountType,
               alias: inputValue,
-              bank: bank,
+              bank: bankRef,
             });
             //TODO:success modal for upload success
             await delay(1000);
