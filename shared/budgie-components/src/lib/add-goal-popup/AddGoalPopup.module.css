@@ -9,7 +9,7 @@
   z-index: 15;
   align-items: center;
   width: 85vw;
-  font-size: calc(1.2rem*var(--font-size-multiplier));
+  font-size: calc(1.2rem * var(--font-size-multiplier));
 }
 
 .popupContent {
@@ -25,7 +25,7 @@
 
 .tabs {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .tabs button {

@@ -3,6 +3,7 @@ import { UserContext } from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';
 
 import { GoalPageRevised } from '@capstone-repo/shared/budgie-components';
+import { GoalsPage } from '@capstone-repo/shared/budgie-components';
 import ComparisonPage from '../comparison-page/comparison-page';
 import InsightsPage from '../insight-page/InsightsPage';
 import { collection, getDocs, query, where } from '@firebase/firestore';
@@ -60,7 +61,7 @@ export function PlanningPageRevised(props: PlanningPageRevisedProps) {
 
   return (
     <div className="mainPage h-full flex flex-col">
-      <div className="flex justify-center rounded-2xl bg-[var(--block-background)] h-[calc(6vh*var(--font-size-multiplier))]">
+      <div className="flex shadow-lg z-50 justify-center rounded-2xl bg-[var(--block-background)] h-[calc(6vh*var(--font-size-multiplier))]">
         <button
           className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-BudgieBlue2 hover:text-BudgieWhite font-medium mr-16 cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
             viewMode === 'goals' ? 'border-b-4 border-BudgieBlue2' : ''
