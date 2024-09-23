@@ -63,8 +63,54 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
 
   const handleNext = () => {
+    if (step === 1) {
+      if (!goalType) {
+        alert("Please select a goal type before proceeding.");
+        return;
+      }
+    } else if (step === 2) {
+      if (goalType === 'Savings') {
+        if (!goalName) {
+          alert("Please enter a goal name.");
+          return;
+        }
+        if (!targetAmount || targetAmount <= 0) {
+          alert("Please enter a valid target savings amount.");
+          return;
+        }
+        if (!targetDate) {
+          alert("Please select a target date.");
+          return;
+        }
+      } else if (goalType === 'Spending Limit') {
+        if (!goalName) {
+          alert("Please enter a goal name.");
+          return;
+        }
+        if (!spendingLimit || spendingLimit <= 0) {
+          alert("Please enter a valid monthly spending limit.");
+          return;
+        }
+      } else if (goalType === 'Debt Reduction') {
+        if (!goalName) {
+          alert("Please enter a goal name.");
+          return;
+        }
+        if (!debtAmount || debtAmount <= 0) {
+          alert("Please enter a valid debt amount.");
+          return;
+        }
+      }
+    } else if (step === 3) {
+      if (selectedAccounts.length === 0) {
+        alert("Please select at least one account.");
+        return;
+      }
+    }
+  
     if (step < 4) setStep(step + 1);
   };
+  
   const handleBack = () => {
     if (step > 1) setStep(step - 1);
   };
@@ -145,6 +191,12 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
   const popupWidth = getPopupWidth();
 
   const handleSubmit = async () => {
+
+    if (!updateMethod) {
+      alert("Please select an update method for the goal.");
+      return;
+    }
+
     const goalData: any = {
       type: goalType,
       name: goalName,
@@ -160,7 +212,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       if (goalType === 'Debt') {
         goalData.initial_amount = debtAmount;
       }
-    } else if (goalType === 'Spending') {
+    } else if (goalType === 'Spending Limit') {
       goalData.spending_limit = spendingLimit;
       goalData.category = selectedCategory;
     }
