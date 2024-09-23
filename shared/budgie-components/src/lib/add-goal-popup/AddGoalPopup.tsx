@@ -42,7 +42,7 @@ export interface AddGoalPopupProps {
 
 export function AddGoalPopup(props: AddGoalPopupProps) {
   const [goalType, setGoalType] = useState<string | null>(null);
-  const [step, setStep] = useState(1); // Tracks the current step in the wizard
+  const [step, setStep] = useState(1);
   const [goalName, setGoalName] = useState('');
   const [targetAmount, setTargetAmount] = useState(0);
   const [targetDate, setTargetDate] = useState<string | null>(null);
@@ -62,8 +62,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
 
 
-
-  // Handle step navigation
   const handleNext = () => {
     if (step < 4) setStep(step + 1);
   };
@@ -148,17 +146,25 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
   const handleSubmit = async () => {
     const goalData: any = {
-      goalType,
-      goalName,
-      targetAmount,
-      targetDate,
+      type: goalType,
+      name: goalName,
       accounts: selectedAccounts,
-      description,
-      updateMethod,
-      spendingLimit,
-      debtAmount,
       uid: user?.uid,
     };
+
+    if (goalType === 'Savings' || goalType === 'Debt') {
+      goalData.current_amount = 0;
+      goalData.target_amount = targetAmount;
+      goalData.target_date = targetDate;
+      goalData.description = description;
+      if (goalType === 'Debt') {
+        goalData.initial_amount = debtAmount;
+      }
+    } else if (goalType === 'Spending') {
+      goalData.spending_limit = spendingLimit;
+      goalData.category = selectedCategory;
+    }
+
     try {
       await addDoc(collection(db, 'goals'), goalData);
       props.togglePopup();
@@ -172,7 +178,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
       {/*1: Select Goal Type */}
       {step === 1 && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[40vw] h-[60vh] flex flex-col justify-between">
+        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between">
 
           <p className={styles.goalHeading}>Select a Goal Type:</p>
           <div className={styles.goalInfo}>
@@ -215,7 +221,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
       {/*2: Goal Details */}
       {step === 2 && goalType === 'Savings' && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[40vw] h-[60vh] flex flex-col justify-between">
+        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between">
 
           <p className={styles.goalHeading}>Savings Goal Details</p>
           <div className={styles.goalInfo}>
@@ -293,7 +299,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       )}
 
       {step === 2 && goalType === 'Spending Limit' && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[40vw] h-[60vh] flex flex-col justify-between">
+        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between">
 
           <p className={styles.goalHeading}>Spending Limit Goal</p>
           <div className={styles.goalInfo}>
@@ -353,7 +359,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       )}
 
       {step === 2 && goalType === 'Debt Reduction' && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[40vw] h-[60vh] flex flex-col justify-between">
+        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between">
 
 
           <p className={styles.goalHeading}>Debt Reduction Goal</p>
@@ -412,7 +418,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
       {/*3: Account Selection */}
       {step === 3 && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[40vw] h-[60vh] flex flex-col justify-between">
+        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between">
 
           <p className={styles.goalHeading}>Select Accounts</p>
           <div className={styles.goalInfo}>
@@ -455,7 +461,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
       {/*4: Update Method */}
       {step === 4 && goalType !== 'Spending Limit' && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[40vw] h-[60vh] flex flex-col justify-between">
+        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between">
           <p className={styles.goalHeading}>How would you like to update this goal?</p>
           <div className={styles.updateGoalInfo}>
             <label style={{ marginBottom: '0.2rem', display: 'block' }}>
@@ -509,7 +515,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       )}
 
       {step === 4 && goalType === 'Spending Limit' && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[40vw] h-[60vh] flex flex-col justify-between">
+        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between">
           <p className={styles.goalHeading}>How would you like to update this goal?</p>
           <div className={styles.updateGoalInfo}>
             <label style={{ marginBottom: '0.2rem', display: 'block' }}>

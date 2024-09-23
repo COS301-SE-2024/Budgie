@@ -41,6 +41,7 @@
   color: black;
   font-weight: 100;
   line-height: calc(1.2rem * var(--font-size-multiplier));
+  width: 100%;
 }
 
 .goalForm select {
@@ -141,13 +142,12 @@
 }
 
 .selected:hover {
-  background-color: var(--main-background);
+  border: 1px solid var(--block-background);
 }
 
 .checkOption {
   margin-bottom: 0.5rem;
 }
-
 
 .goalHeading {
   color: var(--main-text);
