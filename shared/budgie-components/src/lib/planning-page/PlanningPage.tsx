@@ -439,7 +439,7 @@ export function PlanningPage(props: PlanningPageProps) {
             onClick={() => setViewMode('insight')}
             style={{ marginLeft: '5rem' }}
           >
-            Upcoming
+            Insight
           </button>
         </div>
       </div>

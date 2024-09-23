@@ -1,3 +1,7 @@
+.comparisonsPage{
+    background-color: var(--main-background);
+}
+
 .container {
     background-color: var(--main-background);
     width: 85vw;
