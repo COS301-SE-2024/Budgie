@@ -5,8 +5,6 @@ import { UserContext } from '@capstone-repo/shared/budgie-components';
 import styles from './AddGoalPopup.module.css';
 import '../../root.css';
 
-/* eslint-disable-next-line */
-
 interface ClearableInputProps {
   value: number;
   onChange: (value: number) => void;
@@ -43,7 +41,6 @@ export interface AddGoalPopupProps {
 }
 
 export function AddGoalPopup(props: AddGoalPopupProps) {
-  const [activeTab, setActiveTab] = useState<string>('Savings');
   const [goalType, setGoalType] = useState<string | null>(null);
   const [step, setStep] = useState(1); // Tracks the current step in the wizard
   const [goalName, setGoalName] = useState('');
@@ -57,12 +54,33 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
   const [updateMethod, setUpdateMethod] = useState('');
   const user = useContext(UserContext);
 
-  const handleNext = () => setStep(step + 1);
-  const handleBack = () => setStep(step - 1);
+  // Handle step navigation
+  const handleNext = () => {
+    if (step < 4) setStep(step + 1);
+  };
+  const handleBack = () => {
+    if (step > 1) setStep(step - 1);
+  };
+
   const handleGoalTypeSelection = (type: string) => {
     setGoalType(type);
-    setStep(2);
   };
+
+  function getPopupWidth(): string {
+    const root = document.documentElement;
+    const computedStyle = getComputedStyle(root);
+    const width =
+      20 -
+      (35 *
+        parseFloat(computedStyle.getPropertyValue('--font-size-multiplier')) -
+        35) *
+      0.5;
+    const widthString = width.toString();
+    console.log(computedStyle.getPropertyValue('--font-size-multiplier'));
+    return widthString + 'vw';
+      }
+
+      const popupWidth = getPopupWidth();
 
   const handleSubmit = async () => {
     const goalData: any = {
@@ -87,114 +105,265 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
   return (
     <div className={styles.addGoalPopup}>
-      <div className={styles.popupContainer}>
-        <div className={styles.popupContent}>
-          {/* 1: Select Goal Type*/}
-          {step === 1 && (
-            <div>
+      <div className={styles.popupContent}>
+        {/* Step 1: Select Goal Type */}
+        {step === 1 && (
+          <div>
+            
               <p className={styles.goalHeading}>Select a Goal Type:</p>
-              <button className={styles.cancelButton} onClick={() => handleGoalTypeSelection('Savings')}>
+              <div className={styles.goalInfo}>
+              <button
+                className={`${styles.goalTypeButton} ${goalType === 'Savings' ? styles.selected : ''}`}
+                onClick={() => handleGoalTypeSelection('Savings')}
+              >
                 <p className={styles.goalTitle}>Savings Goal</p>
-                <p className={styles.goalDescription}>This goal helps you set aside a specific amount of money over time for future purposes, such as an emergency fund, vacation, or large purchase.</p>
+                <p className={styles.goalDescription}>Plan and work towards saving a specific amount of money by a set deadline.</p>
               </button>
-              <button className={styles.cancelButton} onClick={() => handleGoalTypeSelection('Spending Limit')}>
-                Spending Limit
+              <button
+                className={`${styles.goalTypeButton} ${goalType === 'Spending Limit' ? styles.selected : ''}`}
+                onClick={() => handleGoalTypeSelection('Spending Limit')}
+              >
+                <p className={styles.goalTitle}>Limit Spending</p>
+                <p className={styles.goalDescription}>Control your spending by setting a monthly limit on your purchases.</p>
               </button>
-              <button className={styles.cancelButton} onClick={() => handleGoalTypeSelection('Debt Reduction')}>
-                Debt Reduction
+              <button
+                className={`${styles.goalTypeButton} ${goalType === 'Debt Reduction' ? styles.selected : ''}`}
+                onClick={() => handleGoalTypeSelection('Debt Reduction')}
+              >
+                <p className={styles.goalTitle}>Debt Reduction</p>
+                <p className={styles.goalDescription}>Focus on paying outstanding debts, such as loans or credit cards.</p>
               </button>
             </div>
-          )}
 
-          {step === 2 && goalType === 'Savings' && (
-            <div>
-              <h2>Savings Goal Details</h2>
+            <div className={styles.buttonContainer}>
+              <button className={styles.cancelButton} onClick={props.togglePopup}>
+                Cancel
+              </button>
+              {goalType ? (
+                <button className={styles.nextButton} onClick={handleNext}>
+                  Next
+                </button>
+              ) : null}
+            </div>
+
+          </div>
+        )}
+
+        {/* Step 2: Goal Details */}
+        {step === 2 && goalType === 'Savings' && (
+          <div>
+            
+            
+              <p className={styles.goalHeading}>Savings Goal Details</p>
+              <div className={styles.goalInfo}>
+              <div className={styles.goalForm}>
+              <div className={styles.formGroup}>
+              <span
+                className={`material-symbols-outlined ${styles.icon}`}
+                style={{
+                  fontSize: 'calc(1rem * var(--font-size-multiplier))',
+                  color: 'var(--greyed-text)',
+                }}
+              >
+                info
+              </span>
+              <span className={styles.popupText} style={{ width: popupWidth }}>
+                Enter a descriptive name for your savings goal. This could be a
+                short term goal like a vacation fund or a long term goal like
+                your retirement savings.
+              </span>
               <label>Goal Name:</label>
-              <input type="text" value={goalName} onChange={(e) => setGoalName(e.target.value)} required />
-
-              <label>Target Amount:</label>
-              <ClearableInput value={targetAmount} onChange={setTargetAmount} />
-
-              <label>Target Date:</label>
-              <input type="date" value={targetDate || ''} onChange={(e) => setTargetDate(e.target.value)} required />
-
-              <button onClick={handleNext}>Next</button>
+              <input
+                type="text"
+                value={goalName}
+                onChange={(e) => setGoalName(e.target.value)}
+                required
+              />
             </div>
-          )}
+            <div className={styles.formGroup}>
+              <span
+                className={`material-symbols-outlined ${styles.icon}`}
+                style={{
+                  fontSize: 'calc(1rem * var(--font-size-multiplier))',
+                  color: 'var(--greyed-text)',
+                }}
+              >
+                info
+              </span>
+              <span className={styles.popupText} style={{ width: popupWidth }}>
+                Enter the amount of money you aim to save for this goal.
+              </span>
+              <label>Target Savings Amount:</label>
+              <ClearableInput value={targetAmount} onChange={setTargetAmount} />
+            </div>
+            <div className={styles.formGroup}>
+              <span
+                className={`material-symbols-outlined ${styles.icon}`}
+                style={{
+                  fontSize: 'calc(1rem * var(--font-size-multiplier))',
+                  color: 'var(--greyed-text)',
+                }}
+              >
+                info
+              </span>
+              <span className={styles.popupText} style={{ width: popupWidth }}>
+                Select the date by which you want to reach this goal.
+              </span>
+              <label>Target Date:</label>
+              <input
+                type="date"
+                value={targetDate || ''}
+                onChange={(e) => setTargetDate(e.target.value)}
+                required
+              />
+            </div>
+            </div>
+            </div>
+            <div className={styles.buttonContainer}>
+              <button className={styles.cancelButton} onClick={props.togglePopup}>
+                Cancel
+              </button>
+              <button className={styles.prevButton}onClick={handleBack}>Previous</button>
+              <button className={styles.nextButton} onClick={handleNext}>Next</button>
+            </div>
+          </div>
+        )}
 
-          {step === 2 && goalType === 'Spending Limit' && (
-            <div>
-              <h2>Spending Limit Goal</h2>
+        {step === 2 && goalType === 'Spending Limit' && (
+          <div>
+            
+            <p className={styles.goalHeading}>Spending Limit Goal</p>
+            <div className={styles.goalInfo}>
               <label>Goal Name:</label>
               <input type="text" value={goalName} onChange={(e) => setGoalName(e.target.value)} required />
 
               <label>Monthly Limit:</label>
               <ClearableInput value={spendingLimit} onChange={setSpendingLimit} />
-
-              <button onClick={handleNext}>Next</button>
             </div>
-          )}
+            <div className={styles.buttonContainer}>
+              <button className={styles.cancelButton} onClick={props.togglePopup}>
+                Cancel
+              </button>
+              <button className={styles.prevButton} onClick={handleBack}>Previous</button>
+              <button className={styles.nextButton} onClick={handleNext}>Next</button>
+            </div>
+          </div>
+        )}
 
-          {step === 2 && goalType === 'Debt Reduction' && (
-            <div>
-              <h2>Debt Reduction Goal</h2>
+        {step === 2 && goalType === 'Debt Reduction' && (
+          <div>
+            
+            <p className={styles.goalHeading}>Debt Reduction Goal</p>
+            <div className={styles.goalInfo}>
               <label>Goal Name:</label>
               <input type="text" value={goalName} onChange={(e) => setGoalName(e.target.value)} required />
 
               <label>Debt Amount:</label>
               <ClearableInput value={debtAmount} onChange={setDebtAmount} />
-
-              <button onClick={handleNext}>Next</button>
             </div>
-          )}
+            <div className={styles.buttonContainer}>
+              <button className={styles.cancelButton} onClick={props.togglePopup}>
+                Cancel
+              </button>
+              <button className={styles.prevButton} onClick={handleBack}>Previous</button>
+              <button className={styles.nextButton} onClick={handleNext}>Next</button>
+            </div>
+          </div>
+        )}
 
-          {step === 3 && (
-            <div>
-              <h2>Select Accounts</h2>
-              {/* Assume accounts is populated */}
+        {/* Step 3: Account Selection */}
+        {step === 3 && (
+          <div>
+            
+            <p className={styles.goalHeading}>Select Accounts</p>
+            <div className={styles.goalInfo}>
               <label>Assigned Accounts:</label>
-              <select multiple value={selectedAccounts} onChange={(e) => setSelectedAccounts(Array.from(e.target.selectedOptions, option => option.value))}>
+              <select
+                multiple
+                value={selectedAccounts}
+                onChange={(e) => setSelectedAccounts(Array.from(e.target.selectedOptions, option => option.value))}
+              >
                 {accounts.map((account, idx) => (
                   <option key={idx} value={account}>
                     {account}
                   </option>
                 ))}
               </select>
-
-              <button onClick={handleBack}>Back</button>
-              <button onClick={handleNext}>Next</button>
             </div>
-          )}
+            <div className={styles.buttonContainer}>
+              <button className={styles.cancelButton} onClick={props.togglePopup}>
+                Cancel
+              </button>
+              <button className={styles.prevButton} onClick={handleBack}>Previous</button>
+              <button className={styles.nextButton} onClick={handleNext}>Next</button>
+            </div>
+          </div>
+        )}
 
-          {step === 4 && goalType === 'Savings' && (
-            <div>
-              <h2>How would you like to update this goal?</h2>
+        {/* Step 4: Update Method */}
+        {step === 4 && goalType === 'Savings' && (
+          <div>
+            
+            <p className={styles.goalHeading}>How would you like to update this goal?</p>
+            <div className={styles.goalInfo}>
               <label>
-                <input type="radio" value="assign-all" checked={updateMethod === 'assign-all'} onChange={() => setUpdateMethod('assign-all')} />
+                <input
+                  type="radio"
+                  value="assign-all"
+                  checked={updateMethod === 'assign-all'}
+                  onChange={() => setUpdateMethod('assign-all')}
+                />
                 Assign all transactions from selected accounts
               </label>
               <label>
-                <input type="radio" value="assign-description" checked={updateMethod === 'assign-description'} onChange={() => setUpdateMethod('assign-description')} />
+                <input
+                  type="radio"
+                  value="assign-description"
+                  checked={updateMethod === 'assign-description'}
+                  onChange={() => setUpdateMethod('assign-description')}
+                />
                 Automatically assign transactions with a certain description
               </label>
               {updateMethod === 'assign-description' && (
-                <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Enter description" />
+                <input
+                  type="text"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Enter description"
+                />
               )}
               <label>
-                <input type="radio" value="manual" checked={updateMethod === 'manual'} onChange={() => setUpdateMethod('manual')} />
+                <input
+                  type="radio"
+                  value="manual"
+                  checked={updateMethod === 'manual'}
+                  onChange={() => setUpdateMethod('manual')}
+                />
                 Manually assign transactions
               </label>
-
-              <button onClick={handleBack}>Back</button>
-              <button onClick={handleSubmit}>Submit</button>
             </div>
-          )}
+            <div className={styles.buttonContainer}>
+              <button className={styles.cancelButton} onClick={props.togglePopup}>
+                Cancel
+              </button>
+              <button className={styles.prevButton} onClick={handleBack}>Previous</button>
+              <button className={styles.nextButton} onClick={handleSubmit}>Submit</button>
+            </div>
+          </div>
+        )}
 
-          {step === 4 && goalType === 'Spending Limit' && (
-            <div>
-              <h2>How would you like to update this goal?</h2>
+        {step === 4 && goalType === 'Spending Limit' && (
+          <div>
+            
+            <p className={styles.goalHeading}>How would you like to update this goal?</p>
+            <div className={styles.goalInfo}>
               <label>
-                <input type="radio" value="assign-category" checked={updateMethod === 'assign-category'} onChange={() => setUpdateMethod('assign-category')} />
+                <input
+                  type="radio"
+                  value="assign-category"
+                  checked={updateMethod === 'assign-category'}
+                  onChange={() => setUpdateMethod('assign-category')}
+                />
                 Automatically assign transactions by category
               </label>
               {updateMethod === 'assign-category' && (
@@ -209,43 +378,71 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 </div>
               )}
               <label>
-                <input type="radio" value="manual" checked={updateMethod === 'manual'} onChange={() => setUpdateMethod('manual')} />
+                <input
+                  type="radio"
+                  value="manual"
+                  checked={updateMethod === 'manual'}
+                  onChange={() => setUpdateMethod('manual')}
+                />
                 Manually assign transactions
               </label>
-
-              <button onClick={handleBack}>Back</button>
+            </div>
+            <div className={styles.buttonContainer}>
+              <button className={styles.cancelButton} onClick={props.togglePopup}>
+                Cancel
+              </button>
+              <button className={styles.prevButton} onClick={handleBack}>Previous</button>
               <button onClick={handleSubmit}>Submit</button>
             </div>
-          )}
+          </div>
+        )}
 
-          {step === 4 && goalType === 'Debt Reduction' && (
-            <div>
-              <h2>How would you like to update this goal?</h2>
+        {step === 4 && goalType === 'Debt Reduction' && (
+          <div>
+            
+            <p className={styles.goalHeading}>How would you like to update this goal?</p>
+            <div className={styles.goalInfo}>
               <label>
-                <input type="radio" value="assign-description" checked={updateMethod === 'assign-description'} onChange={() => setUpdateMethod('assign-description')} />
+                <input
+                  type="radio"
+                  value="assign-description"
+                  checked={updateMethod === 'assign-description'}
+                  onChange={() => setUpdateMethod('assign-description')}
+                />
                 Automatically assign transactions with a certain description
               </label>
               {updateMethod === 'assign-description' && (
-                <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Enter description" />
+                <input
+                  type="text"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Enter description"
+                />
               )}
               <label>
-                <input type="radio" value="manual" checked={updateMethod === 'manual'} onChange={() => setUpdateMethod('manual')} />
+                <input
+                  type="radio"
+                  value="manual"
+                  checked={updateMethod === 'manual'}
+                  onChange={() => setUpdateMethod('manual')}
+                />
                 Manually assign transactions
               </label>
-
-              <button onClick={handleBack}>Back</button>
+            </div>
+            <div className={styles.buttonContainer}>
+              <button className={styles.cancelButton} onClick={props.togglePopup}>
+                Cancel
+              </button>
+              <button className={styles.prevButton} onClick={handleBack}>Previous</button>
               <button onClick={handleSubmit}>Submit</button>
             </div>
-          )}
-
-          <button className={styles.cancelButton} onClick={props.togglePopup}>
-            Cancel
-          </button>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
 
 interface GoalFormProps {
   activeTab: string;

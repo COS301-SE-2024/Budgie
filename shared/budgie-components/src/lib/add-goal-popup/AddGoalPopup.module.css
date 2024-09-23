@@ -16,12 +16,16 @@
 .popupContent {
   background: var(--block-background);
   padding: 20px;
-  border-bottom-right-radius: 5px;
-  border-bottom-left-radius: 5px;
+  border-radius: 5px;
   text-align: center;
   z-index: 2;
   width: calc(35vw * var(--font-size-multiplier));
-  border-top: 4px solid var(--primary-1);
+  height: calc(50vh*var(--font-size-multiplier));
+}
+
+.goalInfo {
+  height: calc(36vh*var(--font-size-multiplier));
+  align-content: center;
 }
 
 .tabs {
@@ -61,7 +65,7 @@
 .goalForm .formGroup {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 2rem;
   align-items: center;
   position: relative;
 }
@@ -112,24 +116,72 @@
 
 .cancelButton {
   padding: 10px;
-  background-color: var(--main-background);
-  color: var(--main-text);
+  color: var(--primary-1);
   border: none;
   cursor: pointer;
-  width: 100%;
-  margin-top: 0.5rem;
+  width: 55%;
   transition: 0.3s ease;
-  margin-top: 1rem;
-  border: 1px solid var(--main-background);
+  font-weight: bold;
+  border-radius: 5px;
+  text-align: left;
+}
+
+.nextButton {
+  padding: 10px;
+  color: var(--secondary-text);
+  border: none;
+  cursor: pointer;
+  width: 20%;
+  transition: 0.3s ease;
+  font-weight: bold;
+  background-color: var(--primary-1);
+  border-radius: 5px;
+}
+
+.prevButton {
+  padding: 10px;
+  color: var(--primary-1);
+  border: 1px solid var(--primary-1);
+  cursor: pointer;
+  width: 20%;
+  transition: 0.3s ease;
+  font-weight: bold;
+  border-radius: 5px;
 }
 
 .cancelButton:hover {
   filter: brightness(1.05);
 }
 
+.buttonContainer {
+  display: flex;
+  justify-content: space-between;
+  align-self: center;
+}
+
+.goalTypeButton {
+  padding: 10px;
+  color: var(--main-text);
+  background-color: var(--main-background);
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  transition: 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.goalTypeButton:hover {
+  background-color: var(--block-background);
+}
+
+.selected {
+  border: 1px solid var(--primary-1);
+  background-color: var(--block-background);
+}
+
 .goalHeading{
   color: var(--main-text);
-  margin-bottom: 2rem;
+  margin-top: 1rem;
   text-align: center;
   font-weight: bold;
 }
