@@ -1,60 +1,11 @@
-
-.addGoalPopup {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  z-index: 15;
-  align-items: center;
-  width: 85vw;
-  font-size: calc(1.2rem*var(--font-size-multiplier));
-}
-
-.popupContent {
-  background: var(--block-background);
-  padding: 20px;
-  border-radius: 5px;
-  text-align: center;
-  z-index: 2;
-  width: calc(35vw * var(--font-size-multiplier));
-  height: calc(50vh*var(--font-size-multiplier));
-}
-
 .goalInfo {
-  height: calc(36vh*var(--font-size-multiplier));
   align-content: center;
 }
 
-.tabs {
-  display: flex;
-  justify-content: space-between;
-}
-
-.tabs button {
-  padding: 10px 20px;
-  border: none;
-  background-color: var(--block-background);
-  cursor: pointer;
-  border-top-right-radius: 5px;
-  border-top-left-radius: 5px;
-  width: 32%;
-}
-
-.tabs button.active {
-  background-color: var(--primary-1);
-  color: white;
-}
-
-.tabs button:hover {
-  filter: brightness(0.9);
-  transition: 0.3s ease;
-}
-
-.tabs button.active:hover {
-  filter: brightness(1);
+.updateGoalInfo {
+  height: calc(36vh*var(--font-size-multiplier));
+  align-content: center;
+  text-align: left;
 }
 
 .goalForm {
@@ -115,6 +66,14 @@
   filter: brightness(1.1);
 }
 
+.goalForm .formGroup {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+
 .cancelButton {
   padding: 10px;
   color: var(--primary-1);
@@ -158,6 +117,7 @@
   display: flex;
   justify-content: space-between;
   align-self: center;
+  width: 100%;
 }
 
 .goalTypeButton {
@@ -168,7 +128,7 @@
   cursor: pointer;
   width: 100%;
   transition: 0.3s ease;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .goalTypeButton:hover {
@@ -180,9 +140,18 @@
   background-color: var(--block-background);
 }
 
-.goalHeading{
+.selected:hover {
+  background-color: var(--main-background);
+}
+
+.checkOption {
+  margin-bottom: 0.5rem;
+}
+
+
+.goalHeading {
   color: var(--main-text);
-  margin-top: 1rem;
+  margin-bottom: 1rem;
   text-align: center;
   font-weight: bold;
 }
@@ -208,13 +177,105 @@
   padding: 1rem;
   z-index: 1000000;
   position: fixed;
-  transform: translateX(calc(35vw * var(--font-size-multiplier)));
+  transform: translateX(calc(40vw * var(--font-size-multiplier)));
   opacity: 0;
   transition: opacity 0.3s;
   font-weight: 200;
 }
 
-.icon:hover + .popupText {
+.icon:hover+.popupText {
   visibility: visible;
   opacity: 1;
+}
+
+.categoryDropdown {
+  border: 1px solid #ccc;
+  padding: 5px;
+  border-radius: 10px;
+  width: calc(9vw * var(--font-size-multiplier));
+  box-sizing: border-box;
+  font-weight: bold;
+  font-size: calc(16px * var(--font-size-multiplier));
+  text-align: center;
+  text-align-last: center;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: var(--main-background);
+  border: none;
+  background-image: none;
+}
+
+.categoryDropdown option {
+  text-align: left;
+  background-color: var(--main-background);
+  color: var(--main-text);
+}
+
+.buttonContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.income {
+  background-color: #76ee92;
+  border: none;
+}
+
+.transport {
+  background-color: #4eb5ff;
+  border: none;
+}
+
+.eatingOut {
+  background-color: #ffcd4e;
+  border: none;
+}
+
+.groceries {
+  background-color: #a98dfb;
+  border: none;
+}
+
+.entertainment {
+  background-color: #fd7575;
+  border: none;
+}
+
+.shopping {
+  background-color: #fb94f1;
+  border: none;
+}
+
+.insurance {
+  background-color: #72f1e2;
+  border: none;
+}
+
+.utilities {
+  background-color: #fdad73;
+  border: none;
+}
+
+.medicalAid {
+  background-color: #9a9a9a;
+  border: none;
+}
+
+.other {
+  background-color: #d6d6d6;
+  color: rgb(0, 0, 0);
+  border: none;
+}
+
+.transfer {
+  background-color: #000000;
+  color: white;
+  border: none;
+}
+
+.default {
+  background-color: var(--main-background);
+  color: black;
 }
