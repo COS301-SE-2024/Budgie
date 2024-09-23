@@ -101,13 +101,15 @@
 
   .deleteButton
   {
-    background-color: rgb(177, 3, 3) !important;
-    border: none !important;
+    border: 1px solid rgb(177, 3, 3) !important;
+    color:rgb(177, 3, 3) !important;
+    background-color: var(--block-background) !important;
     margin-top: 0 !important;
   }
 
   .deleteButton:hover {
     background-color: rgb(196, 2, 2) !important;
+    color:white !important;
   }
   
   .popupText {

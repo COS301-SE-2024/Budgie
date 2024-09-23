@@ -60,15 +60,27 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
   const [currentAccountNumber, setCurrentAccountNumber] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [keywords, setKeywords] = useState<string[]>([]);
+
+
+  const addKeyword = () => {
+    if (description.trim() === '') {
+      alert('Please enter a keyword.');
+      return;
+    }
+
+    setKeywords([...keywords, description.trim()]);
+    setDescription('');
+  };
+
+  const removeKeyword = (keywordToRemove: string) => {
+    setKeywords(keywords.filter((keyword) => keyword !== keywordToRemove));
+  };
+
 
 
   const handleNext = () => {
-    if (step === 1) {
-      if (!goalType) {
-        alert("Please select a goal type before proceeding.");
-        return;
-      }
-    } else if (step === 2) {
+    if (step === 2) {
       if (goalType === 'Savings') {
         if (!goalName) {
           alert("Please enter a goal name.");
@@ -100,17 +112,27 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
           alert("Please enter a valid debt amount.");
           return;
         }
+        if (!targetDate) {
+          alert("Please select a target date.");
+          return;
+        }
       }
     } else if (step === 3) {
+      if (!updateMethod) {
+        alert("Please select an update method for the goal.");
+        return;
+      }
+    }
+    else if (step === 4) {
       if (selectedAccounts.length === 0) {
         alert("Please select at least one account.");
         return;
       }
     }
-  
-    if (step < 4) setStep(step + 1);
+
+    if (step < 5) setStep(step + 1);
   };
-  
+
   const handleBack = () => {
     if (step > 1) setStep(step - 1);
   };
@@ -192,21 +214,24 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
   const handleSubmit = async () => {
 
-    if (!updateMethod) {
-      alert("Please select an update method for the goal.");
-      return;
-    }
-
     const goalData: any = {
       type: goalType,
       name: goalName,
       accounts: selectedAccounts,
       uid: user?.uid,
+      updateType: updateMethod
     };
+    if (updateMethod == 'assign-description' && keywords.length == 0) {
+      alert("Please enter atleast one keyword.")
+    }
+    else {
+    if (updateMethod == 'assign-description' && keywords.length > 0) {
+      goalData.description = keywords;
+    }
 
-    if (goalType === 'Savings' || goalType === 'Debt Reduction') {      
+
+    if (goalType === 'Savings' || goalType === 'Debt Reduction') {
       goalData.target_date = targetDate;
-      goalData.description = description;
       if (goalType === 'Debt Reduction') {
         goalData.initial_amount = debtAmount;
         goalData.current_amount = debtAmount;
@@ -219,13 +244,13 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       goalData.spending_limit = spendingLimit;
       goalData.category = selectedCategory;
     }
-
     try {
       await addDoc(collection(db, 'goals'), goalData);
       props.togglePopup();
     } catch (error) {
       console.error('Error saving goal:', error);
     }
+}
   };
 
   return (
@@ -233,7 +258,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
       {/*1: Select Goal Type */}
       {step === 1 && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between">
+        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
 
           <p className={styles.goalHeading}>Select a Goal Type:</p>
           <div className={styles.goalInfo}>
@@ -276,7 +301,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
       {/*2: Goal Details */}
       {step === 2 && goalType === 'Savings' && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between">
+        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
 
           <p className={styles.goalHeading}>Savings Goal Details</p>
           <div className={styles.goalInfo}>
@@ -354,7 +379,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       )}
 
       {step === 2 && goalType === 'Spending Limit' && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between">
+        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
 
           <p className={styles.goalHeading}>Spending Limit Goal</p>
           <div className={styles.goalInfo}>
@@ -414,9 +439,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       )}
 
       {step === 2 && goalType === 'Debt Reduction' && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between">
-
-
+        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
           <p className={styles.goalHeading}>Debt Reduction Goal</p>
           <div className={styles.goalInfo}>
             <div className={styles.goalForm}>
@@ -459,6 +482,27 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 <label>Debt Amount:</label>
                 <ClearableInput value={debtAmount} onChange={setDebtAmount} />
               </div>
+              <div className={styles.formGroup}>
+                <span
+                  className={`material-symbols-outlined ${styles.icon}`}
+                  style={{
+                    fontSize: 'calc(1rem * var(--font-size-multiplier))',
+                    color: 'var(--greyed-text)',
+                  }}
+                >
+                  info
+                </span>
+                <span className={styles.popupText} style={{ width: popupWidth }}>
+                  Select the date by which you want to reach this goal.
+                </span>
+                <label>Target Date:</label>
+                <input
+                  type="date"
+                  value={targetDate || ''}
+                  onChange={(e) => setTargetDate(e.target.value)}
+                  required
+                />
+              </div>
             </div>
           </div>
           <div className={styles.buttonContainer}>
@@ -471,38 +515,51 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
         </div>
       )}
 
-      {/*3: Associated Account Selection */}
-      {step === 3 && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between">
-
-          <p className={styles.goalHeading}>Select Accounts</p>
-          <div className={styles.goalInfo}>
-            <p className={styles.goalDescription} style={{ textAlign: 'center' }}>Select the account/s you want to associate this goal with.</p>
-            <p className={styles.goalDescription} style={{ textAlign: 'center' }}>Transactions for the selected account/s can be assigned to this goal.</p>
-            <br></br>
-
-            {accountOptions.map((option, index) => (
-              <div key={index} className={styles.checkOption}>
-                <label>
-                  <input
-                    type="checkbox"
-                    value={option.alias}
-                    checked={selectedAccounts.includes(option.alias)}
-                    onChange={(e) => {
-                      const selected = e.target.value;
-                      if (e.target.checked) {
-                        setSelectedAccounts([...selectedAccounts, selected]);
-                      } else {
-                        setSelectedAccounts(selectedAccounts.filter(account => account !== selected));
-                      }
-                    }}
-                    style={{ marginRight: '1rem' }}
-                  />
-                  {option.alias}
-                </label>
-              </div>
-            ))}
-
+      {/*3: Update Method */}
+      {step === 3 && goalType !== 'Spending Limit' && (
+        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
+          <p className={styles.goalHeading}>How would you like to update this goal?</p>
+          <div className={styles.updateGoalInfo}>
+            <label style={{ display: 'block', marginBottom: '1rem' }}>
+              <input
+                type="radio"
+                value="assign-all"
+                checked={updateMethod === 'assign-all'}
+                onChange={() => setUpdateMethod('assign-all')}
+                style={{ marginRight: '1rem' }}
+              />
+              Assign all transactions from selected accounts.
+            </label>
+            <label style={{ display: 'block', marginBottom: '1rem' }}>
+              <input
+                type="radio"
+                value="assign-description"
+                checked={updateMethod === 'assign-description'}
+                style={{ marginRight: '1rem' }}
+                onChange={() => setUpdateMethod('assign-description')}
+              />
+              Automatically assign transactions with a certain description.
+            </label>
+            <label style={{ display: 'block', marginBottom: '1rem' }}>
+              <input
+                type="radio"
+                value="assign-transactions"
+                checked={updateMethod === 'assign-transactions'}
+                onChange={() => setUpdateMethod('assign-transactions')}
+                style={{ marginRight: '1rem' }}
+              />
+              Manually assign transactions.
+            </label>
+            <label style={{ display: 'block' }}>
+              <input
+                type="radio"
+                value="manual"
+                checked={updateMethod === 'manual'}
+                onChange={() => setUpdateMethod('manual')}
+                style={{ marginRight: '1rem' }}
+              />
+              Manually input update amounts.
+            </label>
           </div>
           <div className={styles.buttonContainer}>
             <button className={styles.cancelButton} onClick={props.togglePopup}>
@@ -514,66 +571,11 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
         </div>
       )}
 
-      {/*4: Update Method */}
-      {step === 4 && goalType !== 'Spending Limit' && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between">
+      {step === 3 && goalType === 'Spending Limit' && (
+        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
           <p className={styles.goalHeading}>How would you like to update this goal?</p>
           <div className={styles.updateGoalInfo}>
-            <label style={{ marginBottom: '0.2rem', display: 'block' }}>
-              <input
-                type="radio"
-                value="assign-all"
-                checked={updateMethod === 'assign-all'}
-                onChange={() => setUpdateMethod('assign-all')}
-                style={{ marginRight: '1rem' }}
-              />
-              Assign all transactions from selected accounts
-            </label>
-            <label style={{ display: 'block' }}>
-              <input
-                type="radio"
-                value="assign-description"
-                checked={updateMethod === 'assign-description'}
-                style={{ marginRight: '1rem' }}
-                onChange={() => setUpdateMethod('assign-description')}
-              />
-              Automatically assign transactions with a certain description
-            </label>
-            {updateMethod === 'assign-description' && (
-              <input
-                type="text"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                style={{ marginLeft: '2rem', marginTop: '1rem', marginBottom: '1rem' }}
-                placeholder="Enter description"
-              />
-            )}
-            <label style={{ marginTop: '0.2rem', display: 'block' }}>
-              <input
-                type="radio"
-                value="manual"
-                checked={updateMethod === 'manual'}
-                onChange={() => setUpdateMethod('manual')}
-                style={{ marginRight: '1rem' }}
-              />
-              Manually assign transactions
-            </label>
-          </div>
-          <div className={styles.buttonContainer}>
-            <button className={styles.cancelButton} onClick={props.togglePopup}>
-              Cancel
-            </button>
-            <button className={styles.prevButton} onClick={handleBack}>Previous</button>
-            <button className={styles.nextButton} onClick={handleSubmit}>Submit</button>
-          </div>
-        </div>
-      )}
-
-      {step === 4 && goalType === 'Spending Limit' && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between">
-          <p className={styles.goalHeading}>How would you like to update this goal?</p>
-          <div className={styles.updateGoalInfo}>
-            <label style={{ marginBottom: '0.2rem', display: 'block' }}>
+            <label style={{ display: 'block', marginBottom: '1rem' }}>
               <input
                 type="radio"
                 value="assign-category"
@@ -581,11 +583,11 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 onChange={() => setUpdateMethod('assign-category')}
                 style={{ marginRight: '1rem' }}
               />
-              Automatically assign transactions by category
+              Automatically assign transactions by category.
             </label>
             {updateMethod === 'assign-category' && (
-              <div style={{ marginLeft: '2rem', marginTop: '0.2rem', marginBottom: '2rem' }}>
-                <select
+              <div style={{ marginLeft: '2rem', marginTop: '0.2rem', marginBottom: '1rem' }}>
+                {/*<select
                   className={`${styles.categoryDropdown} ${getCategoryStyle(selectedCategory)}`}
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
@@ -602,11 +604,11 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                   <option value="Medical Aid">Medical Aid</option>
                   <option value="Transfer">Transfer</option>
                   <option value="Other">Other</option>
-                </select>
+                </select>*/}
 
               </div>
             )}
-            <label style={{ display: 'block' }}>
+            <label style={{ display: 'block', marginBottom: '1rem' }}>
               <input
                 type="radio"
                 value="assign-description"
@@ -614,18 +616,19 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 style={{ marginRight: '1rem' }}
                 onChange={() => setUpdateMethod('assign-description')}
               />
-              Automatically assign transactions with a certain description
+              Automatically assign transactions with a certain description.
             </label>
-            {updateMethod === 'assign-description' && (
+            <label style={{ display: 'block', marginBottom: '1rem' }}>
               <input
-                type="text"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                style={{ marginLeft: '2rem', marginTop: '1rem', marginBottom: '1rem' }}
-                placeholder="Enter description"
+                type="radio"
+                value="assign-transactions"
+                checked={updateMethod === 'assign-transactions'}
+                onChange={() => setUpdateMethod('assign-transactions')}
+                style={{ marginRight: '1rem' }}
               />
-            )}
-            <label style={{ marginTop: '0.2rem', display: 'block' }}>
+              Manually assign transactions.
+            </label>
+            <label style={{ display: 'block' }}>
               <input
                 type="radio"
                 value="manual"
@@ -633,8 +636,143 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 onChange={() => setUpdateMethod('manual')}
                 style={{ marginRight: '1rem' }}
               />
-              Manually assign transactions
+              Manually input update amounts.
             </label>
+          </div>
+          <div className={styles.buttonContainer}>
+            <button className={styles.cancelButton} onClick={props.togglePopup}>
+              Cancel
+            </button>
+            <button className={styles.prevButton} onClick={handleBack}>Previous</button>
+            <button className={styles.nextButton} onClick={handleNext}>Next</button>
+          </div>
+        </div>
+      )}
+
+      {/*4: Associated Account Selection */}
+      {step === 4 && updateMethod == 'assign-all' && (
+        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
+          <p className={styles.goalHeading}>Select Accounts</p>
+          <div className={styles.goalInfo}>
+            <p className={styles.goalDescription} style={{ textAlign: 'center' }}>Select the account/s you want to associate this goal with.</p>
+            <p className={styles.goalDescription} style={{ textAlign: 'center' }}>All transactions for the selected account/s will be assigned to this goal.</p>
+            <div className={styles.checkBoxContainer}>
+              {accountOptions.map((option, index) => (
+                <div key={index} className={styles.checkOption}>
+                  <label>
+                    <input
+                      type="checkbox"
+                      value={option.alias}
+                      checked={selectedAccounts.includes(option.alias)}
+                      onChange={(e) => {
+                        const selected = e.target.value;
+                        if (e.target.checked) {
+                          setSelectedAccounts((prevAccounts) =>
+                            prevAccounts.filter(account => account !== 'no-account').concat(selected)
+                          );
+                        } else {
+                          setSelectedAccounts((prevAccounts) =>
+                            prevAccounts.filter(account => account !== selected)
+                          );
+                        }
+                      }}
+                      style={{ marginRight: '1rem' }}
+                    />
+                    {option.alias}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className={styles.buttonContainer}>
+            <button className={styles.cancelButton} onClick={props.togglePopup}>
+              Cancel
+            </button>
+            <button className={styles.prevButton} onClick={handleBack}>Previous</button>
+            <button className={styles.nextButton} onClick={handleSubmit}>Submit</button>
+          </div>
+        </div>
+      )}
+      {step === 4 && updateMethod == 'assign-description' && (
+        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
+          <p className={styles.goalHeading}>Select Associated Accounts</p>
+          <div className={styles.goalInfo}>
+            <p className={styles.goalDescription} style={{ textAlign: 'center' }}>Select the account/s you want to associate this goal with.</p>
+            <div className={styles.checkBoxContainer}>
+              {accountOptions.map((option, index) => (
+                <div key={index} className={styles.checkOption}>
+                  <label style={{ color: 'var(--primary-1)', fontWeight: 'bold' }}>
+                    <input
+                      type="checkbox"
+                      value={option.alias}
+                      checked={selectedAccounts.includes(option.alias)}
+                      onChange={(e) => {
+                        const selected = e.target.value;
+                        if (e.target.checked) {
+                          setSelectedAccounts((prevAccounts) =>
+                            prevAccounts.filter(account => account !== 'no-account').concat(selected)
+                          );
+                        } else {
+                          setSelectedAccounts((prevAccounts) =>
+                            prevAccounts.filter(account => account !== selected)
+                          );
+                        }
+                      }}
+                      style={{ marginRight: '1rem' }}
+                    />
+                    {option.alias}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className={styles.buttonContainer}>
+            <button className={styles.cancelButton} onClick={props.togglePopup}>
+              Cancel
+            </button>
+            <button className={styles.prevButton} onClick={handleBack}>Previous</button>
+            <button className={styles.nextButton} onClick={handleNext}>Next</button>
+          </div>
+        </div>
+      )}
+
+      {/*4: Adding Keywords*/}
+      {step === 5 && updateMethod == 'assign-description' && (
+        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
+          <p className={styles.goalHeading}>Select Transaction Descriptions</p>
+          <div className={styles.goalInfo} style={{ height: '100%', justifyContent: 'flex-start', paddingTop: '2rem' }}>
+            <p className={styles.goalDescription} style={{ textAlign: 'center' }}>Enter the keyword/s for the transactions you want automatically assigned to this goal.</p>
+            <p className={styles.goalDescription} style={{ textAlign: 'center' }}>All transactions with descriptions containing the keyword/s will be assigned to this goal.</p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {updateMethod === 'assign-description' && (
+                <div style={{ display: 'flex', alignItems: 'center', marginTop: '1rem', width: 'fit-content' }}>
+                  <input
+                    type="text"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Enter keyword"
+                    style={{ marginRight: '0.5rem' }}
+                  />
+                  <button onClick={addKeyword} style={{ padding: '0.5rem 1rem', color: "var(--primary-1)", fontWeight: 'bold' }}>Add</button>
+                </div>
+              )}
+
+              <div style={{ marginTop: '2rem' }}>
+                {keywords.map((keyword, index) => (
+                  <div key={index} style={{ display: 'inline-flex', alignItems: 'center', marginRight: '0.5rem', marginBottom: '0.5rem', padding: '0.25rem 0.5rem', borderRadius: '5px', backgroundColor: 'var(--main-background)' }}>
+                    <span style={{ marginRight: '1rem' }}>{keyword}</span>
+                    <button
+                      onClick={() => removeKeyword(keyword)}
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
           <div className={styles.buttonContainer}>
             <button className={styles.cancelButton} onClick={props.togglePopup}>

@@ -79,6 +79,12 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
         return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
       }
     }
+    if (goal.current_amount && goal.initial_amount !== undefined) {
+      return Math.min(
+        100,
+        ((goal.initial_amount - goal.current_amount) / (goal.initial_amount)) * 100
+      );
+    }
     if (
       goal.spending_limit !== undefined &&
       goal.monthly_updates !== undefined
@@ -547,22 +553,22 @@ export function GoalsPage() {
           ? a.name
           : option === 'type'
             ? a.type
-              : option === 'end_date'
-                ? new Date(a.target_date || '').getTime()
-                : option === 'progress'
-                  ? calculateProgressPercentage(a)
-                  : 0;
+            : option === 'end_date'
+              ? new Date(a.target_date || '').getTime()
+              : option === 'progress'
+                ? calculateProgressPercentage(a)
+                : 0;
 
       const bValue =
         option === 'name'
           ? b.name
           : option === 'type'
             ? b.type
-              : option === 'end_date'
-                ? new Date(b.target_date || '2100-01-01').getTime()
-                : option === 'progress'
-                  ? calculateProgressPercentage(b)
-                  : 0;
+            : option === 'end_date'
+              ? new Date(b.target_date || '2100-01-01').getTime()
+              : option === 'progress'
+                ? calculateProgressPercentage(b)
+                : 0;
 
       if (aValue === null && bValue !== null) return -1;
       if (bValue === null && aValue !== null) return 1;
@@ -750,39 +756,43 @@ export function GoalsPage() {
                                 )}
                               </div>
                             </div>
-                            {goal.current_amount !== undefined &&
-                              goal.target_amount !== undefined && (
-                                <div>
-                                  {goal.initial_amount !== undefined && (
-                                    <div className={styles.goalPair}>
-                                      <div className={styles.goalLabel}>
+                            {goal.current_amount !== undefined && (
+                              <div>
+                                {goal.initial_amount !== undefined && (
+                                  <>
+                                    {goal.type == "Debt Reduction"? (
+
+                                      <div className={styles.goalPair}>
+                                        <div className={styles.goalLabel}>
                                         Initial Amount:
                                       </div>
                                       <div className={styles.goalValue}>
                                         R {goal.initial_amount.toFixed(2)}
                                       </div>
-                                    </div>
-                                  )}
+                                      </div>) : (<></>)}
+                                  </>
+                                )}
+                                <div className={styles.goalPair}>
+                                  <div className={styles.goalLabel}>
+                                    Current Amount:
+                                  </div>
+                                  <div className={styles.goalValue}>
+                                    R {goal.current_amount.toFixed(2)}
+                                  </div>
+                                </div>
+                                {goal.type == "Savings" &&
+                                  goal.target_amount ? (
+
                                   <div className={styles.goalPair}>
                                     <div className={styles.goalLabel}>
-                                      Current Amount:
+                                      Target Amount:
                                     </div>
                                     <div className={styles.goalValue}>
-                                      R {goal.current_amount.toFixed(2)}
+                                      R{goal.target_amount.toFixed(2)}
                                     </div>
-                                  </div>
-                                  {goal.type == "Savings"? (
-                                    
-                                    <div className={styles.goalPair}>
-                                      <div className={styles.goalLabel}>
-                                        Target Amount:
-                                      </div>
-                                      <div className={styles.goalValue}>
-                                        R{goal.target_amount.toFixed(2)}
-                                      </div>
-                                  </div>):(<></>)}
-                                </div>
-                              )}
+                                  </div>) : (<></>)}
+                              </div>
+                            )}
                             {goal.target_date && (
                               <div>
                                 <div className={styles.goalPair}>
