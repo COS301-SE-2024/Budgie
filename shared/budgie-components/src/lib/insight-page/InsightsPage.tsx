@@ -5,8 +5,44 @@ import { faGasPump, faBank, faHome, faBus, faLightbulb, faFileInvoiceDollar } fr
 import fnb from '../../../public/images/FNB_Color.png';
 import absa from '../../../public/images/absa-logo.png';
 import sb from '../../../public/images/Standard-Bank-Logo.png';
+import capitec from '../../../public/images/capitec.png';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  updateDoc,
+  query, 
+  where,
+  setDoc,
+} from 'firebase/firestore';
+
+export async function getLastPetrolPrices(){
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear(); // Returns the current year as a number
+    const currentMonth = (currentDate.getMonth()).toString().padStart(2, '0');
+    const date = currentYear + "/" + currentMonth + "/01 ";
+    try{
+        const q = query(
+            collection(db, 'petrol prices'),
+            where('date', '==', date),
+        );
+        const result = await getDocs(q)
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function getThisPetrolPrices(){
+
+}
+
+export async function getNextPetrolPrices(){
+
+}
 
 export function InsightsPage() {
 
@@ -21,6 +57,9 @@ export function InsightsPage() {
         return formatter.format(value);
     };
 
+    useEffect(() => {
+        getLastPetrolPrices();
+    });
 
     return (
         <div className={styles.insightsContainer}>
@@ -150,16 +189,47 @@ export function InsightsPage() {
                     </div>
                     <div className={styles.prosConsContainer}>
                         <div className={styles.pros}>
-                            <h3>Pros</h3>
-                            <div className={styles.underline}></div>
-                            <div className={styles.prosItem}>Bank Fees: R50</div>
-                            <div className={styles.prosItem}>Earn Ebucks</div>
+                        <div className={styles.prosContainer}>
+                            <h3 className={styles.prosTitle}>Pros of FNB</h3>
+                            <ul className={styles.prosList}>
+                                <li className={styles.prosItem}>
+                                    <span className={styles.prosLabel}>Digital Banking:</span>
+                                    Strong digital and mobile banking platforms, offering a wide range of user-friendly features.
+                                </li>
+                                <li className={styles.prosItem}>
+                                    <span className={styles.prosLabel}>Reward Programs:</span>
+                                    FNB offers eBucks, which incentivize clients based on their spending.
+                                </li>
+                                <li className={styles.prosItem}>
+                                    <span className={styles.prosLabel}>Product Variety:</span>
+                                    Comprehensive range of accounts, from low-cost Easy accounts to premium Private Clients accounts.
+                                </li>
+                                <li className={styles.prosItem}>
+                                    <span className={styles.prosLabel}>Innovative Solutions:</span>
+                                    High on tech innovation, including mobile wallet and contactless payment options.
+                                </li>
+                            </ul>
+                        </div>
                         </div>
                         <div className={styles.cons}>
-                            <h3>Cons</h3>
-                            <div className={styles.underline}></div>
-                            <div className={styles.consItem}>Limited Branches</div>
-                            <div className={styles.consItem}>High Interest on Loans</div>
+                        <div className={styles.consContainer}>
+                            <h3 className={styles.consTitle}>Cons of FNB</h3>
+                            <ul className={styles.consList}>
+                                <li className={styles.consItem}>
+                                    <span className={styles.consLabel}>Fees:</span>
+                                    FNB can be on the higher side with account maintenance fees and transaction charges for premium accounts.
+                                </li>
+                                <li className={styles.consItem}>
+                                    <span className={styles.consLabel}>Complexity:</span>
+                                    Some users may find their fee structures and account types a bit complicated.
+                                </li>
+                                <li className={styles.consItem}>
+                                    <span className={styles.consLabel}>Branch Services:</span>
+                                    Reports suggest that in-branch services can sometimes be slow compared to their digital offering.
+                                </li>
+                            </ul>
+                        </div>
+
                         </div>
                     </div>
                 </div>
@@ -187,20 +257,123 @@ export function InsightsPage() {
                                 }}>
                             </Image></span>
                         </div>
+                        <span className={styles.arrow} onClick={() => setCurrentBank("capitec")}>&gt;</span>
+                    </div>
+                    <div className={styles.prosConsContainer}>
+                        <div className={styles.pros}>
+                        <div className={styles.prosContainer}>
+                            <h3 className={styles.prosTitle}>Pros of Absa</h3>
+                            <ul className={styles.prosList}>
+                                <li className={styles.prosItem}>
+                                    <span className={styles.prosLabel}>Comprehensive Offering:</span>
+                                    Strong in retail banking and investment services, offering a variety of account options from low-cost to premium.
+                                </li>
+                                <li className={styles.prosItem}>
+                                    <span className={styles.prosLabel}>African Footprint:</span>
+                                    One of the largest footprints across Africa, providing opportunities for cross-border transactions.
+                                </li>
+                                <li className={styles.prosItem}>
+                                    <span className={styles.prosLabel}>Wealth Management:</span>
+                                    Offers strong wealth management services, catering to high-net-worth individuals with customized solutions.
+                                </li>
+                                <li className={styles.prosItem}>
+                                    <span className={styles.prosLabel}>Branch and ATM Network:</span>
+                                    Extensive branch and ATM network, particularly helpful for customers who prefer in-person banking services.
+                                </li>
+                            </ul>
+                        </div>
+                        </div>
+                        <div className={styles.cons}>
+                        <div className={styles.consContainer}>
+                            <h3 className={styles.consTitle}>Cons of Absa</h3>
+                            <ul className={styles.consList}>
+                                <li className={styles.consItem}>
+                                    <span className={styles.consLabel}>Customer Service:</span>
+                                    Absa has been known to face issues with customer service, with long wait times being a frequent complaint.
+                                </li>
+                                <li className={styles.consItem}>
+                                    <span className={styles.consLabel}>Fees:</span>
+                                    Fees can be high, particularly for premium accounts or customers using in-branch services.
+                                </li>
+                                <li className={styles.consItem}>
+                                    <span className={styles.consLabel}>Digital Services:</span>
+                                    While improving, Absa’s digital services and mobile banking app are not considered as seamless or advanced as FNB or Capitec’s offerings.
+                                </li>
+                            </ul>
+                        </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            )}
+
+            {currentBank=="capitec" && (
+             //Bank Insights Grid 
+             <div className={styles.gridItem}>
+                <div className={styles.gridItemTitleBox}>
+                    <h2 className={styles.gridItemTitle}>Bank Insights</h2>
+                </div>
+                <div className={styles.bankInsightsContainer}>
+                    <div className={styles.navigation}>
+                        <span className={styles.arrow} onClick={() => setCurrentBank("absa")}>&lt;</span>
+                        <div className={styles.bankInfo}>
+                        <span><Image 
+                                src={capitec} 
+                                width={150} 
+                                alt="Capitec"     
+                                style={{ 
+                                    width: '120px', 
+                                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
+                                    borderRadius: '8px' 
+                                }}>
+                            </Image></span>
+                        </div>
                         <span className={styles.arrow} onClick={() => setCurrentBank("sb")}>&gt;</span>
                     </div>
                     <div className={styles.prosConsContainer}>
                         <div className={styles.pros}>
-                            <h3>Pros</h3>
-                            <div className={styles.underline}></div>
-                            <div className={styles.prosItem}>Bank Fees: R50</div>
-                            <div className={styles.prosItem}>Earn Ebucks</div>
+                        <div className={styles.prosContainer}>
+                            <h3 className={styles.prosTitle}>Pros of Capitec</h3>
+                            <ul className={styles.prosList}>
+                                <li className={styles.prosItem}>
+                                    <span className={styles.prosLabel}>Low Fees:</span>
+                                    Capitec is widely recognized for offering the lowest fees among the major banks, making it popular with cost-conscious customers.
+                                </li>
+                                <li className={styles.prosItem}>
+                                    <span className={styles.prosLabel}>Simplified Products:</span>
+                                    Focuses on simple, easy-to-understand products like the Global One account, which offers low fees and easy account management.
+                                </li>
+                                <li className={styles.prosItem}>
+                                    <span className={styles.prosLabel}>Growth:</span>
+                                    Capitec has shown remarkable growth and competitiveness, often disrupting the banking sector with its aggressive strategies.
+                                </li>
+                                <li className={styles.prosItem}>
+                                    <span className={styles.prosLabel}>Digital Banking:</span>
+                                    Well-regarded for its user-friendly digital banking services and mobile app.
+                                </li>
+                            </ul>
+                        </div>
                         </div>
                         <div className={styles.cons}>
-                            <h3>Cons</h3>
-                            <div className={styles.underline}></div>
-                            <div className={styles.consItem}>Limited Branches</div>
-                            <div className={styles.consItem}>High Interest on Loans</div>
+                        <div className={styles.consContainer}>
+                            <h3 className={styles.consTitle}>Cons of Capitec</h3>
+                            <ul className={styles.consList}>
+                                <li className={styles.consItem}>
+                                    <span className={styles.consLabel}>Limited Corporate Services:</span>
+                                    Capitec is primarily focused on retail banking, and its corporate or investment banking offerings are less developed compared to Standard Bank or Nedbank.
+                                </li>
+                                <li className={styles.consItem}>
+                                    <span className={styles.consLabel}>Branch Network:</span>
+                                    While growing, Capitec’s branch and ATM network may not be as extensive as the older banks, especially in rural areas.
+                                </li>
+                                <li className={styles.consItem}>
+                                    <span className={styles.consLabel}>Investment Services:</span>
+                                    Capitec is relatively new in the asset management and investment space, so its offerings are more limited compared to its peers.
+                                </li>
+                            </ul>
+                        </div>
+
                         </div>
                     </div>
                 </div>
@@ -215,7 +388,7 @@ export function InsightsPage() {
                 </div>
                 <div className={styles.bankInsightsContainer}>
                     <div className={styles.navigation}>
-                        <span className={styles.arrow} onClick={() => setCurrentBank("absa")}>&lt;</span>
+                        <span className={styles.arrow} onClick={() => setCurrentBank("capitec")}>&lt;</span>
                         <div className={styles.bankInfo}>
                         <span><Image 
                                 src={sb} 
@@ -232,16 +405,47 @@ export function InsightsPage() {
                     </div>
                     <div className={styles.prosConsContainer}>
                         <div className={styles.pros}>
-                            <h3>Pros</h3>
-                            <div className={styles.underline}></div>
-                            <div className={styles.prosItem}>Bank Fees: R50</div>
-                            <div className={styles.prosItem}>Earn Ebucks</div>
+                        <div className={styles.prosContainer}>
+                            <h3 className={styles.prosTitle}>Pros of Standard Bank</h3>
+                            <ul className={styles.prosList}>
+                                <li className={styles.prosItem}>
+                                    <span className={styles.prosLabel}>Stability:</span>
+                                    Long-established presence in the banking sector, offering financial security and trust.
+                                </li>
+                                <li className={styles.prosItem}>
+                                    <span className={styles.prosLabel}>Corporate Services:</span>
+                                    Significant presence in corporate and investment banking, making it strong for business clients.
+                                </li>
+                                <li className={styles.prosItem}>
+                                    <span className={styles.prosLabel}>Wide Network:</span>
+                                    Extensive branch and ATM network across the country, ensuring access even in rural areas
+                                </li>
+                                <li className={styles.prosItem}>
+                                    <span className={styles.prosLabel}>Diverse Products:</span>
+                                    Offers a wide variety of financial products and services, including retail banking, wealth management, and investment services.
+                                </li>
+                            </ul>
+                        </div>
                         </div>
                         <div className={styles.cons}>
-                            <h3>Cons</h3>
-                            <div className={styles.underline}></div>
-                            <div className={styles.consItem}>Limited Branches</div>
-                            <div className={styles.consItem}>High Interest on Loans</div>
+                        <div className={styles.consContainer}>
+                            <h3 className={styles.consTitle}>Cons of Standard Bank</h3>
+                            <ul className={styles.consList}>
+                                <li className={styles.consItem}>
+                                    <span className={styles.consLabel}>Fees:</span>
+                                    Can be more expensive in terms of transaction fees and monthly account fees, especially for basic accounts.
+                                </li>
+                                <li className={styles.consItem}>
+                                    <span className={styles.consLabel}>Customer Satisfaction:</span>
+                                    Standard Bank tends to rank lower in customer satisfaction surveys, with complaints often related to customer service.
+                                </li>
+                                <li className={styles.consItem}>
+                                    <span className={styles.consLabel}>Slow Adaptation:</span>
+                                    Lags behind competitors like FNB in terms of mobile banking innovations.
+                                </li>
+                            </ul>
+                        </div>
+
                         </div>
                     </div>
                 </div>
