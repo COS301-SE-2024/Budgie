@@ -204,13 +204,16 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       uid: user?.uid,
     };
 
-    if (goalType === 'Savings' || goalType === 'Debt') {
-      goalData.current_amount = 0;
-      goalData.target_amount = targetAmount;
+    if (goalType === 'Savings' || goalType === 'Debt Reduction') {      
       goalData.target_date = targetDate;
       goalData.description = description;
-      if (goalType === 'Debt') {
+      if (goalType === 'Debt Reduction') {
         goalData.initial_amount = debtAmount;
+        goalData.current_amount = debtAmount;
+      }
+      if (goalType === 'Savings') {
+        goalData.current_amount = 0;
+        goalData.target_amount = targetAmount;
       }
     } else if (goalType === 'Spending Limit') {
       goalData.spending_limit = spendingLimit;

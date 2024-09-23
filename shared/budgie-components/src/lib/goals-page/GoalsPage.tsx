@@ -24,7 +24,6 @@ interface Goal {
   id: string;
   name: string;
   type: string;
-  start_date: string;
   initial_amount?: number;
   current_amount?: number;
   target_amount?: number;
@@ -74,7 +73,7 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
           100,
           ((goal.initial_amount - goal.current_amount) /
             (goal.initial_amount - goal.target_amount)) *
-            100
+          100
         );
       } else {
         return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
@@ -297,7 +296,7 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
           </div>
         )}
 
-        {goal.type === 'Debt' && (
+        {goal.type === 'Debt Reduction' && (
           <div className={styles.carouselSlide} key="progress">
             <div className={styles.goalGraph}>
               <CircularProgressbar
@@ -347,7 +346,7 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
           </div>
         )}
 
-        {goal.type === 'Debt' && goal.updates !== undefined && (
+        {goal.type === 'Debt Reduction' && goal.updates !== undefined && (
           <div className={styles.carouselSlide} key="chart">
             <div className={styles.goalGraph}>
               <ResponsiveContainer width="100%" height="100%">
@@ -404,7 +403,7 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
           </div>
         )}
 
-        {goal.type === 'Spending' && (
+        {goal.type === 'Spending Limit' && (
           <div className={styles.carouselSlide} key="progress">
             <div className={styles.goalGraph}>
               <CircularProgressbar
@@ -461,7 +460,7 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
           </div>
         )}
 
-        {goal.type === 'Spending' && goal.updates !== undefined && (
+        {goal.type === 'Spending Limit' && goal.updates !== undefined && (
           <div className={styles.carouselSlide} key="chart">
             <div className={styles.goalGraph}>
               <ResponsiveContainer width="100%" height="100%">
@@ -523,7 +522,7 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
   );
 };
 
-export interface GoalsPageProps {}
+export interface GoalsPageProps { }
 
 export function GoalsPage() {
   const [Goals, setGoals] = useState<Goal[]>([]);
@@ -547,27 +546,23 @@ export function GoalsPage() {
         option === 'name'
           ? a.name
           : option === 'type'
-          ? a.type
-          : option === 'start_date'
-          ? new Date(a.start_date || '').getTime()
-          : option === 'end_date'
-          ? new Date(a.target_date || '').getTime()
-          : option === 'progress'
-          ? calculateProgressPercentage(a)
-          : 0;
+            ? a.type
+              : option === 'end_date'
+                ? new Date(a.target_date || '').getTime()
+                : option === 'progress'
+                  ? calculateProgressPercentage(a)
+                  : 0;
 
       const bValue =
         option === 'name'
           ? b.name
           : option === 'type'
-          ? b.type
-          : option === 'start_date'
-          ? new Date(b.start_date || '').getTime()
-          : option === 'end_date'
-          ? new Date(b.target_date || '2100-01-01').getTime()
-          : option === 'progress'
-          ? calculateProgressPercentage(b)
-          : 0;
+            ? b.type
+              : option === 'end_date'
+                ? new Date(b.target_date || '2100-01-01').getTime()
+                : option === 'progress'
+                  ? calculateProgressPercentage(b)
+                  : 0;
 
       if (aValue === null && bValue !== null) return -1;
       if (bValue === null && aValue !== null) return 1;
@@ -586,7 +581,7 @@ export function GoalsPage() {
           100,
           ((goal.initial_amount - goal.current_amount) /
             (goal.initial_amount - goal.target_amount)) *
-            100
+          100
         );
       } else {
         return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
@@ -644,7 +639,7 @@ export function GoalsPage() {
   const handleEditGoalPopup = (index: number) => {
     setEditPopupOpen((prevState) => ({
       ...prevState,
-      [index]: !prevState[index], // Toggle the popup for the clicked goal
+      [index]: !prevState[index],
     }));
     fetchGoals();
   };
@@ -652,7 +647,7 @@ export function GoalsPage() {
   const handleUpdateGoalPopup = (index: number) => {
     setUpdatePopupOpen((prevState) => ({
       ...prevState,
-      [index]: !prevState[index], // Toggle the popup for the clicked goal
+      [index]: !prevState[index],
     }));
     fetchGoals();
   };
@@ -660,9 +655,8 @@ export function GoalsPage() {
   const monthlyBudgetSpent = (goal: Goal): number => {
     if (goal.monthly_updates !== undefined) {
       const data = JSON.parse(goal.monthly_updates);
-      const currentMonthYear = `${
-        monthNames[new Date().getMonth()]
-      } ${new Date().getFullYear()}`;
+      const currentMonthYear = `${monthNames[new Date().getMonth()]
+        } ${new Date().getFullYear()}`;
       const currentMonthData = data.find(
         (item: { month: string }) => item.month === currentMonthYear
       );
@@ -689,9 +683,7 @@ export function GoalsPage() {
       ) : (
         <>
           <div className={styles.header}>
-            <button className={styles.addGoalsButton} onClick={addGoalPopup}>
-              Add a Goal
-            </button>
+
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <p className={styles.sortHeader}>Sort By:</p>
               <select
@@ -701,18 +693,20 @@ export function GoalsPage() {
               >
                 <option value="name">Name</option>
                 <option value="type">Type</option>
-                <option value="start_date">Start Date</option>
                 <option value="end_date">Target Date</option>
                 <option value="progress">Progress</option>
               </select>
             </div>
+            <button className={styles.addAGoalButton} onClick={addGoalPopup}>
+              Add a Goal
+            </button>
             {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
           </div>
           <div
             style={{
               width: '85vw',
               backgroundColor: 'var(--main-background)',
-              marginBottom: 'calc((5rem * var(--font-size-multiplier)))',
+              marginBottom: 'calc((4rem * var(--font-size-multiplier)))',
             }}
           ></div>
           <div className={styles.planningModalContainer}>
@@ -750,9 +744,9 @@ export function GoalsPage() {
                               <div className={styles.goalLabel}>Goal Type:</div>
                               <div className={styles.goalValue}>
                                 {goal.type === 'Savings' && <>Savings</>}
-                                {goal.type === 'Debt' && <>Debt Reduction</>}
-                                {goal.type === 'Spending' && (
-                                  <>Limiting Spending</>
+                                {goal.type === 'Debt Reduction' && <>Debt Reduction</>}
+                                {goal.type === 'Spending Limit' && (
+                                  <>Spending Limit</>
                                 )}
                               </div>
                             </div>
@@ -777,24 +771,18 @@ export function GoalsPage() {
                                       R {goal.current_amount.toFixed(2)}
                                     </div>
                                   </div>
-                                  <div className={styles.goalPair}>
-                                    <div className={styles.goalLabel}>
-                                      Target Amount:
-                                    </div>
-                                    <div className={styles.goalValue}>
-                                      R{goal.target_amount.toFixed(2)}
-                                    </div>
-                                  </div>
+                                  {goal.type == "Savings"? (
+                                    
+                                    <div className={styles.goalPair}>
+                                      <div className={styles.goalLabel}>
+                                        Target Amount:
+                                      </div>
+                                      <div className={styles.goalValue}>
+                                        R{goal.target_amount.toFixed(2)}
+                                      </div>
+                                  </div>):(<></>)}
                                 </div>
                               )}
-                            <div className={styles.goalPair}>
-                              <div className={styles.goalLabel}>
-                                Start Date:
-                              </div>
-                              <div className={styles.goalValue}>
-                                {goal.start_date}
-                              </div>
-                            </div>
                             {goal.target_date && (
                               <div>
                                 <div className={styles.goalPair}>
@@ -812,8 +800,8 @@ export function GoalsPage() {
                                   <div className={styles.goalValue}>
                                     {calculateDaysLeft(goal.target_date) > 0
                                       ? ` ${calculateDaysLeft(
-                                          goal.target_date
-                                        )}`
+                                        goal.target_date
+                                      )}`
                                       : 'Target Date Passed'}
                                   </div>
                                 </div>

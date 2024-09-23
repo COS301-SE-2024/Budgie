@@ -1,10 +1,11 @@
 .mainPage {
   background-color: var(--main-background);
   width: 85vw;
-  height: calc(100vh - (6vh * var(--font-size-multiplier)));
+  height: calc(100vh - (7vh * var(--font-size-multiplier)));
   padding-left: calc(1.5rem * var(--font-size-multiplier));
   padding-right: 2rem;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -113,13 +114,23 @@
   transition: 0.3s ease;
 }
 
+.addAGoalButton {
+  width: calc(10rem * var(--font-size-multiplier));
+  height: calc(3rem * var(--font-size-multiplier));
+  color: white;
+  background-color: var(--primary-1);
+  font-weight: bold;
+  border-radius: 10px;
+  transition: 0.3s ease;
+}
+
 .addGoalsButton:hover {
   filter: brightness(1.15);
 }
 
 
 .planningModalContainer {
-  width: 80%;
+  width: 85%;
   margin-bottom: 2rem;
   font-size: calc(1.5rem * var(--font-size-multiplier));
 }
