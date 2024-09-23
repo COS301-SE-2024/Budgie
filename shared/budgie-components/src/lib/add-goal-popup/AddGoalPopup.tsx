@@ -78,9 +78,9 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
     const widthString = width.toString();
     console.log(computedStyle.getPropertyValue('--font-size-multiplier'));
     return widthString + 'vw';
-      }
+  }
 
-      const popupWidth = getPopupWidth();
+  const popupWidth = getPopupWidth();
 
   const handleSubmit = async () => {
     const goalData: any = {
@@ -109,9 +109,8 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
         {/* Step 1: Select Goal Type */}
         {step === 1 && (
           <div>
-            
-              <p className={styles.goalHeading}>Select a Goal Type:</p>
-              <div className={styles.goalInfo}>
+            <p className={styles.goalHeading}>Select a Goal Type:</p>
+            <div className={styles.goalInfo}>
               <button
                 className={`${styles.goalTypeButton} ${goalType === 'Savings' ? styles.selected : ''}`}
                 onClick={() => handleGoalTypeSelection('Savings')}
@@ -152,78 +151,76 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
         {/* Step 2: Goal Details */}
         {step === 2 && goalType === 'Savings' && (
           <div>
-            
-            
-              <p className={styles.goalHeading}>Savings Goal Details</p>
-              <div className={styles.goalInfo}>
+            <p className={styles.goalHeading}>Savings Goal Details</p>
+            <div className={styles.goalInfo}>
               <div className={styles.goalForm}>
-              <div className={styles.formGroup}>
-              <span
-                className={`material-symbols-outlined ${styles.icon}`}
-                style={{
-                  fontSize: 'calc(1rem * var(--font-size-multiplier))',
-                  color: 'var(--greyed-text)',
-                }}
-              >
-                info
-              </span>
-              <span className={styles.popupText} style={{ width: popupWidth }}>
-                Enter a descriptive name for your savings goal. This could be a
-                short term goal like a vacation fund or a long term goal like
-                your retirement savings.
-              </span>
-              <label>Goal Name:</label>
-              <input
-                type="text"
-                value={goalName}
-                onChange={(e) => setGoalName(e.target.value)}
-                required
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <span
-                className={`material-symbols-outlined ${styles.icon}`}
-                style={{
-                  fontSize: 'calc(1rem * var(--font-size-multiplier))',
-                  color: 'var(--greyed-text)',
-                }}
-              >
-                info
-              </span>
-              <span className={styles.popupText} style={{ width: popupWidth }}>
-                Enter the amount of money you aim to save for this goal.
-              </span>
-              <label>Target Savings Amount:</label>
-              <ClearableInput value={targetAmount} onChange={setTargetAmount} />
-            </div>
-            <div className={styles.formGroup}>
-              <span
-                className={`material-symbols-outlined ${styles.icon}`}
-                style={{
-                  fontSize: 'calc(1rem * var(--font-size-multiplier))',
-                  color: 'var(--greyed-text)',
-                }}
-              >
-                info
-              </span>
-              <span className={styles.popupText} style={{ width: popupWidth }}>
-                Select the date by which you want to reach this goal.
-              </span>
-              <label>Target Date:</label>
-              <input
-                type="date"
-                value={targetDate || ''}
-                onChange={(e) => setTargetDate(e.target.value)}
-                required
-              />
-            </div>
-            </div>
+                <div className={styles.formGroup}>
+                  <span
+                    className={`material-symbols-outlined ${styles.icon}`}
+                    style={{
+                      fontSize: 'calc(1rem * var(--font-size-multiplier))',
+                      color: 'var(--greyed-text)',
+                    }}
+                  >
+                    info
+                  </span>
+                  <span className={styles.popupText} style={{ width: popupWidth }}>
+                    Enter a descriptive name for your savings goal. This could be a
+                    short term goal like a vacation fund or a long term goal like
+                    your retirement savings.
+                  </span>
+                  <label>Goal Name:</label>
+                  <input
+                    type="text"
+                    value={goalName}
+                    onChange={(e) => setGoalName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <span
+                    className={`material-symbols-outlined ${styles.icon}`}
+                    style={{
+                      fontSize: 'calc(1rem * var(--font-size-multiplier))',
+                      color: 'var(--greyed-text)',
+                    }}
+                  >
+                    info
+                  </span>
+                  <span className={styles.popupText} style={{ width: popupWidth }}>
+                    Enter the amount of money you aim to save for this goal.
+                  </span>
+                  <label>Target Savings Amount:</label>
+                  <ClearableInput value={targetAmount} onChange={setTargetAmount} />
+                </div>
+                <div className={styles.formGroup}>
+                  <span
+                    className={`material-symbols-outlined ${styles.icon}`}
+                    style={{
+                      fontSize: 'calc(1rem * var(--font-size-multiplier))',
+                      color: 'var(--greyed-text)',
+                    }}
+                  >
+                    info
+                  </span>
+                  <span className={styles.popupText} style={{ width: popupWidth }}>
+                    Select the date by which you want to reach this goal.
+                  </span>
+                  <label>Target Date:</label>
+                  <input
+                    type="date"
+                    value={targetDate || ''}
+                    onChange={(e) => setTargetDate(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
             </div>
             <div className={styles.buttonContainer}>
               <button className={styles.cancelButton} onClick={props.togglePopup}>
                 Cancel
               </button>
-              <button className={styles.prevButton}onClick={handleBack}>Previous</button>
+              <button className={styles.prevButton} onClick={handleBack}>Previous</button>
               <button className={styles.nextButton} onClick={handleNext}>Next</button>
             </div>
           </div>
@@ -231,15 +228,53 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
         {step === 2 && goalType === 'Spending Limit' && (
           <div>
-            
             <p className={styles.goalHeading}>Spending Limit Goal</p>
             <div className={styles.goalInfo}>
-              <label>Goal Name:</label>
-              <input type="text" value={goalName} onChange={(e) => setGoalName(e.target.value)} required />
-
-              <label>Monthly Limit:</label>
-              <ClearableInput value={spendingLimit} onChange={setSpendingLimit} />
+              <div className={styles.goalForm}>
+                <div className={styles.formGroup}>
+                  <span
+                    className={`material-symbols-outlined ${styles.icon}`}
+                    style={{
+                      fontSize: 'calc(1rem * var(--font-size-multiplier))',
+                      color: 'var(--greyed-text)',
+                    }}
+                  >
+                    info
+                  </span>
+                  <span className={styles.popupText} style={{ width: popupWidth }}>
+                    Enter a descriptive name for your spending reduction goal. This
+                    could be a specific type of spending you want to reduce such as
+                    entertainment or dining out.
+                  </span>
+                  <label>Goal Name:</label>
+                  <input
+                    type="text"
+                    value={goalName}
+                    onChange={(e) => setGoalName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <span
+                    className={`material-symbols-outlined ${styles.icon}`}
+                    style={{
+                      fontSize: 'calc(1rem * var(--font-size-multiplier))',
+                      color: 'var(--greyed-text)',
+                    }}
+                  >
+                    info
+                  </span>
+                  <span className={styles.popupText} style={{ width: popupWidth }}>
+                    Enter the monthly spending limit you want to set for this type
+                    of expense. Spending below this amount each month will
+                    contribute to your progress.
+                  </span>
+                  <label>Monthly Limit:</label>
+                  <ClearableInput value={spendingLimit} onChange={setSpendingLimit} />
+                </div>
+              </div>
             </div>
+
             <div className={styles.buttonContainer}>
               <button className={styles.cancelButton} onClick={props.togglePopup}>
                 Cancel
@@ -252,14 +287,50 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
         {step === 2 && goalType === 'Debt Reduction' && (
           <div>
-            
+
             <p className={styles.goalHeading}>Debt Reduction Goal</p>
             <div className={styles.goalInfo}>
-              <label>Goal Name:</label>
-              <input type="text" value={goalName} onChange={(e) => setGoalName(e.target.value)} required />
-
-              <label>Debt Amount:</label>
-              <ClearableInput value={debtAmount} onChange={setDebtAmount} />
+              <div className={styles.goalForm}>
+                <div className={styles.formGroup}>
+                  <span
+                    className={`material-symbols-outlined ${styles.icon}`}
+                    style={{
+                      fontSize: 'calc(1rem * var(--font-size-multiplier))',
+                      color: 'var(--greyed-text)',
+                    }}
+                  >
+                    info
+                  </span>
+                  <span className={styles.popupText} style={{ width: popupWidth }}>
+                    Enter a descriptive name for your debt reduction goal. This
+                    could be a goal to pay off any money you owe, such as a credit
+                    card or a loan.
+                  </span>
+                  <label>Goal Name:</label>
+                  <input
+                    type="text"
+                    value={goalName}
+                    onChange={(e) => setGoalName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <span
+                    className={`material-symbols-outlined ${styles.icon}`}
+                    style={{
+                      fontSize: 'calc(1rem * var(--font-size-multiplier))',
+                      color: 'var(--greyed-text)',
+                    }}
+                  >
+                    info
+                  </span>
+                  <span className={styles.popupText} style={{ width: popupWidth }}>
+                    Enter the amount of money you currently owe on this debt.
+                  </span>
+                  <label>Debt Amount:</label>
+                  <ClearableInput value={debtAmount} onChange={setDebtAmount} />
+                </div>
+              </div>
             </div>
             <div className={styles.buttonContainer}>
               <button className={styles.cancelButton} onClick={props.togglePopup}>
@@ -274,7 +345,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
         {/* Step 3: Account Selection */}
         {step === 3 && (
           <div>
-            
+
             <p className={styles.goalHeading}>Select Accounts</p>
             <div className={styles.goalInfo}>
               <label>Assigned Accounts:</label>
@@ -303,7 +374,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
         {/* Step 4: Update Method */}
         {step === 4 && goalType === 'Savings' && (
           <div>
-            
+
             <p className={styles.goalHeading}>How would you like to update this goal?</p>
             <div className={styles.goalInfo}>
               <label>
@@ -354,7 +425,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
         {step === 4 && goalType === 'Spending Limit' && (
           <div>
-            
+
             <p className={styles.goalHeading}>How would you like to update this goal?</p>
             <div className={styles.goalInfo}>
               <label>
@@ -399,7 +470,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
         {step === 4 && goalType === 'Debt Reduction' && (
           <div>
-            
+
             <p className={styles.goalHeading}>How would you like to update this goal?</p>
             <div className={styles.goalInfo}>
               <label>

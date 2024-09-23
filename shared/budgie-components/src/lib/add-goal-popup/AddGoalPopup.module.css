@@ -60,6 +60,7 @@
 .goalForm {
   margin: 0 auto;
   text-align: left;
+  width: 90%;
 }
 
 .goalForm .formGroup {
