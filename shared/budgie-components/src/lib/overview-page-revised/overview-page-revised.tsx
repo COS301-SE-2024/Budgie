@@ -662,9 +662,9 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
       <div className="mainPage">
         <div className="w-full text-xl text-center h-full flex flex-col items-center justify-center ">
           <p className="text-gray-500">
-            You have not uploaded any transactions. <br />
+            You have not added any accounts to track <br />
             <br />
-            Head to the accounts section to add a new account.
+            Head to the accounts section to add a new account
           </p>
           <button
             onClick={() => {

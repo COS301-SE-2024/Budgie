@@ -17,3 +17,5 @@ export { UploadStatementCSV } from './lib/upload-statement-csv/UploadStatementCS
 export { AddAccountsPage } from './lib/add-accounts-page/add-accounts-page';
 export { SpecificAccountPage } from './lib/specific-account-page/specific-account-page';
 export { OverviewPageRevised } from './lib/overview-page-revised/overview-page-revised';
+export { PlanningPageRevised } from './lib/planning-page-revised/planning-page-revised';
+export { GoalPageRevised } from './lib/goal-page-revised/goal-page-revised';
