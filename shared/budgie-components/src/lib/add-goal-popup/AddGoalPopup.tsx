@@ -468,7 +468,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
         </div>
       )}
 
-      {/*3: Account Selection */}
+      {/*3: Associated Account Selection */}
       {step === 3 && (
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between">
 
