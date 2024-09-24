@@ -244,7 +244,8 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       name: goalName,
       accounts: selectedAccounts,
       uid: user?.uid,
-      updateType: updateMethod
+      updateType: updateMethod,
+      target_date: targetDate
     };
     if (updateMethod == 'assign-description' && keywords.length == 0) {
       alert("Please enter atleast one keyword.")
@@ -253,10 +254,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       if (updateMethod == 'assign-description' && keywords.length > 0) {
         goalData.description = keywords;
       }
-
-
       if (goalType === 'Savings' || goalType === 'Debt Reduction') {
-        goalData.target_date = targetDate;
         if (goalType === 'Debt Reduction') {
           goalData.initial_amount = debtAmount;
           goalData.current_amount = debtAmount;
@@ -449,6 +447,27 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 </span>
                 <label>Monthly Limit:</label>
                 <ClearableInput value={spendingLimit} onChange={setSpendingLimit} />
+              </div>
+              <div className={styles.formGroup}>
+                <span
+                  className={`material-symbols-outlined ${styles.icon}`}
+                  style={{
+                    fontSize: 'calc(1rem * var(--font-size-multiplier))',
+                    color: 'var(--greyed-text)',
+                  }}
+                >
+                  info
+                </span>
+                <span className={styles.popupText} style={{ width: popupWidth }}>
+                  Select the date until which you want to limit your spending for this goal.
+                </span>
+                <label>End Date:</label>
+                <input
+                  type="date"
+                  value={targetDate || ''}
+                  onChange={(e) => setTargetDate(e.target.value)}
+                  required
+                />
               </div>
             </div>
           </div>

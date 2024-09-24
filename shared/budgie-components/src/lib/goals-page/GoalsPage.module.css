@@ -197,7 +197,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: calc(1.5rem * var(--font-size-multiplier));
 }
 
 .goalValue {
@@ -208,6 +207,7 @@
   display: flex;
   align-items: center;
   margin-top: 1rem;
+  font-size: calc(1.1rem * var(--font-size-multiplier));
 }
 
 .percentageDisplay {
@@ -224,8 +224,6 @@
   color: white;
   border: none;
   cursor: pointer;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
   transition: 0.3s ease;
   border: 1px solid var(--primary-1);
   border-radius: 5px;
@@ -234,6 +232,25 @@
 }
 
 .updateViewButton:hover {
+  filter: brightness(1.1);
+}
+
+.editViewButton {
+  height: 100%;
+  padding: 10px;
+  background-color: var(--block-background);
+  color: var(--primary-1);
+  border: none;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: 0.3s ease;
+  border: 1px solid var(--primary-1);
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.editViewButton:hover {
   filter: brightness(1.1);
 }
 
@@ -304,4 +321,21 @@
   padding: 1rem;
   font-weight: bold;
   color: var(--greyed-text);
+}
+
+.goalPage{
+  width: 100%;
+
+}
+
+.goalPageRow {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.goalPageBlock {
+  background-color: var(--block-background);
+  border-radius: 5px;
+  padding: 1rem;
 }

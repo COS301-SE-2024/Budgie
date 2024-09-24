@@ -20,6 +20,15 @@ import UpdateGoalPopup from '../update-goal-progress-popup/UpdateGoalProgressPop
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import '../../root.css';
 
+import Image from 'next/image';
+
+import gif1 from '../../../public/images/birdgif1.gif';
+import gif2 from '../../../public/images/birdgif2.gif';
+import gif3 from '../../../public/images/birdgif3.gif';
+import gif4 from '../../../public/images/birdgif4.gif';
+import gif5 from '../../../public/images/birdgif5.gif';
+import gif6 from '../../../public/images/birdgif6.gif';
+
 interface Goal {
   id: string;
   name: string;
@@ -528,6 +537,346 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
   );
 };
 
+export interface GoalInfoPageProps {
+  goal: Goal;
+  onClose: () => void;
+}
+
+const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonthIndex = now.getMonth();
+  const currentMonthName = monthNames[currentMonthIndex];
+
+  const [updatePopupOpen, setUpdatePopupOpen] = useState(false);
+
+  const handleUpdateGoalPopup = () => {
+    setUpdatePopupOpen(!updatePopupOpen);
+  };
+
+  const [editPopupOpen, setEditPopupOpen] = useState(false);
+
+  const handleEditGoalPopup = () => {
+    setEditPopupOpen(!editPopupOpen);
+  };
+
+
+  const monthlyBudgetSpent = (goal: Goal): number => {
+    if (goal.monthly_updates !== undefined) {
+      const data = JSON.parse(goal.monthly_updates);
+      const currentMonthYear = `${monthNames[new Date().getMonth()]
+        } ${new Date().getFullYear()}`;
+      const currentMonthData = data.find(
+        (item: { month: string }) => item.month === currentMonthYear
+      );
+      const amountForCurrentMonth = currentMonthData
+        ? currentMonthData.amount
+        : 0;
+      return amountForCurrentMonth;
+    }
+    return 0;
+  };
+
+  const calculateProgressPercentage = (goal: Goal): number => {
+    if (goal.current_amount && goal.target_amount !== undefined) {
+      if (goal.initial_amount) {
+        return Math.min(
+          100,
+          ((goal.initial_amount - goal.current_amount) /
+            (goal.initial_amount - goal.target_amount)) *
+          100
+        );
+      } else {
+        return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
+      }
+    }
+    if (
+      goal.spending_limit !== undefined &&
+      goal.monthly_updates !== undefined
+    ) {
+      const amountForCurrentMonth = monthlyBudgetSpent(goal);
+      return (amountForCurrentMonth / goal.spending_limit) * 100;
+    }
+    return 0;
+  };
+
+  const calculateDaysLeft = (targetDate: string): number => {
+    const currentDate = new Date();
+    const target = new Date(targetDate);
+    const diffTime = target.getTime() - currentDate.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  const getGif = (progress: number) => {
+    if (progress <= 15) return gif1;
+    if (progress <= 40) return gif2;
+    if (progress <= 60) return gif3;
+    if (progress <= 80) return gif4;
+    if (progress < 100) return gif5;
+    return gif6;
+  };
+
+  const barData = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [
+      {
+        label: 'Progress',
+        data: [10, 20, 30, 40, 50, 60],
+        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+      },
+    ],
+  };
+
+  const getColorForValue = (value: number): string => {
+    if (value < 100) return 'var(--primary-1)';
+    return '#FF0000';
+  };
+
+  interface GoalMonthlyUpdate {
+    amount: number;
+    month: string;
+  }
+
+  const getUpdates = () => {
+    if (goal.monthly_updates) {
+      const updatesData: GoalMonthlyUpdate[] = JSON.parse(goal.monthly_updates);
+
+      const parseMonth = (monthStr: string): Date => {
+        return new Date(`1 ${monthStr}`);
+      };
+
+      const formattedData = updatesData
+        .map((update) => ({
+          month: update.month,
+          amount: update.amount,
+          date: parseMonth(update.month),
+        }))
+        .sort((a, b) => a.date.getTime() - b.date.getTime())
+        .map(({ date, ...rest }) => rest);
+      return formattedData;
+    }
+  };
+
+  const getBudgetUpdates = () => {
+    if (goal.monthly_updates) {
+      const updatesData: GoalMonthlyUpdate[] = JSON.parse(goal.monthly_updates);
+
+      const parseMonth = (monthStr: string): Date => {
+        return new Date(`1 ${monthStr}`);
+      };
+
+      const spendingLimit = goal.spending_limit || Infinity;
+
+      const formattedData = updatesData
+        .map((update) => {
+          const amount = update.amount;
+          const excess = amount > spendingLimit ? amount - spendingLimit : 0;
+          const amountWithinLimit =
+            amount > spendingLimit ? spendingLimit : amount;
+
+          return {
+            month: update.month,
+            amount: amountWithinLimit,
+            excess,
+            date: parseMonth(update.month),
+          };
+        })
+        .sort((a, b) => a.date.getTime() - b.date.getTime())
+        .map(({ date, excess, ...rest }) => ({
+          ...rest,
+          excess,
+        }));
+
+      return formattedData;
+    }
+  };
+
+  return (
+    <div className={styles.mainPage} style={{ position: 'fixed', right: 0, top: 0, height: '100%', zIndex: "11", paddingTop: '2rem' }}>
+      <div className={styles.goalPage}>
+        <h1 className="text-3xl font-bold mb-4" style={{ color: 'var(--primary-1)' }}>
+          <span className="material-symbols-outlined" onClick={onClose} style={{ marginRight: '0.8rem', fontSize: 'calc(1.5rem * var(--font-size-multiplier))' }}>
+            arrow_back
+          </span>
+          {goal.name}
+        </h1>
+        <div className={styles.goalPageRow} style={{ display: 'flex', justifyContent: 'space-between' }}>
+
+          <div className={styles.goalPageBlock} style={{ width: 'calc(100% - 20rem)', display: 'flex', flexDirection: 'column', margin: '1rem' }}>
+            <h2 className="text-xl font-semibold mb-4">Goal Details</h2>
+            <div style={{ display: 'flex', flexGrow: 1, flexDirection: 'column', justifyContent: 'center' }}>
+              <div className="flex justify-around items-center">
+                <div className="flex flex-col space-y-2">
+                  <div className={styles.goalPair}>
+                    <div className={styles.goalLabel}>Goal Type:</div>
+                    <div className={styles.goalValue}>{goal.type}</div>
+                  </div>
+                  {goal.target_date != undefined && (
+                    <div className={styles.goalPair}>
+                      <div className={styles.goalLabel}>Target Date:</div>
+                      <div className={styles.goalValue}>{goal.target_date}</div>
+                    </div>
+                  )}
+                  {goal.initial_amount != undefined && (
+                    <div className={styles.goalPair}>
+                      <div className={styles.goalLabel}>Initial Amount:</div>
+                      <div className={styles.goalValue}>R {goal.initial_amount.toFixed(2)}</div>
+                    </div>
+                  )}
+                  {goal.current_amount != undefined && (
+                    <div className={styles.goalPair}>
+                      <div className={styles.goalLabel}>Current Amount:</div>
+                      <div className={styles.goalValue}>R {goal.current_amount.toFixed(2)}</div>
+                    </div>
+                  )}
+                  {goal.target_amount != undefined &&
+                    <div className={styles.goalPair}>
+                      <div className={styles.goalLabel}>Target Amount:</div>
+                      <div className={styles.goalValue}>R {goal.target_amount.toFixed(2)}</div>
+                    </div>
+                  }
+                  {goal.target_date != undefined &&
+                    <div className={styles.goalPair}>
+                      <div className={styles.goalLabel}>
+                        Days Left:
+                      </div>
+                      <div className={styles.goalValue}>
+                        {calculateDaysLeft(goal.target_date) > 0
+                          ? ` ${calculateDaysLeft(
+                            goal.target_date
+                          )}`
+                          : 'Target Date Passed'}
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                {/* Buttons */}
+                <div className="flex flex-col space-y-4">
+                  <div
+                    className={styles.editViewButton}
+                    onClick={handleEditGoalPopup}
+                  >
+                    Edit Details
+                  </div>
+                  {editPopupOpen && (
+                    <EditGoalPopup
+                      togglePopup={handleEditGoalPopup}
+                      goal={goal}
+                    />
+                  )}
+                  <div
+                    className={styles.updateViewButton}
+                    onClick={handleUpdateGoalPopup}
+                  >
+                    Update Progress
+                  </div>
+                  {updatePopupOpen && (
+                    <UpdateGoalPopup
+                      togglePopup={handleUpdateGoalPopup}
+                      goal={goal}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            className={styles.goalPageBlock}
+            style={{
+              width: '25rem',
+              backgroundColor: 'var(--block-background)',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              margin: '1rem'
+            }}
+          >
+            <h2 className="text-xl font-semibold mb-4">Your Goal's Wingman</h2>
+            <div className="flex items-center justify-center w-full h-full">
+              <Image src={getGif(calculateProgressPercentage(goal))} alt="Goal GIF" className="object-contain w-full h-full" />
+            </div>
+          </div>
+        </div>
+
+
+        <div className={styles.goalPageRow} style={{ display: 'flex', gap: '2rem' }}>
+          {/* Row 2 - Left Block (Progress Circle) */}
+          <div className={styles.goalPageBlock} style={{ flex: 1, margin: '1rem 0 1rem 1rem' }}>
+            <h2 className="text-xl font-semibold mb-4">Your Progress</h2>
+            <div className="flex items-center justify-center">
+              <div className={styles.goalGraph}>
+                <CircularProgressbar
+                  value={calculateProgressPercentage(goal)}
+                  styles={buildStyles({
+                    pathColor: getColorForValue(
+                      calculateProgressPercentage(goal)
+                    ),
+                    trailColor: '#d6d6d6',
+                  })}
+                />
+                <div
+                  className={styles.percentageDisplay}
+                  style={{
+                    color: getColorForValue(calculateProgressPercentage(goal)),
+                  }}
+                >
+                  {`${calculateProgressPercentage(goal).toFixed(2)}%`}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Row 2 - Right Block (Bar Chart) 
+          <div className={styles.goalPageBlock} style={{ flex: 1, margin: '1rem 1rem 1rem 0' }}>
+            <h2 className="text-xl font-semibold mb-4">Your Progress Over Time</h2>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={getUpdates()}
+                margin={{ top: 0, right: 0, bottom: 0, left: 10 }}
+              >
+                <XAxis
+                  dataKey="month"
+                  tick={false}
+                  stroke="var(--main-text)"
+                />
+                <YAxis
+                  tick={{ fill: 'var(--main-text)' }}
+                  stroke="var(--main-text)"
+                >
+                  <Label
+                    value="Amount"
+                    angle={-90}
+                    position="left"
+                    style={{ textAnchor: 'middle', fill: 'var(--main-text)' }}
+                  />
+                </YAxis>
+                <Tooltip cursor={{ fill: 'var(--main-background)' }} />
+                <Bar dataKey="amount" fill="var(--primary-1)" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>*/}
+        </div>
+
+
+        {/* Row 3 - Full Width (Transactions) */}
+        <div className={styles.goalPageBlock} style={{ margin: '1rem' }}>
+          <h2 className="text-xl font-semibold mb-4">Transactions</h2>
+          {/* Add your transactions table or content here */}
+          <p>Transaction list goes here...</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+
+
+
+
+
 export interface GoalsPageProps { }
 
 export function GoalsPage() {
@@ -542,6 +891,8 @@ export function GoalsPage() {
   const [sortOption, setSortOption] = useState('name');
   const [hasGoals, setHasGoals] = useState(false);
   const user = useContext(UserContext);
+  const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
+
 
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSortOption(event.target.value);
@@ -674,6 +1025,10 @@ export function GoalsPage() {
 
   const sortedGoals = sortGoals(Goals, sortOption);
 
+  const handleNameClick = (goal: Goal) => {
+    setSelectedGoal(goal);
+  };
+
   return (
     <div className={styles.mainPage}>
       {!hasGoals ? (
@@ -719,7 +1074,7 @@ export function GoalsPage() {
             <div className="p-4">
               <table className="min-w-full table-auto border-collapse border border-gray-200">
                 <thead>
-                  <tr style={{color:'var(--secondary-text)', backgroundColor:'var(--primary-1)'}}>
+                  <tr style={{ color: 'var(--secondary-text)', backgroundColor: 'var(--primary-1)' }}>
                     <th className="border border-gray-200 p-2 text-left">Name</th>
                     <th className="border border-gray-200 p-2 text-left">Type</th>
                     <th className="border border-gray-200 p-2 text-left">Target Date</th>
@@ -728,20 +1083,27 @@ export function GoalsPage() {
                 </thead>
                 <tbody>
                   {sortedGoals.map((goal, index) => (
-                    <tr key={index} 
-                    style={{backgroundColor: 'var(--block-background)', fontSize:"calc(1.2rem * var(--font-size-multiplier))"}}>
-                      <td className="border border-gray-200 p-2">{goal.name}</td>
+                    <tr key={index}
+                      style={{ backgroundColor: 'var(--block-background)', fontSize: "calc(1.2rem * var(--font-size-multiplier))" }}>
+                      <td className="border p-2 underline cursor-pointer hover:text-blue-700"
+                        onClick={() => handleNameClick(goal)}>{goal.name}</td>
                       <td className="border border-gray-200 p-2">{goal.type}</td>
                       <td className="border border-gray-200 p-2">
-                        {goal.type === 'Spending Limit' ? '- - -' : goal.target_date}
+                        {goal.target_date}
                       </td>
                       <td className="border border-gray-200 p-2">
-                        <div className="relative w-full h-6 bg-gray-200 rounded">
-                          <div
-                            className="absolute top-0 left-0 h-full bg-green-500 rounded"
-                            style={{ width: `${calculateProgressPercentage(goal)}%` }}
-                          />
-                          <span className="absolute top-0 left-1/2 transform -translate-x-1/2 text-sm text-white">
+                        <div className="flex items-center">
+                          <div className="relative w-full h-8 rounded" style={{ backgroundColor: 'var(--main-background)' }}>
+                            <div
+                              className="absolute top-0 left-0 h-full bg-green-500 rounded"
+                              style={{
+                                width: `${calculateProgressPercentage(goal)}%`,
+                                backgroundColor: 'var(--primary-2)',
+                              }}
+                            />
+
+                          </div>
+                          <span className="ml-3 text-sm" style={{ color: 'var(--main-text' }}>
                             {calculateProgressPercentage(goal)}%
                           </span>
                         </div>
@@ -751,6 +1113,27 @@ export function GoalsPage() {
                 </tbody>
               </table>
             </div>
+
+            {selectedGoal && (
+
+
+              <>
+                <GoalInfoPage goal={selectedGoal} onClose={() => setSelectedGoal(null)}></GoalInfoPage>
+                {/*<h2 className="text-xl font-bold">Goal Details</h2>
+    <p>Name: {selectedGoal.name}</p>
+    <p>Type: {selectedGoal.type}</p>
+    {selectedGoal.target_date && <p>Target Date: {selectedGoal.target_date}</p>}
+    <p>Progress: {calculateProgressPercentage(selectedGoal)}%</p>
+
+
+    <button
+      onClick={() => setSelectedGoal(null)} // Close the component
+      className="mt-4 p-2 bg-red-500 text-white rounded hover:bg-red-700"
+    >
+      Close
+    </button>*/}
+              </>
+            )}
 
 
 
