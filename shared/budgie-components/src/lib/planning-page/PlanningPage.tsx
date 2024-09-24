@@ -381,6 +381,7 @@ export function PlanningPage(props: PlanningPageProps) {
     target_date?: string;
     spending_limit?: number;
   }
+
   useThemeSettings();
 
   useEffect(() => {
@@ -410,7 +411,7 @@ export function PlanningPage(props: PlanningPageProps) {
   }, []);
 
   return (
-    <div>
+    <div className="mainPage">
       <div className={styles.topBar}>
         <div>
           <button
@@ -421,7 +422,6 @@ export function PlanningPage(props: PlanningPageProps) {
           >
             Goals
           </button>
-
           <button
             className={`${styles.button} ${
               viewMode === 'comparisons' ? styles.activeButton : ''
@@ -431,7 +431,6 @@ export function PlanningPage(props: PlanningPageProps) {
           >
             Comparisons
           </button>
-
           <button
             className={`${styles.button} ${
               viewMode === 'insight' ? styles.activeButton : ''
@@ -451,11 +450,9 @@ export function PlanningPage(props: PlanningPageProps) {
             <GoalsPage />
           ) : viewMode === 'comparisons' ? (
             <ComparisonPage />
-          ) : viewMode === 'insight' ?(
+          ) : viewMode === 'insight' ? (
             <InsightsPage />
-          ): (
-            null 
-          )}
+          ) : null}
         </div>
       </div>
     </div>

@@ -675,7 +675,7 @@ export function GoalsPage() {
   };
 
   return (
-    <div className={styles.mainPage}>
+    <>
       {!hasGoals ? (
         <>
           <div className={styles.noGoalScreen}>
@@ -872,7 +872,7 @@ export function GoalsPage() {
           </div>
         </>
       )}
-    </div>
+    </>
   );
 }
 
