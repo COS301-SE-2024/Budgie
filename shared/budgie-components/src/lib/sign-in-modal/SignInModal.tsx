@@ -1,5 +1,4 @@
 'use client';
-import { useRouter } from 'next/router';
 import './SignInModal.module.css';
 import { useState } from 'react';
 import Image from 'next/image';
@@ -41,7 +40,7 @@ export function SignInModal(props: SignInModalProps) {
     'auth/wrong-password': 'Password is incorrect.',
     'auth/network-request-failed': 'Network error. Please try again.',
     'auth/popup-closed-by-user':
-      'The popup was closed before completing sign in.',
+      'The popup was closed before completing sign-in.',
     'auth/cancelled-popup-request': 'Cancelled previous popup request.',
     // Add more error codes and messages as needed
   };
@@ -90,15 +89,6 @@ export function SignInModal(props: SignInModalProps) {
         setError(true);
         setErrorMessage(friendlyMessage);
 
-        // Set input error states if applicable
-        if (errorCode === 'auth/popup-closed-by-user') {
-          // No input error states to set
-        } else if (errorCode === 'auth/network-request-failed') {
-          // Could highlight network issues
-        } else {
-          // General error
-        }
-
         console.error('Error code:', errorCode);
         console.error('Error message:', error.message);
       } else {
@@ -144,7 +134,6 @@ export function SignInModal(props: SignInModalProps) {
     setLoading(true);
 
     try {
-      const auth = getAuth();
       await setPersistence(auth, browserSessionPersistence);
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -173,8 +162,6 @@ export function SignInModal(props: SignInModalProps) {
           setEmailError(true);
         } else if (errorCode === 'auth/wrong-password') {
           setPasswordError(true);
-        } else {
-          // General error
         }
 
         console.error('Error code:', errorCode);
@@ -201,7 +188,7 @@ export function SignInModal(props: SignInModalProps) {
         </div>
       )}
       <div className="relative z-10 bg-BudgieBlue w-[794px] h-[521px] rounded-[61px] shadow-2xl">
-        <div className="flex flex-col justify-start items-center bg-BudgieWhite w-[397px] h-[521px] rounded-[60px] rounded-tr-none rounded-br-none">
+        <div className="flex flex-col items-center bg-BudgieWhite w-[397px] h-full rounded-l-[60px]">
           <div className="pt-4 h-[55px] w-[55px]">
             <Image src={logo} alt="Logo" />
           </div>
@@ -211,11 +198,11 @@ export function SignInModal(props: SignInModalProps) {
           <form className="pt-4" onSubmit={(e) => e.preventDefault()}>
             <div>
               <input
-                className={`appearance-none text-lg w-72 h-10 font-TripSans font-normal pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow ${
-                  emailError ? 'border-red-500' : ''
+                className={`appearance-none text-lg w-72 h-10 font-TripSans pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow ${
+                  emailError ? 'border-red-500' : 'border-transparent'
                 }`}
                 id="email"
-                type="text"
+                type="email"
                 placeholder="Email"
                 value={email}
                 onChange={handleEmailChange}
@@ -224,8 +211,8 @@ export function SignInModal(props: SignInModalProps) {
             </div>
             <div className="pt-4">
               <input
-                className={`appearance-none text-lg w-72 h-10 font-TripSans font-normal pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow ${
-                  passwordError ? 'border-red-500' : ''
+                className={`appearance-none text-lg w-72 h-10 font-TripSans pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow ${
+                  passwordError ? 'border-red-500' : 'border-transparent'
                 }`}
                 id="password"
                 type="password"
@@ -235,7 +222,7 @@ export function SignInModal(props: SignInModalProps) {
                 disabled={loading}
               />
             </div>
-            <div className="flex flex-col justify-start pt-6 items-center">
+            <div className="flex flex-col pt-6 items-center">
               <button
                 className={`font-TripSans font-medium rounded-[25px] w-36 h-10 ${
                   loading ? 'bg-gray-400' : 'bg-BudgieBlue'
@@ -247,12 +234,12 @@ export function SignInModal(props: SignInModalProps) {
                 {loading ? 'Logging In...' : 'Log In'}
               </button>
             </div>
-            <div className="flex flex-col justify-start pt-3 items-center">
+            <div className="flex flex-col pt-3 items-center">
               <p className="text-BudgieBlue font-TripSans font-medium">OR</p>
             </div>
-            <div className="flex flex-col justify-start pt-3 items-center">
+            <div className="flex flex-col pt-3 items-center">
               <button
-                className={`flex items-center justify-center font-TripSans font-medium rounded-[25px] w-[12rem] h-[2.5rem] ${
+                className={`flex items-center justify-center font-TripSans font-medium rounded-[25px] w-48 h-10 ${
                   loading ? 'bg-gray-400' : 'bg-BudgieBlue'
                 } text-BudgieWhite`}
                 type="button"
@@ -270,7 +257,7 @@ export function SignInModal(props: SignInModalProps) {
             <div className="flex flex-col pt-3 items-center">
               <p className="text-lg text-BudgieBlue font-TripSans font-medium">
                 Don't have an account?{' '}
-                <Link href={'/signup'} className="underline">
+                <Link href="/signup" className="underline">
                   Sign Up
                 </Link>
               </p>
@@ -292,30 +279,11 @@ export function SignInModal(props: SignInModalProps) {
         </div>
         {/* Loading Spinner */}
         {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-opacity-50 bg-black">
-            <div className="loader">Loading...</div>
+          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-25 rounded-[61px]">
+            <div className="w-16 h-16 border-8 border-gray-200 border-t-BudgieBlue rounded-full animate-spin"></div>
           </div>
         )}
       </div>
-      {/* Spinner Styles */}
-      <style jsx>{`
-        .loader {
-          border: 8px solid #f3f3f3;
-          border-top: 8px solid #3498db;
-          border-radius: 50%;
-          width: 60px;
-          height: 60px;
-          animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-          0% {
-            transform: rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
     </>
   );
 }
