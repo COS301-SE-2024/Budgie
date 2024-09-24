@@ -15,17 +15,20 @@ export function Landing(props: LandingProps) {
   return (
     <>
       {showSignInModal && (
-        <>
+        <div
+          onClick={() => {
+            setShowSignInModal(!showSignInModal);
+          }}
+          className="absolute z-40 w-screen h-screen backdrop-blur-sm flex flex-col items-center justify-center"
+        >
           <div
-            onClick={() => {
-              setShowSignInModal(!showSignInModal);
+            onClick={(e) => {
+              e.stopPropagation();
             }}
-            className="z-40 absolute w-screen h-screen backdrop-blur-sm"
-          ></div>
-          <div className="absolute z-50 left-[calc(50vw-397px)] top-[calc(50vh-260px)]">
+          >
             <SignInModal></SignInModal>
           </div>
-        </>
+        </div>
       )}
       {showLearnMore && (
         <>
