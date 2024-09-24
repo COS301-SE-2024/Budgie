@@ -59,491 +59,6 @@ const monthNames = [
   'December',
 ];
 
-export interface GraphCarouselProps {
-  goal: Goal;
-}
-
-const GraphCarousel = ({ goal }: GraphCarouselProps) => {
-  const slides = ['Slide 1', 'Slide 2', 'Slide 3'];
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  interface GoalUpdate {
-    amount: number;
-    date: string;
-  }
-
-  interface GoalMonthlyUpdate {
-    amount: number;
-    month: string;
-  }
-
-  const calculateProgressPercentage = (goal: Goal): number => {
-    if (goal.current_amount && goal.target_amount !== undefined) {
-      if (goal.initial_amount) {
-        return Math.min(
-          100,
-          ((goal.initial_amount - goal.current_amount) /
-            (goal.initial_amount - goal.target_amount)) *
-          100
-        );
-      } else {
-        return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
-      }
-    }
-    if (goal.current_amount && goal.initial_amount !== undefined) {
-      return Math.min(
-        100,
-        ((goal.initial_amount - goal.current_amount) / (goal.initial_amount)) * 100
-      );
-    }
-    if (
-      goal.spending_limit !== undefined &&
-      goal.monthly_updates !== undefined
-    ) {
-      const amountForCurrentMonth = monthlyBudgetSpent(now.getMonth());
-      return (amountForCurrentMonth / goal.spending_limit) * 100;
-    }
-    return 0;
-  };
-
-  const monthlyBudgetSpent = (month: number): number => {
-    if (goal.monthly_updates !== undefined) {
-      const data = JSON.parse(goal.monthly_updates);
-      const currentMonthYear = `${currentMonthName} ${currentYear}`;
-      const currentMonthData = data.find(
-        (item: { month: string }) => item.month === currentMonthYear
-      );
-      const amountForCurrentMonth = currentMonthData
-        ? currentMonthData.amount
-        : 0;
-      return amountForCurrentMonth;
-    }
-    return 0;
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? slides.length - 1 : prevIndex - 1
-    );
-  };
-
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === 2 - 1 ? 0 : prevIndex + 1));
-  };
-
-  const getUpdates = () => {
-    if (goal.monthly_updates) {
-      const updatesData: GoalMonthlyUpdate[] = JSON.parse(goal.monthly_updates);
-
-      const parseMonth = (monthStr: string): Date => {
-        return new Date(`1 ${monthStr}`);
-      };
-
-      const formattedData = updatesData
-        .map((update) => ({
-          month: update.month,
-          amount: update.amount,
-          date: parseMonth(update.month),
-        }))
-        .sort((a, b) => a.date.getTime() - b.date.getTime())
-        .map(({ date, ...rest }) => rest);
-      return formattedData;
-    }
-  };
-
-  const getBudgetUpdates = () => {
-    if (goal.monthly_updates) {
-      const updatesData: GoalMonthlyUpdate[] = JSON.parse(goal.monthly_updates);
-
-      const parseMonth = (monthStr: string): Date => {
-        return new Date(`1 ${monthStr}`);
-      };
-
-      const spendingLimit = goal.spending_limit || Infinity;
-
-      const formattedData = updatesData
-        .map((update) => {
-          const amount = update.amount;
-          const excess = amount > spendingLimit ? amount - spendingLimit : 0;
-          const amountWithinLimit =
-            amount > spendingLimit ? spendingLimit : amount;
-
-          return {
-            month: update.month,
-            amount: amountWithinLimit,
-            excess,
-            date: parseMonth(update.month),
-          };
-        })
-        .sort((a, b) => a.date.getTime() - b.date.getTime())
-        .map(({ date, excess, ...rest }) => ({
-          ...rest,
-          excess,
-        }));
-
-      return formattedData;
-    }
-  };
-
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonthIndex = now.getMonth();
-
-  const currentMonthName = monthNames[currentMonthIndex];
-
-  const getColorForValue = (value: number): string => {
-    if (value < 100) return 'var(--primary-1)';
-    return '#FF0000';
-  };
-
-  return (
-    <div className={styles.carousel}>
-      <div
-        className={styles.carouselContainer}
-        style={{
-          transform: `translateX(-${currentIndex * 100}%)`,
-          transition: 'none',
-        }}
-      >
-        {goal.type === 'Savings' && (
-          <div className={styles.carouselSlide} key="progress">
-            <div className={styles.goalGraph}>
-              <CircularProgressbar
-                value={calculateProgressPercentage(goal)}
-                styles={buildStyles({
-                  pathColor: 'var(--primary-1)',
-                  trailColor: '#d6d6d6',
-                })}
-              />
-              <div className={styles.percentageDisplay}>
-                {`${calculateProgressPercentage(goal).toFixed(2)}%`}
-              </div>
-            </div>
-            <div
-              style={{
-                marginTop: '1rem',
-                display: 'flex',
-                justifyContent: 'space-between',
-                width: '100%',
-              }}
-            >
-              {goal.updates !== undefined ? (
-                <span className={styles.arrow} onClick={prevSlide}>
-                  &#8592;
-                </span>
-              ) : (
-                <span></span>
-              )}
-              <span
-                className={styles.goalLabel}
-                style={{
-                  marginLeft: '1rem',
-                  marginRight: '1rem',
-                  color: 'var(--main-text)',
-                }}
-              >
-                Goal Progress
-              </span>
-              {goal.updates !== undefined ? (
-                <span className={styles.arrow} onClick={nextSlide}>
-                  &#8594;
-                </span>
-              ) : (
-                <span></span>
-              )}
-            </div>
-          </div>
-        )}
-
-        {goal.type === 'Savings' && goal.updates !== undefined && (
-          <div className={styles.carouselSlide} key="chart">
-            <div className={styles.goalGraph}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={getUpdates()}
-                  margin={{ top: 0, right: 0, bottom: 0, left: 10 }}
-                >
-                  <XAxis
-                    dataKey="month"
-                    tick={false}
-                    stroke="var(--main-text)"
-                  />
-                  <YAxis
-                    tick={{ fill: 'var(--main-text)' }}
-                    stroke="var(--main-text)"
-                  >
-                    <Label
-                      value="Amount"
-                      angle={-90}
-                      position="left"
-                      style={{ textAnchor: 'middle', fill: 'var(--main-text)' }}
-                    />
-                  </YAxis>
-                  <Tooltip cursor={{ fill: 'var(--main-background)' }} />
-                  <Bar dataKey="amount" fill="var(--primary-1)" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div
-              style={{
-                marginTop: '1rem',
-                display: 'flex',
-                justifyContent: 'space-between',
-                width: '100%',
-              }}
-            >
-              <span className={styles.arrow} onClick={prevSlide}>
-                &#8592;
-              </span>
-              <span
-                className={styles.goalLabel}
-                style={{
-                  marginLeft: '1rem',
-                  marginRight: '1rem',
-                  color: 'var(--main-text)',
-                }}
-              >
-                Savings per Month
-              </span>
-              <span className={styles.arrow} onClick={nextSlide}>
-                &#8594;
-              </span>
-            </div>
-          </div>
-        )}
-
-        {goal.type === 'Debt Reduction' && (
-          <div className={styles.carouselSlide} key="progress">
-            <div className={styles.goalGraph}>
-              <CircularProgressbar
-                value={calculateProgressPercentage(goal)}
-                styles={buildStyles({
-                  pathColor: 'var(--primary-1)',
-                  trailColor: '#d6d6d6',
-                })}
-              />
-              <div className={styles.percentageDisplay}>
-                {`${calculateProgressPercentage(goal).toFixed(2)}%`}
-              </div>
-            </div>
-            <div
-              style={{
-                marginTop: '1rem',
-                display: 'flex',
-                justifyContent: 'space-between',
-                width: '100%',
-              }}
-            >
-              {goal.updates !== undefined ? (
-                <span className={styles.arrow} onClick={prevSlide}>
-                  &#8592;
-                </span>
-              ) : (
-                <span></span>
-              )}
-              <span
-                className={styles.goalLabel}
-                style={{
-                  marginLeft: '1rem',
-                  marginRight: '1rem',
-                  color: 'var(--main-text)',
-                }}
-              >
-                Goal Progress
-              </span>
-              {goal.updates !== undefined ? (
-                <span className={styles.arrow} onClick={nextSlide}>
-                  &#8594;
-                </span>
-              ) : (
-                <span></span>
-              )}
-            </div>
-          </div>
-        )}
-
-        {goal.type === 'Debt Reduction' && goal.updates !== undefined && (
-          <div className={styles.carouselSlide} key="chart">
-            <div className={styles.goalGraph}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={getUpdates()}
-                  margin={{ top: 0, right: 0, bottom: 0, left: 10 }}
-                >
-                  <XAxis
-                    dataKey="month"
-                    tick={false}
-                    stroke="var(--main-text)"
-                  />
-                  <YAxis
-                    tick={{ fill: 'var(--main-text)' }}
-                    stroke="var(--main-text)"
-                  >
-                    <Label
-                      value="Amount"
-                      angle={-90}
-                      position="left"
-                      style={{ textAnchor: 'middle', fill: 'var(--main-text)' }}
-                    />
-                  </YAxis>
-                  <Tooltip cursor={{ fill: 'var(--main-background)' }} />
-                  <Bar dataKey="amount" fill="var(--primary-1)" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div
-              style={{
-                marginTop: '1rem',
-                display: 'flex',
-                justifyContent: 'space-between',
-                width: '100%',
-              }}
-            >
-              <span className={styles.arrow} onClick={prevSlide}>
-                &#8592;
-              </span>
-              <span
-                className={styles.goalLabel}
-                style={{
-                  marginLeft: '1rem',
-                  marginRight: '1rem',
-                  color: 'var(--main-text)',
-                }}
-              >
-                Debt Payments per Month
-              </span>
-              <span className={styles.arrow} onClick={nextSlide}>
-                &#8594;
-              </span>
-            </div>
-          </div>
-        )}
-
-        {goal.type === 'Spending Limit' && (
-          <div className={styles.carouselSlide} key="progress">
-            <div className={styles.goalGraph}>
-              <CircularProgressbar
-                value={calculateProgressPercentage(goal)}
-                styles={buildStyles({
-                  pathColor: getColorForValue(
-                    calculateProgressPercentage(goal)
-                  ),
-                  trailColor: '#d6d6d6',
-                })}
-              />
-              <div
-                className={styles.percentageDisplay}
-                style={{
-                  color: getColorForValue(calculateProgressPercentage(goal)),
-                }}
-              >
-                {`${calculateProgressPercentage(goal).toFixed(2)}%`}
-              </div>
-            </div>
-            <div
-              style={{
-                marginTop: '1rem',
-                display: 'flex',
-                justifyContent: 'space-between',
-                width: '100%',
-              }}
-            >
-              {goal.updates !== undefined ? (
-                <span className={styles.arrow} onClick={prevSlide}>
-                  &#8592;
-                </span>
-              ) : (
-                <span></span>
-              )}
-              <span
-                className={styles.goalLabel}
-                style={{
-                  marginLeft: '1rem',
-                  marginRight: '1rem',
-                  color: 'var(--main-text)',
-                }}
-              >
-                Budget Used for {currentMonthName} {currentYear}
-              </span>
-              {goal.updates !== undefined ? (
-                <span className={styles.arrow} onClick={nextSlide}>
-                  &#8594;
-                </span>
-              ) : (
-                <span></span>
-              )}
-            </div>
-          </div>
-        )}
-
-        {goal.type === 'Spending Limit' && goal.updates !== undefined && (
-          <div className={styles.carouselSlide} key="chart">
-            <div className={styles.goalGraph}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={getBudgetUpdates()}
-                  margin={{ top: 0, right: 0, bottom: 0, left: 10 }}
-                >
-                  <XAxis
-                    dataKey="month"
-                    tick={false}
-                    stroke="var(--main-text)"
-                  />
-                  <YAxis
-                    tick={{ fill: 'var(--main-text)' }}
-                    stroke="var(--main-text)"
-                  >
-                    <Label
-                      value="Amount"
-                      angle={-90}
-                      position="left"
-                      style={{ textAnchor: 'middle', fill: 'var(--main-text)' }}
-                    />
-                  </YAxis>
-                  <Tooltip cursor={{ fill: 'var(--main-background)' }} />
-                  <Bar dataKey="amount" stackId="a" fill="var(--primary-1)" />
-                  <Bar dataKey="excess" stackId="a" fill="red" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div
-              style={{
-                marginTop: '1rem',
-                display: 'flex',
-                justifyContent: 'space-between',
-                width: '100%',
-              }}
-            >
-              <span className={styles.arrow} onClick={prevSlide}>
-                &#8592;
-              </span>
-              <span
-                className={styles.goalLabel}
-                style={{
-                  marginLeft: '1rem',
-                  marginRight: '1rem',
-                  color: 'var(--main-text)',
-                }}
-              >
-                Amount Spent per Month
-              </span>
-              <span className={styles.arrow} onClick={nextSlide}>
-                &#8594;
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export interface GoalInfoPageProps {
-  goal: Goal;
-  onClose: () => void;
-}
-
 interface Update {
   amount: number;
   date: string;
@@ -553,66 +68,49 @@ export interface TableProps {
   goal: Goal;
 }
 
-const MyComponent = ({ goal }: TableProps) => {
-  const [localUpdates, setLocalUpdates] = useState<Update[]>([]);
-
-  useEffect(() => {
-    if (goal.updates) {
-      try {
-        const parsedUpdates = JSON.parse(goal.updates) as Update[];
-        setLocalUpdates(parsedUpdates);
-      } catch (error) {
-        console.error('Error parsing updates:', error);
-        setLocalUpdates([]);
-      }
-    }
-  }, [goal.updates]);
+const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal: Goal) => void }) => {
+  const [localUpdates, setLocalUpdates] = useState<Update[]>(goal.updates ? JSON.parse(goal.updates) : []);
 
   const handleDeleteUpdate = (amount: number, date: string) => {
-    if (window.confirm("Do you really want to delete this update?")) {
-      setLocalUpdates((prevUpdates: Update[]) => {
-        let removed = false;
-        let newUpdates: Update[] = [];
 
-        for (let i = 0; i < prevUpdates.length; i++) {
-          const update = prevUpdates[i];
-          if (!removed && update.amount === amount && update.date === date) {
-            removed = true;
-            continue;
-          }
-          newUpdates.push(update);
+    if (window.confirm("Do you really want to delete this update?") && goal.updates) {
+      let updatedCurrentAmount = goal.current_amount;
+
+      if (goal.type === "Debt Reduction") {
+        updatedCurrentAmount += amount;
+      } else {
+        updatedCurrentAmount -= amount;
+      }
+
+      let removed = false;
+      const newUpdates: Update[] = [];
+      for (let i = 0; i < localUpdates.length; i++) {
+        const update = localUpdates[i];
+        if (!removed && update.amount === amount && update.date === date) {
+          removed = true;
+          continue;
         }
-        goal.updates = JSON.stringify(newUpdates);
+        newUpdates.push(update);
+      }
 
-        if (goal.type === "Debt Reduction") {
-          goal.current_amount = goal.current_amount + amount;
-        } else {
-          goal.current_amount = goal.current_amount - amount;
-        }
+      goal.current_amount = updatedCurrentAmount;
+      goal.updates = JSON.stringify(newUpdates);
 
-        let monthlyUpdatesArray = goal.monthly_updates
-          ? JSON.parse(goal.monthly_updates)
-          : [];
+      let monthlyUpdatesArray = goal.monthly_updates ? JSON.parse(goal.monthly_updates) : [];
+      const updateMonth = new Date(date).toLocaleString("default", { month: "long", year: "numeric" });
+      const monthlyUpdateIndex = monthlyUpdatesArray.findIndex(
+        (entry: { month: string }) => entry.month === updateMonth
+      );
 
-        const updateMonth = new Date(date).toLocaleString("default", {
-          month: "long",
-          year: "numeric",
-        });
+      if (monthlyUpdateIndex >= 0) {
+        monthlyUpdatesArray[monthlyUpdateIndex].amount -= amount;
+      }
 
-        const monthlyUpdateIndex = monthlyUpdatesArray.findIndex(
-          (entry: { month: string }) => entry.month === updateMonth
-        );
+      goal.monthly_updates = JSON.stringify(monthlyUpdatesArray);
 
-        if (monthlyUpdateIndex >= 0) {
-          monthlyUpdatesArray[monthlyUpdateIndex].amount -= amount;
-        }
-
-        goal.monthly_updates = JSON.stringify(monthlyUpdatesArray);
-
-        updateDB();
-        return newUpdates;
-      });
-
+      setLocalUpdates(newUpdates);
+      onUpdateGoal(goal); 
+      updateDB();
     }
   };
 
@@ -630,6 +128,18 @@ const MyComponent = ({ goal }: TableProps) => {
       console.error("Error saving goal:", error);
     }
   };
+
+  useEffect(() => {
+    if (goal.updates) {
+      try {
+        const parsedUpdates = JSON.parse(goal.updates);
+        setLocalUpdates(parsedUpdates);
+      } catch (error) {
+        console.error("Failed to parse updates", error);
+      }
+    }
+    updateDB();
+  }, [goal.updates, goal.current_amount]); 
 
   return (
     <div>
@@ -662,33 +172,20 @@ const MyComponent = ({ goal }: TableProps) => {
   );
 };
 
+export interface GoalInfoPageProps {
+  goal: Goal;
+  onClose: () => void;
+}
+
 const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
   const now = new Date();
-  const currentYear = now.getFullYear();
   const currentMonthIndex = now.getMonth();
-  const currentMonthName = monthNames[currentMonthIndex];
-  const [updates, setUpdates] = useState(() => {
-    if (goal.updates) {
-      if (typeof goal.updates === 'string') {
-        try {
-          return JSON.parse(goal.updates);
-        } catch (error) {
-          console.error("Invalid JSON format:", error);
-          return [];
-        }
-      } else if (typeof goal.updates === 'object') {
-        return goal.updates;
-      }
-    }
-    return [];
-  });
-
   const [updatePopupOpen, setUpdatePopupOpen] = useState(false);
+  const [currentGoal, setCurrentGoal] = useState(goal);
 
-  interface Update {
-    amount: number;
-    date: string;
-  }
+  const handleGoalUpdate = (updatedGoal: Goal) => {
+    setCurrentGoal({ ...updatedGoal });
+  };
 
   const handleUpdateGoalPopup = () => {
     setUpdatePopupOpen(!updatePopupOpen);
@@ -699,7 +196,6 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
   const handleEditGoalPopup = () => {
     setEditPopupOpen(!editPopupOpen);
   };
-
 
   const monthlyBudgetSpent = (goal: Goal): number => {
     if (goal.monthly_updates !== undefined) {
@@ -769,17 +265,6 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
     return gif6;
   };
 
-  const barData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'Progress',
-        data: [10, 20, 30, 40, 50, 60],
-        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-      },
-    ],
-  };
-
   const getColorForValue = (value: number, type: string): string => {
     if (value < 100) return 'var(--primary-1)';
     if (type == 'Spending Limit' && value >= 100) return '#FF0000';
@@ -844,9 +329,6 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
       return formattedData;
     }
   };
-
-
-
 
   return (
     <div className={styles.mainPage} style={{ position: 'fixed', right: 0, top: 0, height: '100%', zIndex: "11", paddingTop: '2rem' }}>
@@ -998,7 +480,6 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
                       {goal.update_type != undefined && (
                         <div className={styles.goalPair}>
                           <div className={styles.goalLabel}>Update Type:</div>
-                          {/* More goal details */}
                           {goal.update_type == 'assign-all' && (
                             <div className={styles.goalValue}>Assigned Account/s</div>
                           )}
@@ -1016,7 +497,6 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
                           )}
                         </div>
                       )}
-                      {/* Spending limit and target details */}
                       {goal.spending_limit != undefined && (
                         <>
                           <div className={styles.goalPair}>
@@ -1158,24 +638,19 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
         </div>
 
 
-        {goal.update_type == 'manual' && (
-          <>
-            {updates.length > 0 && (
-              <div className={styles.goalPageBlock} style={{ margin: '1rem'}}>
-                <h2 className="text-xl font-semibold mb-4">Updates</h2>
-                <MyComponent goal={goal}></MyComponent>
-              </div>
-            ) }
-          </>)}
+        {currentGoal.update_type == 'manual' && currentGoal.updates && JSON.parse(currentGoal.updates).length > 0 && (
+          <div className={styles.goalPageBlock} style={{ margin: '1rem' }}>
+            <h2 className="text-xl font-semibold mb-4">Updates</h2>
+            <UpdateTable goal={currentGoal} onUpdateGoal={handleGoalUpdate} />
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-
-
-
-export interface GoalsPageProps { }
+export interface GoalsPageProps {
+}
 
 export function GoalsPage() {
   const [Goals, setGoals] = useState<Goal[]>([]);
@@ -1250,13 +725,6 @@ export function GoalsPage() {
     return 0;
   };
 
-  const calculateDaysLeft = (targetDate: string): number => {
-    const currentDate = new Date();
-    const target = new Date(targetDate);
-    const diffTime = target.getTime() - currentDate.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  };
-
   const fetchGoals = async () => {
     if (user && user.uid) {
       try {
@@ -1288,22 +756,6 @@ export function GoalsPage() {
   useEffect(() => {
     fetchGoals();
   }, [sortOption, selectedGoal]);
-
-  const handleEditGoalPopup = (index: number) => {
-    setEditPopupOpen((prevState) => ({
-      ...prevState,
-      [index]: !prevState[index],
-    }));
-    fetchGoals();
-  };
-
-  const handleUpdateGoalPopup = (index: number) => {
-    setUpdatePopupOpen((prevState) => ({
-      ...prevState,
-      [index]: !prevState[index],
-    }));
-    fetchGoals();
-  };
 
   const monthlyBudgetSpent = (goal: Goal): number => {
     if (goal.monthly_updates !== undefined) {
@@ -1413,180 +865,10 @@ export function GoalsPage() {
             </div>
 
             {selectedGoal && (
-
-
               <>
                 <GoalInfoPage goal={selectedGoal} onClose={() => setSelectedGoal(null)}></GoalInfoPage>
-                {/*<h2 className="text-xl font-bold">Goal Details</h2>
-    <p>Name: {selectedGoal.name}</p>
-    <p>Type: {selectedGoal.type}</p>
-    {selectedGoal.target_date && <p>Target Date: {selectedGoal.target_date}</p>}
-    <p>Progress: {calculateProgressPercentage(selectedGoal)}%</p>
-
-
-    <button
-      onClick={() => setSelectedGoal(null)} // Close the component
-      className="mt-4 p-2 bg-red-500 text-white rounded hover:bg-red-700"
-    >
-      Close
-    </button>*/}
               </>
             )}
-
-
-
-
-            {/*Goals ? (
-              <>
-                {Goals.map((goal, index) => (
-                  <div key={goal.id || index}>
-                    <div className={styles.planningModalTitle}>
-                      {goal.name}
-                      <span
-                        className="material-symbols-outlined"
-                        style={{
-                          fontSize:
-                            'min(2.5rem, (calc(1.5rem * var(--font-size-multiplier))))',
-                          fontWeight: 500,
-                          color: 'var(--primary-text)',
-                          marginLeft: '1rem',
-                        }}
-                        onClick={() => handleEditGoalPopup(index)}
-                      >
-                        edit
-                      </span>
-                      {editPopupOpen[index] && (
-                        <EditGoalPopup
-                          togglePopup={() => handleEditGoalPopup(index)}
-                          goal={goal}
-                        />
-                      )}
-                    </div>
-                    <div className={styles.planningModal}>
-                      <div className={styles.goalsContainer}>
-                        <div className={styles.goalDisplay}>
-                          <div className={styles.goal}>
-                            <div className={styles.goalPair}>
-                              <div className={styles.goalLabel}>Goal Type:</div>
-                              <div className={styles.goalValue}>
-                                {goal.type === 'Savings' && <>Savings</>}
-                                {goal.type === 'Debt Reduction' && <>Debt Reduction</>}
-                                {goal.type === 'Spending Limit' && (
-                                  <>Spending Limit</>
-                                )}
-                              </div>
-                            </div>
-                            {goal.current_amount !== undefined && (
-                              <div>
-                                {goal.initial_amount !== undefined && (
-                                  <>
-                                    {goal.type == "Debt Reduction"? (
-
-                                      <div className={styles.goalPair}>
-                                        <div className={styles.goalLabel}>
-                                        Initial Amount:
-                                      </div>
-                                      <div className={styles.goalValue}>
-                                        R {goal.initial_amount.toFixed(2)}
-                                      </div>
-                                      </div>) : (<></>)}
-                                  </>
-                                )}
-                                <div className={styles.goalPair}>
-                                  <div className={styles.goalLabel}>
-                                    Current Amount:
-                                  </div>
-                                  <div className={styles.goalValue}>
-                                    R {goal.current_amount.toFixed(2)}
-                                  </div>
-                                </div>
-                                {goal.type == "Savings" &&
-                                  goal.target_amount ? (
-
-                                  <div className={styles.goalPair}>
-                                    <div className={styles.goalLabel}>
-                                      Target Amount:
-                                    </div>
-                                    <div className={styles.goalValue}>
-                                      R{goal.target_amount.toFixed(2)}
-                                    </div>
-                                  </div>) : (<></>)}
-                              </div>
-                            )}
-                            {goal.target_date && (
-                              <div>
-                                <div className={styles.goalPair}>
-                                  <div className={styles.goalLabel}>
-                                    Target Date:
-                                  </div>
-                                  <div className={styles.goalValue}>
-                                    {goal.target_date}
-                                  </div>
-                                </div>
-                                <div className={styles.goalPair}>
-                                  <div className={styles.goalLabel}>
-                                    Days Left:
-                                  </div>
-                                  <div className={styles.goalValue}>
-                                    {calculateDaysLeft(goal.target_date) > 0
-                                      ? ` ${calculateDaysLeft(
-                                        goal.target_date
-                                      )}`
-                                      : 'Target Date Passed'}
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                            {goal.spending_limit !== undefined && (
-                              <div className={styles.goalPair}>
-                                <div className={styles.goalLabel}>
-                                  Spending Limit:
-                                </div>
-                                <div className={styles.goalValue}>
-                                  R {goal.spending_limit.toFixed(2)}
-                                </div>
-                              </div>
-                            )}
-                            {goal.spending_limit !== undefined && (
-                              <div className={styles.goalPair}>
-                                <div className={styles.goalLabel}>
-                                  Spent this Month:
-                                </div>
-                                <div className={styles.goalValue}>
-                                  R {monthlyBudgetSpent(goal).toFixed(2)}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                          <div
-                            className={styles.updateViewButton}
-                            onClick={() => handleUpdateGoalPopup(index)}
-                          >
-                            Update Progress
-                          </div>
-                          {updatePopupOpen[index] && (
-                            <UpdateGoalPopup
-                              togglePopup={() => handleUpdateGoalPopup(index)}
-                              goal={goal}
-                            />
-                          )}
-                        </div>
-
-                        {goal.current_amount !== undefined &&
-                          goal.target_amount !== undefined && (
-                            <GraphCarousel goal={goal} key={goal.id} />
-                          )}
-                        {goal.spending_limit !== undefined && (
-                          <GraphCarousel goal={goal} key={goal.id} />
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </>
-            ) : (
-              <></>
-            )*/}
           </div>
         </>
       )}
