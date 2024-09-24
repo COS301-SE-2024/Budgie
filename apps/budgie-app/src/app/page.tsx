@@ -12,9 +12,9 @@ export default function Index() {
 
   useEffect(() => {
     if (user) {
-      router.push('/overview');
+      return router.push('/overview');
     }
   }, [user, router]);
 
-  return user === null ? <Landing /> : user ? null : <div>Loading...</div>;
+  return user == null ? <Landing /> : '';
 }

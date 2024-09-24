@@ -22,10 +22,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head></head>
-      <body className="bg-BudgieWhite">
-        <Providers>
-          <main>{children}</main>
-        </Providers>
+      <body className="bg-BudgieWhite w-screen h-screen">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
