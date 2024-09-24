@@ -546,6 +546,7 @@ export function GoalsPage() {
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSortOption(event.target.value);
   };
+
   const sortGoals = (goals: Goal[], option: string) => {
     return [...goals].sort((a, b) => {
       const aValue =
@@ -570,10 +571,7 @@ export function GoalsPage() {
                 ? calculateProgressPercentage(b)
                 : 0;
 
-      if (aValue === null && bValue !== null) return -1;
-      if (bValue === null && aValue !== null) return 1;
-
-      // Compare values if both are present
+      // Compare values
       if (aValue < bValue) return -1;
       if (aValue > bValue) return 1;
       return 0;
@@ -674,6 +672,8 @@ export function GoalsPage() {
     return 0;
   };
 
+  const sortedGoals = sortGoals(Goals, sortOption);
+
   return (
     <div className={styles.mainPage}>
       {!hasGoals ? (
@@ -689,7 +689,6 @@ export function GoalsPage() {
       ) : (
         <>
           <div className={styles.header}>
-
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <p className={styles.sortHeader}>Sort By:</p>
               <select
@@ -716,7 +715,47 @@ export function GoalsPage() {
             }}
           ></div>
           <div className={styles.planningModalContainer}>
-            {Goals ? (
+
+            <div className="p-4">
+              <table className="min-w-full table-auto border-collapse border border-gray-200">
+                <thead>
+                  <tr style={{color:'var(--secondary-text)', backgroundColor:'var(--primary-1)'}}>
+                    <th className="border border-gray-200 p-2 text-left">Name</th>
+                    <th className="border border-gray-200 p-2 text-left">Type</th>
+                    <th className="border border-gray-200 p-2 text-left">Target Date</th>
+                    <th className="border border-gray-200 p-2 text-left">Progress</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedGoals.map((goal, index) => (
+                    <tr key={index} 
+                    style={{backgroundColor: 'var(--block-background)', fontSize:"calc(1.2rem * var(--font-size-multiplier))"}}>
+                      <td className="border border-gray-200 p-2">{goal.name}</td>
+                      <td className="border border-gray-200 p-2">{goal.type}</td>
+                      <td className="border border-gray-200 p-2">
+                        {goal.type === 'Spending Limit' ? '- - -' : goal.target_date}
+                      </td>
+                      <td className="border border-gray-200 p-2">
+                        <div className="relative w-full h-6 bg-gray-200 rounded">
+                          <div
+                            className="absolute top-0 left-0 h-full bg-green-500 rounded"
+                            style={{ width: `${calculateProgressPercentage(goal)}%` }}
+                          />
+                          <span className="absolute top-0 left-1/2 transform -translate-x-1/2 text-sm text-white">
+                            {calculateProgressPercentage(goal)}%
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+
+
+
+            {/*Goals ? (
               <>
                 {Goals.map((goal, index) => (
                   <div key={goal.id || index}>
@@ -866,7 +905,7 @@ export function GoalsPage() {
               </>
             ) : (
               <></>
-            )}
+            )*/}
           </div>
         </>
       )}

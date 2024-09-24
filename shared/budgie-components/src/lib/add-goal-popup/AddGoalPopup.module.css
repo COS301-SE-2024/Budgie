@@ -176,6 +176,12 @@
 .goalDescription {
   color: var(--main-text);
   text-align: left;
+  font-size: calc(1.2rem*var(--font-size-multiplier));
+}
+
+.goalDescriptions {
+  color: var(--main-text);
+  text-align: left;
   font-size: calc(1rem*var(--font-size-multiplier));
 }
 
@@ -237,6 +243,7 @@
   background-color: var(--main-background);
   border: none;
   background-image: none;
+  margin-top: 2rem;
 }
 
 .categoryDropdown option {

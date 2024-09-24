@@ -130,8 +130,9 @@
 
 
 .planningModalContainer {
-  width: 85%;
+  width: 100%;
   margin-bottom: 2rem;
+  margin-top: 2rem;
   font-size: calc(1.5rem * var(--font-size-multiplier));
 }
 
