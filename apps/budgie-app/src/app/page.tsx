@@ -14,7 +14,7 @@ export default function Index() {
     if (user) {
       return router.push('/overview');
     }
-  }, [user, router]);
+  }, [user]);
 
   return user == null ? <Landing /> : '';
 }

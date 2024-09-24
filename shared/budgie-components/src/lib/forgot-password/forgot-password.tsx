@@ -16,6 +16,7 @@ export function ForgotPassword(props: ForgotPasswordProps) {
   // Error handling states
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [emailError, setEmailError] = useState(false); // New state for email error
   const [sent, setSent] = useState(false);
 
   const { onClose = () => {} } = props;
@@ -32,6 +33,12 @@ export function ForgotPassword(props: ForgotPasswordProps) {
     if (error) {
       setError(false);
       setErrorMessage('');
+    }
+    if (emailError) {
+      setEmailError(false); // Reset email error state
+    }
+    if (sent) {
+      setSent(false);
     }
   };
 
@@ -51,6 +58,7 @@ export function ForgotPassword(props: ForgotPasswordProps) {
 
   async function Sendmail() {
     if (!validateEmail(email)) {
+      setEmailError(true); // Set email error state
       setError(true);
       setErrorMessage('Please enter a valid email address.');
       return;
@@ -60,11 +68,10 @@ export function ForgotPassword(props: ForgotPasswordProps) {
     try {
       console.log(`Attempting to send reset email to: ${email}`);
       await sendPasswordResetEmail(auth, email);
-      alert('Password reset email sent successfully');
+      // alert('Password reset email sent successfully');
       setSent(true);
       setError(false);
       setErrorMessage('');
-      // handleClose();
     } catch (error) {
       if (error instanceof FirebaseError) {
         const errorCode = error.code;
@@ -73,6 +80,14 @@ export function ForgotPassword(props: ForgotPasswordProps) {
           'An unexpected error occurred. Please try again.';
         setError(true);
         setErrorMessage(friendlyMessage);
+
+        // Set input error state based on error codes
+        if (
+          errorCode === 'auth/invalid-email' ||
+          errorCode === 'auth/user-not-found'
+        ) {
+          setEmailError(true); // Set email error state
+        }
 
         console.error('Error code:', errorCode);
         console.error('Error message:', error.message);
@@ -98,7 +113,9 @@ export function ForgotPassword(props: ForgotPasswordProps) {
           {/* Container to space items vertically */}
           <div className="flex flex-col items-center space-y-4 mt-6">
             <input
-              className="appearance-none text-lg w-72 h-10 font-TripSans font-normal pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow"
+              className={`appearance-none text-lg w-72 h-10 font-TripSans font-normal pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow ${
+                emailError ? 'border-red-500' : 'border-transparent'
+              }`}
               id="email"
               name="email"
               type="text"

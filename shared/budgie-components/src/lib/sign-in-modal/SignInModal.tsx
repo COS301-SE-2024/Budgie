@@ -178,6 +178,12 @@ export function SignInModal(props: SignInModalProps) {
 
   const handleClose = () => {
     setForgot(false);
+    setEmail('');
+    setPassword('');
+    setError(false);
+    setErrorMessage('');
+    setEmailError(false);
+    setPasswordError(false);
   };
 
   return (
