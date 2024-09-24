@@ -1,6 +1,5 @@
 'use client';
 import { useRouter } from 'next/router';
-import styles from './Landing.module.css';
 import { Fragment, useEffect, useState } from 'react';
 import SignInModal from '../sign-in-modal/SignInModal';
 import LearnModal from '../learn-more-modal/LearnMore';
@@ -20,7 +19,7 @@ export function Landing(props: LandingProps) {
             onClick={() => {
               setShowSignInModal(!showSignInModal);
             }}
-            className="z-20 absolute w-screen h-screen backdrop-blur-sm"
+            className="z-40 absolute w-screen h-screen backdrop-blur-sm"
           ></div>
           <div className="absolute z-50 left-[calc(50vw-397px)] top-[calc(50vh-260px)]">
             <SignInModal></SignInModal>
@@ -33,7 +32,7 @@ export function Landing(props: LandingProps) {
             onClick={() => {
               setShowLearnMore(!showLearnMore);
             }}
-            className="z-20 absolute w-screen h-screen"
+            className="z-40 absolute w-screen h-screen backdrop-blur-sm"
           ></div>
           <div className="absolute z-50 left-[calc(50vw-395px)] top-[calc(50vh-260px)]">
             <LearnModal onClose={() => setShowLearnMore(false)} />
@@ -44,44 +43,41 @@ export function Landing(props: LandingProps) {
         onClick={() => {
           setShowSignInModal(!showSignInModal);
         }}
-        className=" text-lg absolute top-4 right-4 w-[116px] h-[47px] font-TripSans font-bold bg-white hover:bg-BudgieBlue hover:text-BudgieWhite text-BudgieBlue border-4 border-BudgieBlue transition-colors ease-in hover:border-BudgieGrayLight rounded-full "
+        className="z-30 text-lg absolute top-4 right-4 w-[116px] h-[47px] font-TripSans font-bold bg-white hover:bg-BudgieBlue hover:text-BudgieWhite text-BudgieBlue border-4 border-BudgieBlue transition-colors ease-in hover:border-BudgieGrayLight rounded-full "
       >
         Sign In
       </button>
-      <div className="absolute bottom-4 w-full text-center">
-        {!showSignInModal && !showLearnMore && (
-          <button
-            onClick={() => {
-              setShowLearnMore(true);
-            }}
-            className="text-blue-950 font-semibold flex items-center justify-center mx-auto"
-          >
-            <span className="text-xl font-TripSans font-bold ml-4 animate-bounce">
-              Learn More &darr;
-            </span>
-          </button>
-        )}
+      <div className="absolute bottom-4 w-full text-center z-30">
+        <button
+          onClick={() => {
+            setShowLearnMore(true);
+          }}
+          className="text-blue-950 font-semibold flex items-center justify-center mx-auto"
+        >
+          <span className="text-xl font-TripSans font-bold ml-4 animate-bounce">
+            Learn More &darr;
+          </span>
+        </button>
       </div>
       <div className="flex flex-col items-center justify-center h-full w-full">
-        {!showSignInModal && (
-          <div className="flex flex-col items-center justify-center h-full">
-            <h1 className="font-TripSans font-extrabold text-8xl md:text-[128px] text-BudgieBlue opacity-[5%] relative -mb-14 z-10">
-              Budgie
-            </h1>
-            <h1 className="font-TripSans font-extrabold text-8xl md:text-[128px] text-BudgieBlue opacity-[13%] relative -mb-14 z-20">
-              Budgie
-            </h1>
-            <h1 className="font-TripSans font-extrabold text-8xl md:text-[128px] text-BudgieBlue relative z-30">
-              Budgie
-            </h1>
-            <p className="font-TripSans font-extrabold text-xl md:text-1x4 text-BudgieBlue mt-4">
-              Financial Wingman
-            </p>
-          </div>
-        )}
+        <div className="flex flex-col items-center justify-center h-full">
+          <h1 className="font-TripSans font-extrabold text-8xl md:text-[128px] text-BudgieBlue opacity-[5%] relative -mb-14 z-30">
+            Budgie
+          </h1>
+          <h1 className="font-TripSans font-extrabold text-8xl md:text-[128px] text-BudgieBlue opacity-[13%] relative -mb-14 z-30">
+            Budgie
+          </h1>
+          <h1 className="font-TripSans font-extrabold text-8xl md:text-[128px] text-BudgieBlue relative z-30">
+            Budgie
+          </h1>
+          <p className="font-TripSans font-extrabold text-xl md:text-1x4 text-BudgieBlue mt-4 z-30">
+            Financial Wingman
+          </p>
+        </div>
       </div>
-      {/* Wave effect background  bottom*/}
-      <div className="absolute bottom-0 w-full overflow-hidden leading-none h-[300px] md:h-[400px]">
+
+      {/* Wave effect background  bottom */}
+      <div className="absolute bottom-0 w-full overflow-hidden leading-none h-[300px] md:h-[400px] z-0">
         <svg
           className="relative block w-full h-full"
           xmlns="http://www.w3.org/2000/svg"
@@ -108,7 +104,8 @@ export function Landing(props: LandingProps) {
           ></path>
         </svg>
       </div>
-      {/* Wave effect background  top*/}
+
+      {/* Wave effect background  top */}
       <div className="absolute top-0 w-full overflow-hidden leading-none h-[300px] md:h-[400px] z-0">
         <svg
           className="relative block w-full h-full"
