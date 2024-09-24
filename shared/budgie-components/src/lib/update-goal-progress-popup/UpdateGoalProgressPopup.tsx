@@ -90,13 +90,15 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
     id: string;
     name: string;
     type: string;
-    start_date: string;
     initial_amount?: number;
     current_amount?: number;
     target_amount?: number;
     target_date?: string;
     spending_limit?: number;
     updates?: string;
+    monthly_updates?: string;
+    update_type: string;
+    accounts: ([]);
   }
 
   interface SpentAmount {
@@ -162,22 +164,17 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
       e.preventDefault();
 
       const goalData: any = {
-        type: props.activeTab,
         name: goalName,
-        start_date: startDate,
         uid: user.uid,
       };
 
-      if (props.activeTab === 'Savings' || props.activeTab === 'Debt') {
+      if (props.activeTab === 'Savings' || props.activeTab === 'Debt Reduction') {
         goalData.current_amount =
-          props.activeTab === 'Debt'
+          props.activeTab === 'Debt Reduction'
             ? currentAmount - updateAmount
             : currentAmount + updateAmount;
-        goalData.target_amount = targetAmount;
-        goalData.target_date = props.goal.target_date;
-      } else if (props.activeTab === 'Spending') {
-        goalData.spending_limit = spendingLimit;
-      }
+      } 
+      props.goal.current_amount = goalData.current_amount;
 
       try {
         const goalDocRef = doc(db, 'goals', props.goal.id);
@@ -217,6 +214,8 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
         } else {
           updatedMonthlyUpdatesArray.push(newMonthlyUpdate);
         }
+
+        props.goal.monthly_updates = JSON.stringify(updatedMonthlyUpdatesArray);
 
         await updateDoc(goalDocRef, {
           ...goalData,
@@ -388,7 +387,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           </>
         )}
 
-        {props.activeTab === 'Debt' && (
+        {props.activeTab === 'Debt Reduction' && (
           <>
             <div className={styles.formGroup}>
               <span
@@ -450,7 +449,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           </>
         )}
 
-        {props.activeTab === 'Spending' && (
+        {props.activeTab === 'Spending Limit' && (
           <>
             <div className={styles.formGroup}>
               <span

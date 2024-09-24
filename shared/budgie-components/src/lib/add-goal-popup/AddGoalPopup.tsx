@@ -244,7 +244,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       name: goalName,
       accounts: selectedAccounts,
       uid: user?.uid,
-      updateType: updateMethod,
+      update_type: updateMethod,
       target_date: targetDate
     };
     if (updateMethod == 'assign-description' && keywords.length == 0) {

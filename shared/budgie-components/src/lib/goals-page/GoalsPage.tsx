@@ -40,6 +40,8 @@ interface Goal {
   spending_limit?: number;
   updates?: string;
   monthly_updates?: string;
+  update_type: string;
+  accounts: ([]);
 }
 
 const monthNames = [
@@ -627,9 +629,10 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
     ],
   };
 
-  const getColorForValue = (value: number): string => {
+  const getColorForValue = (value: number, type: string): string => {
     if (value < 100) return 'var(--primary-1)';
-    return '#FF0000';
+    if (type == 'Spending Limit' && value >= 100) return '#FF0000';
+    return '#46981d';
   };
 
   interface GoalMonthlyUpdate {
@@ -702,7 +705,9 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
         </h1>
         <div className={styles.goalPageRow} style={{ display: 'flex', justifyContent: 'space-between' }}>
 
-          <div className={styles.goalPageBlock} style={{ width: 'calc(100% - 20rem)', display: 'flex', flexDirection: 'column', margin: '1rem' }}>
+          {goal.type != 'Spending Limit' && (
+            <>
+            <div className={styles.goalPageBlock} style={{ width: 'calc(100% - 20rem)', display: 'flex', flexDirection: 'column', margin: '1rem' }}>
             <h2 className="text-xl font-semibold mb-4">Goal Details</h2>
             <div style={{ display: 'flex', flexGrow: 1, flexDirection: 'column', justifyContent: 'center' }}>
               <div className="flex justify-around items-center">
@@ -711,6 +716,26 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
                     <div className={styles.goalLabel}>Goal Type:</div>
                     <div className={styles.goalValue}>{goal.type}</div>
                   </div>
+                  {goal.update_type != undefined && (
+                    <div className={styles.goalPair}>
+                      <div className={styles.goalLabel}>Update Type:</div>
+                      {goal.update_type == 'assign-all' && (
+                        <div className={styles.goalValue}>Assigned Account/s</div>
+                      )}
+                      {goal.update_type == 'assign-description' && (
+                        <div className={styles.goalValue}>By Transaction Descriptions</div>
+                      )}
+                      {goal.update_type == 'assign-transactions' && (
+                        <div className={styles.goalValue}>Manual Transaction Assignment</div>
+                      )}
+                      {goal.update_type == 'assign-category' && (
+                        <div className={styles.goalValue}>By Transaction Category</div>
+                      )}
+                      {goal.update_type == 'manual' && (
+                        <div className={styles.goalValue}>Manual Updates</div>
+                      )}
+                    </div>
+                  )}
                   {goal.target_date != undefined && (
                     <div className={styles.goalPair}>
                       <div className={styles.goalLabel}>Target Date:</div>
@@ -763,55 +788,170 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
                     <EditGoalPopup
                       togglePopup={handleEditGoalPopup}
                       goal={goal}
+                      toggleMainPopup={onClose}
                     />
                   )}
-                  <div
-                    className={styles.updateViewButton}
-                    onClick={handleUpdateGoalPopup}
-                  >
-                    Update Progress
-                  </div>
-                  {updatePopupOpen && (
-                    <UpdateGoalPopup
-                      togglePopup={handleUpdateGoalPopup}
-                      goal={goal}
-                    />
+                  {goal.update_type == 'manual' && (
+                    <>
+                      <div
+                        className={styles.updateViewButton}
+                        onClick={handleUpdateGoalPopup}
+                      >
+                        Update Progress
+                      </div>
+                      {updatePopupOpen && (
+                        <UpdateGoalPopup
+                          togglePopup={handleUpdateGoalPopup}
+                          goal={goal}
+                        />
+                      )}
+                    </>
                   )}
                 </div>
               </div>
             </div>
           </div>
-
-          <div
-            className={styles.goalPageBlock}
-            style={{
-              width: '25rem',
-              backgroundColor: 'var(--block-background)',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              margin: '1rem'
-            }}
-          >
-            <h2 className="text-xl font-semibold mb-4">Your Goal's Wingman</h2>
-            <div className="flex items-center justify-center w-full h-full">
-              <Image src={getGif(calculateProgressPercentage(goal))} alt="Goal GIF" className="object-contain w-full h-full" />
+            <div
+              className={styles.goalPageBlock}
+              style={{
+                width: '25rem',
+                backgroundColor: 'var(--block-background)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                margin: '1rem'
+              }}
+            >
+              <h2 className="text-xl font-semibold mb-4">Goal Wingman</h2>
+              <div className="flex items-center justify-center w-full h-full">
+                <Image src={getGif(calculateProgressPercentage(goal))} alt="Goal GIF" className="object-contain w-full h-full" />
+              </div>
             </div>
+            </>)}
+
+            {goal.type == 'Spending Limit' && (
+            <>
+            <div className={styles.goalPageBlock} style={{ width: '100%', display: 'flex', flexDirection: 'column', margin: '1rem' }}>
+            <h2 className="text-xl font-semibold mb-4">Goal Details</h2>
+            <div style={{ display: 'flex', flexGrow: 1, flexDirection: 'column', justifyContent: 'center' }}>
+              <div className="flex justify-around items-center">
+                <div className="flex flex-col space-y-2">
+                  <div className={styles.goalPair}>
+                    <div className={styles.goalLabel}>Goal Type:</div>
+                    <div className={styles.goalValue}>{goal.type}</div>
+                  </div>
+                  {goal.update_type != undefined && (
+                    <div className={styles.goalPair}>
+                      <div className={styles.goalLabel}>Update Type:</div>
+                      {goal.update_type == 'assign-all' && (
+                        <div className={styles.goalValue}>Assigned Account/s</div>
+                      )}
+                      {goal.update_type == 'assign-description' && (
+                        <div className={styles.goalValue}>By Transaction Descriptions</div>
+                      )}
+                      {goal.update_type == 'assign-transactions' && (
+                        <div className={styles.goalValue}>Manual Transaction Assignment</div>
+                      )}
+                      {goal.update_type == 'assign-category' && (
+                        <div className={styles.goalValue}>By Transaction Category</div>
+                      )}
+                      {goal.update_type == 'manual' && (
+                        <div className={styles.goalValue}>Manual Updates</div>
+                      )}
+                    </div>
+                  )}
+                  {goal.target_date != undefined && (
+                    <div className={styles.goalPair}>
+                      <div className={styles.goalLabel}>Target Date:</div>
+                      <div className={styles.goalValue}>{goal.target_date}</div>
+                    </div>
+                  )}
+                  {goal.initial_amount != undefined && (
+                    <div className={styles.goalPair}>
+                      <div className={styles.goalLabel}>Initial Amount:</div>
+                      <div className={styles.goalValue}>R {goal.initial_amount.toFixed(2)}</div>
+                    </div>
+                  )}
+                  {goal.current_amount != undefined && (
+                    <div className={styles.goalPair}>
+                      <div className={styles.goalLabel}>Current Amount:</div>
+                      <div className={styles.goalValue}>R {goal.current_amount.toFixed(2)}</div>
+                    </div>
+                  )}
+                  {goal.target_amount != undefined &&
+                    <div className={styles.goalPair}>
+                      <div className={styles.goalLabel}>Target Amount:</div>
+                      <div className={styles.goalValue}>R {goal.target_amount.toFixed(2)}</div>
+                    </div>
+                  }
+                  {goal.target_date != undefined &&
+                    <div className={styles.goalPair}>
+                      <div className={styles.goalLabel}>
+                        Days Left:
+                      </div>
+                      <div className={styles.goalValue}>
+                        {calculateDaysLeft(goal.target_date) > 0
+                          ? ` ${calculateDaysLeft(
+                            goal.target_date
+                          )}`
+                          : 'Target Date Passed'}
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                {/* Buttons */}
+                <div className="flex flex-col space-y-4">
+                  <div
+                    className={styles.editViewButton}
+                    onClick={handleEditGoalPopup}
+                  >
+                    Edit Details
+                  </div>
+                  {editPopupOpen && (
+                    <EditGoalPopup
+                      togglePopup={handleEditGoalPopup}
+                      goal={goal}
+                      toggleMainPopup={onClose}
+                    />
+                  )}
+                  {goal.update_type == 'manual' && (
+                    <>
+                      <div
+                        className={styles.updateViewButton}
+                        onClick={handleUpdateGoalPopup}
+                      >
+                        Update Progress
+                      </div>
+                      {updatePopupOpen && (
+                        <UpdateGoalPopup
+                          togglePopup={handleUpdateGoalPopup}
+                          goal={goal}
+                        />
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+            <h2 className="text-xl font-semibold mb-4"></h2>
           </div>
+            
+            </>)}
         </div>
 
 
         <div className={styles.goalPageRow} style={{ display: 'flex', gap: '2rem' }}>
           {/* Row 2 - Left Block (Progress Circle) */}
           <div className={styles.goalPageBlock} style={{ flex: 1, margin: '1rem 0 1rem 1rem' }}>
-            <h2 className="text-xl font-semibold mb-4">Your Progress</h2>
+            <h2 className="text-xl font-semibold mb-4">Overall Goal Progress</h2>
             <div className="flex items-center justify-center">
               <div className={styles.goalGraph}>
                 <CircularProgressbar
                   value={calculateProgressPercentage(goal)}
                   styles={buildStyles({
                     pathColor: getColorForValue(
-                      calculateProgressPercentage(goal)
+                      calculateProgressPercentage(goal), goal.type
                     ),
                     trailColor: '#d6d6d6',
                   })}
@@ -819,7 +959,7 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
                 <div
                   className={styles.percentageDisplay}
                   style={{
-                    color: getColorForValue(calculateProgressPercentage(goal)),
+                    color: getColorForValue(calculateProgressPercentage(goal), goal.type),
                   }}
                 >
                   {`${calculateProgressPercentage(goal).toFixed(2)}%`}
@@ -830,7 +970,7 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
 
           {/* Row 2 - Right Block (Bar Chart) 
           <div className={styles.goalPageBlock} style={{ flex: 1, margin: '1rem 1rem 1rem 0' }}>
-            <h2 className="text-xl font-semibold mb-4">Your Progress Over Time</h2>
+            <h2 className="text-xl font-semibold mb-4">Goal Progress Over Time</h2>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={getUpdates()}
@@ -989,7 +1129,7 @@ export function GoalsPage() {
 
   useEffect(() => {
     fetchGoals();
-  }, [sortOption]);
+  }, [sortOption, selectedGoal]);
 
   const handleEditGoalPopup = (index: number) => {
     setEditPopupOpen((prevState) => ({

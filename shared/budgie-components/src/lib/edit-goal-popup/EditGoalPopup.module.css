@@ -15,12 +15,10 @@
   .popupContent {
     background: var(--block-background);
     padding: 20px;
-    border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px;
+    border-radius: 5px;
     text-align: center;
     z-index: 2;
     width: calc(35vw * var(--font-size-multiplier));
-    border-top: 4px solid var(--primary-1);
   }
   
   .goalForm {

@@ -40,6 +40,7 @@ const ClearableInput: React.FC<ClearableInputProps> = ({ value, onChange }) => {
 
 export interface EditGoalPopupProps {
   togglePopup: () => void;
+  toggleMainPopup: () => void;
   goal: any;
 }
 
@@ -52,6 +53,7 @@ export function EditGoalPopup(props: EditGoalPopupProps) {
           <GoalForm
             togglePopup={props.togglePopup}
             goal={props.goal}
+            toggleMainPopup={props.toggleMainPopup}
           />
           <button className={styles.cancelButton} onClick={props.togglePopup}>
             Cancel
@@ -64,6 +66,7 @@ export function EditGoalPopup(props: EditGoalPopupProps) {
 
 interface GoalFormProps {
   togglePopup: () => void;
+  toggleMainPopup: () => void;
   goal: any;
 }
 
@@ -76,6 +79,21 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   const user = useContext(UserContext);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    props.goal.name = goalName;
+    if (props.goal.type === 'Savings') {
+      props.goal.current_amount = currentAmount;
+      props.goal.target_amount = targetAmount;
+      props.goal.target_date = targetDate;
+    }
+    else if (props.goal.type === 'Debt Reduction') {
+      props.goal.current_amount = currentAmount;
+      props.goal.target_date = targetDate;
+    } 
+    else if (props.goal.type === 'Spending Limit') {
+      props.goal.spending_limit = spendingLimit;
+    }
+
+
     if (user && user.uid) {
       e.preventDefault();
 
@@ -132,6 +150,8 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
         const goalDocRef = doc(db, 'goals', props.goal.id);
         await updateDoc(goalDocRef, goalData);
         props.togglePopup();
+        props.toggleMainPopup();
+        props.goal = null;
       } catch (error) {
         console.error('Error saving goal:', error);
       }
@@ -170,26 +190,6 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
                 value={goalName}
                 onChange={(e) => setGoalName(e.target.value)}
                 required
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <span
-                className={`material-symbols-outlined ${styles.icon}`}
-                style={{
-                  fontSize: 'calc(1rem * var(--font-size-multiplier))',
-                  color: 'var(--greyed-text)',
-                }}
-              >
-                info
-              </span>
-              <span className={styles.popupText}>
-                If you have already saved money towards this goal, add that
-                amount here. If you haven't, you should enter 0.
-              </span>
-              <label>Current Savings Amount:</label>
-              <ClearableInput
-                value={currentAmount}
-                onChange={setCurrentAmount}
               />
             </div>
             <div className={styles.formGroup}>
@@ -270,7 +270,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               <span className={styles.popupText}>
                 Enter the amount of money you currently owe.
               </span>
-              <label>Current Debt Amount:</label>
+              <label>Debt Amount:</label>
               <ClearableInput
                 value={currentAmount}
                 onChange={setCurrentAmount}
