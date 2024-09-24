@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { Fragment, useEffect, useState } from 'react';
 import SignInModal from '../sign-in-modal/SignInModal';
 import LearnModal from '../learn-more-modal/LearnMore';
+import styles from './Landing.module.css'; // Import your CSS module
 
 /* eslint-disable-next-line */
 export interface LandingProps {}
@@ -115,13 +116,7 @@ export function Landing(props: LandingProps) {
           style={{ transform: 'rotate(180deg)' }}
         >
           <defs>
-            <linearGradient
-              id="waveGradientTop"
-              x1="0%"
-              y1="0%"
-              x2="100%"
-              y2="100%"
-            >
+            <linearGradient id="waveGradientTop" x1="0%" y1="0%" x2="100%">
               <stop offset="0%" style={{ stopColor: '#a0e9af' }} />
               <stop offset="50%" style={{ stopColor: '#c0f0c0' }} />
               <stop offset="75%" style={{ stopColor: '#b2f5a8' }} />
