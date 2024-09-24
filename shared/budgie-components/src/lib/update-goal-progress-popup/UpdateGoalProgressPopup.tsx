@@ -203,11 +203,15 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           updatesArray = [];
         }
   
+        // Add new update
         const newUpdate = {
           amount: updateAmount,
           date: updateDate,
         };
         updatesArray.push(newUpdate);
+  
+        // Sort updates by date (newest first)
+        updatesArray.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
   
         const existingMonthlyUpdates = goalDoc.exists()
           ? goalDoc.data()?.monthly_updates || '[]'
@@ -222,7 +226,8 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           console.error('Error parsing existing monthly updates:', error);
           updatedMonthlyUpdatesArray = [];
         }
-
+  
+        // Add or update the monthly update entry
         const newMonthlyUpdate = {
           amount: updateAmount,
           month: getMonthName(updateDate) + ' ' + getYear(updateDate),
@@ -239,6 +244,11 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           updatedMonthlyUpdatesArray.push(newMonthlyUpdate);
         }
   
+        // Sort monthly updates by month (you can adjust this if necessary)
+        updatedMonthlyUpdatesArray.sort((a: any, b: any) => 
+          new Date(b.month).getTime() - new Date(a.month).getTime()
+        );
+  
         props.goal.monthly_updates = JSON.stringify(updatedMonthlyUpdatesArray);
         props.goal.updates = JSON.stringify(updatesArray);
   
@@ -254,6 +264,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
       }
     }
   };
+  
   
   
   

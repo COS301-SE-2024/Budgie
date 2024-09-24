@@ -9,6 +9,7 @@ import {
   YAxis,
   ResponsiveContainer,
   Label,
+  CartesianGrid,
 } from 'recharts';
 import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
@@ -109,7 +110,7 @@ const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal:
       goal.monthly_updates = JSON.stringify(monthlyUpdatesArray);
 
       setLocalUpdates(newUpdates);
-      onUpdateGoal(goal); 
+      onUpdateGoal(goal);
       updateDB();
     }
   };
@@ -139,7 +140,7 @@ const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal:
       }
     }
     updateDB();
-  }, [goal.updates, goal.current_amount]); 
+  }, [goal.updates, goal.current_amount]);
 
   return (
     <div>
@@ -177,14 +178,14 @@ export interface GoalInfoPageProps {
   onClose: () => void;
 }
 
-const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
+const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onUpdateGoal: (goal: Goal) => void }) => {
   const now = new Date();
-  const currentMonthIndex = now.getMonth();
   const [updatePopupOpen, setUpdatePopupOpen] = useState(false);
   const [currentGoal, setCurrentGoal] = useState(goal);
 
   const handleGoalUpdate = (updatedGoal: Goal) => {
     setCurrentGoal({ ...updatedGoal });
+    onUpdateGoal(updatedGoal);
   };
 
   const handleUpdateGoalPopup = () => {
@@ -278,23 +279,18 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
 
   const getUpdates = () => {
     if (goal.monthly_updates) {
-      const updatesData: GoalMonthlyUpdate[] = JSON.parse(goal.monthly_updates);
+      const updatesData = JSON.parse(goal.monthly_updates);
 
-      const parseMonth = (monthStr: string): Date => {
-        return new Date(`1 ${monthStr}`);
-      };
+      updatesData.sort((a: { month: string }) => new Date(a.month).getTime());
 
-      const formattedData = updatesData
-        .map((update) => ({
-          month: update.month,
-          amount: update.amount,
-          date: parseMonth(update.month),
-        }))
-        .sort((a, b) => a.date.getTime() - b.date.getTime())
-        .map(({ date, ...rest }) => rest);
-      return formattedData;
+      return updatesData.map((update: { month: string; amount: number }) => ({
+        month: update.month,
+        amount: update.amount,
+      }));
     }
+    return [];
   };
+
 
   const getBudgetUpdates = () => {
     if (goal.monthly_updates) {
@@ -579,24 +575,62 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
         </div>
 
 
-        <div className={styles.goalPageRow} style={{ display: 'flex', gap: '2rem' }}>
-          {/* Row 2 - Left Block (Progress Circle) */}
-          <div className={styles.goalPageBlock} style={{ flex: 1, margin: '1rem 0 1rem 1rem' }}>
-            <h2 className="text-xl font-semibold mb-4">Overall Goal Progress</h2>
-            <div className="flex items-center justify-center">
-              <div className={styles.goalGraph}>
+        <div
+          className={styles.goalPageRow}
+          style={{
+            display: 'flex',
+            gap: '2rem',
+            flexWrap: 'wrap',
+            flexDirection: 'row',
+          }}
+        >
+          <div
+            className={styles.goalPageBlock}
+            style={{
+              flex: goal.updates ? '0 1 300px' : '1 1 100%', 
+              flexBasis: goal.updates ? '300px' : '100%',
+              maxWidth: goal.updates ? '300px' : '100%',
+              margin: '1rem',
+              padding: '2rem',
+              display: 'flex',  
+              flexDirection: 'column',
+              justifyContent: 'center',  
+              backgroundColor: 'var(--block-background)',
+              borderRadius: '12px',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+              height: 'auto', 
+            }}
+          >
+            {goal.type != 'Spending Limit' && (
+              <h2 className="text-xl font-semibold mb-3" style={{ textAlign: 'center' }}>
+                Overall Goal Progress
+              </h2>
+            )}
+            {goal.type == 'Spending Limit' && (
+              <h2 className="text-xl font-semibold mb-3" style={{ textAlign: 'center' }}>
+                Spent This Month
+              </h2>
+            )}
+
+            <div className="flex items-center justify-center" style={{ position: 'relative', flexGrow: 1, height: '100%' }}>
+              <div className={styles.goalGraph} style={{ width: '20vh', height: '20vh' }}>
                 <CircularProgressbar
                   value={calculateProgressPercentage(goal)}
                   styles={buildStyles({
-                    pathColor: getColorForValue(
-                      calculateProgressPercentage(goal), goal.type
-                    ),
+                    pathColor: getColorForValue(calculateProgressPercentage(goal), goal.type),
                     trailColor: '#d6d6d6',
+                    strokeLinecap: 'round',
                   })}
                 />
                 <div
                   className={styles.percentageDisplay}
                   style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    fontSize: '1.5rem',
+                    fontWeight: 'bold',
                     color: getColorForValue(calculateProgressPercentage(goal), goal.type),
                   }}
                 >
@@ -606,36 +640,81 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
             </div>
           </div>
 
-          {/* Row 2 - Right Block (Bar Chart) 
-          <div className={styles.goalPageBlock} style={{ flex: 1, margin: '1rem 1rem 1rem 0' }}>
-            <h2 className="text-xl font-semibold mb-4">Goal Progress Over Time</h2>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={getUpdates()}
-                margin={{ top: 0, right: 0, bottom: 0, left: 10 }}
-              >
-                <XAxis
-                  dataKey="month"
-                  tick={false}
-                  stroke="var(--main-text)"
-                />
-                <YAxis
-                  tick={{ fill: 'var(--main-text)' }}
-                  stroke="var(--main-text)"
+          {goal.updates != undefined && (
+            <div
+              className={styles.goalPageBlock}
+              style={{
+                flex: '1 1 0',  
+                margin: '1rem',
+                padding: '2rem',
+                backgroundColor: 'var(--block-background)',
+                borderRadius: '12px',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                display: 'flex', 
+                flexDirection: 'column',
+                justifyContent: 'center', 
+                height: '40vh',
+              }}
+            >
+              {goal.type != 'Spending Limit' && (
+                <h2 className="text-xl font-semibold mb-3" style={{ textAlign: 'center' }}>
+                  Goal Progress Over Time
+                </h2>
+              )}
+              {goal.type == 'Spending Limit' && (
+                <h2 className="text-xl font-semibold mb-3" style={{ textAlign: 'center' }}>
+                  Spending by Month
+                </h2>
+              )}
+              <ResponsiveContainer width="100%" height="80%">
+                <BarChart
+                  data={getUpdates()}
+                  margin={{ top: 20, right: 30, bottom: 20, left: 30 }}
                 >
-                  <Label
-                    value="Amount"
-                    angle={-90}
-                    position="left"
-                    style={{ textAnchor: 'middle', fill: 'var(--main-text)' }}
+                  <XAxis
+                    dataKey="month"
+                    stroke="var(--main-text)"
+                    tick={{ fill: 'var(--main-text)', fontSize: 12 }}
                   />
-                </YAxis>
-                <Tooltip cursor={{ fill: 'var(--main-background)' }} />
-                <Bar dataKey="amount" fill="var(--primary-1)" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>*/}
+                  <YAxis
+                    tick={{ fill: 'var(--main-text)', fontSize: 12 }}
+                    stroke="var(--main-text)"
+                    width={50}
+                  >
+                    <Label
+                      value="Amount"
+                      angle={-90}
+                      position="insideLeft"
+                      style={{ textAnchor: 'middle', fill: 'var(--main-text)', fontSize: '14px' }}
+                    />
+                  </YAxis>
+                  <Tooltip
+                    cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
+                    contentStyle={{
+                      backgroundColor: 'var(--main-background)',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '10px',
+                    }}
+                  />
+                  <CartesianGrid stroke="rgba(255, 255, 255, 0.1)" vertical={false} />
+                  <Bar
+                    dataKey="amount"
+                    fill="var(--primary-1)"
+                    radius={[10, 10, 0, 0]}
+                    barSize={40}
+                    stroke="var(--main-border)"
+                    strokeWidth={1}
+                    stackId="a"
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
+
+
+
 
 
         {currentGoal.update_type == 'manual' && currentGoal.updates && JSON.parse(currentGoal.updates).length > 0 && (
@@ -666,6 +745,15 @@ export function GoalsPage() {
   const user = useContext(UserContext);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
 
+  const handleGoalUpdate = (updatedGoal: Goal) => {
+    setGoals(prevGoals => prevGoals.map(goal =>
+      goal.id === updatedGoal.id ? updatedGoal : goal
+    ));
+
+    if (selectedGoal?.id === updatedGoal.id) {
+      setSelectedGoal(updatedGoal);
+    }
+  };
 
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSortOption(event.target.value);
@@ -866,7 +954,7 @@ export function GoalsPage() {
 
             {selectedGoal && (
               <>
-                <GoalInfoPage goal={selectedGoal} onClose={() => setSelectedGoal(null)}></GoalInfoPage>
+                <GoalInfoPage goal={selectedGoal} onClose={() => setSelectedGoal(null)} onUpdateGoal={handleGoalUpdate}></GoalInfoPage>
               </>
             )}
           </div>
