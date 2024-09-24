@@ -128,8 +128,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   const calculateNewCurrentAmount = (goal: Goal): string => {
     if (
       updateAmount &&
-      goal.current_amount !== undefined &&
-      goal.target_amount !== undefined
+      goal.current_amount !== undefined
     ) {
       if (goal.initial_amount !== undefined) {
         return Math.min(goal.current_amount - updateAmount).toFixed(2);
@@ -156,79 +155,108 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
         ).toFixed(2);
       }
     }
+    if (goal.current_amount !== undefined && goal.target_amount == undefined) {
+          if (goal.initial_amount !== undefined) {
+            return Math.min(
+              100,
+              ((goal.initial_amount - goal.current_amount + updateAmount) /
+                (goal.initial_amount)) *
+                100
+            ).toFixed(2);
+          } 
+        }
+    
     return '0.00';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     if (user && user.uid) {
       e.preventDefault();
-
+  
       const goalData: any = {
         name: goalName,
         uid: user.uid,
       };
-
+  
       if (props.activeTab === 'Savings' || props.activeTab === 'Debt Reduction') {
         goalData.current_amount =
           props.activeTab === 'Debt Reduction'
             ? currentAmount - updateAmount
             : currentAmount + updateAmount;
-      } 
+      }
       props.goal.current_amount = goalData.current_amount;
-
+  
       try {
         const goalDocRef = doc(db, 'goals', props.goal.id);
         const goalDoc = await getDoc(goalDocRef);
-
-        //updates-------------------------------------------------------------------------
+  
+        // Parse existing updates safely
         const existingUpdates = goalDoc.exists()
           ? goalDoc.data()?.updates || '[]'
           : '[]';
-        const updatesArray = JSON.parse(existingUpdates);
-
+  
+        let updatesArray = [];
+        try {
+          updatesArray = JSON.parse(existingUpdates);
+        } catch (error) {
+          console.error('Error parsing existing updates:', error);
+          updatesArray = [];
+        }
+  
         const newUpdate = {
           amount: updateAmount,
           date: updateDate,
         };
         updatesArray.push(newUpdate);
+  
         const existingMonthlyUpdates = goalDoc.exists()
-          ? goalDoc.data()?.monthly_updates || []
-          : [];
+          ? goalDoc.data()?.monthly_updates || '[]'
+          : '[]';
+  
+        let updatedMonthlyUpdatesArray = [];
+        try {
+          updatedMonthlyUpdatesArray = Array.isArray(existingMonthlyUpdates)
+            ? existingMonthlyUpdates
+            : JSON.parse(existingMonthlyUpdates); 
+        } catch (error) {
+          console.error('Error parsing existing monthly updates:', error);
+          updatedMonthlyUpdatesArray = [];
+        }
 
         const newMonthlyUpdate = {
           amount: updateAmount,
           month: getMonthName(updateDate) + ' ' + getYear(updateDate),
         };
-
-        const updatedMonthlyUpdatesArray = Array.isArray(existingMonthlyUpdates)
-          ? existingMonthlyUpdates
-          : JSON.parse(existingMonthlyUpdates);
-
+  
         const existingEntryIndex = updatedMonthlyUpdatesArray.findIndex(
           (entry: { month: string }) => entry.month === newMonthlyUpdate.month
         );
-
+  
         if (existingEntryIndex >= 0) {
           updatedMonthlyUpdatesArray[existingEntryIndex].amount +=
             newMonthlyUpdate.amount;
         } else {
           updatedMonthlyUpdatesArray.push(newMonthlyUpdate);
         }
-
+  
         props.goal.monthly_updates = JSON.stringify(updatedMonthlyUpdatesArray);
-
+        props.goal.updates = JSON.stringify(updatesArray);
+  
         await updateDoc(goalDocRef, {
           ...goalData,
           monthly_updates: JSON.stringify(updatedMonthlyUpdatesArray),
           updates: JSON.stringify(updatesArray),
         });
-
+  
         props.togglePopup();
       } catch (error) {
         console.error('Error saving goal:', error);
       }
     }
   };
+  
+  
+  
 
   function getMonthName(dateString: string) {
     const date = new Date(dateString);
@@ -427,10 +455,6 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               <ClearableInput value={updateAmount} onChange={setUpdateAmount} />
             </div>
             <div className={styles.progressInfoContainer}>
-              <div className={styles.target}>
-                Target Amount:
-                <p>R {targetAmount.toFixed(2)}</p>
-              </div>
               <div className={styles.progressInfoBox}>
                 <div className={styles.progressInfo}>
                   <div>Current Debt Amount:</div>

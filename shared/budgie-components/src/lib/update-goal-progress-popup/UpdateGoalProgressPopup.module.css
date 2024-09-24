@@ -144,6 +144,7 @@
 .progressInfo p {
   color: var(--primary-1);
   font-weight: bold;
+  margin-bottom: 2rem;
 }
 
 .target {

@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
   Label,
 } from 'recharts';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import AddGoalPopup from '../add-goal-popup/AddGoalPopup';
@@ -34,7 +34,7 @@ interface Goal {
   name: string;
   type: string;
   initial_amount?: number;
-  current_amount?: number;
+  current_amount: number;
   target_amount?: number;
   target_date?: string;
   spending_limit?: number;
@@ -544,13 +544,151 @@ export interface GoalInfoPageProps {
   onClose: () => void;
 }
 
+interface Update {
+  amount: number;
+  date: string;
+}
+
+export interface TableProps {
+  goal: Goal;
+}
+
+const MyComponent = ({ goal }: TableProps) => {
+  const [localUpdates, setLocalUpdates] = useState<Update[]>([]);
+
+  useEffect(() => {
+    if (goal.updates) {
+      try {
+        const parsedUpdates = JSON.parse(goal.updates) as Update[];
+        setLocalUpdates(parsedUpdates);
+      } catch (error) {
+        console.error('Error parsing updates:', error);
+        setLocalUpdates([]);
+      }
+    }
+  }, [goal.updates]);
+
+  const handleDeleteUpdate = (amount: number, date: string) => {
+    if (window.confirm("Do you really want to delete this update?")) {
+      setLocalUpdates((prevUpdates: Update[]) => {
+        let removed = false;
+        let newUpdates: Update[] = [];
+
+        for (let i = 0; i < prevUpdates.length; i++) {
+          const update = prevUpdates[i];
+          if (!removed && update.amount === amount && update.date === date) {
+            removed = true;
+            continue;
+          }
+          newUpdates.push(update);
+        }
+        goal.updates = JSON.stringify(newUpdates);
+
+        if (goal.type === "Debt Reduction") {
+          goal.current_amount = goal.current_amount + amount;
+        } else {
+          goal.current_amount = goal.current_amount - amount;
+        }
+
+        let monthlyUpdatesArray = goal.monthly_updates
+          ? JSON.parse(goal.monthly_updates)
+          : [];
+
+        const updateMonth = new Date(date).toLocaleString("default", {
+          month: "long",
+          year: "numeric",
+        });
+
+        const monthlyUpdateIndex = monthlyUpdatesArray.findIndex(
+          (entry: { month: string }) => entry.month === updateMonth
+        );
+
+        if (monthlyUpdateIndex >= 0) {
+          monthlyUpdatesArray[monthlyUpdateIndex].amount -= amount;
+        }
+
+        goal.monthly_updates = JSON.stringify(monthlyUpdatesArray);
+
+        updateDB();
+        return newUpdates;
+      });
+
+    }
+  };
+
+  const updateDB = async () => {
+    try {
+      const goalData: any = {
+        updates: goal.updates,
+        current_amount: goal.current_amount,
+        monthly_updates: goal.monthly_updates,
+      };
+
+      const goalDocRef = doc(db, "goals", goal.id);
+      await updateDoc(goalDocRef, goalData);
+    } catch (error) {
+      console.error("Error saving goal:", error);
+    }
+  };
+
+  return (
+    <div>
+      <table className="min-w-full table-auto border-collapse border border-gray-200">
+        <thead>
+          <tr style={{ color: 'var(--secondary-text)', backgroundColor: 'var(--primary-1)' }}>
+            <th className="border border-gray-200 p-2 text-left" style={{ width: '1%', backgroundColor: 'var(--block-background)', border: '1px solid var(--block-background)' }}></th> {/* Empty header with fixed width */}
+            <th className="border border-gray-200 p-2 text-left">Amount</th>
+            <th className="border border-gray-200 p-2 text-left">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {localUpdates.map((update: { amount: number; date: string; }, index: number) => (
+            <tr key={index}>
+              <td className='border border-gray-200 p-2 text-center' style={{ width: '1%', borderLeft: '1px solid var(--block-background)', borderBottom: '1px solid var(--block-background)' }}>
+                <span
+                  style={{ cursor: 'pointer', color: 'red' }}
+                  onClick={() => handleDeleteUpdate(update.amount, update.date)}
+                >
+                  &#x2716;
+                </span>
+              </td>
+              <td className='border border-gray-200 p-2' >{update.amount}</td>
+              <td className='border border-gray-200 p-2'>{update.date}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
 const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonthIndex = now.getMonth();
   const currentMonthName = monthNames[currentMonthIndex];
+  const [updates, setUpdates] = useState(() => {
+    if (goal.updates) {
+      if (typeof goal.updates === 'string') {
+        try {
+          return JSON.parse(goal.updates);
+        } catch (error) {
+          console.error("Invalid JSON format:", error);
+          return [];
+        }
+      } else if (typeof goal.updates === 'object') {
+        return goal.updates;
+      }
+    }
+    return [];
+  });
 
   const [updatePopupOpen, setUpdatePopupOpen] = useState(false);
+
+  interface Update {
+    amount: number;
+    date: string;
+  }
 
   const handleUpdateGoalPopup = () => {
     setUpdatePopupOpen(!updatePopupOpen);
@@ -580,18 +718,31 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
   };
 
   const calculateProgressPercentage = (goal: Goal): number => {
-    if (goal.current_amount && goal.target_amount !== undefined) {
+
+    //debt
+    if (goal.current_amount !== undefined && goal.initial_amount !== undefined) {
       if (goal.initial_amount) {
         return Math.min(
           100,
           ((goal.initial_amount - goal.current_amount) /
-            (goal.initial_amount - goal.target_amount)) *
-          100
+            (goal.initial_amount)) * 100
         );
       } else {
-        return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
+        return Math.min(100, (goal.current_amount) * 100);
       }
     }
+
+    //savings
+    if (goal.current_amount !== undefined && goal.target_amount !== undefined) {
+      return Math.min(
+        100,
+        ((goal.current_amount) /
+          (goal.target_amount)) * 100
+      );
+
+    }
+
+    //limits
     if (
       goal.spending_limit !== undefined &&
       goal.monthly_updates !== undefined
@@ -694,6 +845,9 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
     }
   };
 
+
+
+
   return (
     <div className={styles.mainPage} style={{ position: 'fixed', right: 0, top: 0, height: '100%', zIndex: "11", paddingTop: '2rem' }}>
       <div className={styles.goalPage}>
@@ -707,237 +861,241 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
 
           {goal.type != 'Spending Limit' && (
             <>
-            <div className={styles.goalPageBlock} style={{ width: 'calc(100% - 20rem)', display: 'flex', flexDirection: 'column', margin: '1rem' }}>
-            <h2 className="text-xl font-semibold mb-4">Goal Details</h2>
-            <div style={{ display: 'flex', flexGrow: 1, flexDirection: 'column', justifyContent: 'center' }}>
-              <div className="flex justify-around items-center">
-                <div className="flex flex-col space-y-2">
-                  <div className={styles.goalPair}>
-                    <div className={styles.goalLabel}>Goal Type:</div>
-                    <div className={styles.goalValue}>{goal.type}</div>
-                  </div>
-                  {goal.update_type != undefined && (
-                    <div className={styles.goalPair}>
-                      <div className={styles.goalLabel}>Update Type:</div>
-                      {goal.update_type == 'assign-all' && (
-                        <div className={styles.goalValue}>Assigned Account/s</div>
-                      )}
-                      {goal.update_type == 'assign-description' && (
-                        <div className={styles.goalValue}>By Transaction Descriptions</div>
-                      )}
-                      {goal.update_type == 'assign-transactions' && (
-                        <div className={styles.goalValue}>Manual Transaction Assignment</div>
-                      )}
-                      {goal.update_type == 'assign-category' && (
-                        <div className={styles.goalValue}>By Transaction Category</div>
-                      )}
-                      {goal.update_type == 'manual' && (
-                        <div className={styles.goalValue}>Manual Updates</div>
-                      )}
-                    </div>
-                  )}
-                  {goal.target_date != undefined && (
-                    <div className={styles.goalPair}>
-                      <div className={styles.goalLabel}>Target Date:</div>
-                      <div className={styles.goalValue}>{goal.target_date}</div>
-                    </div>
-                  )}
-                  {goal.initial_amount != undefined && (
-                    <div className={styles.goalPair}>
-                      <div className={styles.goalLabel}>Initial Amount:</div>
-                      <div className={styles.goalValue}>R {goal.initial_amount.toFixed(2)}</div>
-                    </div>
-                  )}
-                  {goal.current_amount != undefined && (
-                    <div className={styles.goalPair}>
-                      <div className={styles.goalLabel}>Current Amount:</div>
-                      <div className={styles.goalValue}>R {goal.current_amount.toFixed(2)}</div>
-                    </div>
-                  )}
-                  {goal.target_amount != undefined &&
-                    <div className={styles.goalPair}>
-                      <div className={styles.goalLabel}>Target Amount:</div>
-                      <div className={styles.goalValue}>R {goal.target_amount.toFixed(2)}</div>
-                    </div>
-                  }
-                  {goal.target_date != undefined &&
-                    <div className={styles.goalPair}>
-                      <div className={styles.goalLabel}>
-                        Days Left:
+              <div className={styles.goalPageBlock} style={{ width: 'calc(100% - 20rem)', display: 'flex', flexDirection: 'column', margin: '1rem' }}>
+                <h2 className="text-xl font-semibold mb-4">Goal Details</h2>
+                <div style={{ display: 'flex', flexGrow: 1, flexDirection: 'column', justifyContent: 'center', marginLeft: '2rem' }}>
+                  <div className="flex items-center" style={{ width: '100%' }}>
+                    <div className="flex flex-col space-y-2">
+                      <div className={styles.goalPair}>
+                        <div className={styles.goalLabel}>Goal Type:</div>
+                        <div className={styles.goalValue}>{goal.type}</div>
                       </div>
-                      <div className={styles.goalValue}>
-                        {calculateDaysLeft(goal.target_date) > 0
-                          ? ` ${calculateDaysLeft(
-                            goal.target_date
-                          )}`
-                          : 'Target Date Passed'}
-                      </div>
+                      {goal.update_type != undefined && (
+                        <div className={styles.goalPair}>
+                          <div className={styles.goalLabel}>Update Type:</div>
+                          {goal.update_type == 'assign-all' && (
+                            <div className={styles.goalValue}>Assigned Account/s</div>
+                          )}
+                          {goal.update_type == 'assign-description' && (
+                            <div className={styles.goalValue}>By Transaction Descriptions</div>
+                          )}
+                          {goal.update_type == 'assign-transactions' && (
+                            <div className={styles.goalValue}>Manual Transaction Assignment</div>
+                          )}
+                          {goal.update_type == 'assign-category' && (
+                            <div className={styles.goalValue}>By Transaction Category</div>
+                          )}
+                          {goal.update_type == 'manual' && (
+                            <div className={styles.goalValue}>Manual Updates</div>
+                          )}
+                        </div>
+                      )}
+                      {goal.target_date != undefined && (
+                        <div className={styles.goalPair}>
+                          <div className={styles.goalLabel}>Target Date:</div>
+                          <div className={styles.goalValue}>{goal.target_date}</div>
+                        </div>
+                      )}
+                      {goal.initial_amount != undefined && (
+                        <div className={styles.goalPair}>
+                          <div className={styles.goalLabel}>Initial Amount:</div>
+                          <div className={styles.goalValue}>R {goal.initial_amount.toFixed(2)}</div>
+                        </div>
+                      )}
+                      {goal.current_amount != undefined && (
+                        <div className={styles.goalPair}>
+                          <div className={styles.goalLabel}>Current Amount:</div>
+                          <div className={styles.goalValue}>R {goal.current_amount.toFixed(2)}</div>
+                        </div>
+                      )}
+                      {goal.target_amount != undefined && (
+                        <div className={styles.goalPair}>
+                          <div className={styles.goalLabel}>Target Amount:</div>
+                          <div className={styles.goalValue}>R {goal.target_amount.toFixed(2)}</div>
+                        </div>
+                      )}
+                      {goal.target_date != undefined && (
+                        <div className={styles.goalPair}>
+                          <div className={styles.goalLabel}>
+                            Days Left:
+                          </div>
+                          <div className={styles.goalValue}>
+                            {calculateDaysLeft(goal.target_date) > 0
+                              ? ` ${calculateDaysLeft(
+                                goal.target_date
+                              )}`
+                              : 'Target Date Passed'}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  }
-                </div>
 
-                {/* Buttons */}
-                <div className="flex flex-col space-y-4">
-                  <div
-                    className={styles.editViewButton}
-                    onClick={handleEditGoalPopup}
-                  >
-                    Edit Details
-                  </div>
-                  {editPopupOpen && (
-                    <EditGoalPopup
-                      togglePopup={handleEditGoalPopup}
-                      goal={goal}
-                      toggleMainPopup={onClose}
-                    />
-                  )}
-                  {goal.update_type == 'manual' && (
-                    <>
-                      <div
-                        className={styles.updateViewButton}
-                        onClick={handleUpdateGoalPopup}
-                      >
-                        Update Progress
+                    <span className="flex flex-col space-y-4" style={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+                      <div style={{ width: 'fit-content' }}>
+                        <div
+                          className={styles.editViewButton}
+                          onClick={handleEditGoalPopup}
+                        >
+                          Edit Details
+                        </div>
+                        {editPopupOpen && (
+                          <EditGoalPopup
+                            togglePopup={handleEditGoalPopup}
+                            goal={goal}
+                            toggleMainPopup={onClose}
+                          />
+                        )}
+                        {goal.update_type == 'manual' && (
+                          <>
+                            <div
+                              className={styles.updateViewButton}
+                              onClick={handleUpdateGoalPopup}
+                            >
+                              Update Progress
+                            </div>
+                            {updatePopupOpen && (
+                              <UpdateGoalPopup
+                                togglePopup={handleUpdateGoalPopup}
+                                goal={goal}
+                              />
+                            )}
+                          </>
+                        )}
                       </div>
-                      {updatePopupOpen && (
-                        <UpdateGoalPopup
-                          togglePopup={handleUpdateGoalPopup}
-                          goal={goal}
-                        />
-                      )}
-                    </>
-                  )}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-            <div
-              className={styles.goalPageBlock}
-              style={{
-                width: '25rem',
-                backgroundColor: 'var(--block-background)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                margin: '1rem'
-              }}
-            >
-              <h2 className="text-xl font-semibold mb-4">Goal Wingman</h2>
-              <div className="flex items-center justify-center w-full h-full">
-                <Image src={getGif(calculateProgressPercentage(goal))} alt="Goal GIF" className="object-contain w-full h-full" />
+              <div
+                className={styles.goalPageBlock}
+                style={{
+                  width: '25rem',
+                  backgroundColor: 'var(--block-background)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  margin: '1rem'
+                }}
+              >
+                <h2 className="text-xl font-semibold mb-4">Goal Wingman</h2>
+                <div className="flex items-center justify-center w-full h-full">
+                  <Image src={getGif(calculateProgressPercentage(goal))} alt="Goal GIF" className="object-contain w-full h-full" />
+                </div>
               </div>
-            </div>
             </>)}
 
-            {goal.type == 'Spending Limit' && (
+          {goal.type == 'Spending Limit' && (
             <>
-            <div className={styles.goalPageBlock} style={{ width: '100%', display: 'flex', flexDirection: 'column', margin: '1rem' }}>
-            <h2 className="text-xl font-semibold mb-4">Goal Details</h2>
-            <div style={{ display: 'flex', flexGrow: 1, flexDirection: 'column', justifyContent: 'center' }}>
-              <div className="flex justify-around items-center">
-                <div className="flex flex-col space-y-2">
-                  <div className={styles.goalPair}>
-                    <div className={styles.goalLabel}>Goal Type:</div>
-                    <div className={styles.goalValue}>{goal.type}</div>
-                  </div>
-                  {goal.update_type != undefined && (
-                    <div className={styles.goalPair}>
-                      <div className={styles.goalLabel}>Update Type:</div>
-                      {goal.update_type == 'assign-all' && (
-                        <div className={styles.goalValue}>Assigned Account/s</div>
-                      )}
-                      {goal.update_type == 'assign-description' && (
-                        <div className={styles.goalValue}>By Transaction Descriptions</div>
-                      )}
-                      {goal.update_type == 'assign-transactions' && (
-                        <div className={styles.goalValue}>Manual Transaction Assignment</div>
-                      )}
-                      {goal.update_type == 'assign-category' && (
-                        <div className={styles.goalValue}>By Transaction Category</div>
-                      )}
-                      {goal.update_type == 'manual' && (
-                        <div className={styles.goalValue}>Manual Updates</div>
-                      )}
-                    </div>
-                  )}
-                  {goal.target_date != undefined && (
-                    <div className={styles.goalPair}>
-                      <div className={styles.goalLabel}>Target Date:</div>
-                      <div className={styles.goalValue}>{goal.target_date}</div>
-                    </div>
-                  )}
-                  {goal.initial_amount != undefined && (
-                    <div className={styles.goalPair}>
-                      <div className={styles.goalLabel}>Initial Amount:</div>
-                      <div className={styles.goalValue}>R {goal.initial_amount.toFixed(2)}</div>
-                    </div>
-                  )}
-                  {goal.current_amount != undefined && (
-                    <div className={styles.goalPair}>
-                      <div className={styles.goalLabel}>Current Amount:</div>
-                      <div className={styles.goalValue}>R {goal.current_amount.toFixed(2)}</div>
-                    </div>
-                  )}
-                  {goal.target_amount != undefined &&
-                    <div className={styles.goalPair}>
-                      <div className={styles.goalLabel}>Target Amount:</div>
-                      <div className={styles.goalValue}>R {goal.target_amount.toFixed(2)}</div>
-                    </div>
-                  }
-                  {goal.target_date != undefined &&
-                    <div className={styles.goalPair}>
-                      <div className={styles.goalLabel}>
-                        Days Left:
+              <div className={styles.goalPageBlock} style={{ width: '100%', display: 'flex', flexDirection: 'column', margin: '1rem' }}>
+                <h2 className="text-xl font-semibold mb-4">Goal Details</h2>
+                <div style={{ display: 'flex', flexGrow: 1, flexDirection: 'column', justifyContent: 'center', marginLeft: '2rem' }}>
+                  <div className="flex items-center" style={{ width: '100%' }}>
+                    <div className="flex flex-col space-y-2">
+                      <div className={styles.goalPair}>
+                        <div className={styles.goalLabel}>Goal Type:</div>
+                        <div className={styles.goalValue}>{goal.type}</div>
                       </div>
-                      <div className={styles.goalValue}>
-                        {calculateDaysLeft(goal.target_date) > 0
-                          ? ` ${calculateDaysLeft(
-                            goal.target_date
-                          )}`
-                          : 'Target Date Passed'}
-                      </div>
+                      {goal.update_type != undefined && (
+                        <div className={styles.goalPair}>
+                          <div className={styles.goalLabel}>Update Type:</div>
+                          {/* More goal details */}
+                          {goal.update_type == 'assign-all' && (
+                            <div className={styles.goalValue}>Assigned Account/s</div>
+                          )}
+                          {goal.update_type == 'assign-description' && (
+                            <div className={styles.goalValue}>By Transaction Descriptions</div>
+                          )}
+                          {goal.update_type == 'assign-transactions' && (
+                            <div className={styles.goalValue}>Manual Transaction Assignment</div>
+                          )}
+                          {goal.update_type == 'assign-category' && (
+                            <div className={styles.goalValue}>By Transaction Category</div>
+                          )}
+                          {goal.update_type == 'manual' && (
+                            <div className={styles.goalValue}>Manual Updates</div>
+                          )}
+                        </div>
+                      )}
+                      {/* Spending limit and target details */}
+                      {goal.spending_limit != undefined && (
+                        <>
+                          <div className={styles.goalPair}>
+                            <div className={styles.goalLabel}>Spending Limit:</div>
+                            <div className={styles.goalValue}>R {goal.spending_limit.toFixed(2)}</div>
+                          </div>
+                          <div className={styles.goalPair}>
+                            <div className={styles.goalLabel}>Spent this Month:</div>
+                            <div className={styles.goalValue}>R {monthlyBudgetSpent(goal).toFixed(2)}</div>
+                          </div>
+                        </>
+                      )}
+                      {goal.target_date != undefined && (
+                        <div className={styles.goalPair}>
+                          <div className={styles.goalLabel}>End Date:</div>
+                          <div className={styles.goalValue}>{goal.target_date}</div>
+                        </div>
+                      )}
+                      {goal.target_amount != undefined &&
+                        <div className={styles.goalPair}>
+                          <div className={styles.goalLabel}>Target Amount:</div>
+                          <div className={styles.goalValue}>R {goal.target_amount.toFixed(2)}</div>
+                        </div>
+                      }
+                      {goal.target_date != undefined &&
+                        <div className={styles.goalPair}>
+                          <div className={styles.goalLabel}>
+                            Days Left:
+                          </div>
+                          <div className={styles.goalValue}>
+                            {calculateDaysLeft(goal.target_date) > 0
+                              ? ` ${calculateDaysLeft(
+                                goal.target_date
+                              )}`
+                              : 'Target Date Passed'}
+                          </div>
+                        </div>
+                      }
                     </div>
-                  }
-                </div>
 
-                {/* Buttons */}
-                <div className="flex flex-col space-y-4">
-                  <div
-                    className={styles.editViewButton}
-                    onClick={handleEditGoalPopup}
-                  >
-                    Edit Details
-                  </div>
-                  {editPopupOpen && (
-                    <EditGoalPopup
-                      togglePopup={handleEditGoalPopup}
-                      goal={goal}
-                      toggleMainPopup={onClose}
-                    />
-                  )}
-                  {goal.update_type == 'manual' && (
-                    <>
-                      <div
-                        className={styles.updateViewButton}
-                        onClick={handleUpdateGoalPopup}
-                      >
-                        Update Progress
+                    <span className="flex flex-col space-y-4" style={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+                      <div style={{ width: 'fit-content' }}>
+                        <div
+                          className={styles.editViewButton}
+                          onClick={handleEditGoalPopup}
+                        >
+                          Edit Details
+                        </div>
+                        {editPopupOpen && (
+                          <EditGoalPopup
+                            togglePopup={handleEditGoalPopup}
+                            goal={goal}
+                            toggleMainPopup={onClose}
+                          />
+                        )}
+                        {goal.update_type == 'manual' && (
+                          <>
+                            <div
+                              className={styles.updateViewButton}
+                              onClick={handleUpdateGoalPopup}
+                            >
+                              Update Progress
+                            </div>
+                            {updatePopupOpen && (
+                              <UpdateGoalPopup
+                                togglePopup={handleUpdateGoalPopup}
+                                goal={goal}
+                              />
+                            )}
+                          </>
+                        )}
                       </div>
-                      {updatePopupOpen && (
-                        <UpdateGoalPopup
-                          togglePopup={handleUpdateGoalPopup}
-                          goal={goal}
-                        />
-                      )}
-                    </>
-                  )}
+                    </span>
+                  </div>
                 </div>
+                <h2 className="text-xl font-semibold mb-4"></h2>
               </div>
-            </div>
-            <h2 className="text-xl font-semibold mb-4"></h2>
-          </div>
-            
-            </>)}
+            </>
+          )}
         </div>
 
 
@@ -1000,19 +1158,19 @@ const GoalInfoPage = ({ goal, onClose }: GoalInfoPageProps) => {
         </div>
 
 
-        {/* Row 3 - Full Width (Transactions) */}
-        <div className={styles.goalPageBlock} style={{ margin: '1rem' }}>
-          <h2 className="text-xl font-semibold mb-4">Transactions</h2>
-          {/* Add your transactions table or content here */}
-          <p>Transaction list goes here...</p>
-        </div>
+        {goal.update_type == 'manual' && (
+          <>
+            {updates.length > 0 && (
+              <div className={styles.goalPageBlock} style={{ margin: '1rem'}}>
+                <h2 className="text-xl font-semibold mb-4">Updates</h2>
+                <MyComponent goal={goal}></MyComponent>
+              </div>
+            ) }
+          </>)}
       </div>
     </div>
   );
 };
-
-
-
 
 
 
