@@ -36,10 +36,15 @@ export function Landing(props: LandingProps) {
             onClick={() => {
               setShowLearnMore(!showLearnMore);
             }}
-            className="z-40 absolute w-screen h-screen backdrop-blur-sm"
-          ></div>
-          <div className="absolute z-50 left-[calc(50vw-395px)] top-[calc(50vh-260px)]">
-            <LearnModal onClose={() => setShowLearnMore(false)} />
+            className="absolute z-40 w-screen h-screen backdrop-blur-sm flex flex-col items-center justify-center"
+          >
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <LearnModal onClose={() => setShowLearnMore(false)} />
+            </div>
           </div>
         </>
       )}
