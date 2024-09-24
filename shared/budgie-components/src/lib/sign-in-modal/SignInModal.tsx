@@ -182,102 +182,100 @@ export function SignInModal(props: SignInModalProps) {
 
   return (
     <>
-      {forgot && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent">
-          <ForgotPassword onClose={handleClose} />
+      {forgot && <ForgotPassword onClose={handleClose} />}
+      {!forgot && (
+        <div className="z-10 bg-BudgieBlue md:w-[794px] h-[521px] md:rounded-r-[60px] rounded-l-[65px] rounded-r-[65px]  shadow-2xl">
+          <div className="flex flex-col items-center bg-BudgieWhite w-[397px] h-full rounded-[60px] md:rounded-l-[60px] md:rounded-r-none">
+            <div className="mt-4 h-[55px] w-[55px]">
+              <Image src={logo} alt="Logo" />
+            </div>
+
+            <p className="mt-2 font-TripSans font-medium text-3xl text-BudgieBlue">
+              Welcome to Budgie
+            </p>
+
+            <input
+              className={`mt-4 appearance-none text-lg w-72 h-10 font-TripSans pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow ${
+                emailError ? 'border-red-500' : 'border-transparent'
+              }`}
+              id="email"
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={handleEmailChange}
+              disabled={loading}
+            />
+
+            <input
+              className={`mt-2 appearance-none text-lg w-72 h-10 font-TripSans pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow ${
+                passwordError ? 'border-red-500' : 'border-transparent'
+              }`}
+              id="password"
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={handlePasswordChange}
+              disabled={loading}
+            />
+
+            <button
+              className={`mt-4 font-TripSans font-medium rounded-[25px] w-36 h-10 ${
+                loading ? 'bg-gray-400' : 'bg-BudgieBlue'
+              } text-BudgieWhite`}
+              type="button"
+              onClick={handleLoginClick}
+              disabled={loading}
+            >
+              {loading ? 'Logging In...' : 'Log In'}
+            </button>
+
+            <p className="mt-2 text-BudgieBlue font-TripSans font-medium">OR</p>
+
+            <button
+              className={`mt-2 flex items-center justify-center font-TripSans font-medium rounded-[25px] w-48 h-10 ${
+                loading ? 'bg-gray-400' : 'bg-BudgieBlue'
+              } text-BudgieWhite`}
+              type="button"
+              onClick={signInWithGoogle}
+              disabled={loading}
+            >
+              <img
+                className="w-6 h-6 mr-2"
+                src="https://www.svgrepo.com/show/475656/google-color.svg"
+                alt="Google logo"
+              />
+              {loading ? 'Signing In...' : 'Sign In with Google'}
+            </button>
+
+            <p className="mt-4 text-lg text-BudgieBlue font-TripSans font-medium">
+              Don't have an account?{' '}
+              <Link href="/signup" className="underline">
+                Sign Up
+              </Link>
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setForgot(!forgot)}
+              className="mt-2 underline text-lg text-BudgieBlue font-TripSans font-medium"
+              disabled={loading}
+            >
+              Forgot Password?
+            </button>
+
+            {/* Reserve space for the error message */}
+            <div className="mt-2 pt-2 w-full text-center text-red-600 font-TripSans font-medium min-h-[24px]">
+              {error && errorMessage}
+            </div>
+          </div>
+          {/* Loading Spinner */}
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-25 ">
+              <div className="w-16 h-16 border-8 border-gray-200 border-t-BudgieBlue rounded-full animate-spin"></div>
+            </div>
+          )}
         </div>
       )}
-      <div className="z-10 bg-BudgieBlue md:w-[794px] h-[521px] md:rounded-r-[60px] rounded-l-[65px] rounded-r-[65px]  shadow-2xl">
-        <div className="flex flex-col items-center bg-BudgieWhite w-[397px] h-full rounded-[60px] md:rounded-l-[60px] md:rounded-r-none">
-          <div className="mt-4 h-[55px] w-[55px]">
-            <Image src={logo} alt="Logo" />
-          </div>
-
-          <p className="mt-2 font-TripSans font-medium text-3xl text-BudgieBlue">
-            Welcome to Budgie
-          </p>
-
-          <input
-            className={`mt-4 appearance-none text-lg w-72 h-10 font-TripSans pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow ${
-              emailError ? 'border-red-500' : 'border-transparent'
-            }`}
-            id="email"
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={handleEmailChange}
-            disabled={loading}
-          />
-
-          <input
-            className={`mt-2 appearance-none text-lg w-72 h-10 font-TripSans pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow ${
-              passwordError ? 'border-red-500' : 'border-transparent'
-            }`}
-            id="password"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={handlePasswordChange}
-            disabled={loading}
-          />
-
-          <button
-            className={`mt-4 font-TripSans font-medium rounded-[25px] w-36 h-10 ${
-              loading ? 'bg-gray-400' : 'bg-BudgieBlue'
-            } text-BudgieWhite`}
-            type="button"
-            onClick={handleLoginClick}
-            disabled={loading}
-          >
-            {loading ? 'Logging In...' : 'Log In'}
-          </button>
-
-          <p className="mt-2 text-BudgieBlue font-TripSans font-medium">OR</p>
-
-          <button
-            className={`mt-2 flex items-center justify-center font-TripSans font-medium rounded-[25px] w-48 h-10 ${
-              loading ? 'bg-gray-400' : 'bg-BudgieBlue'
-            } text-BudgieWhite`}
-            type="button"
-            onClick={signInWithGoogle}
-            disabled={loading}
-          >
-            <img
-              className="w-6 h-6 mr-2"
-              src="https://www.svgrepo.com/show/475656/google-color.svg"
-              alt="Google logo"
-            />
-            {loading ? 'Signing In...' : 'Sign In with Google'}
-          </button>
-
-          <p className="mt-4 text-lg text-BudgieBlue font-TripSans font-medium">
-            Don't have an account?{' '}
-            <Link href="/signup" className="underline">
-              Sign Up
-            </Link>
-          </p>
-
-          <button
-            type="button"
-            onClick={() => setForgot(!forgot)}
-            className="mt-2 underline text-lg text-BudgieBlue font-TripSans font-medium"
-            disabled={loading}
-          >
-            Forgot Password?
-          </button>
-
-          {/* Reserve space for the error message */}
-          <div className="mt-2 pt-2 w-full text-center text-red-600 font-TripSans font-medium min-h-[24px]">
-            {error && errorMessage}
-          </div>
-        </div>
-        {/* Loading Spinner */}
-        {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-25 ">
-            <div className="w-16 h-16 border-8 border-gray-200 border-t-BudgieBlue rounded-full animate-spin"></div>
-          </div>
-        )}
-      </div>
     </>
   );
 }

@@ -23,6 +23,7 @@ export function ForgotPassword(props: ForgotPasswordProps) {
       onClose();
     }
   };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === 'email') setEmail(value);
@@ -48,7 +49,7 @@ export function ForgotPassword(props: ForgotPasswordProps) {
       setSent(true);
       setError(false);
       setErrorMessage('');
-      handleClose();
+      // handleClose();
     } catch (error: any) {
       console.error('Error sending password reset email:', error);
       setError(true);
@@ -60,8 +61,8 @@ export function ForgotPassword(props: ForgotPasswordProps) {
 
   return (
     <>
-      <div className="relative z-10 bg-BudgieBlue w-[794px] h-[521px] rounded-[61px] shadow-2xl">
-        <div className="flex flex-col justify-start items-center bg-BudgieWhite w-[397px] h-[521px] rounded-[60px] rounded-tr-none rounded-br-none">
+      <div className="z-10 bg-BudgieBlue md:w-[794px] h-[521px] md:rounded-r-[60px] rounded-l-[65px] rounded-r-[65px]  shadow-2xl">
+        <div className="flex flex-col items-center bg-BudgieWhite w-[397px] h-full rounded-[60px] md:rounded-l-[60px] md:rounded-r-none">
           <div className=" pt-4 h-[55px] w-[55px]">
             <Image src={logo} alt="Logo"></Image>
           </div>
