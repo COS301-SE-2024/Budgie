@@ -11,7 +11,7 @@ export interface LearnMoreProps {
 const LearnMore: React.FC<LearnMoreProps> = ({ onClose }) => {
   return (
     <>
-      <div className="bg-BudgieBlue w-[397px] md:w-[794px] md:h-[530px] rounded-[61px] p-8 ">
+      <div className="bg-BudgieBlue w-[397px] md:w-[794px] md:h-[530px] rounded-[61px] p-8 shadow-2xl">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-6 text-center text-white">
             Learn More About Budgie
