@@ -1,5 +1,4 @@
 'use client';
-import styles from './page.module.css';
 import React, { useContext, useEffect, useState } from 'react';
 import {
   SignUpPage,
@@ -17,5 +16,5 @@ export default function SignUp() {
     }
   }, [user]);
 
-  return <SignUpPage></SignUpPage>;
+  return user == null ? <SignUpPage></SignUpPage> : '';
 }
