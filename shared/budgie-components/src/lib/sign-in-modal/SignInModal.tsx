@@ -22,19 +22,55 @@ export interface SignInModalProps {}
 export function SignInModal(props: SignInModalProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // Error handling states
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+
+  const [loading, setLoading] = useState(false);
   const [forgot, setForgot] = useState(false);
   const auth = getAuth();
+
+  // Error messages mapping
+  const errorMessages: { [key: string]: string } = {
+    'auth/invalid-email': 'The email address is not valid.',
+    'auth/user-disabled': 'This user account has been disabled.',
+    'auth/user-not-found': 'No account found with this email.',
+    'auth/wrong-password': 'Password is incorrect.',
+    'auth/network-request-failed': 'Network error. Please try again.',
+    'auth/popup-closed-by-user':
+      'The popup was closed before completing sign in.',
+    'auth/cancelled-popup-request': 'Cancelled previous popup request.',
+    // Add more error codes and messages as needed
+  };
+
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
+    if (emailError) {
+      setEmailError(false);
+      setError(false);
+      setErrorMessage('');
+    }
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
+    if (passwordError) {
+      setPasswordError(false);
+      setError(false);
+      setErrorMessage('');
+    }
   };
 
   const signInWithGoogle = async () => {
+    setLoading(true);
     try {
       const provider = new GoogleAuthProvider();
       provider.addScope('profile');
@@ -42,28 +78,71 @@ export function SignInModal(props: SignInModalProps) {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       console.log('User information:', user);
+      // Handle successful login (e.g., redirect)
+      setError(false);
+      setErrorMessage('');
     } catch (error) {
       if (error instanceof FirebaseError) {
         const errorCode = error.code;
-        const errorMessage = error.message;
-        const email = error.customData?.email;
-        const credential = GoogleAuthProvider.credentialFromError(error);
+        const friendlyMessage =
+          errorMessages[errorCode] ||
+          'Failed to sign in with Google. Please try again.';
+        setError(true);
+        setErrorMessage(friendlyMessage);
+
+        // Set input error states if applicable
+        if (errorCode === 'auth/popup-closed-by-user') {
+          // No input error states to set
+        } else if (errorCode === 'auth/network-request-failed') {
+          // Could highlight network issues
+        } else {
+          // General error
+        }
+
         console.error('Error code:', errorCode);
-        console.error('Error message:', errorMessage);
-        console.error('Email:', email);
-        console.error('Credential:', credential);
+        console.error('Error message:', error.message);
       } else {
         console.error('Unexpected error', error);
+        setError(true);
+        setErrorMessage('An unexpected error occurred. Please try again.');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleLoginClick = async () => {
-    if (!email || !password) {
+    let valid = true;
+
+    if (!email) {
+      setEmailError(true);
+      valid = false;
       setError(true);
-      setErrorMessage('Please enter both email and password.');
+      setErrorMessage('Please enter your email address.');
+    } else if (!validateEmail(email)) {
+      setEmailError(true);
+      valid = false;
+      setError(true);
+      setErrorMessage('Please enter a valid email address.');
+    } else {
+      setEmailError(false);
+    }
+
+    if (!password) {
+      setPasswordError(true);
+      valid = false;
+      setError(true);
+      setErrorMessage('Please enter your password.');
+    } else {
+      setPasswordError(false);
+    }
+
+    if (!valid) {
       return;
     }
+
+    setLoading(true);
+
     try {
       const auth = getAuth();
       await setPersistence(auth, browserSessionPersistence);
@@ -74,37 +153,46 @@ export function SignInModal(props: SignInModalProps) {
       );
       const user = userCredential.user;
       console.log('User logged in:', user);
+      // Handle successful login (e.g., redirect)
+      setError(false);
+      setErrorMessage('');
     } catch (error) {
-      if (error instanceof Error) {
-        const errorMessage = error.message;
-        const errorCode = (error as any).code;
+      if (error instanceof FirebaseError) {
+        const errorCode = error.code;
+        const friendlyMessage =
+          errorMessages[errorCode] ||
+          'An unexpected error occurred. Please try again.';
         setError(true);
-        switch (errorCode) {
-          case 'auth/wrong-password':
-            setErrorMessage('Incorrect password.');
-            break;
-          case 'auth/user-not-found':
-            setErrorMessage('No account found with this email.');
-            break;
-          case 'auth/invalid-email':
-            setErrorMessage('This email address is invalid.');
-            break;
-          case 'auth/invalid-credential':
-            setErrorMessage('Invalid Email/Password.');
-            break;
-          default:
-            setErrorMessage(errorMessage);
-            break;
+        setErrorMessage(friendlyMessage);
+
+        // Set input error states based on error codes
+        if (
+          errorCode === 'auth/invalid-email' ||
+          errorCode === 'auth/user-not-found'
+        ) {
+          setEmailError(true);
+        } else if (errorCode === 'auth/wrong-password') {
+          setPasswordError(true);
+        } else {
+          // General error
         }
-        console.error(errorCode, errorMessage);
+
+        console.error('Error code:', errorCode);
+        console.error('Error message:', error.message);
       } else {
         console.error('Unknown error:', error);
+        setError(true);
+        setErrorMessage('An unexpected error occurred. Please try again.');
       }
+    } finally {
+      setLoading(false);
     }
   };
+
   const handleClose = () => {
     setForgot(false);
   };
+
   return (
     <>
       {forgot && (
@@ -123,31 +211,40 @@ export function SignInModal(props: SignInModalProps) {
           <form className="pt-4" onSubmit={(e) => e.preventDefault()}>
             <div>
               <input
-                className="appearance-none text-lg w-72 h-10 font-TripSans font-normal pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow"
+                className={`appearance-none text-lg w-72 h-10 font-TripSans font-normal pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow ${
+                  emailError ? 'border-red-500' : ''
+                }`}
                 id="email"
                 type="text"
                 placeholder="Email"
                 value={email}
                 onChange={handleEmailChange}
+                disabled={loading}
               />
             </div>
             <div className="pt-4">
               <input
-                className="appearance-none text-lg w-72 h-10 font-TripSans font-normal pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow"
+                className={`appearance-none text-lg w-72 h-10 font-TripSans font-normal pl-3 bg-BudgieGrayLight border rounded-[10px] focus:outline-none focus:shadow ${
+                  passwordError ? 'border-red-500' : ''
+                }`}
                 id="password"
                 type="password"
                 placeholder="Password"
                 value={password}
                 onChange={handlePasswordChange}
+                disabled={loading}
               />
             </div>
             <div className="flex flex-col justify-start pt-6 items-center">
               <button
-                className="font-TripSans font-medium rounded-[25px] w-36 h-10 bg-BudgieBlue text-BudgieWhite"
+                className={`font-TripSans font-medium rounded-[25px] w-36 h-10 ${
+                  loading ? 'bg-gray-400' : 'bg-BudgieBlue'
+                } text-BudgieWhite`}
                 type="button"
                 onClick={handleLoginClick}
+                disabled={loading}
               >
-                Log In
+                {loading ? 'Logging In...' : 'Log In'}
               </button>
             </div>
             <div className="flex flex-col justify-start pt-3 items-center">
@@ -155,16 +252,19 @@ export function SignInModal(props: SignInModalProps) {
             </div>
             <div className="flex flex-col justify-start pt-3 items-center">
               <button
-                className="flex items-center justify-center font-TripSans font-medium rounded-[25px] w-[12rem] h-[2.5rem] bg-BudgieBlue text-BudgieWhite"
+                className={`flex items-center justify-center font-TripSans font-medium rounded-[25px] w-[12rem] h-[2.5rem] ${
+                  loading ? 'bg-gray-400' : 'bg-BudgieBlue'
+                } text-BudgieWhite`}
                 type="button"
                 onClick={signInWithGoogle}
+                disabled={loading}
               >
                 <img
                   className="w-6 h-6 mr-2"
                   src="https://www.svgrepo.com/show/475656/google-color.svg"
                   alt="Google logo"
                 />
-                Sign In with Google
+                {loading ? 'Signing In...' : 'Sign In with Google'}
               </button>
             </div>
             <div className="flex flex-col pt-3 items-center">
@@ -178,18 +278,44 @@ export function SignInModal(props: SignInModalProps) {
                 type="button"
                 onClick={() => setForgot(!forgot)}
                 className="underline text-lg text-BudgieBlue font-TripSans font-medium"
+                disabled={loading}
               >
                 Forgot Password?
               </button>
             </div>
             {error && (
-              <div className="pt-2 w-72 h-10 text-red-600 font-TripSans font-medium">
+              <div className="pt-2 w-full text-center text-red-600 font-TripSans font-medium">
                 {errorMessage}
               </div>
             )}
           </form>
         </div>
+        {/* Loading Spinner */}
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-opacity-50 bg-black">
+            <div className="loader">Loading...</div>
+          </div>
+        )}
       </div>
+      {/* Spinner Styles */}
+      <style jsx>{`
+        .loader {
+          border: 8px solid #f3f3f3;
+          border-top: 8px solid #3498db;
+          border-radius: 50%;
+          width: 60px;
+          height: 60px;
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+      `}</style>
     </>
   );
 }
