@@ -12,10 +12,6 @@ export function Landing(props: LandingProps) {
   const [showSignInModal, setShowSignInModal] = useState<boolean>(false);
   const [showLearnMore, setShowLearnMore] = useState<boolean>(false);
 
-  useEffect(() => {
-    console.log('ran useffect');
-  }, []);
-
   return (
     <>
       {showSignInModal && (
@@ -44,54 +40,102 @@ export function Landing(props: LandingProps) {
           </div>
         </>
       )}
-      <div className={styles.landingContainer}>
-        <div className={styles.waveTop}></div>
-        <div className={styles.waveBottom}></div>
-        <div className="relative flex items-center justify-center min-h-screen">
-          <div className="absolute inset-0 bg-gradient-to-b " />
-          {!showSignInModal && (
-            <>
-              <div className="relative z-10 text-center">
-                <div className="flex flex-col items-center w-[560px] h-[332px]">
-                  <h1 className="font-TripSans font-extrabold text-8xl md:text-[128px] text-BudgieBlue absolute top-24 opacity-[13%]">
-                    Budgie
-                  </h1>
-                  <h1 className="font-TripSans font-extrabold text-8xl md:text-[128px] text-BudgieBlue absolute top-10 opacity-5">
-                    Budgie
-                  </h1>
-                  <h1 className="font-TripSans font-extrabold text-8xl md:text-[128px] text-BudgieBlue absolute bottom-12 ">
-                    Budgie
-                  </h1>
-                  <p className="font-TripSans font-extrabold text-xl md:text-1x4 text-BudgieBlue mt-4 absolute bottom-9 right-[28px]">
-                    Financial Wingman
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => {
-                  setShowSignInModal(!showSignInModal);
-                }}
-                className=" text-lg absolute top-4 right-4 w-[116px] h-[47px] font-TripSans font-bold bg-white hover:bg-BudgieBlue hover:text-BudgieWhite text-BudgieBlue border-4 border-BudgieBlue transition-colors ease-in hover:border-BudgieGrayLight rounded-full "
-              >
-                Sign In
-              </button>
-            </>
-          )}
-          <div className="absolute bottom-4 w-full text-center">
-            {!showSignInModal && !showLearnMore && (
-              <button
-                onClick={() => {
-                  setShowLearnMore(true);
-                }}
-                className="text-blue-950 font-semibold flex items-center justify-center mx-auto"
-              >
-                <span className="text-xl font-TripSans font-bold ml-4 animate-bounce">
-                  Learn More &darr;
-                </span>
-              </button>
-            )}
+      <button
+        onClick={() => {
+          setShowSignInModal(!showSignInModal);
+        }}
+        className=" text-lg absolute top-4 right-4 w-[116px] h-[47px] font-TripSans font-bold bg-white hover:bg-BudgieBlue hover:text-BudgieWhite text-BudgieBlue border-4 border-BudgieBlue transition-colors ease-in hover:border-BudgieGrayLight rounded-full "
+      >
+        Sign In
+      </button>
+      <div className="absolute bottom-4 w-full text-center">
+        {!showSignInModal && !showLearnMore && (
+          <button
+            onClick={() => {
+              setShowLearnMore(true);
+            }}
+            className="text-blue-950 font-semibold flex items-center justify-center mx-auto"
+          >
+            <span className="text-xl font-TripSans font-bold ml-4 animate-bounce">
+              Learn More &darr;
+            </span>
+          </button>
+        )}
+      </div>
+      <div className="flex flex-col items-center justify-center h-full w-full">
+        {!showSignInModal && (
+          <div className="flex flex-col items-center justify-center h-full">
+            <h1 className="font-TripSans font-extrabold text-8xl md:text-[128px] text-BudgieBlue opacity-[5%] relative -mb-14 z-10">
+              Budgie
+            </h1>
+            <h1 className="font-TripSans font-extrabold text-8xl md:text-[128px] text-BudgieBlue opacity-[13%] relative -mb-14 z-20">
+              Budgie
+            </h1>
+            <h1 className="font-TripSans font-extrabold text-8xl md:text-[128px] text-BudgieBlue relative z-30">
+              Budgie
+            </h1>
+            <p className="font-TripSans font-extrabold text-xl md:text-1x4 text-BudgieBlue mt-4">
+              Financial Wingman
+            </p>
           </div>
-        </div>
+        )}
+      </div>
+      {/* Wave effect background  bottom*/}
+      <div className="absolute bottom-0 w-full overflow-hidden leading-none h-[300px] md:h-[400px]">
+        <svg
+          className="relative block w-full h-full"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1440 320"
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <linearGradient
+              id="waveGradient"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" style={{ stopColor: '#a0e9af' }} />
+              <stop offset="50%" style={{ stopColor: '#c0f0c0' }} />
+              <stop offset="75%" style={{ stopColor: '#b2f5a8' }} />
+              <stop offset="100%" style={{ stopColor: '#e0f8d1' }} />
+            </linearGradient>
+          </defs>
+          <path
+            fill="url(#waveGradient)"
+            d="M0,256L48,240C96,224,192,192,288,170.7C384,149,480,139,576,149.3C672,160,768,192,864,192C960,192,1056,160,1152,128C1248,96,1344,64,1392,48L1440,32V320H1392C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320H0Z"
+          ></path>
+        </svg>
+      </div>
+      {/* Wave effect background  top*/}
+      <div className="absolute top-0 w-full overflow-hidden leading-none h-[300px] md:h-[400px] z-0">
+        <svg
+          className="relative block w-full h-full"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1440 320"
+          preserveAspectRatio="none"
+          style={{ transform: 'rotate(180deg)' }}
+        >
+          <defs>
+            <linearGradient
+              id="waveGradientTop"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" style={{ stopColor: '#a0e9af' }} />
+              <stop offset="50%" style={{ stopColor: '#c0f0c0' }} />
+              <stop offset="75%" style={{ stopColor: '#b2f5a8' }} />
+              <stop offset="100%" style={{ stopColor: '#e0f8d1' }} />
+            </linearGradient>
+          </defs>
+          <path
+            fill="url(#waveGradientTop)"
+            d="M0,256L48,240C96,224,192,192,288,170.7C384,149,480,139,576,149.3C672,160,768,192,864,192C960,192,1056,160,1152,128C1248,96,1344,64,1392,48L1440,32V320H1392C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320H0Z"
+          ></path>
+        </svg>
       </div>
     </>
   );
