@@ -177,14 +177,6 @@ body {
   --complementary: #f91880;
 }
 
-/* @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=block');
-
-.material-symbols-outlined {
-  font-family: 'Material Symbols Outlined';
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  cursor: pointer;
-} */
-
 .mainPage {
   background-color: var(--main-background);
   width: 85vw;
