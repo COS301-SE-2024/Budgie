@@ -8,7 +8,7 @@
 }
 
 .updateGoalInfo {
-  height: calc(36vh*var(--font-size-multiplier));
+  height: calc(36vh * var(--font-size-multiplier));
   align-content: center;
   text-align: left;
   width: fit-content;
@@ -176,13 +176,13 @@
 .goalDescription {
   color: var(--main-text);
   text-align: left;
-  font-size: calc(1.2rem*var(--font-size-multiplier));
+  font-size: calc(1.2rem * var(--font-size-multiplier));
 }
 
 .goalDescriptions {
   color: var(--main-text);
   text-align: left;
-  font-size: calc(1rem*var(--font-size-multiplier));
+  font-size: calc(1rem * var(--font-size-multiplier));
 }
 
 .popupText {
@@ -217,12 +217,12 @@
   font-weight: 200;
 }
 
-.icon:hover+.popupText {
+.icon:hover + .popupText {
   visibility: visible;
   opacity: 1;
 }
 
-.icon:hover+.noAccountPopupText {
+.icon:hover + .noAccountPopupText {
   visibility: visible;
   opacity: 1;
 }

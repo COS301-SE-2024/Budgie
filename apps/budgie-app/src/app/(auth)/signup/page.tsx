@@ -1,5 +1,4 @@
 'use client';
-import styles from './page.module.css';
 import React, { useContext, useEffect, useState } from 'react';
 import {
   SignUpPage,
@@ -9,15 +8,13 @@ import { useRouter } from 'next/navigation';
 
 export default function SignUp() {
   const user = useContext(UserContext);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     if (user) {
-      router.push('/overview');
-    } else {
-      setLoading(false);
+      return router.push('/overview');
     }
   }, [user]);
-  return <>{!loading && <SignUpPage></SignUpPage>}</>;
+
+  return user == null ? <SignUpPage></SignUpPage> : '';
 }

@@ -1,5 +1,4 @@
 'use client';
-import styles from './page.module.css';
 import React, { useContext, useEffect, useState } from 'react';
 
 import { Landing } from '@capstone-repo/shared/budgie-components';
@@ -12,9 +11,9 @@ export default function Index() {
 
   useEffect(() => {
     if (user) {
-      router.push('/overview');
+      return router.push('/overview');
     }
-  }, [user, router]);
+  }, [user]);
 
-  return user === null ? <Landing /> : user ? null : <div>Loading...</div>;
+  return user == null ? <Landing /> : '';
 }
