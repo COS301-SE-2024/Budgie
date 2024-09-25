@@ -40,10 +40,12 @@ interface Goal {
   target_date?: string;
   spending_limit?: number;
   updates?: string;
+  deleted_updates?: string;
   monthly_updates?: string;
   update_type: string;
   accounts: ([]);
   description?: string[];
+  last_update?: string;
 }
 
 const monthNames = [
@@ -135,6 +137,74 @@ const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal:
     }
   };
 
+  const handleDeleteNonManualUpdate = (amount: number, date: string, description: string) => {
+    if (window.confirm("Do you really want to delete this update? The transaction cannot be added back to this goal.") && goal.updates) {
+      let updatedCurrentAmount = goal.current_amount;
+      const newUpdates: Update[] = [];
+      const deletedUpdates: Update[] = goal.deleted_updates ? JSON.parse(goal.deleted_updates) : [];
+
+      // Adjust current amount
+      if (goal.type === "Debt Reduction") {
+        updatedCurrentAmount += amount;  // Add back the amount for debt reduction
+      } else {
+        updatedCurrentAmount -= amount;  // Subtract the amount for other types
+      }
+
+      // Filter out the update being deleted and move it to deleted_updates
+      let removed = false;
+      for (let i = 0; i < localUpdates.length; i++) {
+        const update = localUpdates[i];
+        if (!removed && update.amount === amount && update.date === date && update.description === description) {
+          deletedUpdates.push(update);  // Move to deleted_updates
+          continue;
+        }
+        newUpdates.push(update);  // Keep remaining updates
+      }
+
+      // Update the monthly_updates array
+      let monthlyUpdatesArray = goal.monthly_updates ? JSON.parse(goal.monthly_updates) : [];
+      const updateMonth = new Date(date).toLocaleString("default", { month: "long", year: "numeric" });
+      const monthlyUpdateIndex = monthlyUpdatesArray.findIndex(
+        (entry: { month: string }) => entry.month === updateMonth
+      );
+
+      if (monthlyUpdateIndex >= 0) {
+        monthlyUpdatesArray[monthlyUpdateIndex].amount -= amount;  // Adjust the monthly total
+        if (monthlyUpdatesArray[monthlyUpdateIndex].amount == 0) {
+          monthlyUpdatesArray.splice(monthlyUpdateIndex, 1);  // Remove month if total is 0
+        }
+      }
+
+      // Update goal's fields
+      goal.current_amount = updatedCurrentAmount;
+      goal.updates = JSON.stringify(newUpdates);
+      goal.deleted_updates = JSON.stringify(deletedUpdates);
+      goal.monthly_updates = JSON.stringify(monthlyUpdatesArray);
+
+      // Update local state and Firestore
+      setLocalUpdates(newUpdates);
+      onUpdateGoal(goal);
+      updateDBNonManual();
+    }
+  };
+
+
+  const updateDBNonManual = async () => {
+    try {
+      const goalData: any = {
+        updates: goal.updates,
+        deleted_updates: goal.deleted_updates, // Save deleted updates to Firestore
+        current_amount: goal.current_amount,
+        monthly_updates: goal.monthly_updates,
+      };
+
+      const goalDocRef = doc(db, "goals", goal.id);
+      await updateDoc(goalDocRef, goalData);
+    } catch (error) {
+      console.error("Error saving goal:", error);
+    }
+  };
+
   useEffect(() => {
     if (goal.updates) {
       try {
@@ -148,33 +218,69 @@ const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal:
   }, [goal.updates, goal.current_amount]);
 
   return (
-    <div>
-      <table className="min-w-full table-auto border-collapse border border-gray-200">
-        <thead>
-          <tr style={{ color: 'var(--secondary-text)', backgroundColor: 'var(--primary-1)' }}>
-            <th className="border border-gray-200 p-2 text-left" style={{ width: '1%', backgroundColor: 'var(--block-background)', border: '1px solid var(--block-background)' }}></th> {/* Empty header with fixed width */}
-            <th className="border border-gray-200 p-2 text-left">Amount</th>
-            <th className="border border-gray-200 p-2 text-left">Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {localUpdates.map((update: { amount: number; date: string; }, index: number) => (
-            <tr key={index}>
-              <td className='border border-gray-200 p-2 text-center' style={{ width: '1%', borderLeft: '1px solid var(--block-background)', borderBottom: '1px solid var(--block-background)' }}>
-                <span
-                  style={{ cursor: 'pointer', color: 'red' }}
-                  onClick={() => handleDeleteUpdate(update.amount, update.date)}
-                >
-                  &#x2716;
-                </span>
-              </td>
-              <td className='border border-gray-200 p-2' >R {update.amount.toFixed(2)}</td>
-              <td className='border border-gray-200 p-2'>{update.date}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <>
+      {goal.update_type == 'manual' && (
+        <div>
+          <table className="min-w-full table-auto border-collapse border border-gray-200">
+            <thead>
+              <tr style={{ color: 'var(--secondary-text)', backgroundColor: 'var(--primary-1)' }}>
+                <th className="border border-gray-200 p-2 text-left" style={{ width: '1%', backgroundColor: 'var(--block-background)', border: '1px solid var(--block-background)' }}></th> {/* Empty header with fixed width */}
+                <th className="border border-gray-200 p-2 text-left">Amount</th>
+                <th className="border border-gray-200 p-2 text-left">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {localUpdates.map((update: { amount: number; date: string; }, index: number) => (
+                <tr key={index}>
+                  <td className='border border-gray-200 p-2 text-center' style={{ width: '1%', borderLeft: '1px solid var(--block-background)', borderBottom: '1px solid var(--block-background)' }}>
+                    <span
+                      style={{ cursor: 'pointer', color: 'red' }}
+                      onClick={() => handleDeleteUpdate(update.amount, update.date)}
+                    >
+                      &#x2716;
+                    </span>
+                  </td>
+                  <td className='border border-gray-200 p-2' >R {update.amount.toFixed(2)}</td>
+                  <td className='border border-gray-200 p-2'>{update.date}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      {goal.update_type != 'manual' && (
+        <div>
+          <table className="min-w-full table-auto border-collapse border border-gray-200">
+            <thead>
+              <tr style={{ color: 'var(--secondary-text)', backgroundColor: 'var(--primary-1)' }}>
+                <th className="border border-gray-200 p-2 text-left" style={{ width: '1%', backgroundColor: 'var(--block-background)', border: '1px solid var(--block-background)' }}></th> {/* Empty header with fixed width */}
+                <th className="border border-gray-200 p-2 text-left">Amount</th>
+                <th className="border border-gray-200 p-2 text-left">Date</th>
+                <th className="border border-gray-200 p-2 text-left">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {localUpdates.map((update: Update, index: number) => (
+                <tr key={index}>
+                  <td className="border border-gray-200 p-2 text-center" style={{ width: '1%', borderLeft: '1px solid var(--block-background)', borderBottom: '1px solid var(--block-background)' }}>
+                    <span
+                      style={{ cursor: 'pointer', color: 'red' }}
+                      onClick={() => handleDeleteNonManualUpdate(update.amount, update.date, update.description || '')}
+                    >
+                      &#x2716;
+                    </span>
+                  </td>
+                  <td className="border border-gray-200 p-2">R {update.amount.toFixed(2)}</td>
+                  <td className="border border-gray-200 p-2">{update.date}</td>
+                  <td className="border border-gray-200 p-2">{update.description || 'No description'}</td>
+                </tr>
+              ))}
+            </tbody>
+
+          </table>
+        </div>
+      )}
+    </>
   );
 };
 
@@ -334,56 +440,6 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
     }
   };
 
-
-  const getTransactionsByKeyword = async (accountNumber: string, uid: string, keyword: string) => {
-    let transactionsList: any[] = [];
-
-    try {
-      // Loop through collections (e.g., "transaction_data_2024", "transaction_data_2023")
-      const years = ["transaction_data_2024", "transaction_data_2023"]; // Add more years as needed
-
-      for (let year of years) {
-        // Query the collection for documents that match the given account number and uid
-        const q = query(
-          collection(db, year),
-          where("account_number", "==", accountNumber),
-          where("uid", "==", uid)
-        );
-
-        // Get documents from the query
-        const querySnapshot = await getDocs(q);
-
-        // Loop through each document
-        querySnapshot.forEach((doc) => {
-          const docData = doc.data();
-
-          // List of months to check for transactions (e.g., "january", "february", etc.)
-          const months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
-
-          // Check each month for transactions
-          months.forEach((month) => {
-            if (docData[month]) {
-              // Parse the JSON string of transactions
-              const transactions = JSON.parse(docData[month]);
-
-              // Filter transactions by the keyword in the description
-              const filteredTransactions = transactions.filter((transaction: { description: string; }) =>
-                transaction.description.toLowerCase().includes(keyword.toLowerCase())
-              );
-
-              // Add filtered transactions to the list
-              transactionsList = transactionsList.concat(filteredTransactions);
-            }
-          });
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching transactions: ", error);
-    }
-
-    return transactionsList;
-  };
-
   const getAccountNumbersForGoal = async (): Promise<string[]> => {
     if (user && user.uid) {
       const accountNumbers: string[] = [];
@@ -461,18 +517,18 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
 
   const aggregateMonthlyUpdates = (transactions: any[]): { amount: number; month: string }[] => {
     const monthlySums: { [key: string]: number } = {};
-  
+
     transactions.forEach((transaction) => {
       const date = new Date(transaction.date);
       const monthYear = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
-  
+
       if (!monthlySums[monthYear]) {
         monthlySums[monthYear] = 0;
       }
-  
+
       monthlySums[monthYear] += transaction.amount;
     });
-  
+
     // Convert the monthlySums object to an array in the required format
     return Object.entries(monthlySums).map(([month, amount]) => ({
       amount: parseFloat(amount.toFixed(2)),  // Ensures two decimal points
@@ -480,37 +536,68 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
     }));
   };
 
-  
-  const handleUpdateClick = async () => {
+  const handleDescriptionUpdateClick = async () => {
     try {
       const accountNumbers = await getAccountNumbersForGoal();
       if (accountNumbers.length > 0) {
         const matchingTransactions = await getMatchingTransactions(accountNumbers, goal.description || []);
+
         if (matchingTransactions.length > 0) {
-          // Store the transactions in the goal's `updates` field
-          goal.updates = JSON.stringify(matchingTransactions.map((transaction) => ({
-            amount: transaction.amount,
-            date: transaction.date,
-            description: transaction.description,
-          })));
-  
-          // Update the goal's `monthly_updates` field with aggregated amounts per month
-          const monthlyUpdates = aggregateMonthlyUpdates(matchingTransactions);
-          goal.monthly_updates = JSON.stringify(monthlyUpdates);
-  
-          handleGoalUpdate(goal);  // Updates the state
-          await updateDB();  // Updates Firestore with new goal data
+          const existingUpdates = goal.updates ? JSON.parse(goal.updates) : [];
+          const deletedUpdates = goal.deleted_updates ? JSON.parse(goal.deleted_updates) : [];
+
+          // Filter out transactions that exist in deleted_updates
+          const filteredTransactions = matchingTransactions.filter((newTx) => {
+            return !deletedUpdates.some((deletedTx: any) =>
+              deletedTx.amount === newTx.amount &&
+              deletedTx.date === newTx.date &&
+              deletedTx.description === newTx.description
+            );
+          });
+
+          // Check for new transactions that are not in existingUpdates or deletedUpdates
+          const newTransactions = filteredTransactions.filter((newTx) => {
+            return !existingUpdates.some((existingTx: any) =>
+              existingTx.amount === newTx.amount &&
+              existingTx.date === newTx.date &&
+              existingTx.description === newTx.description
+            );
+          });
+
+          if (newTransactions.length > 0) {
+            // Update current_amount with new transactions
+            for (let i = 0; i < newTransactions.length; i++) {
+              goal.current_amount += newTransactions[i].amount;
+            }
+
+            // Append new transactions to the existing updates
+            goal.updates = JSON.stringify([...existingUpdates, ...newTransactions]);
+
+            // Update the goal's `monthly_updates` field with aggregated amounts per month
+            const monthlyUpdates = aggregateMonthlyUpdates([...existingUpdates, ...newTransactions]);
+            goal.monthly_updates = JSON.stringify(monthlyUpdates);
+
+            // Store the current date and time in `last_update`
+            goal.last_update = new Date().toISOString();
+
+            handleGoalUpdate(goal);  // Updates the state
+            await updateDB();  // Updates Firestore with new goal data
+            alert("Your transactions have been updated.");
+          } else {
+            alert("No new transactions to update.");
+          }
         } else {
-          console.log("No matching transactions found");
+          console.log("No matching transactions found.");
         }
       } else {
-        console.log("No account numbers found for the goal");
+        console.log("No account numbers found for the goal.");
       }
     } catch (error) {
-      console.error("Error in handleUpdateClick:", error);
+      console.error("Error in handleDescriptionUpdateClick:", error);
     }
   };
-  
+
+
   const updateDB = async () => {
     try {
       const goalDocRef = doc(db, "goals", goal.id);
@@ -518,12 +605,36 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
         updates: goal.updates,
         current_amount: goal.current_amount,  // Optionally update the current amount if needed
         monthly_updates: goal.monthly_updates, // Update monthly_updates in Firestore
+        last_update: goal.last_update  // Update last_update in Firestore
       });
     } catch (error) {
       console.error("Error updating goal in Firestore:", error);
     }
   };
-  
+
+  const timeSinceLastUpdate = (lastUpdate: string): string => {
+    const now = new Date();
+    const lastUpdateDate = new Date(lastUpdate);
+
+    const diffInMilliseconds = now.getTime() - lastUpdateDate.getTime();
+
+    // Convert milliseconds into minutes, hours, and days
+    const diffInMinutes = Math.floor(diffInMilliseconds / (1000 * 60));
+    const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
+
+    // Return the appropriate time ago message
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
+    } else if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
+    } else {
+      return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`;
+    }
+  };
+
+
+
 
 
   return (
@@ -563,7 +674,7 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                     )}
                     {(goal.update_type == 'assign-all' || goal.update_type == 'assign-description' || goal.update_type == 'assign-category') && (
                       <>
-                        <div className={styles.updateViewButton} onClick={handleUpdateClick}>
+                        <div className={styles.updateViewButton} onClick={handleDescriptionUpdateClick}>
                           Check for Updates
                         </div>
                       </>
@@ -623,7 +734,15 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                       <div className={styles.goalPair}>
                         <div className={styles.goalLabel}>Days Left:</div>
                         <div className={styles.goalValue}>
-                          {calculateDaysLeft(goal.target_date) > 0 ? `${calculateDaysLeft(goal.target_date)}` : 'Target Date Passed'}
+                          {calculateDaysLeft(goal.target_date) > 0 ? `${calculateDaysLeft(goal.target_date)} days` : 'Target Date Passed'}
+                        </div>
+                      </div>
+                    )}
+                    {goal.last_update !== undefined && (
+                      <div className={styles.goalPair}>
+                        <div className={styles.goalLabel}>Last Update:</div>
+                        <div className={styles.goalValue}>
+                          {timeSinceLastUpdate(goal.last_update)}
                         </div>
                       </div>
                     )}
@@ -721,7 +840,7 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                   </div>
                 </div>
 
-                {currentGoal.update_type == 'manual' && currentGoal.updates && JSON.parse(currentGoal.updates).length > 0 && (
+                {currentGoal.updates && JSON.parse(currentGoal.updates).length > 0 && (
                   <div className="container mx-auto p-4">
                     <div className="flex justify-between items-start gap-8">
                       <div className="flex-1 flex flex-col justify-center text-center bg-[var(--block-background)] rounded-lg shadow-md p-8">
