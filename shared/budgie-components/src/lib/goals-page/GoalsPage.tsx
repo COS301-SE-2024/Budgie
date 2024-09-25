@@ -465,7 +465,7 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
     return [];
   };
 
-  const getMatchingTransactions = async (accountNumbers: string[], keywords: string[]): Promise<any[]> => {
+  const getMatchingTransactionsByDescription = async (accountNumbers: string[], keywords: string[]): Promise<any[]> => {
     if (user && user.uid) {
       let transactionsList: any[] = [];
       const years = ["transaction_data_2024", "transaction_data_2023"];
@@ -512,6 +512,53 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
         console.error("Error fetching transactions: ", error);
       }
   
+      return transactionsList;
+    }
+    return [];
+  };  
+
+  const getMatchingTransactions = async (accountNumbers: string[]): Promise<any[]> => {
+    if (user && user.uid) {
+      let transactionsList: any[] = [];
+      const years = ["transaction_data_2024", "transaction_data_2023"]; // Adjust this as necessary
+  
+      try {
+        // Loop through each year and account number to fetch transactions
+        for (let year of years) {
+          for (let accountNumber of accountNumbers) {
+            // Create the query to fetch data for the specific account number and year
+            const q = query(
+              collection(db, year),
+              where("account_number", "==", accountNumber),
+              where("uid", "==", user.uid)
+            );
+  
+            // Fetch the documents matching the query
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+              const docData = doc.data();
+              const months = [
+                "january", "february", "march", "april", "may", "june",
+                "july", "august", "september", "october", "november", "december"
+              ];
+  
+              // Loop through each month and extract the transactions
+              months.forEach((month) => {
+                if (docData[month]) {
+                  const transactions = JSON.parse(docData[month]);
+  
+                  // Add the transactions to the overall list
+                  transactionsList = transactionsList.concat(transactions);
+                }
+              });
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching transactions: ", error);
+      }
+  
+      // Return the full list of transactions for all account numbers
       return transactionsList;
     }
     return [];
@@ -579,8 +626,6 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
     return [];
   };
 
-
-
   const aggregateMonthlyUpdates = (transactions: any[]): { amount: number; month: string }[] => {
     const monthlySums: { [key: string]: number } = {};
 
@@ -606,7 +651,7 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
     try {
       const accountNumbers = await getAccountNumbersForGoal();
       if (accountNumbers.length > 0) {
-        const matchingTransactions = await getMatchingTransactions(accountNumbers, goal.description || []);
+        const matchingTransactions = await getMatchingTransactionsByDescription(accountNumbers, goal.description || []);
 
         if (matchingTransactions.length > 0) {
           const existingUpdates = goal.updates ? JSON.parse(goal.updates) : [];
@@ -735,6 +780,70 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
     }
   };
 
+  const handleAllUpdateClick = async () => {
+    try {
+      const accountNumbers = await getAccountNumbersForGoal();
+      if (accountNumbers.length > 0) {
+        // Fetch all transactions for the given account numbers, regardless of category
+        const allTransactions = await getMatchingTransactions(accountNumbers); // Pass an empty array for keywords to fetch all
+  
+        if (allTransactions.length > 0) {
+          const existingUpdates = goal.updates ? JSON.parse(goal.updates) : [];
+          const deletedUpdates = goal.deleted_updates ? JSON.parse(goal.deleted_updates) : [];
+  
+          // Filter out transactions that exist in deleted_updates
+          const filteredTransactions = allTransactions.filter((newTx) => {
+            return !deletedUpdates.some((deletedTx: any) =>
+              deletedTx.amount === newTx.amount &&
+              deletedTx.date === newTx.date &&
+              deletedTx.description === newTx.description &&
+              deletedTx.category === newTx.category
+            );
+          });
+  
+          // Check for new transactions that are not in existingUpdates or deletedUpdates
+          const newTransactions = filteredTransactions.filter((newTx) => {
+            return !existingUpdates.some((existingTx: any) =>
+              existingTx.amount === newTx.amount &&
+              existingTx.date === newTx.date &&
+              existingTx.description === newTx.description &&
+              existingTx.category === newTx.category
+            );
+          });
+  
+          if (newTransactions.length > 0) {
+            // Update current_amount with new transactions
+            for (let i = 0; i < newTransactions.length; i++) {
+              goal.current_amount += newTransactions[i].amount;
+            }
+  
+            // Append new transactions to the existing updates
+            goal.updates = JSON.stringify([...existingUpdates, ...newTransactions]);
+  
+            // Update the goal's `monthly_updates` field with aggregated amounts per month
+            const monthlyUpdates = aggregateMonthlyUpdates([...existingUpdates, ...newTransactions]);
+            goal.monthly_updates = JSON.stringify(monthlyUpdates);
+  
+            // Store the current date and time in `last_update`
+            goal.last_update = new Date().toISOString();
+  
+            handleGoalUpdate(goal);  // Updates the state
+            await updateDB();  // Updates Firestore with new goal data
+            alert("All account-based transactions have been updated.");
+          } else {
+            alert("No new transactions to update.");
+          }
+        } else {
+          console.log("No matching transactions found for the accounts.");
+        }
+      } else {
+        console.log("No account numbers found for the goal.");
+      }
+    } catch (error) {
+      console.error("Error in handleAllUpdateClick:", error);
+    }
+  };
+  
 
   const updateDB = async () => {
     try {
@@ -818,6 +927,13 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                     {(goal.update_type == 'assign-category') && (
                       <>
                         <div className={styles.updateViewButton} onClick={handleCategoryUpdateClick}>
+                          Check for Updates
+                        </div>
+                      </>
+                    )}
+                    {(goal.update_type == 'assign-all') && (
+                      <>
+                        <div className={styles.updateViewButton} onClick={handleAllUpdateClick}>
                           Check for Updates
                         </div>
                       </>

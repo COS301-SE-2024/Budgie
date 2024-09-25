@@ -61,7 +61,7 @@ export function PlanningPageRevised(props: PlanningPageRevisedProps) {
 
   return (
     <div className="mainPage h-full flex flex-col">
-      <div className="flex shadow-lg z-10 justify-center rounded-2xl bg-[var(--block-background)] h-[calc(6vh*var(--font-size-multiplier))]">
+      <div className="flex shadow-lg z-2 justify-center rounded-2xl bg-[var(--block-background)] h-[calc(6vh*var(--font-size-multiplier))]">
         <button
           className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-BudgieBlue2 hover:text-BudgieWhite font-medium mr-16 cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
             viewMode === 'goals' ? 'border-b-4 border-BudgieBlue2' : ''
