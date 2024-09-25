@@ -18,5 +18,5 @@ export default function overview() {
     }
   }, [user]);
 
-  return <>{!loading && <AccountsPage></AccountsPage>}</>;
+  return !loading && <AccountsPage></AccountsPage>;
 }

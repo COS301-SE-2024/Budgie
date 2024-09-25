@@ -446,7 +446,7 @@ export function AccountsPage(props: AccountsPageProps) {
       )}
       {!showNoAccounts && (
         <div className="mainPage">
-          <div className="w-full h-full flex flex-col items-center justify-center gap-0">
+          <div className="w-full h-full flex flex-col items-center justify-center">
             <div className="md:w-[85%] w-[100%] h-full min-w-60">
               <div
                 className="w-full h-[10%] mt-8 min-h-20 flex items-center md:justify-between justify-center shadow-md bg-BudgieWhite rounded-[2rem]"
@@ -455,7 +455,7 @@ export function AccountsPage(props: AccountsPageProps) {
                 <InfoSection xAxis={graphX} yAxis={graphY}></InfoSection>
               </div>
               <div
-                className="w-full h-[40%] min-h-80 mt-[1rem] fl shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center"
+                className="w-full h-[40%] min-h-80 mt-[1rem] shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center"
                 style={{ backgroundColor: 'var(--block-background)' }}
               >
                 {graphX.length != 0 && graphY.length != 0 && (
