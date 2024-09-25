@@ -1050,9 +1050,17 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
         <div className="w-full h-full flex flex-col items-center justify-center">
           <div className="md:w-[85%] w-[100%] h-full min-w-60">
             <div
-              className="w-full h-[10%] mt-8 min-h-20 flex items-center justify-center shadow-md bg-BudgieWhite rounded-[2rem]"
+              className="w-full h-[10%] mt-8 min-h-20 flex items-center justify-center shadow-md bg-BudgieWhite rounded-[2rem] relative"
               style={{ backgroundColor: 'var(--block-background)' }}
             >
+              <span
+                onClick={() => router.back()}
+                aria-label="back"
+                className="cursor-pointer material-symbols-outlined absolute left-4 transition-all bg-gray-200 p-1.5 hover:bg-gray-300 rounded-lg text-BudgieBlue2"
+                style={{ fontSize: '1.5rem' }}
+              >
+                arrow_back
+              </span>
               <span className="font-TripSans font-bold lg:text-3xl">
                 {account.alias}
               </span>
