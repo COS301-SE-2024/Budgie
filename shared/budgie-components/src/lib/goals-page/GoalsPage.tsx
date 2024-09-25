@@ -1186,7 +1186,7 @@ export function GoalsPage() {
             style={{
               width: '85vw',
               backgroundColor: 'var(--main-background)',
-              marginBottom: 'calc((4rem * var(--font-size-multiplier)))',
+              marginBottom: 'calc((6rem * var(--font-size-multiplier)))',
             }}
           ></div>
           <div className={styles.planningModalContainer}>
