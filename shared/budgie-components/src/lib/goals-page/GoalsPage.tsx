@@ -44,11 +44,15 @@ interface Goal {
   deleted_updates?: string;
   monthly_updates?: string;
   update_type: string;
-  accounts: ([]);
-  description?: string[];
   last_update?: string;
-  category?: string;
+  conditions?: string;
 }
+
+type Condition = {
+  accounts: string[];
+  keywords: string[];
+  category: string;
+};
 
 const monthNames = [
   'January',
@@ -403,462 +407,6 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
     return [];
   };
 
-
-  const getBudgetUpdates = () => {
-    if (goal.monthly_updates) {
-      const updatesData: GoalMonthlyUpdate[] = JSON.parse(goal.monthly_updates);
-
-      const parseMonth = (monthStr: string): Date => {
-        return new Date(`1 ${monthStr}`);
-      };
-
-      const spendingLimit = goal.spending_limit || Infinity;
-
-      const formattedData = updatesData
-        .map((update) => {
-          const amount = update.amount;
-          const excess = amount > spendingLimit ? amount - spendingLimit : 0;
-          const amountWithinLimit =
-            amount > spendingLimit ? spendingLimit : amount;
-
-          return {
-            month: update.month,
-            amount: amountWithinLimit,
-            excess,
-            date: parseMonth(update.month),
-          };
-        })
-        .sort((a, b) => a.date.getTime() - b.date.getTime())
-        .map(({ date, excess, ...rest }) => ({
-          ...rest,
-          excess,
-        }));
-
-      return formattedData;
-    }
-  };
-
-  const getAccountNumbersForGoal = async (): Promise<string[]> => {
-    if (user && user.uid) {
-      const accountNumbers: string[] = [];
-      const goalAccounts = goal.accounts;  // Goal's account aliases
-
-      if (!goalAccounts || goalAccounts.length === 0) return accountNumbers;
-
-      try {
-        const accountsCollectionRef = collection(db, "accounts");
-        const q = query(accountsCollectionRef, where("uid", "==", user.uid), where("alias", "in", goalAccounts));
-        const querySnapshot = await getDocs(q);
-
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.account_number) {
-            accountNumbers.push(data.account_number);
-          }
-        });
-      } catch (error) {
-        console.error("Error getting account numbers for goal:", error);
-      }
-
-      return accountNumbers;
-    }
-    return [];
-  };
-
-  const getMatchingTransactionsByDescription = async (accountNumbers: string[], keywords: string[]): Promise<any[]> => {
-    if (user && user.uid) {
-      let transactionsList: any[] = [];
-      const years = ["transaction_data_2024", "transaction_data_2023"];
-  
-      try {
-        for (let year of years) {
-          for (let accountNumber of accountNumbers) {
-            const q = query(
-              collection(db, year),
-              where("account_number", "==", accountNumber),
-              where("uid", "==", user.uid)
-            );
-  
-            const querySnapshot = await getDocs(q);
-            querySnapshot.forEach((doc) => {
-              const docData = doc.data();
-              const months = [
-                "january", "february", "march", "april", "may", "june",
-                "july", "august", "september", "october", "november", "december"
-              ];
-  
-              months.forEach((month) => {
-                if (docData[month]) {
-                  const transactions = JSON.parse(docData[month]);
-  
-                  const filteredTransactions = transactions
-                    .filter((transaction: { description: string }) =>
-                      keywords.some((keyword) =>
-                        transaction.description.toLowerCase().includes(keyword.toLowerCase())
-                      )
-                    )
-                    .map((transaction: { amount: number }) => ({
-                      ...transaction,
-                      amount: -(transaction.amount), 
-                    }));
-  
-                  transactionsList = transactionsList.concat(filteredTransactions);
-                }
-              });
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching transactions: ", error);
-      }
-  
-      return transactionsList;
-    }
-    return [];
-  };  
-
-  const getMatchingTransactions = async (accountNumbers: string[]): Promise<any[]> => {
-    if (user && user.uid) {
-      let transactionsList: any[] = [];
-      const years = ["transaction_data_2024", "transaction_data_2023"]; // Adjust this as necessary
-  
-      try {
-        // Loop through each year and account number to fetch transactions
-        for (let year of years) {
-          for (let accountNumber of accountNumbers) {
-            // Create the query to fetch data for the specific account number and year
-            const q = query(
-              collection(db, year),
-              where("account_number", "==", accountNumber),
-              where("uid", "==", user.uid)
-            );
-  
-            // Fetch the documents matching the query
-            const querySnapshot = await getDocs(q);
-            querySnapshot.forEach((doc) => {
-              const docData = doc.data();
-              const months = [
-                "january", "february", "march", "april", "may", "june",
-                "july", "august", "september", "october", "november", "december"
-              ];
-  
-              // Loop through each month and extract the transactions
-              months.forEach((month) => {
-                if (docData[month]) {
-                  const transactions = JSON.parse(docData[month]);
-  
-                  // Add the transactions to the overall list
-                  transactionsList = transactionsList.concat(transactions);
-                }
-              });
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching transactions: ", error);
-      }
-  
-      // Return the full list of transactions for all account numbers
-      return transactionsList;
-    }
-    return [];
-  };
-  
-
-  const getMatchingTransactionsByCategory = async (accountNumbers: string[], categories: string[]): Promise<any[]> => {
-    if (user && user.uid) {
-      let transactionsList: any[] = [];
-      const years = ["transaction_data_2024", "transaction_data_2023"]; // Add more years as needed
-
-      try {
-        for (let year of years) {
-          for (let accountNumber of accountNumbers) {
-            // Query the collection for documents that match the given account number and uid
-            const q = query(
-              collection(db, year),
-              where("account_number", "==", accountNumber),
-              where("uid", "==", user.uid)
-            );
-
-            // Get documents from the query
-            const querySnapshot = await getDocs(q);
-
-            // Loop through each document
-            querySnapshot.forEach((doc) => {
-              const docData = doc.data();
-
-              // List of months to check for transactions (e.g., "january", "february", etc.)
-              const months = [
-                "january", "february", "march", "april", "may", "june",
-                "july", "august", "september", "october", "november", "december"
-              ];
-
-              // Check each month for transactions
-              months.forEach((month) => {
-                if (docData[month]) {
-                  // Parse the JSON string of transactions
-                  const transactions = JSON.parse(docData[month]);
-
-                  // Filter transactions by the category
-                  const filteredTransactions = transactions.map((transaction: { category: string; amount: number }) => {
-                    // Ensure the amount is stored as a positive number
-                    return {
-                      ...transaction,
-                      amount: -(transaction.amount),
-                    };
-                  }).filter((transaction: { category: string; }) =>
-                    categories.includes(transaction.category)
-                  );
-
-                  // Add filtered transactions to the list
-                  transactionsList = transactionsList.concat(filteredTransactions);
-                }
-              });
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching transactions by category: ", error);
-      }
-
-      return transactionsList;
-    }
-    return [];
-  };
-
-  const aggregateMonthlyUpdates = (transactions: any[]): { amount: number; month: string }[] => {
-    const monthlySums: { [key: string]: number } = {};
-
-    transactions.forEach((transaction) => {
-      const date = new Date(transaction.date);
-      const monthYear = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
-
-      if (!monthlySums[monthYear]) {
-        monthlySums[monthYear] = 0;
-      }
-
-      monthlySums[monthYear] += transaction.amount;
-    });
-
-    // Convert the monthlySums object to an array in the required format
-    return Object.entries(monthlySums).map(([month, amount]) => ({
-      amount: parseFloat(amount.toFixed(2)),  // Ensures two decimal points
-      month,
-    }));
-  };
-
-  const handleDescriptionUpdateClick = async () => {
-    try {
-      const accountNumbers = await getAccountNumbersForGoal();
-      if (accountNumbers.length > 0) {
-        const matchingTransactions = await getMatchingTransactionsByDescription(accountNumbers, goal.description || []);
-
-        if (matchingTransactions.length > 0) {
-          const existingUpdates = goal.updates ? JSON.parse(goal.updates) : [];
-          const deletedUpdates = goal.deleted_updates ? JSON.parse(goal.deleted_updates) : [];
-
-          // Filter out transactions that exist in deleted_updates
-          const filteredTransactions = matchingTransactions.filter((newTx) => {
-            return !deletedUpdates.some((deletedTx: any) =>
-              deletedTx.amount === newTx.amount &&
-              deletedTx.date === newTx.date &&
-              deletedTx.description === newTx.description
-            );
-          });
-
-          // Check for new transactions that are not in existingUpdates or deletedUpdates
-          const newTransactions = filteredTransactions.filter((newTx) => {
-            return !existingUpdates.some((existingTx: any) =>
-              existingTx.amount === newTx.amount &&
-              existingTx.date === newTx.date &&
-              existingTx.description === newTx.description
-            );
-          });
-
-          if (newTransactions.length > 0) {
-            // Update current_amount with new transactions
-            for (let i = 0; i < newTransactions.length; i++) {
-              if (goal.type != 'Debt Reduction'){
-              goal.current_amount += newTransactions[i].amount;
-              }
-              else {
-                goal.current_amount -= newTransactions[i].amount;
-              }
-            }
-
-            // Append new transactions to the existing updates
-            goal.updates = JSON.stringify([...existingUpdates, ...newTransactions]);
-
-            // Update the goal's `monthly_updates` field with aggregated amounts per month
-            const monthlyUpdates = aggregateMonthlyUpdates([...existingUpdates, ...newTransactions]);
-            goal.monthly_updates = JSON.stringify(monthlyUpdates);
-
-            // Store the current date and time in `last_update`
-            goal.last_update = new Date().toISOString();
-
-            handleGoalUpdate(goal);  // Updates the state
-            await updateDB();  // Updates Firestore with new goal data
-            alert("Your transactions have been updated.");
-          } else {
-            alert("No new transactions to update.");
-          }
-        } else {
-          console.log("No matching transactions found.");
-        }
-      } else {
-        console.log("No account numbers found for the goal.");
-      }
-    } catch (error) {
-      console.error("Error in handleDescriptionUpdateClick:", error);
-    }
-  };
-
-  const handleCategoryUpdateClick = async () => {
-    try {
-      const accountNumbers = await getAccountNumbersForGoal();
-      if (accountNumbers.length > 0 && goal.category) {
-        const matchingTransactions = await getMatchingTransactionsByCategory(
-          accountNumbers,
-          [goal.category]  // Pass the category as an array
-        );
-
-        if (matchingTransactions.length > 0) {
-          const existingUpdates = goal.updates ? JSON.parse(goal.updates) : [];
-          const deletedUpdates = goal.deleted_updates ? JSON.parse(goal.deleted_updates) : [];
-
-          // Filter out transactions that exist in deleted_updates
-          const filteredTransactions = matchingTransactions.filter((newTx) => {
-            return !deletedUpdates.some((deletedTx: any) =>
-              deletedTx.amount === newTx.amount &&
-              deletedTx.date === newTx.date &&
-              deletedTx.description === newTx.description &&
-              deletedTx.category === newTx.category
-            );
-          });
-
-          // Check for new transactions that match the category and are not in existingUpdates or deletedUpdates
-          const newTransactions = filteredTransactions.filter((newTx) => {
-            return newTx.category === goal.category && // Ensure it matches the goal's category
-              !existingUpdates.some((existingTx: any) =>
-                existingTx.amount === newTx.amount &&
-                existingTx.date === newTx.date &&
-                existingTx.description === newTx.description &&
-                existingTx.category === newTx.category
-              );
-          });
-
-          if (newTransactions.length > 0) {
-            // Update current_amount with new transactions
-            for (let i = 0; i < newTransactions.length; i++) {
-              goal.current_amount += newTransactions[i].amount;
-            }
-
-            // Append new transactions to the existing updates
-            goal.updates = JSON.stringify([...existingUpdates, ...newTransactions]);
-
-            // Update the goal's `monthly_updates` field with aggregated amounts per month
-            const monthlyUpdates = aggregateMonthlyUpdates([...existingUpdates, ...newTransactions]);
-            goal.monthly_updates = JSON.stringify(monthlyUpdates);
-
-            // Store the current date and time in `last_update`
-            goal.last_update = new Date().toISOString();
-
-            handleGoalUpdate(goal);  // Updates the state
-            await updateDB();  // Updates Firestore with new goal data
-            alert("Your category-based transactions have been updated.");
-          } else {
-            alert("No new transactions to update.");
-          }
-        } else {
-          console.log("No matching transactions found for the category.");
-        }
-      } else {
-        console.log("No account numbers found for the goal or no category specified.");
-      }
-    } catch (error) {
-      console.error("Error in handleCategoryUpdateClick:", error);
-    }
-  };
-
-  const handleAllUpdateClick = async () => {
-    try {
-      const accountNumbers = await getAccountNumbersForGoal();
-      if (accountNumbers.length > 0) {
-        // Fetch all transactions for the given account numbers, regardless of category
-        const allTransactions = await getMatchingTransactions(accountNumbers); // Pass an empty array for keywords to fetch all
-  
-        if (allTransactions.length > 0) {
-          const existingUpdates = goal.updates ? JSON.parse(goal.updates) : [];
-          const deletedUpdates = goal.deleted_updates ? JSON.parse(goal.deleted_updates) : [];
-  
-          // Filter out transactions that exist in deleted_updates
-          const filteredTransactions = allTransactions.filter((newTx) => {
-            return !deletedUpdates.some((deletedTx: any) =>
-              deletedTx.amount === newTx.amount &&
-              deletedTx.date === newTx.date &&
-              deletedTx.description === newTx.description &&
-              deletedTx.category === newTx.category
-            );
-          });
-  
-          // Check for new transactions that are not in existingUpdates or deletedUpdates
-          const newTransactions = filteredTransactions.filter((newTx) => {
-            return !existingUpdates.some((existingTx: any) =>
-              existingTx.amount === newTx.amount &&
-              existingTx.date === newTx.date &&
-              existingTx.description === newTx.description &&
-              existingTx.category === newTx.category
-            );
-          });
-  
-          if (newTransactions.length > 0) {
-            // Update current_amount with new transactions
-            for (let i = 0; i < newTransactions.length; i++) {
-              goal.current_amount += newTransactions[i].amount;
-            }
-  
-            // Append new transactions to the existing updates
-            goal.updates = JSON.stringify([...existingUpdates, ...newTransactions]);
-  
-            // Update the goal's `monthly_updates` field with aggregated amounts per month
-            const monthlyUpdates = aggregateMonthlyUpdates([...existingUpdates, ...newTransactions]);
-            goal.monthly_updates = JSON.stringify(monthlyUpdates);
-  
-            // Store the current date and time in `last_update`
-            goal.last_update = new Date().toISOString();
-  
-            handleGoalUpdate(goal);  // Updates the state
-            await updateDB();  // Updates Firestore with new goal data
-            alert("All account-based transactions have been updated.");
-          } else {
-            alert("No new transactions to update.");
-          }
-        } else {
-          console.log("No matching transactions found for the accounts.");
-        }
-      } else {
-        console.log("No account numbers found for the goal.");
-      }
-    } catch (error) {
-      console.error("Error in handleAllUpdateClick:", error);
-    }
-  };
-  
-
-  const updateDB = async () => {
-    try {
-      const goalDocRef = doc(db, "goals", goal.id);
-      await updateDoc(goalDocRef, {
-        updates: goal.updates,
-        current_amount: goal.current_amount,  // Optionally update the current amount if needed
-        monthly_updates: goal.monthly_updates, // Update monthly_updates in Firestore
-        last_update: goal.last_update  // Update last_update in Firestore
-      });
-    } catch (error) {
-      console.error("Error updating goal in Firestore:", error);
-    }
-  };
-
   const timeSinceLastUpdate = (lastUpdate: string): string => {
     const now = new Date();
     const lastUpdateDate = new Date(lastUpdate);
@@ -880,13 +428,10 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
     }
   };
 
-
-
   return (
     <div className={styles.mainPage} style={{ position: 'fixed', right: 0, top: 0, height: '100%', zIndex: "11", paddingTop: '2rem' }}>
       <div className={styles.goalPage}>
         <div className="flex flex-col gap-8">
-          {/* Fixed top section */}
           <div className="flex shadow-lg z-10 justify-center fixed top-0 right-0 z-10  bg-[var(--block-background)] p-2" style={{ width: '85vw' }}>
             <div className="container mx-auto">
               <div className="flex-1 flex flex-col justify-center text-center p-3">
@@ -909,32 +454,10 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                     {editPopupOpen && (
                       <EditGoalPopup togglePopup={handleEditGoalPopup} goal={goal} toggleMainPopup={onClose} />
                     )}
-                    {goal.update_type == 'manual' && (
+                    {(goal.update_type == 'automatic') && (
                       <>
                         <div className={styles.updateViewButton} onClick={handleUpdateGoalPopup}>
-                          Update Progress
-                        </div>
-                        {updatePopupOpen && <UpdateGoalPopup togglePopup={handleUpdateGoalPopup} goal={goal} />}
-                      </>
-                    )}
-                    {(goal.update_type == 'assign-description') && (
-                      <>
-                        <div className={styles.updateViewButton} onClick={handleDescriptionUpdateClick}>
-                          Check for Updates
-                        </div>
-                      </>
-                    )}
-                    {(goal.update_type == 'assign-category') && (
-                      <>
-                        <div className={styles.updateViewButton} onClick={handleCategoryUpdateClick}>
-                          Check for Updates
-                        </div>
-                      </>
-                    )}
-                    {(goal.update_type == 'assign-all') && (
-                      <>
-                        <div className={styles.updateViewButton} onClick={handleAllUpdateClick}>
-                          Check for Updates
+                          Add an Update
                         </div>
                       </>
                     )}
@@ -958,11 +481,8 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                     <div className={styles.goalPair}>
                       <div className={styles.goalLabel}>Update Type:</div>
                       <div className={styles.goalValue}>
-                        {goal.update_type == 'assign-all' && 'Assigned Account/s'}
-                        {goal.update_type == 'assign-description' && 'By Transaction Descriptions'}
-                        {goal.update_type == 'assign-transactions' && 'Manual Transaction Assignment'}
-                        {goal.update_type == 'assign-category' && 'By Transaction Category'}
-                        {goal.update_type == 'manual' && 'Manual Updates'}
+                        {goal.update_type == 'automatic' && 'Automatic'}
+                        {goal.update_type == 'manual' && 'Manual Only'}
                       </div>
                     </div>
                     {goal.target_date && (
@@ -1233,15 +753,28 @@ export function GoalsPage() {
             ...data,
           };
         });
+  
         if (goalsList.length > 0) {
           setHasGoals(true);
         }
-        setGoals(sortGoals(goalsList, sortOption));
+        
+        // Sort the goals
+        const sortedGoals = sortGoals(goalsList, sortOption);
+        setGoals(sortedGoals);
+  
+        // Automatically update goals with update_type === "automatic"
+        const automaticGoals = sortedGoals.filter((goal) => goal.update_type === "automatic");
+        automaticGoals.forEach(async (goal) => {
+          await updateTransactionsForGoal(goal);
+          handleGoalUpdate(goal); // Update the goal in state after the transactions are updated
+        });
+  
       } catch (error) {
         console.error('Error getting goals document:', error);
       }
     }
   };
+  
 
   const addGoalPopup = () => {
     setIsGoalPopupOpen(!isGoalPopupOpen);
@@ -1273,6 +806,205 @@ export function GoalsPage() {
   const handleNameClick = (goal: Goal) => {
     setSelectedGoal(goal);
   };
+
+  const getAccountNumbersForCondition = async (aliases: string[]): Promise<string[]> => {
+    const accountNumbers: string[] = [];
+  
+    if (user && user.uid && aliases.length > 0) {
+      try {
+        const accountsCollectionRef = collection(db, "accounts");
+        const batchSize = 10;
+        for (let i = 0; i < aliases.length; i += batchSize) {
+          const batch = aliases.slice(i, i + batchSize);
+          const q = query(
+            accountsCollectionRef,
+            where("uid", "==", user.uid),
+            where("alias", "in", batch)  // Query for batches of aliases
+          );
+          const querySnapshot = await getDocs(q);
+  
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.account_number) {
+              accountNumbers.push(data.account_number);
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error getting account numbers for condition:", error);
+      }
+    }
+    return accountNumbers;
+  };
+  
+  const getTransactionsForAccounts = async (accountNumbers: string[]): Promise<any[]> => {
+    if (user && user.uid) {
+      let transactionsList: any[] = [];
+      const years = ["transaction_data_2024", "transaction_data_2023"];  // Adjust year ranges as needed.
+  
+      try {
+        for (let year of years) {
+          for (let accountNumber of accountNumbers) {
+            const q = query(
+              collection(db, year),
+              where("account_number", "==", accountNumber),
+              where("uid", "==", user.uid)
+            );
+            const querySnapshot = await getDocs(q);
+  
+            querySnapshot.forEach((doc) => {
+              const docData = doc.data();
+              const months = [
+                "january", "february", "march", "april", "may", "june",
+                "july", "august", "september", "october", "november", "december"
+              ];
+  
+              months.forEach((month) => {
+                if (docData[month]) {
+                  const transactions = JSON.parse(docData[month]);
+  
+                  // Add transactions to the overall list
+                  transactionsList = transactionsList.concat(transactions.map((transaction: { amount: number }) => ({
+                    ...transaction,
+                    amount: -(transaction.amount)  // Ensure negative amounts for spending transactions
+                  })));
+                }
+              });
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+  
+      return transactionsList;
+    }
+    return [];
+  };
+  
+  const filterTransactionsByCategory = (transactions: any[], category: string): any[] => {
+    if (!category || category === "Any") {
+      return transactions;  // No filtering if category is "Any" or not provided
+    }
+  
+    return transactions.filter((transaction: { category: string }) => transaction.category === category);
+  };
+  
+  const filterTransactionsByKeywords = (transactions: any[], keywords: string[]): any[] => {
+    const matchingTransactions: any[] = [];
+    const remainingTransactions = [...transactions];  // Copy the transaction list to modify
+  
+    keywords.forEach((keyword) => {
+      for (let i = remainingTransactions.length - 1; i >= 0; i--) {
+        const transaction = remainingTransactions[i];
+        if (transaction.description.toLowerCase().includes(keyword.toLowerCase())) {
+          matchingTransactions.push(transaction);
+          remainingTransactions.splice(i, 1);  // Remove the transaction to avoid duplicate matches
+        }
+      }
+    });
+  
+    // If no keywords are provided, return all remaining transactions
+    if (keywords.length === 0) {
+      return remainingTransactions;
+    }
+  
+    return matchingTransactions;
+  };
+  
+  const updateTransactionsForGoal = async (goal: Goal) => {
+    try {
+      const conditions = goal.conditions ? JSON.parse(goal.conditions) : [];
+      let allMatchingTransactions: any[] = [];
+  
+      for (let condition of conditions) {
+        const { accounts, category, keywords } = condition;
+  
+        const conditionAccountNumbers = await getAccountNumbersForCondition(accounts);
+        let transactionsForCondition = await getTransactionsForAccounts(conditionAccountNumbers);
+        transactionsForCondition = filterTransactionsByCategory(transactionsForCondition, category);
+        const keywordFilteredTransactions = filterTransactionsByKeywords(transactionsForCondition, keywords || []);
+        allMatchingTransactions = allMatchingTransactions.concat(keywordFilteredTransactions);
+      }
+  
+      if (allMatchingTransactions.length > 0) {
+        const existingUpdates = goal.updates ? JSON.parse(goal.updates) : [];
+        const deletedUpdates = goal.deleted_updates ? JSON.parse(goal.deleted_updates) : [];
+        const filteredTransactions = allMatchingTransactions.filter((newTx) => {
+          return !deletedUpdates.some((deletedTx: any) =>
+            deletedTx.amount === newTx.amount &&
+            deletedTx.date === newTx.date &&
+            deletedTx.description === newTx.description &&
+            deletedTx.category === newTx.category
+          );
+        });
+        const newTransactions = filteredTransactions.filter((newTx) => {
+          return !existingUpdates.some((existingTx: any) =>
+            existingTx.amount === newTx.amount &&
+            existingTx.date === newTx.date &&
+            existingTx.description === newTx.description &&
+            existingTx.category === newTx.category
+          );
+        });
+  
+        if (newTransactions.length > 0) {
+          for (let i = 0; i < newTransactions.length; i++) {
+            if (goal.type !== 'Debt Reduction') {
+              goal.current_amount += newTransactions[i].amount;
+            } else {
+              goal.current_amount -= newTransactions[i].amount;
+            }
+          }
+          goal.updates = JSON.stringify([...existingUpdates, ...newTransactions]);
+          const monthlyUpdates = aggregateMonthlyUpdates([...existingUpdates, ...newTransactions]);
+          goal.monthly_updates = JSON.stringify(monthlyUpdates);
+          goal.last_update = new Date().toISOString();
+  
+          // Update Firestore
+          await updateGoalInDB(goal); // Firestore update logic goes here
+        }
+      }
+    } catch (error) {
+      console.error("Error updating transactions for goal:", error);
+    }
+  };
+  
+  const aggregateMonthlyUpdates = (transactions: any[]): { amount: number; month: string }[] => {
+    const monthlySums: { [key: string]: number } = {};
+  
+    transactions.forEach((transaction) => {
+      const date = new Date(transaction.date);
+      const monthYear = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+  
+      if (!monthlySums[monthYear]) {
+        monthlySums[monthYear] = 0;
+      }
+  
+      monthlySums[monthYear] += transaction.amount;
+    });
+  
+    // Convert the monthlySums object to an array in the required format
+    return Object.entries(monthlySums).map(([month, amount]) => ({
+      amount: parseFloat(amount.toFixed(2)),  // Ensures two decimal points
+      month,
+    }));
+  };  
+
+// Function to update goal in Firestore
+const updateGoalInDB = async (goal: Goal) => {
+  try {
+    const goalDocRef = doc(db, "goals", goal.id);
+    await updateDoc(goalDocRef, {
+      updates: goal.updates,
+      current_amount: goal.current_amount,
+      monthly_updates: goal.monthly_updates,
+      last_update: goal.last_update
+    });
+  } catch (error) {
+    console.error("Error updating goal in Firestore:", error);
+  }
+};
+
 
   return (
     <>

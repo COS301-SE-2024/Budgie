@@ -73,8 +73,11 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
   const addCondition = () => {
 
-    if(selectedAccounts.length == 0 && keywords.length == 0 && selectedCategory == "Any") {
+    if (selectedAccounts.length == 0 && keywords.length == 0 && selectedCategory == "Any") {
       alert("Please set at least one condition.")
+    }
+    else if (selectedAccounts.length == 0) {
+      alert("Please select at least one account.")
     }
     else {
       const newCondition: Condition = {
@@ -89,7 +92,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       setKeywords([]);
       setSelectedCategory('Any');
       handleBack();
-    }    
+    }
   };
 
   const removeCondition = (index: number) => {
@@ -99,7 +102,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
   const addKeyword = () => {
     if (description && !keywords.includes(description)) {
       setKeywords([...keywords, description]);
-      setDescription(''); 
+      setDescription('');
     }
   };
 
@@ -177,7 +180,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
         return;
       }
     }
-
 
     if (step < 5) setStep(step + 1);
   };
@@ -265,7 +267,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
     const goalData: any = {
       type: goalType,
       name: goalName,
-      accounts: selectedAccounts,
       uid: user?.uid,
       update_type: updateMethod,
     };
@@ -290,7 +291,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
         }
       } else if (goalType === 'Spending Limit') {
         goalData.spending_limit = spendingLimit;
-        goalData.category = selectedCategory;
       }
       try {
         await addDoc(collection(db, 'goals'), goalData);
@@ -304,7 +304,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
   return (
     <div className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center z-50000 w-[85vw] text-sm md:text-lg lg:text-xl">
-
       {/*1: Select Goal Type */}
       {step === 1 && (
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
@@ -617,7 +616,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
         </div>
       )}
 
-      {/*4: Associated Account Selection */}
+      {/*4: Set Conditions */}
       {step === 4 && updateMethod == 'automatic' && (
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
           <p className={styles.goalHeading}>Set Automatic Update Conditions</p>
@@ -633,10 +632,10 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 {conditions.map((condition, index) => (
                   <div key={index} className="flex justify-between bg-gray-100 px-3 py-1 mb-2 rounded">
                     <div style={{ textAlign: 'left' }}>
-                      <p style={{color:'var(--primary-1)', fontWeight:'bold'}}>Condition {index + 1}</p>
-                      {condition.accounts.length>0 && (<p>Accounts: {condition.accounts.join(', ')}</p>)}
-                      {condition.keywords.length>0 && (<p>Keywords: {condition.keywords.join(', ')}</p>)}
-                      {condition.category && condition.category != "Any" && (<p>Category: {condition.category}</p>)}                      
+                      <p style={{ color: 'var(--primary-1)', fontWeight: 'bold' }}>Condition {index + 1}</p>
+                      {condition.accounts.length > 0 && (<p>Accounts: {condition.accounts.join(', ')}</p>)}
+                      {condition.keywords.length > 0 && (<p>Keywords: {condition.keywords.join(', ')}</p>)}
+                      {condition.category && condition.category != "Any" && (<p>Category: {condition.category}</p>)}
                     </div>
                     <button
                       onClick={() => removeCondition(index)}
