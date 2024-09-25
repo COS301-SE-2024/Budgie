@@ -126,12 +126,12 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   };
 
   const calculateNewCurrentAmount = (goal: Goal): string => {
-    if (
-      updateAmount &&
-      goal.current_amount !== undefined
+    if (updateAmount && goal.current_amount !== undefined
     ) {
       if (goal.initial_amount !== undefined) {
-        return Math.min(goal.current_amount - updateAmount).toFixed(2);
+        let amount = goal.current_amount - updateAmount;
+        if (amount<0){amount = 0}
+        return amount.toFixed(2);
       }
       return (currentAmount + updateAmount).toFixed(2);
     } else {
@@ -329,11 +329,9 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
 
   const calculateNewAmountLeft = (goal: Goal): string => {
     if (updateAmount) {
-      return (
-        spendingLimit -
-        monthlyBudgetSpent(props.goal) -
-        updateAmount
-      ).toFixed(2);
+      let amount = (spendingLimit - monthlyBudgetSpent(props.goal) -updateAmount)
+      if (amount < 0){amount = 0;}
+      return amount.toFixed(2);
     } else {
       return (spendingLimit - monthlyBudgetSpent(props.goal)).toFixed(2);
     }

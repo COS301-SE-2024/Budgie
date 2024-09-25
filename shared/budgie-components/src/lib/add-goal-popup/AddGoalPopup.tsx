@@ -245,7 +245,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       accounts: selectedAccounts,
       uid: user?.uid,
       update_type: updateMethod,
-      target_date: targetDate
     };
     if (updateMethod == 'assign-description' && keywords.length == 0) {
       alert("Please enter atleast one keyword.")
@@ -255,6 +254,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
         goalData.description = keywords;
       }
       if (goalType === 'Savings' || goalType === 'Debt Reduction') {
+        goalData.target_date= targetDate
         if (goalType === 'Debt Reduction') {
           goalData.initial_amount = debtAmount;
           goalData.current_amount = debtAmount;
@@ -447,27 +447,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 </span>
                 <label>Monthly Limit:</label>
                 <ClearableInput value={spendingLimit} onChange={setSpendingLimit} />
-              </div>
-              <div className={styles.formGroup}>
-                <span
-                  className={`material-symbols-outlined ${styles.icon}`}
-                  style={{
-                    fontSize: 'calc(1rem * var(--font-size-multiplier))',
-                    color: 'var(--greyed-text)',
-                  }}
-                >
-                  info
-                </span>
-                <span className={styles.popupText} style={{ width: popupWidth }}>
-                  Select the date until which you want to limit your spending for this goal.
-                </span>
-                <label>End Date:</label>
-                <input
-                  type="date"
-                  value={targetDate || ''}
-                  onChange={(e) => setTargetDate(e.target.value)}
-                  required
-                />
               </div>
             </div>
           </div>
@@ -754,7 +733,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Enter keyword"
-                  style={{ marginRight: '0.5rem' }}
+                  style={{ marginRight: '0.5rem', color:'black' }}
                 />
                 <button onClick={addKeyword} style={{ padding: '0.5rem 1rem', color: "var(--primary-1)", fontWeight: 'bold' }}>Add</button>
               </div>

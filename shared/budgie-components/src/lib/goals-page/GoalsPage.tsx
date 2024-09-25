@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   Label,
   CartesianGrid,
+  Cell,
 } from 'recharts';
 import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
@@ -220,13 +221,13 @@ const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal:
   }, [goal.updates, goal.current_amount]);
 
   return (
-    <>
+    <div style={{ fontSize: 'calc(1.2rem * var(--font-size-multiplier))' }}>
       {goal.update_type == 'manual' && (
         <div>
           <table className="min-w-full table-auto border-collapse border border-gray-200">
             <thead>
               <tr style={{ color: 'var(--secondary-text)', backgroundColor: 'var(--primary-1)' }}>
-                <th className="border border-gray-200 p-2 text-left" style={{ width: '1%', backgroundColor: 'var(--block-background)', border: '1px solid var(--block-background)' }}></th> {/* Empty header with fixed width */}
+                <th className="border border-gray-200 p-2 text-left" style={{ width: '1%', backgroundColor: 'var(--block-background)', borderLeft: '1px solid var(--block-background)', borderTop: '1px solid var(--block-background)', borderBottom: '1px solid var(--block-background)' }}></th> {/* Empty header with fixed width */}
                 <th className="border border-gray-200 p-2 text-left">Amount</th>
                 <th className="border border-gray-200 p-2 text-left">Date</th>
               </tr>
@@ -282,7 +283,7 @@ const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal:
           </table>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
@@ -330,8 +331,7 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
 
   const calculateProgressPercentage = (goal: Goal): number => {
 
-    //debt
-    if (goal.current_amount !== undefined && goal.initial_amount !== undefined) {
+    if (goal.current_amount !== undefined && goal.initial_amount !== undefined && goal.type == "Debt Reduction") {
       if (goal.initial_amount) {
         return Math.min(
           100,
@@ -343,20 +343,16 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
       }
     }
 
-    //savings
-    if (goal.current_amount !== undefined && goal.target_amount !== undefined) {
+    if (goal.current_amount !== undefined && goal.target_amount !== undefined && goal.type == "Savings") {
       return Math.min(
         100,
-        -(((goal.current_amount) /
+        (((goal.current_amount) /
           (goal.target_amount)) * 100)
       );
 
     }
 
-    //limits
-    if (
-      goal.spending_limit !== undefined &&
-      goal.monthly_updates !== undefined
+    if (goal.spending_limit !== undefined && goal.monthly_updates !== undefined && goal.type == "Spending Limit"
     ) {
       const amountForCurrentMonth = monthlyBudgetSpent(goal);
       return (amountForCurrentMonth / goal.spending_limit) * 100;
@@ -473,7 +469,7 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
     if (user && user.uid) {
       let transactionsList: any[] = [];
       const years = ["transaction_data_2024", "transaction_data_2023"];
-
+  
       try {
         for (let year of years) {
           for (let accountNumber of accountNumbers) {
@@ -482,7 +478,7 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
               where("account_number", "==", accountNumber),
               where("uid", "==", user.uid)
             );
-
+  
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach((doc) => {
               const docData = doc.data();
@@ -490,18 +486,22 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                 "january", "february", "march", "april", "may", "june",
                 "july", "august", "september", "october", "november", "december"
               ];
-
+  
               months.forEach((month) => {
                 if (docData[month]) {
                   const transactions = JSON.parse(docData[month]);
-
-                  // Filter transactions by keywords in the description
-                  const filteredTransactions = transactions.filter((transaction: { description: string }) =>
-                    keywords.some((keyword) =>
-                      transaction.description.toLowerCase().includes(keyword.toLowerCase())
+  
+                  const filteredTransactions = transactions
+                    .filter((transaction: { description: string }) =>
+                      keywords.some((keyword) =>
+                        transaction.description.toLowerCase().includes(keyword.toLowerCase())
+                      )
                     )
-                  );
-
+                    .map((transaction: { amount: number }) => ({
+                      ...transaction,
+                      amount: -(transaction.amount), 
+                    }));
+  
                   transactionsList = transactionsList.concat(filteredTransactions);
                 }
               });
@@ -511,17 +511,18 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
       } catch (error) {
         console.error("Error fetching transactions: ", error);
       }
-
+  
       return transactionsList;
     }
     return [];
   };
+  
 
   const getMatchingTransactionsByCategory = async (accountNumbers: string[], categories: string[]): Promise<any[]> => {
     if (user && user.uid) {
       let transactionsList: any[] = [];
       const years = ["transaction_data_2024", "transaction_data_2023"]; // Add more years as needed
-  
+
       try {
         for (let year of years) {
           for (let accountNumber of accountNumbers) {
@@ -531,37 +532,37 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
               where("account_number", "==", accountNumber),
               where("uid", "==", user.uid)
             );
-  
+
             // Get documents from the query
             const querySnapshot = await getDocs(q);
-  
+
             // Loop through each document
             querySnapshot.forEach((doc) => {
               const docData = doc.data();
-  
+
               // List of months to check for transactions (e.g., "january", "february", etc.)
               const months = [
                 "january", "february", "march", "april", "may", "june",
                 "july", "august", "september", "october", "november", "december"
               ];
-  
+
               // Check each month for transactions
               months.forEach((month) => {
                 if (docData[month]) {
                   // Parse the JSON string of transactions
                   const transactions = JSON.parse(docData[month]);
-  
+
                   // Filter transactions by the category
                   const filteredTransactions = transactions.map((transaction: { category: string; amount: number }) => {
                     // Ensure the amount is stored as a positive number
                     return {
                       ...transaction,
-                      amount: Math.abs(transaction.amount), // Convert amount to positive
+                      amount: -(transaction.amount),
                     };
                   }).filter((transaction: { category: string; }) =>
                     categories.includes(transaction.category)
                   );
-  
+
                   // Add filtered transactions to the list
                   transactionsList = transactionsList.concat(filteredTransactions);
                 }
@@ -572,12 +573,12 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
       } catch (error) {
         console.error("Error fetching transactions by category: ", error);
       }
-  
+
       return transactionsList;
     }
     return [];
   };
-  
+
 
 
   const aggregateMonthlyUpdates = (transactions: any[]): { amount: number; month: string }[] => {
@@ -632,7 +633,12 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
           if (newTransactions.length > 0) {
             // Update current_amount with new transactions
             for (let i = 0; i < newTransactions.length; i++) {
+              if (goal.type != 'Debt Reduction'){
               goal.current_amount += newTransactions[i].amount;
+              }
+              else {
+                goal.current_amount -= newTransactions[i].amount;
+              }
             }
 
             // Append new transactions to the existing updates
@@ -728,7 +734,7 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
       console.error("Error in handleCategoryUpdateClick:", error);
     }
   };
-  
+
 
   const updateDB = async () => {
     try {
@@ -772,7 +778,7 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
       <div className={styles.goalPage}>
         <div className="flex flex-col gap-8">
           {/* Fixed top section */}
-          <div className="fixed top-0 right-0 z-10  bg-[var(--main-background)] p-2 shadow-md" style={{ width: '85vw' }}>
+          <div className="flex shadow-lg z-10 justify-center fixed top-0 right-0 z-10  bg-[var(--block-background)] p-2" style={{ width: '85vw' }}>
             <div className="container mx-auto">
               <div className="flex-1 flex flex-col justify-center text-center p-3">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '1rem' }}>
@@ -855,19 +861,19 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                         <div className={styles.goalValue}>R {goal.initial_amount.toFixed(2)}</div>
                       </div>
                     )}
-                    {goal.current_amount !== undefined && goal.type != 'Spending Limit' &&(
+                    {goal.current_amount !== undefined && goal.type != 'Spending Limit' && (
                       <div className={styles.goalPair}>
                         <div className={styles.goalLabel}>Current Amount:</div>
                         <div className={styles.goalValue}>R {goal.current_amount.toFixed(2)}</div>
                       </div>
                     )}
-                    {goal.spending_limit !== undefined && goal.type == 'Spending Limit' &&(
+                    {goal.spending_limit !== undefined && goal.type == 'Spending Limit' && (
                       <div className={styles.goalPair}>
                         <div className={styles.goalLabel}>Monthly Limit:</div>
                         <div className={styles.goalValue}>R {goal.spending_limit.toFixed(2)}</div>
                       </div>
                     )}
-                    {goal.monthly_updates !== undefined && goal.type == 'Spending Limit' &&(
+                    {goal.monthly_updates !== undefined && goal.type == 'Spending Limit' && (
                       <div className={styles.goalPair}>
                         <div className={styles.goalLabel}>Spent this Month:</div>
                         <div className={styles.goalValue}>R {monthlyBudgetSpent(goal)}</div>
@@ -934,7 +940,7 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
             </div>
 
             {/* Second Row - Updates and Bar Chart */}
-            {goal.updates && (
+            {goal.updates && JSON.parse(goal.updates).length > 0 && (
               <>
                 <div className="container mx-auto p-4">
                   <div className="flex justify-between items-start gap-8">
@@ -974,15 +980,18 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                             }}
                           />
                           <CartesianGrid stroke="rgba(255, 255, 255, 0.1)" vertical={false} />
-                          <Bar
-                            dataKey="amount"
-                            fill="var(--primary-1)"
-                            radius={[10, 10, 0, 0]}
-                            barSize={40}
-                            stroke="var(--main-border)"
-                            strokeWidth={1}
-                            stackId="a"
-                          />
+                          <Bar dataKey="amount" radius={[10, 10, 0, 0]} barSize={40} stroke="var(--main-border)" strokeWidth={1}>
+                            {getUpdates().map((entry: { amount: number; }, index: any) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={
+                                  goal.type === 'Spending Limit' && goal.spending_limit && entry.amount > goal.spending_limit
+                                    ? 'red' // Color for bars that exceed the limit
+                                    : 'var(--primary-1)' // Default color
+                                }
+                              />
+                            ))}
+                          </Bar>
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -992,7 +1001,7 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                 {currentGoal.updates && JSON.parse(currentGoal.updates).length > 0 && (
                   <div className="container mx-auto p-4">
                     <div className="flex justify-between items-start gap-8">
-                      <div className="flex-1 flex flex-col justify-center text-center bg-[var(--block-background)] rounded-lg shadow-md p-8">
+                      <div className="flex-1 flex flex-col justify-center text-center bg-[var(--block-background)] rounded-lg shadow-md p-8 pl-20 pr-20">
                         <h2 className="text-xl font-semibold mb-10">Updates</h2>
                         <UpdateTable goal={currentGoal} onUpdateGoal={handleGoalUpdate} />
                       </div>
@@ -1216,7 +1225,7 @@ export function GoalsPage() {
                             <div
                               className="absolute top-0 left-0 h-full bg-green-500 rounded"
                               style={{
-                                width: `${calculateProgressPercentage(goal)}%`,
+                                width: `${Math.min(100, calculateProgressPercentage(goal))}%`,
                                 backgroundColor: 'var(--primary-2)',
                               }}
                             />

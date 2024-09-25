@@ -5,6 +5,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 80%;
 }
 
 .updateGoalInfo {
@@ -23,7 +24,7 @@
 .goalForm {
   margin: 0 auto;
   text-align: left;
-  width: 90%;
+  width: 100%;
 }
 
 .goalForm .formGroup {

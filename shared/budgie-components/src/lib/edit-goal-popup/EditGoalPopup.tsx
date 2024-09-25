@@ -133,18 +133,9 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
     );
     if (confirmDelete) {
       const goalData: any = {
-        type: props.goal.type,
         name: goalName,
         uid: 'User has deleted this goal.',
       };
-
-      if (props.goal.type === 'Savings' || props.goal.type === 'Debt Reduction') {
-        goalData.current_amount = currentAmount;
-        goalData.target_amount = targetAmount;
-        goalData.target_date = targetDate;
-      } else if (props.goal.type === 'Spending Limit') {
-        goalData.spending_limit = spendingLimit;
-      }
 
       try {
         const goalDocRef = doc(db, 'goals', props.goal.id);
