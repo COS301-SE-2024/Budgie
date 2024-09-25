@@ -1190,7 +1190,6 @@ export function GoalsPage() {
             }}
           ></div>
           <div className={styles.planningModalContainer}>
-
             <div className="p-4">
               <table className="min-w-full table-auto border-collapse border border-gray-200">
                 <thead>
@@ -1224,7 +1223,7 @@ export function GoalsPage() {
 
                           </div>
                           <span className="ml-3 text-sm" style={{ color: 'var(--main-text' }}>
-                            {calculateProgressPercentage(goal)}%
+                            {calculateProgressPercentage(goal).toFixed(2)}%
                           </span>
                         </div>
                       </td>
