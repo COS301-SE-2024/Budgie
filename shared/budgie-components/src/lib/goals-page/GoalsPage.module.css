@@ -89,6 +89,7 @@
   font-weight: bold;
   margin-right: 1rem;
 }
+
 .sortDropdown {
   background-color: var(--block-background);
   padding-right: 2.5vw;
@@ -231,7 +232,6 @@
   border-radius: 5px;
   text-align: center;
   font-weight: bold;
-  margin-top: 1rem;
 }
 
 .updateViewButton:hover {
