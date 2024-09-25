@@ -45,11 +45,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
   const [step, setStep] = useState(1);
   const [goalName, setGoalName] = useState('');
   const [targetAmount, setTargetAmount] = useState(0);
-  const [startDate, setStartDate] = useState(
-    new Date().toISOString().split('T')[0]
-  );
   const [targetDate, setTargetDate] = useState<string | null>(null);
-  //spending
   const [spendingLimit, setSpendingLimit] = useState(0);
   const [debtAmount, setDebtAmount] = useState(0);
   const [accounts, setAccounts] = useState<string[]>([]);
@@ -66,6 +62,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [keywords, setKeywords] = useState<string[]>([]);
 
+
   const addKeyword = () => {
     if (description.trim() === '') {
       alert('Please enter a keyword.');
@@ -79,6 +76,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
   const removeKeyword = (keywordToRemove: string) => {
     setKeywords(keywords.filter((keyword) => keyword !== keywordToRemove));
   };
+
 
   async function checkGoalExists(name: string) {
     try {
@@ -107,50 +105,52 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       if (await goalNameExists) {
         alert('You already have a goal with this name.');
         return;
-      } else if (goalType === 'Savings') {
+      }
+      else if (goalType === 'Savings') {
         if (!goalName) {
-          alert('Please enter a goal name.');
+          alert("Please enter a goal name.");
           return;
         }
         if (!targetAmount || targetAmount <= 0) {
-          alert('Please enter a valid target savings amount.');
+          alert("Please enter a valid target savings amount.");
           return;
         }
         if (!targetDate) {
-          alert('Please select a target date.');
+          alert("Please select a target date.");
           return;
         }
       } else if (goalType === 'Spending Limit') {
         if (!goalName) {
-          alert('Please enter a goal name.');
+          alert("Please enter a goal name.");
           return;
         }
         if (!spendingLimit || spendingLimit <= 0) {
-          alert('Please enter a valid monthly spending limit.');
+          alert("Please enter a valid monthly spending limit.");
           return;
         }
       } else if (goalType === 'Debt Reduction') {
         if (!goalName) {
-          alert('Please enter a goal name.');
+          alert("Please enter a goal name.");
           return;
         }
         if (!debtAmount || debtAmount <= 0) {
-          alert('Please enter a valid debt amount.');
+          alert("Please enter a valid debt amount.");
           return;
         }
         if (!targetDate) {
-          alert('Please select a target date.');
+          alert("Please select a target date.");
           return;
         }
       }
     } else if (step === 3) {
       if (!updateMethod) {
-        alert('Please select an update method for the goal.');
+        alert("Please select an update method for the goal.");
         return;
       }
-    } else if (step === 4) {
+    }
+    else if (step === 4) {
       if (selectedAccounts.length === 0) {
-        alert('Please select at least one account.');
+        alert("Please select at least one account.");
         return;
       }
     }
@@ -174,9 +174,9 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       (35 *
         parseFloat(computedStyle.getPropertyValue('--font-size-multiplier')) -
         35) *
-        0.5;
+      0.5;
     const widthString = width.toString();
-    // console.log(computedStyle.getPropertyValue('--font-size-multiplier'));
+    console.log(computedStyle.getPropertyValue('--font-size-multiplier'));
     return widthString + 'vw';
   }
 
@@ -238,17 +238,19 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
   const popupWidth = getPopupWidth();
 
   const handleSubmit = async () => {
+
     const goalData: any = {
       type: goalType,
       name: goalName,
       accounts: selectedAccounts,
       uid: user?.uid,
       update_type: updateMethod,
-      target_date: targetDate,
+      target_date: targetDate
     };
     if (updateMethod == 'assign-description' && keywords.length == 0) {
-      alert('Please enter atleast one keyword.');
-    } else {
+      alert("Please enter atleast one keyword.")
+    }
+    else {
       if (updateMethod == 'assign-description' && keywords.length > 0) {
         goalData.description = keywords;
       }
@@ -276,46 +278,33 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
   return (
     <div className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center z-15 w-[85vw] text-sm md:text-lg lg:text-xl">
+
       {/*1: Select Goal Type */}
       {step === 1 && (
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
+
           <p className={styles.goalHeading}>Select a Goal Type:</p>
           <div className={styles.goalInfo}>
             <button
-              className={`${styles.goalTypeButton} ${
-                goalType === 'Savings' ? styles.selected : ''
-              }`}
+              className={`${styles.goalTypeButton} ${goalType === 'Savings' ? styles.selected : ''}`}
               onClick={() => handleGoalTypeSelection('Savings')}
             >
               <p className={styles.goalTitle}>Savings Goal</p>
-              <p className={styles.goalDescriptions}>
-                Plan and work towards saving a specific amount of money by a set
-                deadline.
-              </p>
+              <p className={styles.goalDescriptions}>Plan and work towards saving a specific amount of money by a set deadline.</p>
             </button>
             <button
-              className={`${styles.goalTypeButton} ${
-                goalType === 'Spending Limit' ? styles.selected : ''
-              }`}
+              className={`${styles.goalTypeButton} ${goalType === 'Spending Limit' ? styles.selected : ''}`}
               onClick={() => handleGoalTypeSelection('Spending Limit')}
             >
               <p className={styles.goalTitle}>Limit Spending</p>
-              <p className={styles.goalDescriptions}>
-                Control your spending by setting a monthly limit on your
-                purchases.
-              </p>
+              <p className={styles.goalDescriptions}>Control your spending by setting a monthly limit on your purchases.</p>
             </button>
             <button
-              className={`${styles.goalTypeButton} ${
-                goalType === 'Debt Reduction' ? styles.selected : ''
-              }`}
+              className={`${styles.goalTypeButton} ${goalType === 'Debt Reduction' ? styles.selected : ''}`}
               onClick={() => handleGoalTypeSelection('Debt Reduction')}
             >
               <p className={styles.goalTitle}>Debt Reduction</p>
-              <p className={styles.goalDescriptions}>
-                Focus on paying outstanding debts, such as loans or credit
-                cards.
-              </p>
+              <p className={styles.goalDescriptions}>Focus on paying outstanding debts, such as loans or credit cards.</p>
             </button>
           </div>
 
@@ -329,12 +318,14 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
               </button>
             ) : null}
           </div>
+
         </div>
       )}
 
       {/*2: Goal Details */}
       {step === 2 && goalType === 'Savings' && (
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
+
           <p className={styles.goalHeading}>Savings Goal Details</p>
           <div className={styles.goalInfo}>
             <div className={styles.goalForm}>
@@ -348,13 +339,10 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 >
                   info
                 </span>
-                <span
-                  className={styles.popupText}
-                  style={{ width: popupWidth }}
-                >
-                  Enter a descriptive name for your savings goal. This could be
-                  a short term goal like a vacation fund or a long term goal
-                  like your retirement savings.
+                <span className={styles.popupText} style={{ width: popupWidth }}>
+                  Enter a descriptive name for your savings goal. This could be a
+                  short term goal like a vacation fund or a long term goal like
+                  your retirement savings.
                 </span>
                 <label>Goal Name:</label>
                 <input
@@ -374,17 +362,11 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 >
                   info
                 </span>
-                <span
-                  className={styles.popupText}
-                  style={{ width: popupWidth }}
-                >
+                <span className={styles.popupText} style={{ width: popupWidth }}>
                   Enter the amount of money you aim to save for this goal.
                 </span>
                 <label>Target Savings Amount:</label>
-                <ClearableInput
-                  value={targetAmount}
-                  onChange={setTargetAmount}
-                />
+                <ClearableInput value={targetAmount} onChange={setTargetAmount} />
               </div>
               <div className={styles.formGroup}>
                 <span
@@ -396,10 +378,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 >
                   info
                 </span>
-                <span
-                  className={styles.popupText}
-                  style={{ width: popupWidth }}
-                >
+                <span className={styles.popupText} style={{ width: popupWidth }}>
                   Select the date by which you want to reach this goal.
                 </span>
                 <label>Target Date:</label>
@@ -416,18 +395,15 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
             <button className={styles.cancelButton} onClick={props.togglePopup}>
               Cancel
             </button>
-            <button className={styles.prevButton} onClick={handleBack}>
-              Previous
-            </button>
-            <button className={styles.nextButton} onClick={handleNext}>
-              Next
-            </button>
+            <button className={styles.prevButton} onClick={handleBack}>Previous</button>
+            <button className={styles.nextButton} onClick={handleNext}>Next</button>
           </div>
         </div>
       )}
 
       {step === 2 && goalType === 'Spending Limit' && (
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
+
           <p className={styles.goalHeading}>Spending Limit Goal</p>
           <div className={styles.goalInfo}>
             <div className={styles.goalForm}>
@@ -441,13 +417,10 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 >
                   info
                 </span>
-                <span
-                  className={styles.popupText}
-                  style={{ width: popupWidth }}
-                >
-                  Enter a descriptive name for your spending reduction goal.
-                  This could be a specific type of spending you want to reduce
-                  such as entertainment or dining out.
+                <span className={styles.popupText} style={{ width: popupWidth }}>
+                  Enter a descriptive name for your spending reduction goal. This
+                  could be a specific type of spending you want to reduce such as
+                  entertainment or dining out.
                 </span>
                 <label>Goal Name:</label>
                 <input
@@ -467,19 +440,13 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 >
                   info
                 </span>
-                <span
-                  className={styles.popupText}
-                  style={{ width: popupWidth }}
-                >
+                <span className={styles.popupText} style={{ width: popupWidth }}>
                   Enter the monthly spending limit you want to set for this type
                   of expense. Spending below this amount each month will
                   contribute to your progress.
                 </span>
                 <label>Monthly Limit:</label>
-                <ClearableInput
-                  value={spendingLimit}
-                  onChange={setSpendingLimit}
-                />
+                <ClearableInput value={spendingLimit} onChange={setSpendingLimit} />
               </div>
               <div className={styles.formGroup}>
                 <span
@@ -491,12 +458,8 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 >
                   info
                 </span>
-                <span
-                  className={styles.popupText}
-                  style={{ width: popupWidth }}
-                >
-                  Select the date until which you want to limit your spending
-                  for this goal.
+                <span className={styles.popupText} style={{ width: popupWidth }}>
+                  Select the date until which you want to limit your spending for this goal.
                 </span>
                 <label>End Date:</label>
                 <input
@@ -513,12 +476,8 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
             <button className={styles.cancelButton} onClick={props.togglePopup}>
               Cancel
             </button>
-            <button className={styles.prevButton} onClick={handleBack}>
-              Previous
-            </button>
-            <button className={styles.nextButton} onClick={handleNext}>
-              Next
-            </button>
+            <button className={styles.prevButton} onClick={handleBack}>Previous</button>
+            <button className={styles.nextButton} onClick={handleNext}>Next</button>
           </div>
         </div>
       )}
@@ -538,10 +497,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 >
                   info
                 </span>
-                <span
-                  className={styles.popupText}
-                  style={{ width: popupWidth }}
-                >
+                <span className={styles.popupText} style={{ width: popupWidth }}>
                   Enter a descriptive name for your debt reduction goal. This
                   could be a goal to pay off any money you owe, such as a credit
                   card or a loan.
@@ -564,10 +520,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 >
                   info
                 </span>
-                <span
-                  className={styles.popupText}
-                  style={{ width: popupWidth }}
-                >
+                <span className={styles.popupText} style={{ width: popupWidth }}>
                   Enter the amount of money you currently owe on this debt.
                 </span>
                 <label>Debt Amount:</label>
@@ -583,10 +536,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 >
                   info
                 </span>
-                <span
-                  className={styles.popupText}
-                  style={{ width: popupWidth }}
-                >
+                <span className={styles.popupText} style={{ width: popupWidth }}>
                   Select the date by which you want to reach this goal.
                 </span>
                 <label>Target Date:</label>
@@ -603,12 +553,8 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
             <button className={styles.cancelButton} onClick={props.togglePopup}>
               Cancel
             </button>
-            <button className={styles.prevButton} onClick={handleBack}>
-              Previous
-            </button>
-            <button className={styles.nextButton} onClick={handleNext}>
-              Next
-            </button>
+            <button className={styles.prevButton} onClick={handleBack}>Previous</button>
+            <button className={styles.nextButton} onClick={handleNext}>Next</button>
           </div>
         </div>
       )}
@@ -616,9 +562,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       {/*3: Update Method */}
       {step === 3 && goalType !== 'Spending Limit' && (
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
-          <p className={styles.goalHeading}>
-            How would you like to update this goal?
-          </p>
+          <p className={styles.goalHeading}>How would you like to update this goal?</p>
           <div className={styles.updateGoalInfo}>
             <label style={{ display: 'block', marginBottom: '1rem' }}>
               <input
@@ -665,21 +609,15 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
             <button className={styles.cancelButton} onClick={props.togglePopup}>
               Cancel
             </button>
-            <button className={styles.prevButton} onClick={handleBack}>
-              Previous
-            </button>
-            <button className={styles.nextButton} onClick={handleNext}>
-              Next
-            </button>
+            <button className={styles.prevButton} onClick={handleBack}>Previous</button>
+            <button className={styles.nextButton} onClick={handleNext}>Next</button>
           </div>
         </div>
       )}
 
       {step === 3 && goalType === 'Spending Limit' && (
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
-          <p className={styles.goalHeading}>
-            How would you like to update this goal?
-          </p>
+          <p className={styles.goalHeading}>How would you like to update this goal?</p>
           <div className={styles.updateGoalInfo}>
             <label style={{ display: 'block', marginBottom: '1rem' }}>
               <input
@@ -726,12 +664,8 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
             <button className={styles.cancelButton} onClick={props.togglePopup}>
               Cancel
             </button>
-            <button className={styles.prevButton} onClick={handleBack}>
-              Previous
-            </button>
-            <button className={styles.nextButton} onClick={handleNext}>
-              Next
-            </button>
+            <button className={styles.prevButton} onClick={handleBack}>Previous</button>
+            <button className={styles.nextButton} onClick={handleNext}>Next</button>
           </div>
         </div>
       )}
@@ -741,28 +675,11 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
           <p className={styles.goalHeading}>Select Accounts</p>
           <div className={styles.goalInfo}>
-            <p
-              className={styles.goalDescription}
-              style={{ textAlign: 'center' }}
-            >
-              Select the account/s you want to associate this goal with.
-            </p>
+            <p className={styles.goalDescription} style={{ textAlign: 'center' }}>Select the account/s you want to associate this goal with.</p>
             {updateMethod === 'assign-all' ? (
-              <p
-                className={styles.goalDescription}
-                style={{ textAlign: 'center' }}
-              >
-                All transactions for the selected account/s will be
-                automatically assigned to this goal.
-              </p>
+              <p className={styles.goalDescription} style={{ textAlign: 'center' }}>All transactions for the selected account/s will be automatically assigned to this goal.</p>
             ) : (
-              <p
-                className={styles.goalDescription}
-                style={{ textAlign: 'center' }}
-              >
-                Transactions for the selected account/s can be assigned to this
-                goal.
-              </p>
+              <p className={styles.goalDescription} style={{ textAlign: 'center' }}>Transactions for the selected account/s can be assigned to this goal.</p>
             )}
             <div className={styles.checkBoxContainer}>
               {accountOptions.map((option, index) => (
@@ -776,15 +693,11 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                         const selected = e.target.value;
                         if (e.target.checked) {
                           setSelectedAccounts((prevAccounts) =>
-                            prevAccounts
-                              .filter((account) => account !== 'no-account')
-                              .concat(selected)
+                            prevAccounts.filter(account => account !== 'no-account').concat(selected)
                           );
                         } else {
                           setSelectedAccounts((prevAccounts) =>
-                            prevAccounts.filter(
-                              (account) => account !== selected
-                            )
+                            prevAccounts.filter(account => account !== selected)
                           );
                         }
                       }}
@@ -797,21 +710,14 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
             </div>
           </div>
           <div className={styles.buttonContainer}>
-            <button className={styles.cancelButton} onClick={props.togglePopup}>
-              Cancel
-            </button>
-            <button className={styles.prevButton} onClick={handleBack}>
-              Previous
-            </button>
+            <button className={styles.cancelButton} onClick={props.togglePopup}>Cancel</button>
+            <button className={styles.prevButton} onClick={handleBack}>Previous</button>
             {updateMethod === 'assign-all' ? (
-              <button className={styles.nextButton} onClick={handleSubmit}>
-                Confirm
-              </button>
+              <button className={styles.nextButton} onClick={handleSubmit}>Confirm</button>
             ) : (
-              <button className={styles.nextButton} onClick={handleNext}>
-                Next
-              </button>
+              <button className={styles.nextButton} onClick={handleNext}>Next</button>
             )}
+
           </div>
         </div>
       )}
@@ -821,30 +727,13 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
           <p className={styles.goalHeading}>Manually Updated Goal</p>
           <div className={styles.goalInfo}>
-            <p
-              className={styles.goalDescription}
-              style={{ textAlign: 'center' }}
-            >
-              You are about to create a manually updated goal.
-            </p>
-            <p
-              className={styles.goalDescription}
-              style={{ textAlign: 'center', marginTop: '1rem' }}
-            >
-              You will be able to update this goal by manually adding or
-              removing funds without linking any transactions.
-            </p>
+            <p className={styles.goalDescription} style={{ textAlign: 'center' }}>You are about to create a manually updated goal.</p>
+            <p className={styles.goalDescription} style={{ textAlign: 'center', marginTop: '1rem' }}>You will be able to update this goal by manually adding or removing funds without linking any transactions.</p>
           </div>
           <div className={styles.buttonContainer}>
-            <button className={styles.cancelButton} onClick={props.togglePopup}>
-              Cancel
-            </button>
-            <button className={styles.prevButton} onClick={handleBack}>
-              Previous
-            </button>
-            <button className={styles.nextButton} onClick={handleSubmit}>
-              Confirm
-            </button>
+            <button className={styles.cancelButton} onClick={props.togglePopup}>Cancel</button>
+            <button className={styles.prevButton} onClick={handleBack}>Previous</button>
+            <button className={styles.nextButton} onClick={handleSubmit}>Confirm</button>
           </div>
         </div>
       )}
@@ -853,44 +742,13 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       {step === 5 && updateMethod == 'assign-description' && (
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
           <p className={styles.goalHeading}>Select Transaction Descriptions</p>
-          <div
-            className={styles.goalInfo}
-            style={{
-              height: '100%',
-              justifyContent: 'flex-start',
-              paddingTop: '2rem',
-            }}
-          >
-            <p
-              className={styles.goalDescription}
-              style={{ textAlign: 'center' }}
-            >
-              Enter the keyword/s for the transactions you want automatically
-              assigned to this goal.
-            </p>
-            <p
-              className={styles.goalDescription}
-              style={{ textAlign: 'center' }}
-            >
-              All transactions with descriptions containing the keyword/s will
-              be assigned to this goal.
-            </p>
+          <div className={styles.goalInfo} style={{ height: '100%', justifyContent: 'flex-start', paddingTop: '2rem' }}>
+            <p className={styles.goalDescription} style={{ textAlign: 'center' }}>Enter the keyword/s for the transactions you want automatically assigned to this goal.</p>
+            <p className={styles.goalDescription} style={{ textAlign: 'center' }}>All transactions with descriptions containing the keyword/s will be assigned to this goal.</p>
 
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginTop: '1rem',
-                  width: 'fit-content',
-                }}
-              >
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+
+              <div style={{ display: 'flex', alignItems: 'center', marginTop: '1rem', width: 'fit-content' }}>
                 <input
                   type="text"
                   value={description}
@@ -898,59 +756,28 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                   placeholder="Enter keyword"
                   style={{ marginRight: '0.5rem' }}
                 />
-                <button
-                  onClick={addKeyword}
-                  style={{
-                    padding: '0.5rem 1rem',
-                    color: 'var(--primary-1)',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  Add
-                </button>
+                <button onClick={addKeyword} style={{ padding: '0.5rem 1rem', color: "var(--primary-1)", fontWeight: 'bold' }}>Add</button>
               </div>
               <div style={{ marginTop: '2rem' }}>
                 {keywords.map((keyword, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      marginRight: '0.5rem',
-                      marginBottom: '0.5rem',
-                      padding: '0.25rem 0.5rem',
-                      borderRadius: '5px',
-                      backgroundColor: 'var(--main-background)',
-                    }}
-                  >
+                  <div key={index} style={{ display: 'inline-flex', alignItems: 'center', marginRight: '0.5rem', marginBottom: '0.5rem', padding: '0.25rem 0.5rem', borderRadius: '5px', backgroundColor: 'var(--main-background)' }}>
                     <span style={{ marginRight: '1rem' }}>{keyword}</span>
                     <button
                       onClick={() => removeKeyword(keyword)}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      {' '}
-                      ✕{' '}
-                    </button>
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+                    > ✕ </button>
                   </div>
                 ))}
               </div>
             </div>
+
           </div>
           <div className={styles.buttonContainer}>
             <button className={styles.cancelButton} onClick={props.togglePopup}>
               Cancel
             </button>
-            <button className={styles.prevButton} onClick={handleBack}>
-              Previous
-            </button>
-            <button className={styles.nextButton} onClick={handleSubmit}>
-              Confirm
-            </button>
+            <button className={styles.prevButton} onClick={handleBack}>Previous</button>
+            <button className={styles.nextButton} onClick={handleSubmit}>Confirm</button>
           </div>
         </div>
       )}
@@ -960,31 +787,11 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
           <p className={styles.goalHeading}>Select Spending Category</p>
           <div className={styles.goalInfo}>
-            <p
-              className={styles.goalDescription}
-              style={{ textAlign: 'center' }}
-            >
-              Select the category in which you would like to limit your
-              spending.
-            </p>
-            <p
-              className={styles.goalDescription}
-              style={{ textAlign: 'center' }}
-            >
-              All transactions for the associated account/s which have this
-              category will be added to this goal.
-            </p>
-            <div
-              style={{
-                marginLeft: '2rem',
-                marginTop: '0.2rem',
-                marginBottom: '1rem',
-              }}
-            >
+            <p className={styles.goalDescription} style={{ textAlign: 'center' }}>Select the category in which you would like to limit your spending.</p>
+            <p className={styles.goalDescription} style={{ textAlign: 'center' }}>All transactions for the associated account/s which have this category will be added to this goal.</p>
+            <div style={{ marginLeft: '2rem', marginTop: '0.2rem', marginBottom: '1rem' }}>
               <select
-                className={`${styles.categoryDropdown} ${getCategoryStyle(
-                  selectedCategory
-                )}`}
+                className={`${styles.categoryDropdown} ${getCategoryStyle(selectedCategory)}`}
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
@@ -1004,19 +811,14 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
             </div>
           </div>
           <div className={styles.buttonContainer}>
-            <button className={styles.cancelButton} onClick={props.togglePopup}>
-              Cancel
-            </button>
-            <button className={styles.prevButton} onClick={handleBack}>
-              Previous
-            </button>
+            <button className={styles.cancelButton} onClick={props.togglePopup}>Cancel</button>
+            <button className={styles.prevButton} onClick={handleBack}>Previous</button>
 
-            <button className={styles.nextButton} onClick={handleSubmit}>
-              Confirm
-            </button>
+            <button className={styles.nextButton} onClick={handleSubmit}>Confirm</button>
           </div>
         </div>
       )}
+
     </div>
   );
 }
