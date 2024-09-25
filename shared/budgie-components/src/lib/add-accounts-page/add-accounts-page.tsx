@@ -17,6 +17,7 @@ import {
   QueryDocumentSnapshot,
   DocumentReference,
 } from 'firebase/firestore';
+import '../../root.css';
 import styles from './add-accounts-page.module.css';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';
@@ -50,72 +51,65 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     }
 
     return (
-      <div className="mainPage">
-        <div
-          className="flex items-center justify-center bg-BudgieGray h-full w-full"
-          style={{ backgroundColor: 'var(--main-background)', color: 'black' }}
-        >
-          <div className="flex bg-black w-[72rem] h-3/4 rounded-[3rem] shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)]">
-            <div
-              onClick={() => OnAddAccountTypeClick('current')}
-              className="flex flex-col items-center cursor-pointer bg-[rgb(228,228,228)] w-96 h-full rounded-l-[2.5rem] hover:z-50 hover:shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)] transition-shadow ease-in duration-200"
+      <div className="flex items-center justify-center h-full w-full">
+        <div className="flex flex-col md:flex-row md:bg-black md:w-[80%] md:h-2/3 h-full md:min-h-96 rounded-[3rem] md:shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)]">
+          <div
+            onClick={() => OnAddAccountTypeClick('current')}
+            className="p-2 mb-5 md:mb-0 flex flex-col items-center justify-center cursor-pointer md:bg-[rgb(228,228,228)] bg-[rgb(248,248,248)] md:w-1/3 md:h-full md:rounded-l-[2.5rem] rounded-[2.5rem] md:rounded-r-none hover:z-50 hover:shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)] transition-shadow ease-in duration-200"
+          >
+            <span
+              className=" text-black material-symbols-outlined"
+              style={{
+                fontSize: '9rem',
+              }}
             >
-              <span
-                className="mt-24 text-black material-symbols-outlined"
-                style={{
-                  fontSize: '9rem',
-                }}
-              >
-                account_balance
-              </span>
-              <span className=" text-2xl font-TripSans font-medium">
-                Current Account
-              </span>
-              <span className="mt-16 text-[rgba(160,160,160,0.8)] text-center text-xl font-TripSans font-medium">
-                This is an account where you receive <br /> your paycheque and
-                make daily <br /> payments.
-              </span>
-            </div>
-            <div
-              onClick={() => OnAddAccountTypeClick('savings')}
-              className="flex flex-col items-center cursor-pointer bg-[rgb(238,238,238)] w-96 h-full hover:z-50 hover:shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)] transition-shadow ease-in duration-200"
+              account_balance
+            </span>
+            <span className="mt-6 text-2xl font-TripSans font-medium text-center">
+              Current Account
+            </span>
+            <span className="mt-6 text-[rgba(160,160,160,0.8)] text-center text-xl font-TripSans font-medium">
+              This is an account where you receive <br /> make daily payments
+            </span>
+          </div>
+          <div
+            onClick={() => OnAddAccountTypeClick('savings')}
+            className="p-2 flex flex-col items-center justify-center cursor-pointer rounded-[2.5rem] md:rounded-none md:bg-[rgb(238,238,238)] bg-[rgb(248,248,248)] md:w-1/3 md:h-full hover:z-50 hover:shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)] transition-shadow ease-in duration-200"
+          >
+            <span
+              className="text-black material-symbols-outlined"
+              style={{
+                fontSize: '9rem',
+              }}
             >
-              <span
-                className="mt-24 text-black material-symbols-outlined"
-                style={{
-                  fontSize: '9rem',
-                }}
-              >
-                savings
-              </span>
-              <span className=" text-2xl font-TripSans font-medium">
-                Savings Account
-              </span>
-              <span className="mt-16 text-[rgba(160,160,160,0.8)] text-center text-xl font-TripSans font-medium">
-                This is an account where you save and earn interest on your
-                money.
-              </span>
-            </div>
-            <div
-              onClick={() => OnAddAccountTypeClick('custom')}
-              className="flex flex-col items-center cursor-pointer bg-[rgb(248,248,248)] w-96 h-full rounded-r-[2.5rem] hover:z-50 hover:shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)] transition-shadow ease-in duration-200"
+              savings
+            </span>
+            <span className="mt-6 text-2xl font-TripSans font-medium text-center">
+              Savings Account
+            </span>
+            <span className="mt-6 text-[rgba(160,160,160,0.8)] text-center text-xl font-TripSans font-medium">
+              This is an account where you save and earn interest on your money.
+            </span>
+          </div>
+          <div
+            onClick={() => OnAddAccountTypeClick('custom')}
+            className="p-2 mt-5 md:mt-0 flex flex-col items-center justify-center cursor-pointer bg-[rgb(248,248,248)] md:w-1/3 md:h-full rounded-r-[2.5rem] rounded-l-[2.5rem] md:rounded-l-none hover:z-50 hover:shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)] transition-shadow ease-in duration-200"
+          >
+            <span
+              className=" text-black material-symbols-outlined"
+              style={{
+                fontSize: '9rem',
+              }}
             >
-              <span
-                className="mt-24 text-black material-symbols-outlined"
-                style={{
-                  fontSize: '9rem',
-                }}
-              >
-                tune
-              </span>
-              <span className=" text-2xl font-TripSans font-medium">
-                Custom Account
-              </span>
-              <span className="mt-16 text-[rgba(160,160,160,0.8)] text-center text-xl font-TripSans font-medium">
-                Add any additional account you feel <br /> does not fit into the
-                previous two categories.
-              </span>
-            </div>
+              tune
+            </span>
+            <span className="mt-6 text-2xl font-TripSans font-medium text-center">
+              Custom Account
+            </span>
+            <span className="mt-6 text-[rgba(160,160,160,0.8)] text-center text-xl font-TripSans font-medium">
+              Add any additional account you feel <br /> does not fit into the
+              previous two categories.
+            </span>
           </div>
         </div>
       </div>
@@ -176,17 +170,20 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     return (
-      <div onClick={handleExit} className={styles.mainPageBlurModal}>
+      <div
+        onClick={handleExit}
+        className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
+      >
         <div
-          className="flex flex-col items-center justify-start rounded-[2rem] w-96 h-96 bg-BudgieWhite "
+          className="flex flex-col items-center justify-center p-2 md:justify-start rounded-[2rem] w-60 h-60 md:w-96 md:h-96 bg-BudgieWhite "
           onClick={(e) => handleChildElementClick(e)}
           style={{ backgroundColor: 'var(--main-background)' }}
         >
-          <span className="text-2xl text-center mt-[5rem]">
+          <span className="md:text-2xl text-center md:mt-[5rem]">
             Upload your transaction history <br /> in the form of a CSV <br />{' '}
             to auto-detect account information.
           </span>
-          <div className="mt-7">
+          <div className="md:mt-7 mt-3">
             <button
               className="bg-BudgieWhite cursor-pointer rounded-3xl hover:bg-white hover:shadow-2xl transition-all ease-in"
               onClick={() => {
@@ -683,7 +680,10 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     return (
-      <div onClick={handleExit} className={styles.mainPageBlurModal}>
+      <div
+        onClick={handleExit}
+        className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
+      >
         <div
           className="flex flex-col items-center justify-start rounded-[3rem] w-[45%] h-4/6 bg-BudgieGray "
           onClick={(e) => handleChildElementClick(e)}
@@ -866,12 +866,14 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
 
   return (
     <>
-      <AddAccountModal></AddAccountModal>
-      {showUploadCSVModal && <UploadCSVModal></UploadCSVModal>}
-      {showAccountInfoModal && <AccountInfoModal></AccountInfoModal>}
-      {showSuccessModal && <SuccessModal></SuccessModal>}
-      {showAccountAlreadyTracked && <AlreadyTracked></AlreadyTracked>}
-      {loader && <SpinnerLoader></SpinnerLoader>}
+      <div className="mainPage">
+        <AddAccountModal></AddAccountModal>
+        {showUploadCSVModal && <UploadCSVModal></UploadCSVModal>}
+        {showAccountInfoModal && <AccountInfoModal></AccountInfoModal>}
+        {showSuccessModal && <SuccessModal></SuccessModal>}
+        {showAccountAlreadyTracked && <AlreadyTracked></AlreadyTracked>}
+        {loader && <SpinnerLoader></SpinnerLoader>}
+      </div>
     </>
   );
 }

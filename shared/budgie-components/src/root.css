@@ -177,7 +177,7 @@ body {
   --complementary: #f91880;
 }
 
-.mainPage {
+/* .mainPage {
   background-color: var(--main-background);
   width: 85vw;
   height: 100vh;
@@ -188,6 +188,15 @@ body {
   position: fixed;
   right: 0;
   top: 0;
+} */
+
+.mainPage {
+  background-color: var(--main-background);
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 1rem;
+  overflow-y: auto;
+  flex-grow: 1;
 }
 
 .pageTitle {

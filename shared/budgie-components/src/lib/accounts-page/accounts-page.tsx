@@ -1,6 +1,5 @@
 'use client';
 
-import styles from './accounts-page.module.css';
 import '../../root.css';
 import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -206,17 +205,17 @@ function NoAccountsPage(props: NoAccountsPageProps) {
       >
         <div
           onClick={props.onAddClick}
-          className="flex flex-col items-center justify-center bg-BudgieGray hover:bg-black hover:bg-opacity-5 h-80 w-80 border-dashed border-2 border-gray-400 border-opacity-40 hover:border-opacity-100 cursor-pointer  rounded-3xl"
+          className="flex flex-col items-center justify-center p-2 bg-BudgieGray hover:bg-black hover:bg-opacity-5 h-40 w-40 md:h-80 md:w-80 border-dashed border-2 border-gray-400 border-opacity-40 hover:border-opacity-100 cursor-pointer  rounded-3xl"
           style={{ backgroundColor: 'var(--main-background)' }}
         >
-          <span className="text-2xl text-gray-400 text-opacity-60">
+          <span className="md:text-2xl text-gray-400 text-opacity-60 text-center">
             No Accounts Added Yet
           </span>
-          <span className="mt-5 text-xl text-gray-400 text-opacity-60">
+          <span className="mt-5 md:text-xl text-gray-400 text-opacity-60 text-center">
             Add an Account
           </span>
           <span
-            className="mt-2 text-opacity-50 text-gray-400 material-symbols-outlined"
+            className="md:mt-2 text-opacity-50 text-gray-400 material-symbols-outlined "
             style={{
               fontSize: '3rem',
             }}

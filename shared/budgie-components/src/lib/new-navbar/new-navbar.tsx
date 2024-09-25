@@ -38,8 +38,8 @@ export function NewNavbar(props: NavbarProps) {
   }
 
   return (
-    <div className=" w-[5rem] md:w-[15rem] bg-[var(--block-background)] h-full [box-shadow:0_0_10px_rgba(0,0,0,0.5)] pt-6 z-[100] ">
-      <ul className="ml-4 mr-4">
+    <div className=" w-[5rem] min-w-[5rem] md:w-[15rem] md:min-w-[15rem] bg-[var(--block-background)] h-full [box-shadow:0_0_10px_rgba(0,0,0,0.5)] pt-6 z-[100]">
+      <ul className="mr-4 ml-4">
         {/* Overview item */}
         <Link href={'/overview'}>
           <li
