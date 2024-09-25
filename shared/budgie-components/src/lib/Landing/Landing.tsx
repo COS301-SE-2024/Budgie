@@ -85,7 +85,7 @@ export function Landing(props: LandingProps) {
         </div>
       </div>
 
-      {/* Wave effect background  bottom */}
+      {/* Wave effect background bottom */}
       <div className="absolute bottom-0 w-full overflow-hidden leading-none h-[300px] md:h-[400px] z-0">
         <svg
           className="relative block w-full h-full"
@@ -95,7 +95,7 @@ export function Landing(props: LandingProps) {
         >
           <defs>
             <linearGradient
-              id="waveGradient"
+              id="waveGradientBottomLarge"
               x1="0%"
               y1="0%"
               x2="100%"
@@ -108,13 +108,40 @@ export function Landing(props: LandingProps) {
             </linearGradient>
           </defs>
           <path
-            fill="url(#waveGradient)"
+            fill="url(#waveGradientBottomLarge)"
+            d="M0,256L48,240C96,224,192,192,288,170.7C384,149,480,139,576,149.3C672,160,768,192,864,192C960,192,1056,160,1152,128C1248,96,1344,64,1392,48L1440,32V320H1392C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320H0Z"
+          ></path>
+        </svg>
+      </div>
+      <div className="absolute bottom-0 w-full overflow-hidden leading-none h-[200px] md:h-[300px] z-10">
+        <svg
+          className="relative block w-full h-full"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1440 320"
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <linearGradient
+              id="waveGradientBottomSmall"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" style={{ stopColor: '#e0f8d1' }} />
+              <stop offset="50%" style={{ stopColor: '#a0e9af' }} />
+              <stop offset="75%" style={{ stopColor: '#a0e9af' }} />
+              <stop offset="100%" style={{ stopColor: '#e0f8d1' }} />
+            </linearGradient>
+          </defs>
+          <path
+            fill="url(#waveGradientBottomSmall)"
             d="M0,256L48,240C96,224,192,192,288,170.7C384,149,480,139,576,149.3C672,160,768,192,864,192C960,192,1056,160,1152,128C1248,96,1344,64,1392,48L1440,32V320H1392C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320H0Z"
           ></path>
         </svg>
       </div>
 
-      {/* Wave effect background  top */}
+      {/* Wave effect background top */}
       <div className="absolute top-0 w-full overflow-hidden leading-none h-[300px] md:h-[400px] z-0">
         <svg
           className="relative block w-full h-full"
@@ -124,7 +151,13 @@ export function Landing(props: LandingProps) {
           style={{ transform: 'rotate(180deg)' }}
         >
           <defs>
-            <linearGradient id="waveGradientTop" x1="0%" y1="0%" x2="100%">
+            <linearGradient
+              id="waveGradientTopLarge"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
               <stop offset="0%" style={{ stopColor: '#a0e9af' }} />
               <stop offset="50%" style={{ stopColor: '#c0f0c0' }} />
               <stop offset="75%" style={{ stopColor: '#b2f5a8' }} />
@@ -132,7 +165,36 @@ export function Landing(props: LandingProps) {
             </linearGradient>
           </defs>
           <path
-            fill="url(#waveGradientTop)"
+            fill="url(#waveGradientTopLarge)"
+            d="M0,256L48,240C96,224,192,192,288,170.7C384,149,480,139,576,149.3C672,160,768,192,864,192C960,192,1056,160,1152,128C1248,96,1344,64,1392,48L1440,32V320H1392C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320H0Z"
+          ></path>
+        </svg>
+      </div>
+      <div className="absolute top-0 w-full overflow-hidden leading-none h-[200px] md:h-[300px] z-10">
+        <svg
+          className="relative block w-full h-full"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1440 320"
+          preserveAspectRatio="none"
+          style={{ transform: 'rotate(180deg)' }}
+        >
+          <defs>
+            <linearGradient
+              id="waveGradientTopSmall"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              {/* Corrected stopColor values */}
+              <stop offset="0%" style={{ stopColor: '#e0f8d1' }} />
+              <stop offset="50%" style={{ stopColor: '#a0e9af' }} />
+              <stop offset="75%" style={{ stopColor: '#a0e9af' }} />
+              <stop offset="100%" style={{ stopColor: '#e0f8d1' }} />
+            </linearGradient>
+          </defs>
+          <path
+            fill="url(#waveGradientTopSmall)"
             d="M0,256L48,240C96,224,192,192,288,170.7C384,149,480,139,576,149.3C672,160,768,192,864,192C960,192,1056,160,1152,128C1248,96,1344,64,1392,48L1440,32V320H1392C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320H0Z"
           ></path>
         </svg>
