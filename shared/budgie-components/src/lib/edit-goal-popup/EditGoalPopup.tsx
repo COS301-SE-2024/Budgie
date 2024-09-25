@@ -40,6 +40,7 @@ const ClearableInput: React.FC<ClearableInputProps> = ({ value, onChange }) => {
 
 export interface EditGoalPopupProps {
   togglePopup: () => void;
+  toggleMainPopup: () => void;
   goal: any;
 }
 
@@ -50,9 +51,9 @@ export function EditGoalPopup(props: EditGoalPopupProps) {
       <div className={styles.popupContainer}>
         <div className={styles.popupContent}>
           <GoalForm
-            activeTab={p}
             togglePopup={props.togglePopup}
             goal={props.goal}
+            toggleMainPopup={props.toggleMainPopup}
           />
           <button className={styles.cancelButton} onClick={props.togglePopup}>
             Cancel
@@ -64,8 +65,8 @@ export function EditGoalPopup(props: EditGoalPopupProps) {
 }
 
 interface GoalFormProps {
-  activeTab: string;
   togglePopup: () => void;
+  toggleMainPopup: () => void;
   goal: any;
 }
 
@@ -73,27 +74,45 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   const [goalName, setGoalName] = useState(props.goal.name);
   const [currentAmount, setCurrentAmount] = useState(props.goal.current_amount);
   const [targetAmount, setTargetAmount] = useState(props.goal.target_amount);
-  const [startDate, setStartDate] = useState(props.goal.start_date);
   const [targetDate, setTargetDate] = useState(props.goal.target_date);
   const [spendingLimit, setSpendingLimit] = useState(props.goal.spending_limit);
   const user = useContext(UserContext);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    props.goal.name = goalName;
+    if (props.goal.type === 'Savings') {
+      props.goal.current_amount = currentAmount;
+      props.goal.target_amount = targetAmount;
+      props.goal.target_date = targetDate;
+    }
+    else if (props.goal.type === 'Debt Reduction') {
+      props.goal.current_amount = currentAmount;
+      props.goal.target_date = targetDate;
+    } 
+    else if (props.goal.type === 'Spending Limit') {
+      props.goal.spending_limit = spendingLimit;
+    }
+
+
     if (user && user.uid) {
       e.preventDefault();
 
       const goalData: any = {
-        type: props.activeTab,
+        type: props.goal.type,
         name: goalName,
-        start_date: startDate,
         uid: user.uid,
       };
 
-      if (props.activeTab === 'Savings' || props.activeTab === 'Debt') {
+      if (props.goal.type === 'Savings') {
         goalData.current_amount = currentAmount;
         goalData.target_amount = targetAmount;
         goalData.target_date = targetDate;
-      } else if (props.activeTab === 'Spending') {
+      }
+      else if (props.goal.type === 'Debt Reduction') {
+        goalData.current_amount = currentAmount;
+        goalData.target_date = targetDate;
+      } 
+      else if (props.goal.type === 'Spending Limit') {
         goalData.spending_limit = spendingLimit;
       }
 
@@ -114,17 +133,16 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
     );
     if (confirmDelete) {
       const goalData: any = {
-        type: props.activeTab,
+        type: props.goal.type,
         name: goalName,
-        start_date: startDate,
         uid: 'User has deleted this goal.',
       };
 
-      if (props.activeTab === 'Savings' || props.activeTab === 'Debt') {
+      if (props.goal.type === 'Savings' || props.goal.type === 'Debt Reduction') {
         goalData.current_amount = currentAmount;
         goalData.target_amount = targetAmount;
         goalData.target_date = targetDate;
-      } else if (props.activeTab === 'Spending') {
+      } else if (props.goal.type === 'Spending Limit') {
         goalData.spending_limit = spendingLimit;
       }
 
@@ -132,6 +150,8 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
         const goalDocRef = doc(db, 'goals', props.goal.id);
         await updateDoc(goalDocRef, goalData);
         props.togglePopup();
+        props.toggleMainPopup();
+        props.goal = null;
       } catch (error) {
         console.error('Error saving goal:', error);
       }
@@ -147,7 +167,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
             Delete Goal
           </button>
         </p>
-        {props.activeTab === 'Savings' && (
+        {props.goal.type === 'Savings' && (
           <>
             <div className={styles.formGroup}>
               <span
@@ -183,51 +203,10 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
                 info
               </span>
               <span className={styles.popupText}>
-                If you have already saved money towards this goal, add that
-                amount here. If you haven't, you should enter 0.
-              </span>
-              <label>Current Savings Amount:</label>
-              <ClearableInput
-                value={currentAmount}
-                onChange={setCurrentAmount}
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <span
-                className={`material-symbols-outlined ${styles.icon}`}
-                style={{
-                  fontSize: 'calc(1rem * var(--font-size-multiplier))',
-                  color: 'var(--greyed-text)',
-                }}
-              >
-                info
-              </span>
-              <span className={styles.popupText}>
                 Enter the amount of money you aim to save for this goal.
               </span>
               <label>Target Savings Amount:</label>
               <ClearableInput value={targetAmount} onChange={setTargetAmount} />
-            </div>
-            <div className={styles.formGroup}>
-              <span
-                className={`material-symbols-outlined ${styles.icon}`}
-                style={{
-                  fontSize: 'calc(1rem * var(--font-size-multiplier))',
-                  color: 'var(--greyed-text)',
-                }}
-              >
-                info
-              </span>
-              <span className={styles.popupText}>
-                Select the date you started working towards this goal.
-              </span>
-              <label>Start Date:</label>
-              <input
-                type="date"
-                value={startDate || ''}
-                onChange={(e) => setStartDate(e.target.value)}
-                required
-              />
             </div>
             <div className={styles.formGroup}>
               <span
@@ -253,7 +232,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           </>
         )}
 
-        {props.activeTab === 'Debt' && (
+        {props.goal.type === 'Debt Reduction' && (
           <>
             <div className={styles.formGroup}>
               <span
@@ -291,48 +270,10 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
               <span className={styles.popupText}>
                 Enter the amount of money you currently owe.
               </span>
-              <label>Current Debt Amount:</label>
+              <label>Debt Amount:</label>
               <ClearableInput
                 value={currentAmount}
                 onChange={setCurrentAmount}
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <span
-                className={`material-symbols-outlined ${styles.icon}`}
-                style={{
-                  fontSize: 'calc(1rem * var(--font-size-multiplier))',
-                  color: 'var(--greyed-text)',
-                }}
-              >
-                info
-              </span>
-              <span className={styles.popupText}>
-                Enter the amount of money you aim to owe. This should be less
-                than the current amount you owe and can even be zero.
-              </span>
-              <label>Target Debt Amount:</label>
-              <ClearableInput value={targetAmount} onChange={setTargetAmount} />
-            </div>
-            <div className={styles.formGroup}>
-              <span
-                className={`material-symbols-outlined ${styles.icon}`}
-                style={{
-                  fontSize: 'calc(1rem * var(--font-size-multiplier))',
-                  color: 'var(--greyed-text)',
-                }}
-              >
-                info
-              </span>
-              <span className={styles.popupText}>
-                Select the date you started working towards this goal.
-              </span>
-              <label>Start Date:</label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                required
               />
             </div>
             <div className={styles.formGroup}>
@@ -359,7 +300,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           </>
         )}
 
-        {props.activeTab === 'Spending' && (
+        {props.goal.type === 'Spending Limit' && (
           <>
             <div className={styles.formGroup}>
               <span
@@ -381,27 +322,6 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
                 type="text"
                 value={goalName}
                 onChange={(e) => setGoalName(e.target.value)}
-                required
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <span
-                className={`material-symbols-outlined ${styles.icon}`}
-                style={{
-                  fontSize: 'calc(1rem * var(--font-size-multiplier))',
-                  color: 'var(--greyed-text)',
-                }}
-              >
-                info
-              </span>
-              <span className={styles.popupText}>
-                Select the date you started working towards this goal.
-              </span>
-              <label>Start Date:</label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
                 required
               />
             </div>

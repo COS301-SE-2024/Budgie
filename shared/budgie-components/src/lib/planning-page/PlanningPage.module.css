@@ -4,7 +4,8 @@
   align-items: center;
   background-color: var(--block-background);
   width: 85vw;
-  height: calc(6vh * var(--font-size-multiplier));
+  height: calc(7vh * var(--font-size-multiplier));
+  z-index: 1000;
 }
 
 .button {
@@ -22,6 +23,7 @@
 .button:hover {
   background-color: var(--primary-1);
   color: var(--secondary-text);
+  border-bottom: 5px solid var(--primary-1);
 }
 
 .activeButton {
