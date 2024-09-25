@@ -354,8 +354,8 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   return (
     <div className={styles.goalForm}>
       <form onSubmit={handleSubmit}>
-        <p className={styles.goalDescription}>
-          Update your progress on {props.goal.name} below:
+        <p className={styles.goalHeading}>
+          Add a manual update to {props.goal.name} below:
         </p>
         {props.activeTab === 'Savings' && (
           <>

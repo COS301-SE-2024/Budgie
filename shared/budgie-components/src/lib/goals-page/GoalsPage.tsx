@@ -145,7 +145,7 @@ const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal:
   };
 
   const handleDeleteNonManualUpdate = (amount: number, date: string, description: string) => {
-    if (window.confirm("Do you really want to delete this update? The transaction cannot be added back to this goal.") && goal.updates) {
+    if (window.confirm("Do you really want to delete this update? The transaction will not be automatically added back to this goal.") && goal.updates) {
       let updatedCurrentAmount = goal.current_amount;
       const newUpdates: Update[] = [];
       const deletedUpdates: Update[] = goal.deleted_updates ? JSON.parse(goal.deleted_updates) : [];
@@ -211,6 +211,7 @@ const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal:
       console.error("Error saving goal:", error);
     }
   };
+
 
   useEffect(() => {
     if (goal.updates) {
@@ -428,6 +429,121 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
     }
   };
 
+  // Calculate remaining amount needed to reach the savings goal
+  const calculateRemainingSavings = (goal: Goal): number => {
+    if (goal.target_amount != undefined && goal.current_amount != undefined) {
+      return goal.target_amount - goal.current_amount;
+    }
+    return 0;
+  };
+
+  // Calculate the average monthly savings so far
+  const calculateAverageSavings = (goal: Goal): number => {
+    if (goal.monthly_updates) {
+      const monthlyUpdates = JSON.parse(goal.monthly_updates);
+      const totalSaved = monthlyUpdates.reduce((sum: number, update: { amount: number }) => sum + update.amount, 0);
+      return totalSaved / monthlyUpdates.length;
+    }
+    return 0;
+  };
+
+  // Check if the user needs to save more or less to reach their target in time
+  const calculateSavingsGoalStatus = (goal: Goal): JSX.Element => {
+    if (goal.target_date) {
+      const remainingSavings = calculateRemainingSavings(goal);
+      const averageSavings = calculateAverageSavings(goal);
+      const monthsLeft = calculateMonthsLeft(goal.target_date);
+      const requiredSavingsPerMonth = remainingSavings / monthsLeft;
+
+      if (requiredSavingsPerMonth > averageSavings) {
+        const percentageIncrease = ((requiredSavingsPerMonth - averageSavings) / averageSavings) * 100;
+        return <p>Going forward, you need to save {percentageIncrease.toFixed(2)}% more per month than your average to reach your goal in time.</p>;
+      } else {
+        const percentageOfAverage = (requiredSavingsPerMonth / averageSavings) * 100;
+        return <p>Going forward, you only need to save {percentageOfAverage.toFixed(2)}% of your average savings per month to reach your goal in time.</p>;
+      }
+    }
+    return <></>
+  };
+
+  const calculateSavingsPerMonth = (goal: Goal): number => {
+    if (goal.target_amount != undefined && goal.current_amount != undefined && goal.target_date !== undefined) {
+      const months = Math.max(1, calculateMonthsLeft(goal.target_date))
+      return (goal.target_amount - goal.current_amount) / months;
+    }
+    return 0;
+  };
+
+
+  // Helper function to calculate months left until target date
+  const calculateMonthsLeft = (targetDate: string): number => {
+    const currentDate = new Date();
+    const target = new Date(targetDate);
+    const diffMonths = (target.getFullYear() - currentDate.getFullYear()) * 12 + (target.getMonth() - currentDate.getMonth());
+    return Math.max(diffMonths, 0);
+  };
+
+  // Calculate the average monthly spending
+  const calculateAverageSpending = (goal: Goal): number => {
+    if (goal.monthly_updates) {
+      const monthlyUpdates = JSON.parse(goal.monthly_updates);
+      const totalSpent = monthlyUpdates.reduce((sum: number, update: { amount: number }) => sum + update.amount, 0);
+      return totalSpent / monthlyUpdates.length;
+    }
+    return 0;
+  };
+
+  // Calculate the percentage difference between average spending and the monthly limit
+  const calculateSpendingDifferencePercentage = (goal: Goal): number => {
+    const averageSpending = calculateAverageSpending(goal);
+    const monthlyLimit = goal.spending_limit || 0;
+    return ((averageSpending - monthlyLimit) / monthlyLimit) * 100;
+  };
+
+  // Find the biggest expense in the updates
+  const calculateBiggestExpense = (goal: Goal): Update => {
+    if (goal.updates) {
+      const updates = JSON.parse(goal.updates);
+      return updates.reduce((biggest: Update, current: Update) => {
+        return current.amount > biggest.amount ? current : biggest;
+      }, updates[0]);
+    }
+    return { amount: 0, date: '', description: '' }; // Default return if no updates
+  };
+
+  // Find the month of the biggest expense
+  const calculateBiggestExpenseMonth = (goal: Goal): string => {
+    const biggestExpense = calculateBiggestExpense(goal);
+    return new Date(biggestExpense.date).toLocaleString('default', { month: 'long' });
+  };
+
+  // Calculate what percentage the biggest expense took from that month's limit
+  const calculateBiggestExpensePercentage = (goal: Goal): number => {
+    const biggestExpense = calculateBiggestExpense(goal);
+    const monthlyLimit = goal.spending_limit || 1; // Avoid division by zero
+    return (biggestExpense.amount / monthlyLimit) * 100;
+  };
+
+  // Calculate remaining amount to pay off debt
+  const calculateRemainingDebt = (goal: Goal): number => {
+    if (goal.initial_amount && goal.current_amount) {
+      return goal.current_amount;
+    }
+    return 0;
+  };
+
+  // Calculate the average monthly payment towards debt
+  const calculateAverageDebtPayments = (goal: Goal): number => {
+    if (goal.monthly_updates) {
+      const monthlyUpdates = JSON.parse(goal.monthly_updates);
+      const totalPaid = monthlyUpdates.reduce((sum: number, update: { amount: number }) => sum + update.amount, 0);
+      return totalPaid / monthlyUpdates.length;
+    }
+    return 0;
+  };
+
+
+
   return (
     <div className={styles.mainPage} style={{ position: 'fixed', right: 0, top: 0, height: '100%', zIndex: "11", paddingTop: '2rem' }}>
       <div className={styles.goalPage}>
@@ -454,12 +570,11 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                     {editPopupOpen && (
                       <EditGoalPopup togglePopup={handleEditGoalPopup} goal={goal} toggleMainPopup={onClose} />
                     )}
-                    {(goal.update_type == 'automatic') && (
-                      <>
-                        <div className={styles.updateViewButton} onClick={handleUpdateGoalPopup}>
-                          Add an Update
-                        </div>
-                      </>
+                    <div className={styles.updateViewButton} onClick={handleUpdateGoalPopup}>
+                      Add an Update
+                    </div>
+                    {updatePopupOpen && (
+                      <UpdateGoalPopup togglePopup={handleUpdateGoalPopup} goal={goal} />
                     )}
                   </div>
                 </div>
@@ -468,7 +583,6 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
           </div>
 
           <div className="mt-[8rem]">
-            {/* First Row */}
             <div className="container mx-auto p-4">
               <div className="flex items-stretch space-x-4">
                 <div className="flex-1 flex flex-col items-center justify-between text-center bg-[var(--block-background)] rounded-lg shadow-md p-8">
@@ -506,7 +620,7 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                     {goal.monthly_updates !== undefined && goal.type == 'Spending Limit' && (
                       <div className={styles.goalPair}>
                         <div className={styles.goalLabel}>Spent this Month:</div>
-                        <div className={styles.goalValue}>R {monthlyBudgetSpent(goal)}</div>
+                        <div className={styles.goalValue}>R {monthlyBudgetSpent(goal).toFixed(2)}</div>
                       </div>
                     )}
                     {goal.target_amount !== undefined && (
@@ -517,16 +631,16 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                     )}
                     {goal.target_date !== undefined && (
                       <>
-                      <div className={styles.goalPair}>
-                        <div className={styles.goalLabel}>Target Date:</div>
-                        <div className={styles.goalValue}>{goal.target_date}</div>
-                      </div>
-                      <div className={styles.goalPair}>
-                        <div className={styles.goalLabel}>Days Left:</div>
-                        <div className={styles.goalValue}>
-                          {calculateDaysLeft(goal.target_date) > 0 ? `${calculateDaysLeft(goal.target_date)} days` : 'Target Date Passed'}
+                        <div className={styles.goalPair}>
+                          <div className={styles.goalLabel}>Target Date:</div>
+                          <div className={styles.goalValue}>{goal.target_date}</div>
                         </div>
-                      </div>
+                        <div className={styles.goalPair}>
+                          <div className={styles.goalLabel}>Days Left:</div>
+                          <div className={styles.goalValue}>
+                            {calculateDaysLeft(goal.target_date) > 0 ? `${calculateDaysLeft(goal.target_date)} days` : 'Target Date Passed'}
+                          </div>
+                        </div>
                       </>
                     )}
                     {goal.last_update !== undefined && (
@@ -575,7 +689,57 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
               </div>
             </div>
 
-            {/* Second Row - Updates and Bar Chart */}
+            {/* Insights Section */}
+            <div className="container mx-auto p-4">
+              <div className="flex flex-col justify-center items-center bg-[var(--block-background)] rounded-lg shadow-md p-8 w-full">
+                <h2 className="text-xl font-semibold mb-4">Insights</h2>
+                <div className='justify-left items-left bg-grey w-full' style={{ fontSize: 'calc(1.2rem*var(--font-size-multiplier))' }}>
+                  {goal.target_date && calculateMonthsLeft(goal.target_date) == 0 && (
+                    <>
+                      <p>This goal's target date has passed.</p>
+                      <br></br>
+                      <p>You can set a new date by clicking "Edit Details" above.</p>
+                    </>
+                  )}
+                  {goal.type === 'Savings' && goal.target_amount && goal.target_amount > goal.current_amount && goal.target_date && calculateMonthsLeft(goal.target_date) > 0 && (
+                    <>
+                      <p>You still need to save R{calculateRemainingSavings(goal).toFixed(2)}.</p>
+                      <br></br>
+                      <p>This means you need to save R{calculateSavingsPerMonth(goal).toFixed(2)} per month in order to reach your goal by {goal.target_date}.</p>
+                      <br></br>
+                      <p>The average amount you have saved per month is R{calculateAverageSavings(goal).toFixed(2)}.</p>
+                      <br></br>
+                      {calculateSavingsGoalStatus(goal)}
+                    </>
+                  )}
+                  {goal.type === 'Savings' && goal.target_amount && goal.target_amount <= goal.current_amount && (
+                    (<p>You've reached your goal!</p>)
+                  )}
+                  {goal.type === 'Spending Limit' && (
+                    <>
+                      <p>On average, you have spent R{calculateAverageSpending(goal).toFixed(2)} per month.</p>
+                      <br></br>
+                      <p>Your average spending is {Math.abs(calculateSpendingDifferencePercentage(goal)).toFixed(2)}% {calculateSpendingDifferencePercentage(goal) > 0 ? 'above' : 'below'} your monthly limit.</p>
+                      <br></br>
+                      <p>Your biggest expense was "{calculateBiggestExpense(goal).description}" in {calculateBiggestExpenseMonth(goal)}. This used {calculateBiggestExpensePercentage(goal).toFixed(2)}% of that month's limit.</p>
+                    </>
+                  )}
+                  {goal.type === 'Debt Reduction' && goal.target_date !== undefined && goal.current_amount > 0 && goal.target_date && calculateMonthsLeft(goal.target_date) > 0 && (
+                    <>
+                      <p>You still need to pay R{calculateRemainingDebt(goal).toFixed(2)} towards this debt.</p>
+                      <br></br>
+                      <p>This means you need to pay R{(calculateRemainingDebt(goal) / calculateMonthsLeft(goal.target_date)).toFixed(2)} per month in order to reach your goal by {goal.target_date}.</p>
+                      <br></br>
+                      <p>Your average monthly payment is R{calculateAverageDebtPayments(goal).toFixed(2)}.</p>
+                    </>
+                  )}
+                  {goal.type === 'Debt Reduction' && goal.current_amount <= 0 && (
+                    (<p>You've reached your goal!</p>)
+                  )}
+                </div>
+              </div>
+            </div>
+
             {goal.updates && JSON.parse(goal.updates).length > 0 && (
               <>
                 <div className="container mx-auto p-4">
@@ -599,7 +763,7 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                             tick={{ fill: 'var(--main-text)', fontSize: 12 }}
                             stroke="var(--main-text)"
                             width={50}
-                            allowDataOverflow={true} 
+                            allowDataOverflow={true}
                             domain={['auto', 'auto']}
                           >
                             <Label
@@ -623,8 +787,8 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                             {getUpdates().map((entry: { amount: number; }, index: any) => (
                               <Cell
                                 key={`cell-${index}`}
-                                fill={goal.type === 'Spending Limit' && goal.spending_limit?
-                                  (entry.amount > goal.spending_limit? 'red' : 'var(--primary-1)')
+                                fill={goal.type === 'Spending Limit' && goal.spending_limit ?
+                                  (entry.amount > goal.spending_limit ? 'red' : 'var(--primary-1)')
                                   :
                                   (entry.amount < 0 ? 'var(--primary-2)' : 'var(--primary-1)')}
                               />
@@ -788,7 +952,7 @@ export function GoalsPage() {
       fetchGoals();
     }
   }, [sortOption, selectedGoal]); // Only fetch if there's no selected goal to avoid reopening
-  
+
 
   const monthlyBudgetSpent = (goal: Goal): number => {
     if (goal.monthly_updates !== undefined) {
@@ -845,7 +1009,12 @@ export function GoalsPage() {
   const getTransactionsForAccounts = async (accountNumbers: string[]): Promise<any[]> => {
     if (user && user.uid) {
       let transactionsList: any[] = [];
-      const years = ["transaction_data_2024", "transaction_data_2023"];  // Adjust year ranges as needed.
+      const currentYear = new Date().getFullYear();
+      const years = [];
+
+      for (let year = 1980; year <= currentYear; year++) {
+        years.push(`transaction_data_${year}`);
+      }
 
       try {
         for (let year of years) {
@@ -965,8 +1134,7 @@ export function GoalsPage() {
           goal.monthly_updates = JSON.stringify(monthlyUpdates);
           goal.last_update = new Date().toISOString();
 
-          // Update Firestore
-          await updateGoalInDB(goal); // Firestore update logic goes here
+          await updateGoalInDB(goal);
         }
       }
     } catch (error) {
@@ -1078,7 +1246,7 @@ export function GoalsPage() {
                             <div
                               className="absolute top-0 left-0 h-full bg-green-500 rounded"
                               style={{
-                                width: goal.current_amount < 0? 0:`${Math.min(100, calculateProgressPercentage(goal))}%`,
+                                width: goal.current_amount < 0 ? 0 : `${Math.min(100, calculateProgressPercentage(goal))}%`,
                                 backgroundColor: 'var(--primary-2)',
                               }}
                             />
