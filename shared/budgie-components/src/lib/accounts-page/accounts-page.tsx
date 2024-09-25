@@ -235,44 +235,28 @@ function AccountUnit(props: AccountUnitProps) {
       onClick={() => {
         router.push(`accounts/${props.account.number}`);
       }}
-      className="w-[full] cursor-pointer shadow-md min-w-[23rem] max-w-[23rem] m-[1rem] rounded-[2rem] h-[21rem] flex flex-col items-center justify-center bg-BudgieWhite hover:shadow-2xl transition-shadow"
+      className="cursor-pointer p-2 shadow-md w-full lg:min-h-80 md:max-h-60 md:min-h-60 max-h-40 min-h-40 rounded-[2rem]  flex flex-col items-center justify-center bg-BudgieWhite hover:shadow-2xl transition-shadow"
       style={{ backgroundColor: 'var(--block-background)' }}
     >
       {props.account.type == 'current' && (
-        <span
-          className="text-black material-symbols-outlined"
-          style={{
-            fontSize: '9rem',
-            color: 'var(--main-text)',
-          }}
-        >
+        <span className="text-black material-symbols-outlined lg:!text-[9rem] md:!text-[6rem]">
           account_balance
         </span>
       )}
       {props.account.type == 'savings' && (
-        <span
-          className="text-black material-symbols-outlined"
-          style={{
-            fontSize: '9rem',
-          }}
-        >
+        <span className="text-black material-symbols-outlined lg:!text-[9rem] md:!text-[6rem]">
           savings
         </span>
       )}
       {props.account.type == 'custom' && (
-        <span
-          className="text-black material-symbols-outlined"
-          style={{
-            fontSize: '9rem',
-          }}
-        >
+        <span className="text-black material-symbols-outlined lg:!text-[9rem] md:!text-[6rem]">
           tune
         </span>
       )}
-      <span className="font-TripSans font-medium text-3xl">
+      <span className="font-TripSans font-medium lg:text-3xl text-center">
         {props.account.alias}
       </span>
-      <span className="mt-4 font-TripSans font-medium opacity-25 text-sm">
+      <span className="mt-4 font-TripSans font-medium opacity-25 lg:text-sm text-center hidden sm:inline">
         {props.account.name}
       </span>
     </div>
@@ -286,17 +270,12 @@ function AddAccountIcon() {
       onClick={() => {
         router.push('/accounts/new');
       }}
-      className="w-[full] cursor-pointer min-w-[23rem] max-w-[23rem] m-[1rem] rounded-[2rem] h-[21rem] flex flex-col items-center justify-center hover:bg-black hover:bg-opacity-5 border-dashed border-2 border-gray-400 border-opacity-40 hover:border-opacity-100"
+      className=" cursor-pointer shadow-md w-full lg:min-h-80 md:max-h-60 md:min-h-60 max-h-40 min-h-40 rounded-[2rem] flex flex-col items-center justify-center hover:bg-black hover:bg-opacity-5 border-dashed border-2 border-gray-400 border-opacity-40 hover:border-opacity-100"
     >
-      <span className="mt-5 text-xl text-gray-400 text-opacity-60">
+      <span className="mt-5 md:text-xl lg:text-2xl text-gray-400 text-opacity-60 text-center">
         Add an Account
       </span>
-      <span
-        className="mt-2 text-opacity-50 text-gray-400 material-symbols-outlined"
-        style={{
-          fontSize: '3rem',
-        }}
-      >
+      <span className="mt-2 text-opacity-50 text-gray-400 material-symbols-outlined lg:!text-[3rem] md:!text-[2rem]">
         add
       </span>
     </div>
@@ -344,7 +323,7 @@ function InfoSection(props: GraphSectionProps) {
       <>
         {balancePrev <= balanceTotal && (
           <span
-            className="text-BudgieGreen1 material-symbols-outlined"
+            className="text-BudgieGreen1 material-symbols-outlined !text-[1rem] md:!text-[2rem] "
             style={{
               fontSize: '2rem',
             }}
@@ -354,7 +333,7 @@ function InfoSection(props: GraphSectionProps) {
         )}
         {balancePrev > balanceTotal && (
           <span
-            className="text-red-400 material-symbols-outlined"
+            className="text-red-400 material-symbols-outlined !text-[1rem] md:!text-[2rem]"
             style={{
               fontSize: '2rem',
             }}
@@ -368,25 +347,24 @@ function InfoSection(props: GraphSectionProps) {
 
   return (
     <>
-      <span className="font-TripSans font-bold text-3xl ml-10">
+      <span className="font-TripSans font-bold lg:text-2xl ml-10 hidden md:inline">
         {recentMonth}
       </span>
-      <div className="mr-10 h-full flex flex-col items-start justify-center">
+      <div className="mr-10 h-full flex flex-col items-end justify-center">
         <div className="flex items-center">
-          <span className="font-TripSans font-bold text-3xl">
-            Total Balance: R {formatTransactionValue(balanceTotal)}
+          <span className="font-TripSans font-bold lg:text-2xl text-center">
+            Total Balance: R{formatTransactionValue(balanceTotal)}
           </span>
           <UpOrDown></UpOrDown>
         </div>
-        <div>
-          {props.yAxis[11] == 0 && (
-            <>
-              <span className="font-TripSans text-gray-400">
-                Upload More Financial data to update balance.
-              </span>
-            </>
-          )}
-        </div>
+
+        {props.yAxis[11] == 0 && (
+          <>
+            <span className="font-TripSans text-gray-400 lg:text-lg text-sm text-right">
+              Upload More Financial data to update balance.
+            </span>
+          </>
+        )}
       </div>
     </>
   );
@@ -468,25 +446,32 @@ export function AccountsPage(props: AccountsPageProps) {
       )}
       {!showNoAccounts && (
         <div className="mainPage">
-          <div
-            className="w-full h-[10%] flex items-center justify-between shadow-md bg-BudgieWhite rounded-[2rem]"
-            style={{ backgroundColor: 'var(--block-background)' }}
-          >
-            <InfoSection xAxis={graphX} yAxis={graphY}></InfoSection>
-          </div>
-          <div
-            className="w-full h-[40%] mt-[1rem] fl shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center"
-            style={{ backgroundColor: 'var(--block-background)' }}
-          >
-            {graphX.length != 0 && graphY.length != 0 && (
-              <GraphSection xAxis={graphX} yAxis={graphY}></GraphSection>
-            )}
-          </div>
-          <div className="w-full grid grid-cols-3">
-            {accountsArray.map((account) => (
-              <AccountUnit account={account} key={account.number}></AccountUnit>
-            ))}
-            <AddAccountIcon></AddAccountIcon>
+          <div className="w-full h-full flex flex-col items-center justify-center gap-0">
+            <div className="md:w-[85%] w-[100%] h-full min-w-60">
+              <div
+                className="w-full h-[10%] mt-8 min-h-20 flex items-center md:justify-between justify-center shadow-md bg-BudgieWhite rounded-[2rem]"
+                style={{ backgroundColor: 'var(--block-background)' }}
+              >
+                <InfoSection xAxis={graphX} yAxis={graphY}></InfoSection>
+              </div>
+              <div
+                className="w-full h-[40%] min-h-80 mt-[1rem] fl shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center"
+                style={{ backgroundColor: 'var(--block-background)' }}
+              >
+                {graphX.length != 0 && graphY.length != 0 && (
+                  <GraphSection xAxis={graphX} yAxis={graphY}></GraphSection>
+                )}
+              </div>
+              <div className="w-full grid grid-cols-3 place-items-center lg:px-0 py-4 gap-4">
+                {accountsArray.map((account) => (
+                  <AccountUnit
+                    account={account}
+                    key={account.number}
+                  ></AccountUnit>
+                ))}
+                <AddAccountIcon></AddAccountIcon>
+              </div>
+            </div>
           </div>
         </div>
       )}
