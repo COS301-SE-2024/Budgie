@@ -263,11 +263,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
         console.error('Error saving goal:', error);
       }
     }
-  };
-  
-  
-  
-  
+  };  
 
   function getMonthName(dateString: string) {
     const date = new Date(dateString);

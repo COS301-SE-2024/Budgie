@@ -485,12 +485,6 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                         {goal.update_type == 'manual' && 'Manual Only'}
                       </div>
                     </div>
-                    {goal.target_date && (
-                      <div className={styles.goalPair}>
-                        <div className={styles.goalLabel}>Target Date:</div>
-                        <div className={styles.goalValue}>{goal.target_date}</div>
-                      </div>
-                    )}
                     {goal.initial_amount !== undefined && (
                       <div className={styles.goalPair}>
                         <div className={styles.goalLabel}>Initial Amount:</div>
@@ -522,12 +516,18 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                       </div>
                     )}
                     {goal.target_date !== undefined && (
+                      <>
+                      <div className={styles.goalPair}>
+                        <div className={styles.goalLabel}>Target Date:</div>
+                        <div className={styles.goalValue}>{goal.target_date}</div>
+                      </div>
                       <div className={styles.goalPair}>
                         <div className={styles.goalLabel}>Days Left:</div>
                         <div className={styles.goalValue}>
                           {calculateDaysLeft(goal.target_date) > 0 ? `${calculateDaysLeft(goal.target_date)} days` : 'Target Date Passed'}
                         </div>
                       </div>
+                      </>
                     )}
                     {goal.last_update !== undefined && (
                       <div className={styles.goalPair}>
@@ -587,7 +587,8 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                       <ResponsiveContainer width="100%" height="80%">
                         <BarChart
                           data={getUpdates()}
-                          margin={{ top: 20, right: 30, bottom: 20, left: 30 }}
+                          margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
+                          startAngle={180}
                         >
                           <XAxis
                             dataKey="month"
@@ -598,6 +599,8 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                             tick={{ fill: 'var(--main-text)', fontSize: 12 }}
                             stroke="var(--main-text)"
                             width={50}
+                            allowDataOverflow={true} 
+                            domain={['auto', 'auto']}
                           >
                             <Label
                               value="Amount"
@@ -616,15 +619,14 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                             }}
                           />
                           <CartesianGrid stroke="rgba(255, 255, 255, 0.1)" vertical={false} />
-                          <Bar dataKey="amount" radius={[10, 10, 0, 0]} barSize={40} stroke="var(--main-border)" strokeWidth={1}>
+                          <Bar dataKey="amount" fill="var(--primary-1)" barSize={40} stroke="var(--main-border)" strokeWidth={1}>
                             {getUpdates().map((entry: { amount: number; }, index: any) => (
                               <Cell
                                 key={`cell-${index}`}
-                                fill={
-                                  goal.type === 'Spending Limit' && goal.spending_limit && entry.amount > goal.spending_limit
-                                    ? 'red' // Color for bars that exceed the limit
-                                    : 'var(--primary-1)' // Default color
-                                }
+                                fill={goal.type === 'Spending Limit' && goal.spending_limit?
+                                  (entry.amount > goal.spending_limit? 'red' : 'var(--primary-1)')
+                                  :
+                                  (entry.amount < 0 ? 'var(--primary-2)' : 'var(--primary-1)')}
                               />
                             ))}
                           </Bar>
@@ -753,28 +755,28 @@ export function GoalsPage() {
             ...data,
           };
         });
-  
+
         if (goalsList.length > 0) {
           setHasGoals(true);
         }
-        
+
         // Sort the goals
         const sortedGoals = sortGoals(goalsList, sortOption);
         setGoals(sortedGoals);
-  
+
         // Automatically update goals with update_type === "automatic"
         const automaticGoals = sortedGoals.filter((goal) => goal.update_type === "automatic");
         automaticGoals.forEach(async (goal) => {
           await updateTransactionsForGoal(goal);
           handleGoalUpdate(goal); // Update the goal in state after the transactions are updated
         });
-  
+
       } catch (error) {
         console.error('Error getting goals document:', error);
       }
     }
   };
-  
+
 
   const addGoalPopup = () => {
     setIsGoalPopupOpen(!isGoalPopupOpen);
@@ -782,8 +784,11 @@ export function GoalsPage() {
   };
 
   useEffect(() => {
-    fetchGoals();
-  }, [sortOption, selectedGoal]);
+    if (!selectedGoal) {
+      fetchGoals();
+    }
+  }, [sortOption, selectedGoal]); // Only fetch if there's no selected goal to avoid reopening
+  
 
   const monthlyBudgetSpent = (goal: Goal): number => {
     if (goal.monthly_updates !== undefined) {
@@ -809,7 +814,7 @@ export function GoalsPage() {
 
   const getAccountNumbersForCondition = async (aliases: string[]): Promise<string[]> => {
     const accountNumbers: string[] = [];
-  
+
     if (user && user.uid && aliases.length > 0) {
       try {
         const accountsCollectionRef = collection(db, "accounts");
@@ -822,7 +827,7 @@ export function GoalsPage() {
             where("alias", "in", batch)  // Query for batches of aliases
           );
           const querySnapshot = await getDocs(q);
-  
+
           querySnapshot.forEach((doc) => {
             const data = doc.data();
             if (data.account_number) {
@@ -836,12 +841,12 @@ export function GoalsPage() {
     }
     return accountNumbers;
   };
-  
+
   const getTransactionsForAccounts = async (accountNumbers: string[]): Promise<any[]> => {
     if (user && user.uid) {
       let transactionsList: any[] = [];
       const years = ["transaction_data_2024", "transaction_data_2023"];  // Adjust year ranges as needed.
-  
+
       try {
         for (let year of years) {
           for (let accountNumber of accountNumbers) {
@@ -851,18 +856,18 @@ export function GoalsPage() {
               where("uid", "==", user.uid)
             );
             const querySnapshot = await getDocs(q);
-  
+
             querySnapshot.forEach((doc) => {
               const docData = doc.data();
               const months = [
                 "january", "february", "march", "april", "may", "june",
                 "july", "august", "september", "october", "november", "december"
               ];
-  
+
               months.forEach((month) => {
                 if (docData[month]) {
                   const transactions = JSON.parse(docData[month]);
-  
+
                   // Add transactions to the overall list
                   transactionsList = transactionsList.concat(transactions.map((transaction: { amount: number }) => ({
                     ...transaction,
@@ -876,24 +881,24 @@ export function GoalsPage() {
       } catch (error) {
         console.error("Error fetching transactions:", error);
       }
-  
+
       return transactionsList;
     }
     return [];
   };
-  
+
   const filterTransactionsByCategory = (transactions: any[], category: string): any[] => {
     if (!category || category === "Any") {
       return transactions;  // No filtering if category is "Any" or not provided
     }
-  
+
     return transactions.filter((transaction: { category: string }) => transaction.category === category);
   };
-  
+
   const filterTransactionsByKeywords = (transactions: any[], keywords: string[]): any[] => {
     const matchingTransactions: any[] = [];
     const remainingTransactions = [...transactions];  // Copy the transaction list to modify
-  
+
     keywords.forEach((keyword) => {
       for (let i = remainingTransactions.length - 1; i >= 0; i--) {
         const transaction = remainingTransactions[i];
@@ -903,30 +908,30 @@ export function GoalsPage() {
         }
       }
     });
-  
+
     // If no keywords are provided, return all remaining transactions
     if (keywords.length === 0) {
       return remainingTransactions;
     }
-  
+
     return matchingTransactions;
   };
-  
+
   const updateTransactionsForGoal = async (goal: Goal) => {
     try {
       const conditions = goal.conditions ? JSON.parse(goal.conditions) : [];
       let allMatchingTransactions: any[] = [];
-  
+
       for (let condition of conditions) {
         const { accounts, category, keywords } = condition;
-  
+
         const conditionAccountNumbers = await getAccountNumbersForCondition(accounts);
         let transactionsForCondition = await getTransactionsForAccounts(conditionAccountNumbers);
         transactionsForCondition = filterTransactionsByCategory(transactionsForCondition, category);
         const keywordFilteredTransactions = filterTransactionsByKeywords(transactionsForCondition, keywords || []);
         allMatchingTransactions = allMatchingTransactions.concat(keywordFilteredTransactions);
       }
-  
+
       if (allMatchingTransactions.length > 0) {
         const existingUpdates = goal.updates ? JSON.parse(goal.updates) : [];
         const deletedUpdates = goal.deleted_updates ? JSON.parse(goal.deleted_updates) : [];
@@ -946,7 +951,7 @@ export function GoalsPage() {
             existingTx.category === newTx.category
           );
         });
-  
+
         if (newTransactions.length > 0) {
           for (let i = 0; i < newTransactions.length; i++) {
             if (goal.type !== 'Debt Reduction') {
@@ -959,7 +964,7 @@ export function GoalsPage() {
           const monthlyUpdates = aggregateMonthlyUpdates([...existingUpdates, ...newTransactions]);
           goal.monthly_updates = JSON.stringify(monthlyUpdates);
           goal.last_update = new Date().toISOString();
-  
+
           // Update Firestore
           await updateGoalInDB(goal); // Firestore update logic goes here
         }
@@ -968,42 +973,42 @@ export function GoalsPage() {
       console.error("Error updating transactions for goal:", error);
     }
   };
-  
+
   const aggregateMonthlyUpdates = (transactions: any[]): { amount: number; month: string }[] => {
     const monthlySums: { [key: string]: number } = {};
-  
+
     transactions.forEach((transaction) => {
       const date = new Date(transaction.date);
       const monthYear = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
-  
+
       if (!monthlySums[monthYear]) {
         monthlySums[monthYear] = 0;
       }
-  
+
       monthlySums[monthYear] += transaction.amount;
     });
-  
+
     // Convert the monthlySums object to an array in the required format
     return Object.entries(monthlySums).map(([month, amount]) => ({
       amount: parseFloat(amount.toFixed(2)),  // Ensures two decimal points
       month,
     }));
-  };  
+  };
 
-// Function to update goal in Firestore
-const updateGoalInDB = async (goal: Goal) => {
-  try {
-    const goalDocRef = doc(db, "goals", goal.id);
-    await updateDoc(goalDocRef, {
-      updates: goal.updates,
-      current_amount: goal.current_amount,
-      monthly_updates: goal.monthly_updates,
-      last_update: goal.last_update
-    });
-  } catch (error) {
-    console.error("Error updating goal in Firestore:", error);
-  }
-};
+  // Function to update goal in Firestore
+  const updateGoalInDB = async (goal: Goal) => {
+    try {
+      const goalDocRef = doc(db, "goals", goal.id);
+      await updateDoc(goalDocRef, {
+        updates: goal.updates,
+        current_amount: goal.current_amount,
+        monthly_updates: goal.monthly_updates,
+        last_update: goal.last_update
+      });
+    } catch (error) {
+      console.error("Error updating goal in Firestore:", error);
+    }
+  };
 
 
   return (
@@ -1073,7 +1078,7 @@ const updateGoalInDB = async (goal: Goal) => {
                             <div
                               className="absolute top-0 left-0 h-full bg-green-500 rounded"
                               style={{
-                                width: `${Math.min(100, calculateProgressPercentage(goal))}%`,
+                                width: goal.current_amount < 0? 0:`${Math.min(100, calculateProgressPercentage(goal))}%`,
                                 backgroundColor: 'var(--primary-2)',
                               }}
                             />

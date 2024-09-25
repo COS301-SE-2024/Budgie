@@ -769,9 +769,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
           {/* Button Container */}
 
           <div className={styles.buttonContainer}>
-            <button className={styles.cancelButton} onClick={props.togglePopup}>
-              Cancel
-            </button>
             <button className={styles.prevButton} onClick={handleBack}>
               Back
             </button>
