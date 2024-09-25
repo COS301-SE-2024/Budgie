@@ -190,7 +190,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
                 handleButtonClick('FNB');
               }}
             >
-              <Image src={fnb} width={150} alt="FNB"></Image>
+              <Image className="p-2" src={fnb} width={150} alt="FNB"></Image>
             </button>
             <input
               type="file"
@@ -685,53 +685,50 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
       >
         <div
-          className="flex flex-col items-center justify-start rounded-[3rem] w-[45%] h-4/6 bg-BudgieGray "
+          className="flex flex-col px-2 md:px-6 items-center justify-around rounded-[3rem] w-80 md:w-auto md:h-1/2 min-h-[26rem] bg-BudgieGray "
           onClick={(e) => handleChildElementClick(e)}
           style={{ backgroundColor: 'var(--main-background)' }}
         >
-          <span className="mt-3 text-3xl font-TripSans font-medium">
-            Account Summary
-          </span>
           <div
-            className="bg-BudgieWhite shadow-lg mt-6 py-8 px-6 rounded-3xl flex flex-col items-start justify-center"
+            className="bg-BudgieWhite py-6 px-6 rounded-3xl flex flex-col items-start justify-around max-w-[100%]"
             style={{ backgroundColor: 'var(--block-background)' }}
           >
-            <div className="">
-              <span className="mr-3 text-2xl font-TripSans font-medium">
+            <div className=" flex flex-col md:inline">
+              <span className="mr-3 md:text-2xl font-TripSans font-medium">
                 Type:
               </span>
               <span
-                className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium"
+                className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg md:text-2xl font-TripSans font-medium"
                 style={{ backgroundColor: 'var(--primary-1)' }}
               >
                 {accountType}
               </span>
             </div>
-            <div className="mt-5">
-              <span className="mr-3 text-2xl font-TripSans font-medium">
+            <div className="mt-5 flex flex-col md:inline">
+              <span className="mr-3 md:text-2xl font-TripSans font-medium">
                 Name:
               </span>
               <span
-                className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium"
+                className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg md:text-2xl font-TripSans font-medium"
                 style={{ backgroundColor: 'var(--primary-1)' }}
               >
                 {accountName}
               </span>
             </div>
-            <div className="mt-5">
-              <span className="mr-3 text-2xl font-TripSans font-medium">
+            <div className="mt-5 flex flex-col md:inline">
+              <span className="mr-3 md:text-2xl font-TripSans font-medium">
                 Account Number:
               </span>
               <span
-                className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium"
+                className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg md:text-2xl font-TripSans font-medium"
                 style={{ backgroundColor: 'var(--primary-1)' }}
               >
                 {accountNumber}
               </span>
             </div>
           </div>
-          <div className="flex justify-center items-baseline w-full mt-5">
-            <span className="mt-10 mr-4 text-3xl font-TripSans font-medium">
+          <div className="flex justify-center items-baseline w-full">
+            <span className=" mr-4 md:text-3xl text-xl font-TripSans font-medium">
               Alias:
             </span>
             <input
@@ -740,8 +737,8 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               onChange={handleChange}
               className={`${
                 !aliasError
-                  ? 'bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-[#07456F] outline-none focus:border-1 focus:border-BudgieAccentHover'
-                  : 'bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-red-400 outline-none focus:border-1 focus:border-red-400'
+                  ? 'bg-white md:text-3xl text-xl w-2/3  px-5 py-4 rounded-xl border-2 border-[#07456F] outline-none focus:border-1 focus:border-BudgieAccentHover'
+                  : 'bg-white md:text-3xl text-xl w-2/3  px-5 py-4 rounded-xl border-2 border-red-400 outline-none focus:border-1 focus:border-red-400'
               }`}
               type="text"
               style={{ color: 'black' }}
@@ -749,7 +746,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
           </div>
           <button
             onClick={handleAddAccountClick}
-            className="mt-12 bg-[#07456F] hover:shadow-2xl hover:bg-BudgieAccentHover  text-BudgieWhite text-2xl p-3 rounded-3xl font-bold transition-all ease-in"
+            className=" bg-[#07456F] hover:shadow-2xl hover:bg-BudgieAccentHover  text-BudgieWhite md:text-2xl p-3 rounded-3xl font-bold transition-all ease-in"
           >
             Add Account
           </button>
@@ -769,22 +766,20 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     return (
-      <div onClick={handleExit} className={styles.mainPageBlurModal}>
+      <div
+        onClick={handleExit}
+        className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
+      >
         <div
-          className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
+          className="flex flex-col items-center justify-center rounded-[2rem] md:w-96 md:h-96 w-56 h-56 bg-BudgieWhite "
           onClick={(e) => handleChildElementClick(e)}
           style={{ backgroundColor: 'var(--block-background)' }}
         >
-          <span className="text-center text-3xl font-TripSans font-bold">
+          <span className="text-center md:text-3xl font-TripSans font-bold">
             Account and financial <br />
             data added
           </span>
-          <span
-            className="mt-6 text-BudgieGreen1 material-symbols-outlined"
-            style={{
-              fontSize: '9rem',
-            }}
-          >
+          <span className="mt-6 text-BudgieGreen1 material-symbols-outlined md:!text-[9rem] !text-[3rem]">
             verified
           </span>
         </div>
@@ -803,17 +798,20 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     return (
-      <div onClick={handleExit} className={styles.mainPageBlurModal}>
+      <div
+        onClick={handleExit}
+        className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
+      >
         <div
-          className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
+          className="flex flex-col items-center justify-center rounded-[2rem] md:w-96 md:h-96 w-56 h-56 bg-BudgieWhite "
           onClick={(e) => handleChildElementClick(e)}
         >
-          <span className="text-center text-3xl font-TripSans font-bold">
+          <span className="text-center md:text-3xl font-TripSans font-bold">
             Account already <br />
             tracking
           </span>
           <span
-            className="mt-6 text-red-400 material-symbols-outlined"
+            className="mt-6 text-red-400 material-symbols-outlined md:!text-[9rem] !text-[4rem]"
             style={{
               fontSize: '9rem',
             }}
@@ -834,9 +832,12 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     return (
-      <div onClick={handleExit} className={styles.mainPageBlurModal}>
+      <div
+        onClick={handleExit}
+        className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
+      >
         <div
-          className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
+          className="flex flex-col items-center justify-center rounded-[2rem] md:w-96 md:h-96 w-56 h-56 bg-BudgieWhite "
           onClick={(e) => handleChildElementClick(e)}
           style={{ backgroundColor: 'var(--block-background)' }}
         >
