@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';
 import { PlanningPage } from '@capstone-repo/shared/budgie-components';
+import { PlanningPageRevised } from '@capstone-repo/shared/budgie-components';
 
 export default function settings() {
   const router = useRouter();
@@ -19,5 +20,6 @@ export default function settings() {
     }
   }, [user]);
 
-  return <>{!loading && <PlanningPage></PlanningPage>}</>;
+  // return <>{!loading && <PlanningPage></PlanningPage>}</>;
+  return <>{!loading && <PlanningPageRevised></PlanningPageRevised>}</>;
 }
