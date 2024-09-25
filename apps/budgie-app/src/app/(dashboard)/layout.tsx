@@ -1,7 +1,6 @@
 'use client';
 
 import { NewNavbar } from '@capstone-repo/shared/budgie-components';
-import styles from './page.module.css';
 
 export default function DashboardLayout({
   children, // will be a page or nested layout
@@ -9,7 +8,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={styles.fullPage}>
+    <div className="flex overflow-y-auto h-full">
       <NewNavbar />
       {children}
     </div>

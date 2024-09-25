@@ -1,4 +1,4 @@
-import './global.css';
+import './globals.css';
 import { Providers } from './providers';
 import { Metadata } from 'next';
 import type { Viewport } from 'next';
