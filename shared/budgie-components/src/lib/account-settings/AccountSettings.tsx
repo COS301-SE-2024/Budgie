@@ -1,24 +1,18 @@
 'use client';
 import styles from './AccountSettings.module.css';
 import '../../root.css';
-import React, { useState, useEffect, useContext } from 'react';
-import {
-  doc,
-  getDoc,
-  updateDoc,
-  getFirestore,
-  collection,
-  getDocs,
-} from 'firebase/firestore';
-import { updatePassword } from 'firebase/auth';
-import { UserContext } from '@capstone-repo/shared/budgie-components';
-import { db, auth } from '../../../../../apps/budgie-app/firebase/clientApp';
+import React, { useState, useContext } from 'react';
 import {
   getAuth,
   reauthenticateWithCredential,
   EmailAuthProvider,
+  GoogleAuthProvider,
+  signInWithPopup,
   deleteUser,
+  updatePassword
 } from 'firebase/auth';
+import { UserContext } from '@capstone-repo/shared/budgie-components';
+import { FirebaseError } from 'firebase/app';
 
 /* eslint-disable-next-line */
 export interface AccountSettingsProps {
@@ -27,92 +21,118 @@ export interface AccountSettingsProps {
 
 export function AccountSettings(props: AccountSettingsProps) {
   const auth = getAuth();
-  let user = null;
-  if (auth) {
-    user = auth.currentUser;
-  }
-  const [password, setPassword] = useState<string>('');
+  const user = auth.currentUser;
+
+  const [password, setPassword] = useState<string>(''); // To store user password for reauthentication
   const [message, setMessage] = useState<string>('');
-  const [OldPassword, setOldPassword] = useState<string>('');
+  const [oldPassword, setOldPassword] = useState<string>('');
   const [newPassword, setNewPassword] = useState<string>('');
+  const [conPassword, setConPassword] = useState<string>('');
   const [error, setError] = useState(false);
-  const [ConPassword, setConPassword] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleChangePassword = async () => {
-    const user = useContext(UserContext);
-    // const user = auth.currentUser;
-    setError(!error);
+    /*const user = useContext(UserContext);
+    setError(false);
     setMessage('');
+
     if (!user) {
-      console.error('No user is currently logged in.');
       setError(true);
       setErrorMessage('No user is currently logged in.');
       return;
     }
-    if (user.email) {
-      const credential = EmailAuthProvider.credential(user.email, OldPassword);
-
-      try {
-        await reauthenticateWithCredential(user, credential);
-        console.log('Authenticated successfully');
-      } catch (error) {
-        console.log('Reauthentication failed');
-        setError(true);
-        setErrorMessage('error');
-        return;
-      }
-    }
-
-    const r =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
     try {
-      const ans = r.test(newPassword);
-      if (ans === false) {
-        const e = new Error('Weak password');
-        throw e;
+      // Reauthenticate user with old password
+      const credential = EmailAuthProvider.credential(user.email, oldPassword);
+      await reauthenticateWithCredential(user, credential);
+      console.log('Authenticated successfully');
+
+      // Check password complexity
+      const r = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      if (!r.test(newPassword)) {
+        throw new Error('Weak password');
       }
-      if (newPassword !== ConPassword) {
+      if (newPassword !== conPassword) {
         setError(true);
         setErrorMessage('Password mismatch');
         return;
       }
+
+      // Update the password
       await updatePassword(user, newPassword);
       console.log('New password set');
       handlecClosePopup();
     } catch (e) {
       console.log('Error setting new password');
       setError(true);
-      setErrorMessage('error');
-    }
+      setErrorMessage('Error updating password');
+    }*/
   };
 
   const handleDeleteUser = async () => {
-    console.log('hi');
     if (!user) {
       setMessage('No user is signed in');
       return;
     }
-    const credential = EmailAuthProvider.credential(user.email || '', password);
-    //const db = getFirestore();
+  
     try {
-      await reauthenticateWithCredential(user, credential);
-      /*const userRef = doc(db, 'accounts', user.uid);
-      await updateDoc(userRef, {
-        account_number: 'ANONYMIZED',
-        alias: 'ANONYMIZED',
-        name: 'ANONYMIZED',
-      });*/
+      if (user.providerData[0].providerId === 'google.com') {
+        const provider = new GoogleAuthProvider();
+        const result = await signInWithPopup(auth, provider);
+  
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        if (credential) {
+          await reauthenticateWithCredential(user, credential);
+          console.log('Reauthenticated with Google');
+        } else {
+          throw new Error('Failed to retrieve Google credentials');
+        }
+      } else if (user.providerData[0].providerId === 'password') {
+        if (!password) {
+          setErrorMessage('Please enter your password.');
+          return;
+        }
+  
+        // Create credential with email and password
+        const credential = EmailAuthProvider.credential(user.email || '', password);
+  
+        // Attempt reauthentication with email/password
+        await reauthenticateWithCredential(user, credential);
+        console.log('Reauthenticated with email and password');
+      }
+  
+      // Proceed with account deletion
       await deleteUser(user);
+      alert('Your account has been deleted.');
       auth.signOut();
-
-      //alert('User deleted.');
+      setMessage('Account successfully deleted');
+  
     } catch (error) {
-      console.log('Error deleting user:', error);
-      //alert('Failed to delete user: ' + (error as Error).message);
+      // Ensure that the error is an instance of FirebaseError
+      if (error instanceof FirebaseError) {
+        // Check if the error is due to wrong password
+        if (error.code === 'auth/wrong-password') {
+          setErrorMessage('Incorrect password. Please try again.');
+          alert('Incorrect password. Please try again.');
+        } else if (error.code === 'auth/popup-closed-by-user') {
+          setErrorMessage('Popup closed before reauthentication.');
+          alert('Popup closed before reauthentication.');
+        } else {
+          console.log('Error deleting user:', error);
+          setErrorMessage('Failed to delete user: ' + error.message);
+          alert('Error deleting user: ' + error.message);
+        }
+      } else {
+        // If the error is not a FirebaseError, log and display a generic message
+        console.log('Unknown error:', error);
+        setErrorMessage('An unknown error occurred. Please try again.');
+        alert('An unknown error occurred. Please try again.');
+      }
     }
   };
+  
+
   const [isPopupVisible, setPopupVisible] = useState(false);
   const [isCPopupVisible, setCPopupVisible] = useState(false);
 
@@ -121,6 +141,7 @@ export function AccountSettings(props: AccountSettingsProps) {
   };
 
   const handleClosePopup = () => {
+    setPassword('');
     setPopupVisible(false);
   };
 
@@ -130,7 +151,7 @@ export function AccountSettings(props: AccountSettingsProps) {
 
   const handlecClosePopup = () => {
     setCPopupVisible(false);
-    setError(!error);
+    setError(false);
   };
 
   return (
@@ -150,7 +171,7 @@ export function AccountSettings(props: AccountSettingsProps) {
           <p className={styles.settingTitle}>Password Management</p>
           <p className={styles.settingDescription}>Change your password.</p>
           <button
-            className={styles.deleteButton}
+            className={styles.actionButton}
             onClick={handlePassChangeClick}
           >
             <div className={styles.deleteButton}>Change password</div>
@@ -161,7 +182,7 @@ export function AccountSettings(props: AccountSettingsProps) {
                 <p className="mb-2">Type in your old password:</p>
                 <input
                   type="password"
-                  value={OldPassword}
+                  value={oldPassword}
                   placeholder="Enter your old password"
                   onChange={(e) => setOldPassword(e.target.value)}
                   className="px-2 py-2 border border-gray-300 rounded w-500 mb-4"
@@ -177,7 +198,7 @@ export function AccountSettings(props: AccountSettingsProps) {
                 <p className="mb-2">Confirm new password:</p>
                 <input
                   type="password"
-                  value={ConPassword}
+                  value={conPassword}
                   placeholder="Confirm new password"
                   onChange={(e) => setConPassword(e.target.value)}
                   className="px-2 py-2 border border-gray-300 rounded w-500 mb-4 "
@@ -211,7 +232,7 @@ export function AccountSettings(props: AccountSettingsProps) {
             Click the button below to start deleting your account. Learn about
             our deletion policy here.
           </p>
-          <button className={styles.deleteButton} onClick={handleDeleteClick}>
+          <button className={styles.actionButton} onClick={handleDeleteClick}>
             <div className={styles.deleteButton}>Delete Account</div>
           </button>
           {isPopupVisible && (
