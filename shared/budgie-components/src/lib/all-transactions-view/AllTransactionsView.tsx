@@ -32,7 +32,6 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   const [yearsWithData, setYearsWithData] = useState<number[]>([]);
   const [LeftArrowStyle, setLeftArrowStyle] = useState('');
   const [RightArrowStyle, setRightArrowStyle] = useState('');
-
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [userGoals, setUserGoals] = useState<Goal[]>([]);
@@ -465,28 +464,28 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
         <div className={styles.transactionsList}>
           {transactions.length > 0 && (
             <div className={styles.transactions}>
-            <br />
-            {transactions.map((transaction, index) => (
-              <div
-                key={index}
-                className={styles.transactionCard}
-                style={{
-                  borderLeft: transaction.amount >= 0 ? '15px solid #8EE5A2' : '15px solid var(--primary-1)',
-                }}
-              >
-                <div className={styles.transactionContent}>
-                  <div className={styles.transactionDate}>{transaction.date}</div>
-                  <div
-                    className={styles.transactionDescription}
-                    onClick={() => handleDescriptionClick(transaction)}
-                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                  >
-                    {transaction.description}
-                  </div>
-                  <div className={styles.transactionAmount}>
-                    {formatTransactionValue(transaction.amount)}
-                  </div>
-                  <select
+              <br />
+              {transactions.map((transaction, index) => (
+                <div
+                  key={index}
+                  className={styles.transactionCard}
+                  style={{
+                    borderLeft: transaction.amount >= 0 ? '15px solid #8EE5A2' : '15px solid var(--primary-1)',
+                  }}
+                >
+                  <div className={styles.transactionContent}>
+                    <div className={styles.transactionDate}>{transaction.date}</div>
+                    <div
+                      className={styles.transactionDescription}
+                      onClick={() => handleDescriptionClick(transaction)}
+                      style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                    >
+                      {transaction.description}
+                    </div>
+                    <div className={styles.transactionAmount}>
+                      {formatTransactionValue(transaction.amount)}
+                    </div>
+                    <select
                       className={`${styles.categoryDropdown} ${getCategoryStyle(
                         transaction.category
                       )}`}
@@ -508,11 +507,11 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
                       <option value="Transfer">Transfer</option>
                       <option value="Other">Other</option>
                     </select>
+                  </div>
                 </div>
-              </div>
 
-            ))}
-          </div>
+              ))}
+            </div>
           )}
         </div>
       )}
@@ -522,9 +521,9 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
           <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-full max-w-lg ">
 
             <div className="mb-4">
-              <p className="font-semibold" style={{fontSize:'calc(1.2rem * var(--font-size-multiplier))'}}>Transaction Details</p>
+              <p className="font-semibold" style={{ fontSize: 'calc(1.2rem * var(--font-size-multiplier))' }}>Transaction Details</p>
             </div>
-            <div className="flex flex-col items-center" style={{fontSize:'calc(1rem * var(--font-size-multiplier))'}}>
+            <div className="flex flex-col items-center" style={{ fontSize: 'calc(1rem * var(--font-size-multiplier))' }}>
               <div className="flex justify-between w-[50%]">
                 <div className="font-semibold">Date:</div>
                 <div>{selectedTransaction.date}</div>
@@ -544,7 +543,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
 
             {userGoals.length > 0 && (
               <div className="mt-6">
-                <div className="mb-2 font-semibold" style={{fontSize:'calc(1rem * var(--font-size-multiplier))'}}>Add to a Goal:</div>
+                <div className="mb-2 font-semibold" style={{ fontSize: 'calc(1rem * var(--font-size-multiplier))' }}>Add to a Goal:</div>
                 <div className="flex items-center space-x-2">
                   <select
                     className="flex-grow p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-black"

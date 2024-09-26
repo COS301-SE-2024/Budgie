@@ -74,16 +74,12 @@ interface GoalFormProps {
 
 const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   const [goalName, setGoalName] = useState(props.goal.name);
-  const [goalID, setID] = useState(props.goal.id);
   const [currentAmount, setCurrentAmount] = useState(props.goal.current_amount);
   const [targetAmount, setTargetAmount] = useState(props.goal.target_amount);
-  const [startDate, setStartDate] = useState(props.goal.start_date);
   const [spendingLimit, setSpendingLimit] = useState(props.goal.spending_limit);
   const [spentAmount, setSpentAmount] = useState(0);
   const [updateAmount, setUpdateAmount] = useState(0);
-  const [updateDate, setupdateDate] = useState(
-    new Date().toISOString().split('T')[0]
-  );
+  const [updateDate, setupdateDate] = useState(new Date().toISOString().split('T')[0]);
   const user = useContext(UserContext);
 
   interface Goal {
@@ -189,8 +185,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
       try {
         const goalDocRef = doc(db, 'goals', props.goal.id);
         const goalDoc = await getDoc(goalDocRef);
-  
-        // Parse existing updates safely
+
         const existingUpdates = goalDoc.exists()
           ? goalDoc.data()?.updates || '[]'
           : '[]';
@@ -203,14 +198,11 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           updatesArray = [];
         }
   
-        // Add new update
         const newUpdate = {
           amount: updateAmount,
           date: updateDate,
         };
-        updatesArray.push(newUpdate);
-  
-        // Sort updates by date (newest first)
+        updatesArray.push(newUpdate);  
         updatesArray.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
   
         const existingMonthlyUpdates = goalDoc.exists()
@@ -227,7 +219,6 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           updatedMonthlyUpdatesArray = [];
         }
   
-        // Add or update the monthly update entry
         const newMonthlyUpdate = {
           amount: updateAmount,
           month: getMonthName(updateDate) + ' ' + getYear(updateDate),
@@ -244,7 +235,6 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           updatedMonthlyUpdatesArray.push(newMonthlyUpdate);
         }
   
-        // Sort monthly updates by month (you can adjust this if necessary)
         updatedMonthlyUpdatesArray.sort((a: any, b: any) => 
           new Date(b.month).getTime() - new Date(a.month).getTime()
         );
@@ -540,12 +530,6 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
                   <div>New Amount Left in Budget:</div>
                   <p>R {calculateNewAmountLeft(props.goal)}</p>
                 </div>
-                {/*<div className={styles.progressInfo}>
-                  <div>New Debt Amount:</div>
-                  <p>R {calculateNewCurrentAmount(props.goal)}</p>
-                  <div>New Goal Progress:</div>
-                  <p>{calculateNewProgress(props.goal)} %</p>
-                </div>*/}
               </div>
             </div>
           </>

@@ -42,7 +42,6 @@ type Condition = {
   category: string;
 };
 
-
 export interface AddGoalPopupProps {
   togglePopup: () => void;
 }
@@ -55,24 +54,19 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
   const [targetDate, setTargetDate] = useState<string | null>(null);
   const [spendingLimit, setSpendingLimit] = useState(0);
   const [debtAmount, setDebtAmount] = useState(0);
-  const [accounts, setAccounts] = useState<string[]>([]);
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
   const [description, setDescription] = useState('');
   const [updateMethod, setUpdateMethod] = useState('');
   const user = useContext(UserContext);
-  const [accountOptions, setAccountOptions] = useState<
-    { alias: string; accountNumber: string }[]
-  >([]);
+  const [accountOptions, setAccountOptions] = useState<{ alias: string; accountNumber: string }[]>([]);
   const [selectedAlias, setSelectedAlias] = useState<string>('');
   const [currentAccountNumber, setCurrentAccountNumber] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [keywords, setKeywords] = useState<string[]>([]);
-
   const [conditions, setConditions] = useState<Condition[]>([]);
 
   const addCondition = () => {
-
     if (selectedAccounts.length == 0 && keywords.length == 0 && selectedCategory == "Any") {
       alert("Please set at least one condition.")
     }
@@ -87,7 +81,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       };
 
       setConditions([...conditions, newCondition]);
-
       setSelectedAccounts([]);
       setKeywords([]);
       setSelectedCategory('Any');
@@ -272,7 +265,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
     };
     if (updateMethod == 'automatic' && conditions.length == 0) {
       alert("Please enter atleast one condition.")
-
     }
     else {
       if (updateMethod == 'automatic' && conditions.length > 0) {
@@ -301,13 +293,11 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
     }
   };
 
-
   return (
     <div className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center z-50000 w-[85vw] text-sm md:text-lg lg:text-xl">
       {/*1: Select Goal Type */}
       {step === 1 && (
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
-
           <p className={styles.goalHeading}>Select a Goal Types:</p>
           <div className={styles.goalInfo}>
             <button
@@ -350,7 +340,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       {/*2: Goal Details */}
       {step === 2 && goalType === 'Savings' && (
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
-
           <p className={styles.goalHeading}>Savings Goal Details</p>
           <div className={styles.goalInfo}>
             <div className={styles.goalForm}>
@@ -428,7 +417,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
       {step === 2 && goalType === 'Spending Limit' && (
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
-
           <p className={styles.goalHeading}>Spending Limit Goal</p>
           <div className={styles.goalInfo}>
             <div className={styles.goalForm}>
@@ -567,6 +555,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       {step === 3 && (
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
           <p className={styles.goalHeading}>How would you like to update this goal?</p>
+          <p className={styles.goalDescription} style={{ textAlign: 'center' }}>Note: You can always add transactions as updates to the goal on the Transactions page.</p>
           <div className={styles.updateGoalInfo}>
             <label style={{ display: 'block', marginBottom: '1rem' }}>
               <input
@@ -599,7 +588,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
         </div>
       )}
 
-
       {/*4: Manual Updates */}
       {step === 4 && updateMethod == 'manual' && (
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
@@ -626,7 +614,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
             </p>
             <button onClick={handleNext} style={{ padding: '0.5rem 1rem', color: "var(--primary-1)", fontWeight: 'bold', marginBottom: '2vh' }}>Add Condition</button>
 
-            {/* Scrollable Section for Added Conditions */}
             {conditions.length > 0 && (
               <div className="flex-grow border overflow-y-auto p-4" style={{ backgroundColor: 'var(--main-background)', width: '100%' }}>
                 {conditions.map((condition, index) => (
@@ -659,17 +646,12 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
             )}
           </div>
         </div>
-
       )}
 
       {step === 5 && updateMethod == 'automatic' && (
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
           <p className={styles.goalHeading} style={{ marginBottom: '0' }}>Add Condition</p>
-
-          {/* Scrollable Content */}
           <div className="overflow-y-auto max-h-[75%] w-full px-4 py-2 space-y-4" style={{ backgroundColor: 'var(--main-background)', border: '2px solid var(--primary-1)' }}>
-
-            {/* Select Accounts Section */}
             <div className="border border-gray-300 p-4 rounded-lg" style={{ backgroundColor: 'var(--block-background)' }}>
               <p className={styles.goalDescription} style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '1rem' }}>
                 Select the account/s from which you want transactions to be selected.
@@ -702,8 +684,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 ))}
               </div>
             </div>
-
-            {/* Select Transaction Descriptions Section */}
             <div className="border border-gray-300 p-4 rounded-lg" style={{ backgroundColor: 'var(--block-background)' }}>
               <p className={styles.goalDescription} style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '1rem' }}>
                 Enter the description keyword/s for the transactions you want to be selected.
@@ -737,8 +717,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                 </div>
               </div>
             </div>
-
-            {/* Select Spending Category Section */}
             <div className="border border-gray-300 p-4 rounded-lg" style={{ backgroundColor: 'var(--block-background)' }}>
               <p className={styles.goalDescription} style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '1rem' }}>
                 Select the transaction category that you want to be selected.
@@ -765,8 +743,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
               </div>
             </div>
           </div>
-
-          {/* Button Container */}
 
           <div className={styles.buttonContainer}>
             <button className={styles.prevButton} onClick={handleBack}>

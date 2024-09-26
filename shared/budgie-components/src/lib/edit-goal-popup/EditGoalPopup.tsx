@@ -68,7 +68,7 @@ export interface EditGoalPopupProps {
 }
 
 export function EditGoalPopup(props: EditGoalPopupProps) {
-  const [activeTab, setActiveTab] = useState('details'); // Track active tab
+  const [activeTab, setActiveTab] = useState('details'); 
 
   return (
     <div className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center z-50000 w-[85vw] text-sm md:text-lg lg:text-xl">
@@ -117,9 +117,6 @@ export function EditGoalPopup(props: EditGoalPopupProps) {
         </div>
       </div>
     </div>
-
-
-
   );
 }
 
@@ -136,7 +133,6 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   const [targetDate, setTargetDate] = useState(props.goal.target_date);
   const [spendingLimit, setSpendingLimit] = useState(props.goal.spending_limit);
   const user = useContext(UserContext);
-
 
   async function checkGoalExists(name: string) {
     try {
@@ -337,7 +333,6 @@ const ConditionsTab: React.FC<ConditionsTabProps> = ({
   const [currentAccountNumber, setCurrentAccountNumber] = useState<string>('');
 
   const addCondition = () => {
-
     if (selectedAccounts.length == 0 && keywords.length == 0 && selectedCategory == "Any") {
       alert("Please set at least one condition.")
     }
@@ -352,7 +347,6 @@ const ConditionsTab: React.FC<ConditionsTabProps> = ({
       };
 
       setConditions([...conditions, newCondition]);
-
       setSelectedAccounts([]);
       setKeywords([]);
       setSelectedCategory('Any');
@@ -453,11 +447,10 @@ const ConditionsTab: React.FC<ConditionsTabProps> = ({
     }
   };
 
-
   return (
     <>
       {step === 1 && (
-        <div style={{height:'100%', display:'flex',flexDirection:'column', justifyContent:'space-between'}}>
+        <div style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <p className={styles.goalHeading}>Set Automatic Update Conditions</p>
           <div className="flex flex-col items-center w-full max-h-[40vh]">
             <p className={styles.goalDescription} style={{ textAlign: 'center' }}>
@@ -465,7 +458,6 @@ const ConditionsTab: React.FC<ConditionsTabProps> = ({
             </p>
             <button onClick={handleNext} style={{ padding: '0.5rem 1rem', color: "var(--primary-1)", fontWeight: 'bold', marginBottom: '1vh' }}>Add Condition</button>
 
-            {/* Scrollable Section for Added Conditions */}
             {conditions.length > 0 && (
               <div className="flex-grow border overflow-y-auto p-4 mb-4" style={{ backgroundColor: 'var(--main-background)', width: '100%', border: '2px solid var(--primary-1)' }}>
                 {conditions.map((condition: Condition, index: number) => (
@@ -493,15 +485,12 @@ const ConditionsTab: React.FC<ConditionsTabProps> = ({
             <button className={styles.saveButton} onClick={handleSubmit}>Save</button>
           )}
         </div>
-
       )}
 
       {step === 2 && (
         <>
           <p className={styles.goalHeading} style={{ marginBottom: '0' }}>Add Condition</p>
           <div className="overflow-y-auto max-h-[75%] w-full px-4 py-2 space-y-4" style={{ backgroundColor: 'var(--main-background)', border: '2px solid var(--primary-1)' }}>
-
-            {/* Select Accounts Section */}
             <div className="border border-gray-300 p-4 rounded-lg" style={{ backgroundColor: 'var(--block-background)' }}>
               <p className={styles.goalDescription} style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '1rem' }}>
                 Select the account/s from which you want transactions to be selected.
@@ -535,7 +524,6 @@ const ConditionsTab: React.FC<ConditionsTabProps> = ({
               </div>
             </div>
 
-            {/* Select Transaction Descriptions Section */}
             <div className="border border-gray-300 p-4 rounded-lg" style={{ backgroundColor: 'var(--block-background)' }}>
               <p className={styles.goalDescription} style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '1rem' }}>
                 Enter the description keyword/s for the transactions you want to be selected.
@@ -570,7 +558,6 @@ const ConditionsTab: React.FC<ConditionsTabProps> = ({
               </div>
             </div>
 
-            {/* Select Spending Category Section */}
             <div className="border border-gray-300 p-4 rounded-lg" style={{ backgroundColor: 'var(--block-background)' }}>
               <p className={styles.goalDescription} style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '1rem' }}>
                 Select the transaction category that you want to be selected.
@@ -597,8 +584,6 @@ const ConditionsTab: React.FC<ConditionsTabProps> = ({
               </div>
             </div>
           </div>
-
-          {/* Button Container */}
 
           <div className={styles.buttonContainer}>
             <button className={styles.prevButton} onClick={handleBack}>
