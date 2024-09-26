@@ -32,55 +32,63 @@ export function AccountSettings(props: AccountSettingsProps) {
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleChangePassword = async () => {
-    /*const user = useContext(UserContext);
     setError(false);
     setMessage('');
 
     if (!user) {
       setError(true);
       setErrorMessage('No user is currently logged in.');
+      alert('No user is currently logged in.');
       return;
     }
 
-    try {
-      // Reauthenticate user with old password
-      const credential = EmailAuthProvider.credential(user.email, oldPassword);
-      await reauthenticateWithCredential(user, credential);
-      console.log('Authenticated successfully');
+    if (user.email) {
+      try {
+        // Reauthenticate user with old password
+        const credential = EmailAuthProvider.credential(user.email, oldPassword);
+        await reauthenticateWithCredential(user, credential);
+        console.log('Authenticated successfully');
 
-      // Check password complexity
-      const r = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-      if (!r.test(newPassword)) {
-        throw new Error('Weak password');
-      }
-      if (newPassword !== conPassword) {
-        setError(true);
-        setErrorMessage('Password mismatch');
-        return;
-      }
+        // Check password complexity
+        if (newPassword.length<6) {
+          alert('New password is too weak. It must contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
+          return;
+        }
 
-      // Update the password
-      await updatePassword(user, newPassword);
-      console.log('New password set');
-      handlecClosePopup();
-    } catch (e) {
-      console.log('Error setting new password');
-      setError(true);
-      setErrorMessage('Error updating password');
-    }*/
+        if (newPassword !== conPassword) {
+          alert('Password mismatch. The new password and confirmation do not match.');
+          return;
+        }
+
+        // Update the password
+        await updatePassword(user, newPassword);
+        console.log('New password set');
+        alert('Password updated successfully!');
+        handlecClosePopup();
+      } catch (e: any) {
+        // Check if the error is related to wrong current password
+        if (e.code === 'auth/wrong-password') {
+          alert('Incorrect current password. Please try again.');
+        } else {
+          console.log('Error setting new password:', e);
+          alert('Error updating password: ' + e.message);
+        }
+      }
+    }
   };
+
 
   const handleDeleteUser = async () => {
     if (!user) {
       setMessage('No user is signed in');
       return;
     }
-  
+
     try {
       if (user.providerData[0].providerId === 'google.com') {
         const provider = new GoogleAuthProvider();
         const result = await signInWithPopup(auth, provider);
-  
+
         const credential = GoogleAuthProvider.credentialFromResult(result);
         if (credential) {
           await reauthenticateWithCredential(user, credential);
@@ -93,21 +101,21 @@ export function AccountSettings(props: AccountSettingsProps) {
           setErrorMessage('Please enter your password.');
           return;
         }
-  
+
         // Create credential with email and password
         const credential = EmailAuthProvider.credential(user.email || '', password);
-  
+
         // Attempt reauthentication with email/password
         await reauthenticateWithCredential(user, credential);
         console.log('Reauthenticated with email and password');
       }
-  
+
       // Proceed with account deletion
       await deleteUser(user);
       alert('Your account has been deleted.');
       auth.signOut();
       setMessage('Account successfully deleted');
-  
+
     } catch (error) {
       // Ensure that the error is an instance of FirebaseError
       if (error instanceof FirebaseError) {
@@ -117,7 +125,7 @@ export function AccountSettings(props: AccountSettingsProps) {
           alert('Incorrect password. Please try again.');
         } else if (error.code === 'auth/popup-closed-by-user') {
           setErrorMessage('Popup closed before reauthentication.');
-          alert('Popup closed before reauthentication.');
+
         } else {
           console.log('Error deleting user:', error);
           setErrorMessage('Failed to delete user: ' + error.message);
@@ -131,7 +139,20 @@ export function AccountSettings(props: AccountSettingsProps) {
       }
     }
   };
-  
+
+  let signUpType;
+
+  if (user) {
+    user.providerData.forEach((profile) => {
+      if (profile.providerId === 'google.com') {
+        signUpType = "Google";
+      } else if (profile.providerId === 'password') {
+        signUpType = "Manual";
+      } else {
+        signUpType = profile.providerId;
+      }
+    });
+  }
 
   const [isPopupVisible, setPopupVisible] = useState(false);
   const [isCPopupVisible, setCPopupVisible] = useState(false);
@@ -167,72 +188,74 @@ export function AccountSettings(props: AccountSettingsProps) {
         Account Settings
       </div>
       <div className={styles.settingsOptionsContainer}>
-        <div className={styles.settingsOption}>
-          <p className={styles.settingTitle}>Password Management</p>
-          <p className={styles.settingDescription}>Change your password.</p>
-          <button
-            className={styles.actionButton}
-            onClick={handlePassChangeClick}
-          >
-            <div className={styles.deleteButton}>Change password</div>
-          </button>
-          {isCPopupVisible && (
-            <div className={styles.changeOverlay}>
-              <div className={styles.popupContent}>
-                <p className="mb-2">Type in your old password:</p>
-                <input
-                  type="password"
-                  value={oldPassword}
-                  placeholder="Enter your old password"
-                  onChange={(e) => setOldPassword(e.target.value)}
-                  className="px-2 py-2 border border-gray-300 rounded w-500 mb-4"
-                />
-                <p className="mb-2">Type in your new password:</p>
-                <input
-                  type="password"
-                  value={newPassword}
-                  placeholder="Enter your new password"
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="px-2 py-2 border border-gray-300 rounded w-500 mb-4"
-                />
-                <p className="mb-2">Confirm new password:</p>
-                <input
-                  type="password"
-                  value={conPassword}
-                  placeholder="Confirm new password"
-                  onChange={(e) => setConPassword(e.target.value)}
-                  className="px-2 py-2 border border-gray-300 rounded w-500 mb-4 "
-                />
-                <div className="flex justify-between mt-4">
-                  <button
-                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                    onClick={handleChangePassword}
-                  >
-                    Confirm
-                  </button>
-                  <button
-                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-900"
-                    onClick={handlecClosePopup}
-                  >
-                    Cancel
-                  </button>
-                </div>
-                {error && (
-                  <div className="pt-2 text-red-600 font-medium">
-                    {errorMessage}
+        {signUpType == "Manual" && (
+          <div className={styles.settingsOption}>
+            <p className={styles.settingTitle}>Password Management</p>
+            <p className={styles.settingDescription}>Change your password.</p>
+            <button
+              className={styles.actionButton}
+              onClick={handlePassChangeClick}
+            >
+              <div className={styles.deleteButton}>Change Password</div>
+            </button>
+            {isCPopupVisible && (
+              <div className={styles.changeOverlay}>
+                <div className={styles.popupContent}>
+                  <p className="mb-2">Type in your old password:</p>
+                  <input
+                    type="password"
+                    value={oldPassword}
+                    placeholder="Enter your old password"
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    className="px-2 py-2 border border-gray-300 rounded w-500 mb-4"
+                  />
+                  <p className="mb-2">Type in your new password:</p>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    placeholder="Enter your new password"
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="px-2 py-2 border border-gray-300 rounded w-500 mb-4"
+                  />
+                  <p className="mb-2">Confirm new password:</p>
+                  <input
+                    type="password"
+                    value={conPassword}
+                    placeholder="Confirm new password"
+                    onChange={(e) => setConPassword(e.target.value)}
+                    className="px-2 py-2 border border-gray-300 rounded w-500 mb-4 "
+                  />
+                  <div className="flex justify-between mt-4">
+                    <button
+                      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                      onClick={handleChangePassword}
+                    >
+                      Confirm
+                    </button>
+                    <button
+                      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-900"
+                      onClick={handlecClosePopup}
+                    >
+                      Cancel
+                    </button>
                   </div>
-                )}
+                  {error && (
+                    <div className="pt-2 text-red-600 font-medium">
+                      {errorMessage}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
         <div className={styles.settingsOption}>
           <p className={styles.settingTitle}>Account Deletion</p>
           <p className={styles.settingDescription}>
             Click the button below to start deleting your account. Learn about
             our deletion policy here.
           </p>
-          <button className={styles.actionButton} onClick={handleDeleteClick}>
+          <button className={styles.actionButton} onClick={signUpType == "Google" ? handleDeleteUser : handleDeleteClick}>
             <div className={styles.deleteButton}>Delete Account</div>
           </button>
           {isPopupVisible && (
