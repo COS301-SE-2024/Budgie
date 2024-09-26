@@ -459,12 +459,12 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
           </p>
         </div>
       </div>
-
+<br />
       {balance !== null && (
         <div className={styles.transactionsList}>
           {transactions.length > 0 && (
             <div className={styles.transactions}>
-              <br />
+              
               {transactions.map((transaction, index) => (
                 <div
                   key={index}
@@ -515,6 +515,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
           )}
         </div>
       )}
+      
       {showPopup && selectedTransaction && (
         <div className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center z-50000 w-[85vw] text-sm md:text-lg lg:text-xl">
 

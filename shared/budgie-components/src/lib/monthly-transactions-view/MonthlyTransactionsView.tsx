@@ -505,7 +505,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
           </p>
         </div>
       </div>
-
+<br />
       <div className={styles.transactionsList}>
         {moneyIn === 0 && moneyOut === 0 ? (
           <div className={styles.noTransactionsMessage}>
@@ -513,7 +513,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
           </div>
         ) : (
           <div className={styles.transactions}>
-            <br />
+            
             {transactions.map((transaction, index) => (
               <div
                 key={index}
