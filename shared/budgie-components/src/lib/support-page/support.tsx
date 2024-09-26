@@ -25,25 +25,12 @@ export function Support(props: SupportProps) {
     <>
       <div className="mainPage">
         <div className="pageTitle">
-          <span
-            className="material-symbols-outlined cursor-pointer"
-            style={{ marginRight: '0.5rem', fontSize: '1.5rem' }}
-            onClick={props.onClose}
-          >
-            arrow_back
-          </span>
+
           Support Settings
         </div>
-        <section className="w-full p-2 rounded-sm mb-2 transition ease duration-200 cursor-pointer">
-          <div className="container mx-auto text-center">
-            <h1 className="text-4xl font-bold mb-4">How can we help?</h1>
-          </div>
-        </section>
 
         <section className="container mx-auto py-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-semibold">Help Desk</h2>
-          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="flex justify-center mb-4">
@@ -56,7 +43,7 @@ export function Support(props: SupportProps) {
                 Get your account set up in just a few simple steps.
               </p>
               <button
-                className=" bg-blue-950 BudgieBlue spx-4 py-2 rounded-full shadow-lg"
+                className=" bg-blue-950 BudgieBlue spx-4 py-2 rounded-full shadow-lg text-white"
                 onClick={() => {
                   setHelpModal(!showHelpModal);
                 }}
@@ -73,14 +60,14 @@ export function Support(props: SupportProps) {
                   <span className="text-2xl font-bold">😕</span>
                 </div>
               </div>
-              <h3 className="text-xl font-semibold mb-2">
+              <h3 className="text-xl font-semibold mb-2 ">
                 Frequently Asked Questions
               </h3>
               <p className="text-gray-600 mb-4">
                 Frequently asked questions from users of the website
               </p>
               <button
-                className=" bg-blue-950 BudgieBlue px-4 py-2 rounded-full shadow-lg"
+                className=" bg-blue-950 BudgieBlue px-4 py-2 rounded-full shadow-lg text-white"
                 onClick={() => {
                   setFaqModal(!showFaqModal);
                 }}
