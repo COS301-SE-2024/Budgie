@@ -41,6 +41,7 @@ export function Settings(props: SettingsProps) {
             Change the website’s font size, colour, and background.
           </p>
         </div>
+        {/* 
         <div
           className={styles.settingsOption}
           onClick={() => setCurrentOverlay('Notification')}
@@ -51,6 +52,7 @@ export function Settings(props: SettingsProps) {
             warnings.
           </p>
         </div>
+        */}
         <div
           className={styles.settingsOption}
           onClick={() => setCurrentOverlay('Support')}

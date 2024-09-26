@@ -195,7 +195,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
         35) *
       0.5;
     const widthString = width.toString();
-    console.log(computedStyle.getPropertyValue('--font-size-multiplier'));
     return widthString + 'vw';
   }
 
