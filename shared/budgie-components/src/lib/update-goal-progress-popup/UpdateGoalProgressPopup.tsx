@@ -185,7 +185,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
       try {
         const goalDocRef = doc(db, 'goals', props.goal.id);
         const goalDoc = await getDoc(goalDocRef);
-
+  
         const existingUpdates = goalDoc.exists()
           ? goalDoc.data()?.updates || '[]'
           : '[]';
@@ -198,9 +198,11 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           updatesArray = [];
         }
   
+        const formattedDate = new Date(updateDate).toISOString().slice(0, 10).replace(/-/g, '/');  // Format the date as yyyy/mm/dd
+  
         const newUpdate = {
           amount: updateAmount,
-          date: updateDate,
+          date: formattedDate,  // Save the formatted date
         };
         updatesArray.push(newUpdate);  
         updatesArray.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -246,6 +248,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           ...goalData,
           monthly_updates: JSON.stringify(updatedMonthlyUpdatesArray),
           updates: JSON.stringify(updatesArray),
+          last_update: new Date().toISOString()
         });
   
         props.togglePopup();
@@ -253,7 +256,8 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
         console.error('Error saving goal:', error);
       }
     }
-  };  
+  };
+   
 
   function getMonthName(dateString: string) {
     const date = new Date(dateString);

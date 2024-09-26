@@ -8,7 +8,7 @@
   justify-content: center;
   z-index: 15;
   align-items: center;
-  width: 85vw;
+  width: 100%;
   font-size: calc(1.2rem*var(--font-size-multiplier));
 }
 

@@ -144,7 +144,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     }
 
     const goal = userGoals.find((goal) => goal.id === selectedGoal);
-    if (!goal || !goal.updates) return;
+    if (!goal) return;
 
     const updates = JSON.parse(goal.updates || '[]');
 
@@ -171,9 +171,10 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
       amount: transaction.amount,
       description: transaction.description,
     });
-
+    
     await updateDoc(doc(db, 'goals', goal.id), {
       updates: JSON.stringify(updates),
+      last_update: new Date().toISOString()
     });
 
     alert('Transaction added to goal.');

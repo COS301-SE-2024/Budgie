@@ -364,7 +364,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     }
 
     const goal = userGoals.find((goal) => goal.id === selectedGoal);
-    if (!goal || !goal.updates) return;
+    if (!goal) return;
 
     const updates = JSON.parse(goal.updates || '[]');
 
@@ -394,6 +394,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
 
     await updateDoc(doc(db, 'goals', goal.id), {
       updates: JSON.stringify(updates),
+      last_update: new Date().toISOString()
     });
 
     alert('Transaction added to goal.');

@@ -76,17 +76,14 @@
 }
 
 .header {
-  width: 80vw;
   display: flex;
   justify-content: space-between;
   padding: 1rem;
   margin-left: 1rem;
   border-bottom: 1px solid var(--greyed-text);
-  position: fixed;
   background-color: var(--main-background);
   z-index: 10;
   font-size: calc(1.2rem * var(--font-size-multiplier));
-  margin-top: 1rem;
 }
 
 .sortHeader {

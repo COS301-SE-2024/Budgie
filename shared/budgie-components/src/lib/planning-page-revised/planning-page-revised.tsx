@@ -60,7 +60,7 @@ export function PlanningPageRevised(props: PlanningPageRevisedProps) {
   }
 
   return (
-    <div className="mainPage flex flex-col w-[85vw] items-center" style={{overflowY: 'hidden'}}>
+    <div className="mainPage flex-grow flex-col w-[85vw] items-center" style={{overflowY: 'hidden'}}>
       <div className=" flex shadow-lg z-2 justify-center rounded-2xl bg-[var(--block-background)] p-2 w-[98%] m-6">
         <button
           className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-BudgieBlue2 hover:text-BudgieWhite font-medium mr-16 cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${

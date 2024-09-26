@@ -265,7 +265,7 @@ const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal:
                   </td>
                   <td className="border border-gray-200 p-2">R {update.amount.toFixed(2)}</td>
                   <td className="border border-gray-200 p-2">{update.date}</td>
-                  <td className="border border-gray-200 p-2">{update.description || 'No description'}</td>
+                  <td className="border border-gray-200 p-2">{update.description || 'Manual Update'}</td>
                 </tr>
               ))}
             </tbody>
@@ -425,14 +425,14 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
       const monthsLeft = calculateMonthsLeft(goal.target_date);
       const requiredSavingsPerMonth = remainingSavings / monthsLeft;
 
-      if (goal.current_amount == 0){        
+      if (goal.current_amount == 0) {
         return <></>;
       }
       else if (requiredSavingsPerMonth > averageSavings) {
         const percentageIncrease = ((requiredSavingsPerMonth - averageSavings) / averageSavings) * 100;
         return <p>Going forward, you need to save {percentageIncrease.toFixed(2)}% more per month than your average to reach your goal in time.</p>;
       }
-      
+
       else {
         const percentageOfAverage = (requiredSavingsPerMonth / averageSavings) * 100;
         return <p>Going forward, you only need to save {percentageOfAverage.toFixed(2)}% of your average savings per month to reach your goal in time.</p>;
@@ -657,14 +657,14 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
               <div className="flex flex-col justify-center items-center bg-[var(--block-background)] rounded-lg shadow-md p-8 w-full">
                 <h2 className="text-xl font-semibold mb-4">Insights</h2>
                 <div className='justify-left items-left bg-grey w-full' style={{ fontSize: 'calc(1.2rem*var(--font-size-multiplier))' }}>
-                  {goal.target_date && calculateMonthsLeft(goal.target_date) == 0 && (
+                  {goal.target_date && calculateMonthsLeft(goal.target_date) == 0 && calculateDaysLeft(goal.target_date) == 0 && (
                     <>
                       <p>This goal's target date has passed.</p>
                       <br></br>
                       <p>You can set a new date by clicking "Edit Details" above.</p>
                     </>
                   )}
-                  {goal.type === 'Savings' && goal.target_amount && goal.target_amount > goal.current_amount && goal.target_date && calculateMonthsLeft(goal.target_date) > 0 && (
+                  {goal.type === 'Savings' && goal.target_amount && goal.target_amount > goal.current_amount && goal.target_date && (
                     <>
                       <p>You still need to save R{calculateRemainingSavings(goal).toFixed(2)}.</p>
                       <br></br>
@@ -862,6 +862,29 @@ export function GoalsPage() {
     return 0;
   };
 
+  const updateGoalTransactions = async (goal: Goal) => {
+    try {
+      const existingUpdates = goal.updates ? JSON.parse(goal.updates) : [];
+
+      let updatedCurrentAmount = 0;
+      existingUpdates.forEach((tx: any) => {
+        if (goal.type === 'Debt Reduction') {
+          updatedCurrentAmount -= tx.amount;
+        } else {
+          updatedCurrentAmount += tx.amount;
+        }
+      });
+
+      goal.current_amount = updatedCurrentAmount;
+      await updateDoc(doc(db, 'goals', goal.id), { current_amount: updatedCurrentAmount });
+
+      handleGoalUpdate(goal);
+
+    } catch (error) {
+      console.error('Error updating goal transactions:', error);
+    }
+  };
+
   const fetchGoals = async () => {
     if (user && user.uid) {
       try {
@@ -883,6 +906,10 @@ export function GoalsPage() {
         const sortedGoals = sortGoals(goalsList, sortOption);
         setGoals(sortedGoals);
 
+        for (let goal of sortedGoals) {
+          await updateGoalTransactions(goal);
+        }
+
         const automaticGoals = sortedGoals.filter((goal) => goal.update_type === "automatic");
         automaticGoals.forEach(async (goal) => {
           await updateTransactionsForGoal(goal);
@@ -894,6 +921,7 @@ export function GoalsPage() {
       }
     }
   };
+
 
   const addGoalPopup = () => {
     setIsGoalPopupOpen(!isGoalPopupOpen);
@@ -958,7 +986,7 @@ export function GoalsPage() {
     return accountNumbers;
   };
 
-  const getTransactionsForAccounts = async (accountNumbers: string[]): Promise<any[]> => {
+  const getTransactionsForAccounts = async (accountNumbers: string[], goal: Goal): Promise<any[]> => {
     if (user && user.uid) {
       let transactionsList: any[] = [];
       const currentYear = new Date().getFullYear();
@@ -985,12 +1013,15 @@ export function GoalsPage() {
                 "july", "august", "september", "october", "november", "december"
               ];
 
+              let negation = -1;
+              if (goal.type == "Savings") { negation = 1; }
+
               months.forEach((month) => {
                 if (docData[month]) {
                   const transactions = JSON.parse(docData[month]);
                   transactionsList = transactionsList.concat(transactions.map((transaction: { amount: number }) => ({
                     ...transaction,
-                    amount: -(transaction.amount)
+                    amount: (transaction.amount) * negation
                   })));
                 }
               });
@@ -1042,9 +1073,8 @@ export function GoalsPage() {
 
       for (let condition of conditions) {
         const { accounts, category, keywords } = condition;
-
         const conditionAccountNumbers = await getAccountNumbersForCondition(accounts);
-        let transactionsForCondition = await getTransactionsForAccounts(conditionAccountNumbers);
+        let transactionsForCondition = await getTransactionsForAccounts(conditionAccountNumbers, goal);
         transactionsForCondition = filterTransactionsByCategory(transactionsForCondition, category);
         const keywordFilteredTransactions = filterTransactionsByKeywords(transactionsForCondition, keywords || []);
         allMatchingTransactions = allMatchingTransactions.concat(keywordFilteredTransactions);
@@ -1127,21 +1157,30 @@ export function GoalsPage() {
 
   return (
     <>
+      {isGoalPopupOpen && (
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, width: '100%', height: '100%', zIndex: 100 }}>
+          <AddGoalPopup togglePopup={addGoalPopup} />
+        </div>
+      )}
+      {selectedGoal && (
+        <div style={{ position: 'relative'}} className='relative'>
+          <GoalInfoPage goal={selectedGoal} onClose={() => setSelectedGoal(null)} onUpdateGoal={handleGoalUpdate}></GoalInfoPage>
+        </div>
+      )}
       {!hasGoals ? (
         <>
           <div className="flex flex-col items-center justify-center bg-[var(--main-background)] h-full">
-          <div className="text-2xl">Add your first goal:</div>
-          <button
-            className="text-2xl mt-4 bg-BudgieBlue2 hover:bg-BudgieAccentHover transition-colors text-white p-4 rounded-2xl"
-            onClick={addGoalPopup}
-          >
-            Add Goal
-          </button>
-          {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
-        </div>
+            <div className="text-2xl">Add your first goal:</div>
+            <button
+              className="text-2xl mt-4 bg-BudgieBlue2 hover:bg-BudgieAccentHover transition-colors text-white p-4 rounded-2xl"
+              onClick={addGoalPopup}
+            >
+              Add Goal
+            </button>
+          </div>
         </>
       ) : (
-        <>
+        <div style={{ position: 'relative' }} className='relative'>
           <div className={styles.header}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <p className={styles.sortHeader}>Sort By:</p>
@@ -1159,15 +1198,9 @@ export function GoalsPage() {
             <button className={styles.addAGoalButton} onClick={addGoalPopup}>
               Add a Goal
             </button>
-            {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
+
+
           </div>
-          <div
-            style={{
-              width: '85vw',
-              backgroundColor: 'var(--main-background)',
-              marginBottom: 'calc((6rem * var(--font-size-multiplier)))',
-            }}
-          ></div>
           <div className={styles.planningModalContainer}>
             <div className="p-4">
               <table className="min-w-full table-auto border-collapse border border-gray-200">
@@ -1211,13 +1244,9 @@ export function GoalsPage() {
               </table>
             </div>
 
-            {selectedGoal && (
-              <>
-                <GoalInfoPage goal={selectedGoal} onClose={() => setSelectedGoal(null)} onUpdateGoal={handleGoalUpdate}></GoalInfoPage>
-              </>
-            )}
+
           </div>
-        </>
+        </div>
       )}
     </>
   );

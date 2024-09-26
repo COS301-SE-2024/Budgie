@@ -293,7 +293,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
   };
 
   return (
-    <div className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center z-50000 w-[85vw] text-sm md:text-lg lg:text-xl">
+    <div className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center z-50000 text-sm md:text-lg lg:text-xl w-full">
       {/*1: Select Goal Type */}
       {step === 1 && (
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
