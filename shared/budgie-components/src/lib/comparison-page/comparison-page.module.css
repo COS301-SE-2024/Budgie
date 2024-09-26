@@ -1,5 +1,8 @@
-.comparisonsPage{
+.comparisonsPage {
     background-color: var(--main-background);
+    overflow-y: auto;
+    height: 80vh;
+    overflow-x: hidden;
 }
 
 .container {
@@ -12,10 +15,11 @@
     display: flex;
     flex-direction: column;
     align-items: left;
-  }
+}
 
 
-  .scrollableSection {
+
+.scrollableSection {
     width: 100%;
     height: 100%;
     /* Ensure it takes up the full height of the comparisonsPage */
@@ -266,25 +270,27 @@
 }
 
 .noAccountsMessage {
-    color: rgb(31, 30, 30); /* Change text color */
+    color: rgb(31, 30, 30);
+    /* Change text color */
     font-size: 20px;
-    height: 70vh; /* Full viewport height */
+    height: 70vh;
+    /* Full viewport height */
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0;
-    text-align: center;         
-  }
-
-.fillUserInfoMessage{
-    color: rgb(31, 30, 30); /* Change text color */
-    font-size: 20px;
-    height: 70vh; /* Full viewport height */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-    text-align: center; 
+    text-align: center;
 }
-  
-  
+
+.fillUserInfoMessage {
+    color: rgb(31, 30, 30);
+    /* Change text color */
+    font-size: 20px;
+    height: 70vh;
+    /* Full viewport height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    text-align: center;
+}

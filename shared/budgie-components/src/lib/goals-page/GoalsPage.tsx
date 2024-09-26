@@ -425,10 +425,15 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
       const monthsLeft = calculateMonthsLeft(goal.target_date);
       const requiredSavingsPerMonth = remainingSavings / monthsLeft;
 
-      if (requiredSavingsPerMonth > averageSavings) {
+      if (goal.current_amount == 0){        
+        return <></>;
+      }
+      else if (requiredSavingsPerMonth > averageSavings) {
         const percentageIncrease = ((requiredSavingsPerMonth - averageSavings) / averageSavings) * 100;
         return <p>Going forward, you need to save {percentageIncrease.toFixed(2)}% more per month than your average to reach your goal in time.</p>;
-      } else {
+      }
+      
+      else {
         const percentageOfAverage = (requiredSavingsPerMonth / averageSavings) * 100;
         return <p>Going forward, you only need to save {percentageOfAverage.toFixed(2)}% of your average savings per month to reach your goal in time.</p>;
       }
@@ -1124,13 +1129,16 @@ export function GoalsPage() {
     <>
       {!hasGoals ? (
         <>
-          <div className={styles.noGoalScreen}>
-            <div className={styles.noGoalText}>Add your first goal:</div>
-            <button className={styles.addGoalsButton} onClick={addGoalPopup}>
-              Add a Goal
-            </button>
-            {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
-          </div>
+          <div className="flex flex-col items-center justify-center bg-[var(--main-background)] h-full">
+          <div className="text-2xl">Add your first goal:</div>
+          <button
+            className="text-2xl mt-4 bg-BudgieBlue2 hover:bg-BudgieAccentHover transition-colors text-white p-4 rounded-2xl"
+            onClick={addGoalPopup}
+          >
+            Add Goal
+          </button>
+          {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
+        </div>
         </>
       ) : (
         <>

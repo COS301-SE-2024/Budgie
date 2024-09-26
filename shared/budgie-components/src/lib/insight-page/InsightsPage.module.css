@@ -21,6 +21,11 @@
     /* Allow grid items to expand based on their content, with a minimum height */
 }
 
+.mainContainer {
+    overflow-y: auto;
+    height: 80vh;
+}
+
 /* Style for each grid item */
 .gridItem {
     background-color: #ffffff;
