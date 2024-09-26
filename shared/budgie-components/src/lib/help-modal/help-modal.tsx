@@ -156,7 +156,7 @@ export function HelpModal(props: HelpModalProps) {
     }
   };
   return (
-    <div className="mainPage">
+    <div className="flex flex-col shadow-lg z-10 fixed top-0 right-0 z-10  bg-[var(--block-background)] p-8 h-full" style={{ width: '85vw' }}>
       <div className="pageTitle">
         <span
           className="material-symbols-outlined cursor-pointer"
@@ -165,7 +165,7 @@ export function HelpModal(props: HelpModalProps) {
         >
           arrow_back
         </span>
-        Usage guidance
+        Usage Guidance
       </div>
       <section className="bg-white p-6 rounded-lg shadow-md">
         <div className={styles.helpPage}>

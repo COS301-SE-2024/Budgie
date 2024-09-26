@@ -161,16 +161,6 @@ export function DisplaySettings(props: DisplaySettingsProps) {
   return (
     <div className="mainPage">
       <div className="pageTitle">
-        <span
-          className="material-symbols-outlined"
-          onClick={props.onClose}
-          style={{
-            marginRight: '0.8rem',
-            fontSize: 'calc(1.5rem * var(--font-size-multiplier))',
-          }}
-        >
-          arrow_back
-        </span>
         Display Settings
       </div>
       <div className={styles.settingsOptionsContainer}>

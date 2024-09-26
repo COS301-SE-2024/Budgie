@@ -9,7 +9,7 @@ import { PieChart, Pie, Tooltip, Cell, Legend } from 'recharts';
 import { AreaChart } from '@tremor/react';
 
 /* eslint-disable-next-line */
-export interface OverviewPageRevisedProps {}
+export interface OverviewPageRevisedProps { }
 
 type Transaction = {
   date: string;
@@ -780,7 +780,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                       {pageData?.summary?.topThree.map((category, index) => (
                         <div
                           key={index}
-                          className={`p-2 w-[30%] shadow-lg text-center rounded-xl ${getCategoryStyle(
+                          className={`p-2 w-fit shadow-lg text-center rounded-xl ${getCategoryStyle(
                             category
                           )}`}
                         >
@@ -821,12 +821,13 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                 </div>
               </div>
             </div>
-            <div className=" p-2 mt-5 w-full h-1/2 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl">
-              <div className="bg-BudgieGrayLight w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
+            <div className="p-2 mt-5 w-full h-[500px] shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl mb-[5rem]">
+              <div className="bg-BudgieGrayLight w-full h-14 rounded-3xl flex items-center justify-center text-lg font-medium">
                 <span>Income vs Expenses</span>
               </div>
-              <div className="grow flex items-center justify-center">
+              <div className="grow flex items-center justify-center h-[90%]">
                 <AreaChart
+                  className="w-full h-full"
                   data={pageData.incomeExpense.data}
                   index="date"
                   categories={['Income', 'Expenses']}
@@ -837,7 +838,8 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                 ></AreaChart>
               </div>
             </div>
-            <div className="h-[40%] mt-5 w-full flex items-center justify-center">
+
+            {/*<div className="h-[40%] mt-5 w-full flex items-center justify-center">
               <div className=" p-2 mr-5 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl w-1/3 h-full">
                 <div className="bg-BudgieGrayLight w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
                   <span>Latest Transaction</span>
@@ -871,7 +873,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                 </div>
                 <div className="grow flex items-center justify-center"></div>
               </div>
-            </div>
+            </div>*/}
           </div>
         )}
       </>
