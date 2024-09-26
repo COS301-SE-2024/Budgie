@@ -7,7 +7,7 @@ module.exports = {
   content: [
     join(
       __dirname,
-      '{src,pages,components,app}/**/*!(*.stories|*.spec).{ts,tsx,html}'
+      '{src,pages,components,app}/**/*!(*.stories|*.spec).{js,jsx,ts,tsx,html}'
     ),
     ...createGlobPatternsForDependencies(__dirname),
     '../node_modules/@tremor/**/*.{js,ts,jsx,tsx}',
@@ -119,6 +119,7 @@ module.exports = {
     },
   },
   safelist: [
+    'material-symbols-outlined',
     {
       pattern:
         /^(bg-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,

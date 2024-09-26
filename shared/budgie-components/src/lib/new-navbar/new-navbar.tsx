@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import styles from './new-new-navbar.module.css';
 import { getAuth, signOut } from 'firebase/auth';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -29,144 +28,87 @@ export function NewNavbar(props: NavbarProps) {
     setSelectedItem(getFirstSubstring(pathname));
   }, [pathname]);
 
+  // Function to generate class names for nav items
+  function getNavItemClasses(itemName: string) {
+    const baseClasses =
+      "mt-4 font-medium [font-family:'Trip Sans',_sans-serif] flex items-center rounded-[0.4rem] cursor-pointer text-[var(--main-text)] p-[calc(0.2rem_*_var(--font-size-multiplier))] text-[min(2rem,calc(1.2rem_*_var(--font-size-multiplier)))] hover:bg-[var(--hover)] transition duration-300 ease";
+    const selectedClasses =
+      'bg-[var(--primary-1)] text-[var(--secondary-text)] hover:bg-[var(--primary-1)]';
+    return `${baseClasses} ${selectedItem === itemName ? selectedClasses : ''}`;
+  }
+
   return (
-    <div className={styles.sidebar}>
-      <ul className={styles.navList}>
-        {/* Overview item doesn't have an icon */}
+    <div className=" w-[5rem] min-w-[5rem] md:w-[15rem] md:min-w-[15rem] bg-[var(--block-background)] h-full [box-shadow:0_0_10px_rgba(0,0,0,0.5)] pt-6 z-[100]">
+      <ul className="mr-4 ml-4">
+        {/* Overview item */}
         <Link href={'/overview'}>
           <li
-            className={`${styles.navItem} ${
-              selectedItem === 'overview' ? styles.selected : ''
-            }`}
+            className={getNavItemClasses('overview')}
             onClick={() => setSelectedItem('overview')}
           >
-            <span
-              className="material-symbols-outlined"
-              style={{
-                marginRight: '0.3rem',
-                marginLeft: '0.3rem',
-                marginBottom: '0.2rem',
-                fontSize:
-                  'min(2rem, (calc(1.5rem * var(--font-size-multiplier))))',
-                fontWeight: 500,
-              }}
-            >
+            <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] font-[500] text-[min(2rem,calc(1.5rem_*_var(--font-size-multiplier)))]">
               home
             </span>
-            Overview
+            <span className="hidden md:inline">Overview</span>
           </li>
         </Link>
         {/* Accounts item */}
         <Link href={'/accounts'}>
           <li
-            className={`${styles.navItem} ${
-              selectedItem === 'accounts' ? styles.selected : ''
-            }`}
+            className={getNavItemClasses('accounts')}
             onClick={() => setSelectedItem('accounts')}
           >
-            <span
-              className="material-symbols-outlined"
-              style={{
-                marginRight: '0.3rem',
-                marginLeft: '0.3rem',
-                marginBottom: '0.2rem',
-                fontSize:
-                  'min(2rem, (calc(1.5rem * var(--font-size-multiplier))))',
-                fontWeight: 500,
-              }}
-            >
+            <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] font-[500] text-[min(2rem,calc(1.5rem_*_var(--font-size-multiplier)))]">
               account_balance
             </span>
-            Accounts
+            <span className="hidden md:inline">Accounts</span>
           </li>
         </Link>
         {/* Transactions item */}
         <Link href={'/transactions'}>
           <li
-            className={`${styles.navItem} ${
-              selectedItem === 'transactions' ? styles.selected : ''
-            }`}
+            className={getNavItemClasses('transactions')}
             onClick={() => setSelectedItem('transactions')}
           >
-            <span
-              className="material-symbols-outlined"
-              style={{
-                marginRight: '0.3rem',
-                marginLeft: '0.3rem',
-                marginBottom: '0.2rem',
-                fontSize:
-                  'min(2rem, (calc(1.5rem * var(--font-size-multiplier))))',
-                fontWeight: 500,
-              }}
-            >
+            <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] font-[500] text-[min(2rem,calc(1.5rem_*_var(--font-size-multiplier)))]">
               receipt_long
             </span>
-            Transactions
+            <span className="hidden md:inline">Transactions</span>
           </li>
         </Link>
         {/* Planning item */}
         <Link href={'/planning'}>
           <li
-            className={`${styles.navItem} ${
-              selectedItem === 'planning' ? styles.selected : ''
-            }`}
+            className={getNavItemClasses('planning')}
             onClick={() => setSelectedItem('planning')}
           >
-            <span
-              className="material-symbols-outlined"
-              style={{
-                marginRight: '0.3rem',
-                marginLeft: '0.3rem',
-                marginBottom: '0.2rem',
-                fontSize:
-                  'min(2rem, (calc(1.5rem * var(--font-size-multiplier))))',
-                fontWeight: 500,
-              }}
-            >
+            <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] font-[500] text-[min(2rem,calc(1.5rem_*_var(--font-size-multiplier)))]">
               browse_activity
             </span>
-            Planning
+            <span className="hidden md:inline">Planning</span>
           </li>
         </Link>
         {/* Settings item */}
         <Link href={'/settings'}>
           <li
-            className={`${styles.navItem} ${
-              selectedItem === 'settings' ? styles.selected : ''
-            }`}
+            className={getNavItemClasses('settings')}
             onClick={() => setSelectedItem('settings')}
           >
-            <span
-              className="material-symbols-outlined"
-              style={{
-                marginRight: '0.3rem',
-                marginLeft: '0.3rem',
-                marginBottom: '0.2rem',
-                fontSize:
-                  'min(2rem, (calc(1.5rem * var(--font-size-multiplier))))',
-                fontWeight: 500,
-              }}
-            >
+            <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] font-[500] text-[min(2rem,calc(1.5rem_*_var(--font-size-multiplier)))]">
               settings
             </span>
-            Settings
+            <span className="hidden md:inline">Settings</span>
           </li>
         </Link>
         {/* Logout item */}
-        <li className={styles.navItemLogout} onClick={signout}>
-          <span
-            className="material-symbols-outlined"
-            style={{
-              marginRight: '0.3rem',
-              marginLeft: '0.3rem',
-              marginBottom: '0.2rem',
-              fontSize:
-                'min(2rem, (calc(1.2rem * var(--font-size-multiplier))))',
-            }}
-          >
+        <li
+          className="fixed bottom-4 w-[13vw] font-medium [font-family:'Trip Sans',_sans-serif] flex items-center rounded-[0.4rem] h-8 cursor-pointer text-[var(--main-text)] p-[calc(0.2rem_*_var(--font-size-multiplier))] text-[min(2rem,calc(1.2rem_*_var(--font-size-multiplier)))] hover:bg-[var(--hover)] transition duration-300 ease"
+          onClick={signout}
+        >
+          <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] text-[min(2rem,calc(1.2rem_*_var(--font-size-multiplier)))]">
             logout
           </span>
-          Logout
+          <span className="hidden md:inline">Logout</span>
         </li>
       </ul>
     </div>
