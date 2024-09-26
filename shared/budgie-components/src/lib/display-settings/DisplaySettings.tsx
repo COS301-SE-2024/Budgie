@@ -156,7 +156,6 @@ export function DisplaySettings(props: DisplaySettingsProps) {
     }
 
     updateSettings(theme, color);
-    console.log(document.documentElement.getAttribute('colour-theme'));
   };
 
   return (

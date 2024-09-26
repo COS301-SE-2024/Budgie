@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   Label,
   CartesianGrid,
+  Cell,
 } from 'recharts';
 import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
@@ -43,10 +44,8 @@ interface Goal {
   deleted_updates?: string;
   monthly_updates?: string;
   update_type: string;
-  accounts: ([]);
-  description?: string[];
   last_update?: string;
-  category?: string;
+  conditions?: string;
 }
 
 const monthNames = [
@@ -79,7 +78,6 @@ const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal:
   const [localUpdates, setLocalUpdates] = useState<Update[]>(goal.updates ? JSON.parse(goal.updates) : []);
 
   const handleDeleteUpdate = (amount: number, date: string) => {
-
     if (window.confirm("Do you really want to delete this update?") && goal.updates) {
       let updatedCurrentAmount = goal.current_amount;
 
@@ -117,7 +115,6 @@ const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal:
       }
 
       goal.monthly_updates = JSON.stringify(monthlyUpdatesArray);
-
       setLocalUpdates(newUpdates);
       onUpdateGoal(goal);
       updateDB();
@@ -140,30 +137,27 @@ const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal:
   };
 
   const handleDeleteNonManualUpdate = (amount: number, date: string, description: string) => {
-    if (window.confirm("Do you really want to delete this update? The transaction cannot be added back to this goal.") && goal.updates) {
+    if (window.confirm("Do you really want to delete this update? The transaction will not be automatically added back to this goal.") && goal.updates) {
       let updatedCurrentAmount = goal.current_amount;
       const newUpdates: Update[] = [];
       const deletedUpdates: Update[] = goal.deleted_updates ? JSON.parse(goal.deleted_updates) : [];
 
-      // Adjust current amount
       if (goal.type === "Debt Reduction") {
-        updatedCurrentAmount += amount;  // Add back the amount for debt reduction
+        updatedCurrentAmount += amount;
       } else {
-        updatedCurrentAmount -= amount;  // Subtract the amount for other types
+        updatedCurrentAmount -= amount;
       }
 
-      // Filter out the update being deleted and move it to deleted_updates
       let removed = false;
       for (let i = 0; i < localUpdates.length; i++) {
         const update = localUpdates[i];
         if (!removed && update.amount === amount && update.date === date && update.description === description) {
-          deletedUpdates.push(update);  // Move to deleted_updates
+          deletedUpdates.push(update);
           continue;
         }
-        newUpdates.push(update);  // Keep remaining updates
+        newUpdates.push(update);
       }
 
-      // Update the monthly_updates array
       let monthlyUpdatesArray = goal.monthly_updates ? JSON.parse(goal.monthly_updates) : [];
       const updateMonth = new Date(date).toLocaleString("default", { month: "long", year: "numeric" });
       const monthlyUpdateIndex = monthlyUpdatesArray.findIndex(
@@ -171,31 +165,28 @@ const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal:
       );
 
       if (monthlyUpdateIndex >= 0) {
-        monthlyUpdatesArray[monthlyUpdateIndex].amount -= amount;  // Adjust the monthly total
+        monthlyUpdatesArray[monthlyUpdateIndex].amount -= amount;
         if (monthlyUpdatesArray[monthlyUpdateIndex].amount == 0) {
-          monthlyUpdatesArray.splice(monthlyUpdateIndex, 1);  // Remove month if total is 0
+          monthlyUpdatesArray.splice(monthlyUpdateIndex, 1);
         }
       }
 
-      // Update goal's fields
       goal.current_amount = updatedCurrentAmount;
       goal.updates = JSON.stringify(newUpdates);
       goal.deleted_updates = JSON.stringify(deletedUpdates);
       goal.monthly_updates = JSON.stringify(monthlyUpdatesArray);
 
-      // Update local state and Firestore
       setLocalUpdates(newUpdates);
       onUpdateGoal(goal);
       updateDBNonManual();
     }
   };
 
-
   const updateDBNonManual = async () => {
     try {
       const goalData: any = {
         updates: goal.updates,
-        deleted_updates: goal.deleted_updates, // Save deleted updates to Firestore
+        deleted_updates: goal.deleted_updates,
         current_amount: goal.current_amount,
         monthly_updates: goal.monthly_updates,
       };
@@ -220,13 +211,13 @@ const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal:
   }, [goal.updates, goal.current_amount]);
 
   return (
-    <>
+    <div style={{ fontSize: 'calc(1.2rem * var(--font-size-multiplier))' }}>
       {goal.update_type == 'manual' && (
         <div>
           <table className="min-w-full table-auto border-collapse border border-gray-200">
             <thead>
               <tr style={{ color: 'var(--secondary-text)', backgroundColor: 'var(--primary-1)' }}>
-                <th className="border border-gray-200 p-2 text-left" style={{ width: '1%', backgroundColor: 'var(--block-background)', border: '1px solid var(--block-background)' }}></th> {/* Empty header with fixed width */}
+                <th className="border border-gray-200 p-2 text-left" style={{ width: '1%', backgroundColor: 'var(--block-background)', borderLeft: '1px solid var(--block-background)', borderTop: '1px solid var(--block-background)', borderBottom: '1px solid var(--block-background)' }}></th>
                 <th className="border border-gray-200 p-2 text-left">Amount</th>
                 <th className="border border-gray-200 p-2 text-left">Date</th>
               </tr>
@@ -255,7 +246,7 @@ const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal:
           <table className="min-w-full table-auto border-collapse border border-gray-200">
             <thead>
               <tr style={{ color: 'var(--secondary-text)', backgroundColor: 'var(--primary-1)' }}>
-                <th className="border border-gray-200 p-2 text-left" style={{ width: '1%', backgroundColor: 'var(--block-background)', border: '1px solid var(--block-background)' }}></th> {/* Empty header with fixed width */}
+                <th className="border border-gray-200 p-2 text-left" style={{ width: '1%', backgroundColor: 'var(--block-background)', border: '1px solid var(--block-background)' }}></th>
                 <th className="border border-gray-200 p-2 text-left">Amount</th>
                 <th className="border border-gray-200 p-2 text-left">Date</th>
                 <th className="border border-gray-200 p-2 text-left">Description</th>
@@ -274,15 +265,14 @@ const UpdateTable = ({ goal, onUpdateGoal }: TableProps & { onUpdateGoal: (goal:
                   </td>
                   <td className="border border-gray-200 p-2">R {update.amount.toFixed(2)}</td>
                   <td className="border border-gray-200 p-2">{update.date}</td>
-                  <td className="border border-gray-200 p-2">{update.description || 'No description'}</td>
+                  <td className="border border-gray-200 p-2">{update.description || 'Manual Update'}</td>
                 </tr>
               ))}
             </tbody>
-
           </table>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
@@ -292,10 +282,9 @@ export interface GoalInfoPageProps {
 }
 
 const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onUpdateGoal: (goal: Goal) => void }) => {
-  const now = new Date();
   const [updatePopupOpen, setUpdatePopupOpen] = useState(false);
   const [currentGoal, setCurrentGoal] = useState(goal);
-  const user = useContext(UserContext);
+  const [editPopupOpen, setEditPopupOpen] = useState(false);
 
   const handleGoalUpdate = (updatedGoal: Goal) => {
     setCurrentGoal({ ...updatedGoal });
@@ -305,8 +294,6 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
   const handleUpdateGoalPopup = () => {
     setUpdatePopupOpen(!updatePopupOpen);
   };
-
-  const [editPopupOpen, setEditPopupOpen] = useState(false);
 
   const handleEditGoalPopup = () => {
     setEditPopupOpen(!editPopupOpen);
@@ -329,9 +316,7 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
   };
 
   const calculateProgressPercentage = (goal: Goal): number => {
-
-    //debt
-    if (goal.current_amount !== undefined && goal.initial_amount !== undefined) {
+    if (goal.current_amount !== undefined && goal.initial_amount !== undefined && goal.type == "Debt Reduction") {
       if (goal.initial_amount) {
         return Math.min(
           100,
@@ -343,20 +328,16 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
       }
     }
 
-    //savings
-    if (goal.current_amount !== undefined && goal.target_amount !== undefined) {
+    if (goal.current_amount !== undefined && goal.target_amount !== undefined && goal.type == "Savings") {
       return Math.min(
         100,
-        -(((goal.current_amount) /
+        (((goal.current_amount) /
           (goal.target_amount)) * 100)
       );
 
     }
 
-    //limits
-    if (
-      goal.spending_limit !== undefined &&
-      goal.monthly_updates !== undefined
+    if (goal.spending_limit !== undefined && goal.monthly_updates !== undefined && goal.type == "Spending Limit"
     ) {
       const amountForCurrentMonth = monthlyBudgetSpent(goal);
       return (amountForCurrentMonth / goal.spending_limit) * 100;
@@ -386,11 +367,6 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
     return '#46981d';
   };
 
-  interface GoalMonthlyUpdate {
-    amount: number;
-    month: string;
-  }
-
   const getUpdates = () => {
     if (goal.monthly_updates) {
       const updatesData = JSON.parse(goal.monthly_updates);
@@ -407,355 +383,16 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
     return [];
   };
 
-
-  const getBudgetUpdates = () => {
-    if (goal.monthly_updates) {
-      const updatesData: GoalMonthlyUpdate[] = JSON.parse(goal.monthly_updates);
-
-      const parseMonth = (monthStr: string): Date => {
-        return new Date(`1 ${monthStr}`);
-      };
-
-      const spendingLimit = goal.spending_limit || Infinity;
-
-      const formattedData = updatesData
-        .map((update) => {
-          const amount = update.amount;
-          const excess = amount > spendingLimit ? amount - spendingLimit : 0;
-          const amountWithinLimit =
-            amount > spendingLimit ? spendingLimit : amount;
-
-          return {
-            month: update.month,
-            amount: amountWithinLimit,
-            excess,
-            date: parseMonth(update.month),
-          };
-        })
-        .sort((a, b) => a.date.getTime() - b.date.getTime())
-        .map(({ date, excess, ...rest }) => ({
-          ...rest,
-          excess,
-        }));
-
-      return formattedData;
-    }
-  };
-
-  const getAccountNumbersForGoal = async (): Promise<string[]> => {
-    if (user && user.uid) {
-      const accountNumbers: string[] = [];
-      const goalAccounts = goal.accounts;  // Goal's account aliases
-
-      if (!goalAccounts || goalAccounts.length === 0) return accountNumbers;
-
-      try {
-        const accountsCollectionRef = collection(db, "accounts");
-        const q = query(accountsCollectionRef, where("uid", "==", user.uid), where("alias", "in", goalAccounts));
-        const querySnapshot = await getDocs(q);
-
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.account_number) {
-            accountNumbers.push(data.account_number);
-          }
-        });
-      } catch (error) {
-        console.error("Error getting account numbers for goal:", error);
-      }
-
-      return accountNumbers;
-    }
-    return [];
-  };
-
-  const getMatchingTransactions = async (accountNumbers: string[], keywords: string[]): Promise<any[]> => {
-    if (user && user.uid) {
-      let transactionsList: any[] = [];
-      const years = ["transaction_data_2024", "transaction_data_2023"];
-
-      try {
-        for (let year of years) {
-          for (let accountNumber of accountNumbers) {
-            const q = query(
-              collection(db, year),
-              where("account_number", "==", accountNumber),
-              where("uid", "==", user.uid)
-            );
-
-            const querySnapshot = await getDocs(q);
-            querySnapshot.forEach((doc) => {
-              const docData = doc.data();
-              const months = [
-                "january", "february", "march", "april", "may", "june",
-                "july", "august", "september", "october", "november", "december"
-              ];
-
-              months.forEach((month) => {
-                if (docData[month]) {
-                  const transactions = JSON.parse(docData[month]);
-
-                  // Filter transactions by keywords in the description
-                  const filteredTransactions = transactions.filter((transaction: { description: string }) =>
-                    keywords.some((keyword) =>
-                      transaction.description.toLowerCase().includes(keyword.toLowerCase())
-                    )
-                  );
-
-                  transactionsList = transactionsList.concat(filteredTransactions);
-                }
-              });
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching transactions: ", error);
-      }
-
-      return transactionsList;
-    }
-    return [];
-  };
-
-  const getMatchingTransactionsByCategory = async (accountNumbers: string[], categories: string[]): Promise<any[]> => {
-    if (user && user.uid) {
-      let transactionsList: any[] = [];
-      const years = ["transaction_data_2024", "transaction_data_2023"]; // Add more years as needed
-  
-      try {
-        for (let year of years) {
-          for (let accountNumber of accountNumbers) {
-            // Query the collection for documents that match the given account number and uid
-            const q = query(
-              collection(db, year),
-              where("account_number", "==", accountNumber),
-              where("uid", "==", user.uid)
-            );
-  
-            // Get documents from the query
-            const querySnapshot = await getDocs(q);
-  
-            // Loop through each document
-            querySnapshot.forEach((doc) => {
-              const docData = doc.data();
-  
-              // List of months to check for transactions (e.g., "january", "february", etc.)
-              const months = [
-                "january", "february", "march", "april", "may", "june",
-                "july", "august", "september", "october", "november", "december"
-              ];
-  
-              // Check each month for transactions
-              months.forEach((month) => {
-                if (docData[month]) {
-                  // Parse the JSON string of transactions
-                  const transactions = JSON.parse(docData[month]);
-  
-                  // Filter transactions by the category
-                  const filteredTransactions = transactions.map((transaction: { category: string; amount: number }) => {
-                    // Ensure the amount is stored as a positive number
-                    return {
-                      ...transaction,
-                      amount: Math.abs(transaction.amount), // Convert amount to positive
-                    };
-                  }).filter((transaction: { category: string; }) =>
-                    categories.includes(transaction.category)
-                  );
-  
-                  // Add filtered transactions to the list
-                  transactionsList = transactionsList.concat(filteredTransactions);
-                }
-              });
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching transactions by category: ", error);
-      }
-  
-      return transactionsList;
-    }
-    return [];
-  };
-  
-
-
-  const aggregateMonthlyUpdates = (transactions: any[]): { amount: number; month: string }[] => {
-    const monthlySums: { [key: string]: number } = {};
-
-    transactions.forEach((transaction) => {
-      const date = new Date(transaction.date);
-      const monthYear = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
-
-      if (!monthlySums[monthYear]) {
-        monthlySums[monthYear] = 0;
-      }
-
-      monthlySums[monthYear] += transaction.amount;
-    });
-
-    // Convert the monthlySums object to an array in the required format
-    return Object.entries(monthlySums).map(([month, amount]) => ({
-      amount: parseFloat(amount.toFixed(2)),  // Ensures two decimal points
-      month,
-    }));
-  };
-
-  const handleDescriptionUpdateClick = async () => {
-    try {
-      const accountNumbers = await getAccountNumbersForGoal();
-      if (accountNumbers.length > 0) {
-        const matchingTransactions = await getMatchingTransactions(accountNumbers, goal.description || []);
-
-        if (matchingTransactions.length > 0) {
-          const existingUpdates = goal.updates ? JSON.parse(goal.updates) : [];
-          const deletedUpdates = goal.deleted_updates ? JSON.parse(goal.deleted_updates) : [];
-
-          // Filter out transactions that exist in deleted_updates
-          const filteredTransactions = matchingTransactions.filter((newTx) => {
-            return !deletedUpdates.some((deletedTx: any) =>
-              deletedTx.amount === newTx.amount &&
-              deletedTx.date === newTx.date &&
-              deletedTx.description === newTx.description
-            );
-          });
-
-          // Check for new transactions that are not in existingUpdates or deletedUpdates
-          const newTransactions = filteredTransactions.filter((newTx) => {
-            return !existingUpdates.some((existingTx: any) =>
-              existingTx.amount === newTx.amount &&
-              existingTx.date === newTx.date &&
-              existingTx.description === newTx.description
-            );
-          });
-
-          if (newTransactions.length > 0) {
-            // Update current_amount with new transactions
-            for (let i = 0; i < newTransactions.length; i++) {
-              goal.current_amount += newTransactions[i].amount;
-            }
-
-            // Append new transactions to the existing updates
-            goal.updates = JSON.stringify([...existingUpdates, ...newTransactions]);
-
-            // Update the goal's `monthly_updates` field with aggregated amounts per month
-            const monthlyUpdates = aggregateMonthlyUpdates([...existingUpdates, ...newTransactions]);
-            goal.monthly_updates = JSON.stringify(monthlyUpdates);
-
-            // Store the current date and time in `last_update`
-            goal.last_update = new Date().toISOString();
-
-            handleGoalUpdate(goal);  // Updates the state
-            await updateDB();  // Updates Firestore with new goal data
-            alert("Your transactions have been updated.");
-          } else {
-            alert("No new transactions to update.");
-          }
-        } else {
-          console.log("No matching transactions found.");
-        }
-      } else {
-        console.log("No account numbers found for the goal.");
-      }
-    } catch (error) {
-      console.error("Error in handleDescriptionUpdateClick:", error);
-    }
-  };
-
-  const handleCategoryUpdateClick = async () => {
-    try {
-      const accountNumbers = await getAccountNumbersForGoal();
-      if (accountNumbers.length > 0 && goal.category) {
-        const matchingTransactions = await getMatchingTransactionsByCategory(
-          accountNumbers,
-          [goal.category]  // Pass the category as an array
-        );
-
-        if (matchingTransactions.length > 0) {
-          const existingUpdates = goal.updates ? JSON.parse(goal.updates) : [];
-          const deletedUpdates = goal.deleted_updates ? JSON.parse(goal.deleted_updates) : [];
-
-          // Filter out transactions that exist in deleted_updates
-          const filteredTransactions = matchingTransactions.filter((newTx) => {
-            return !deletedUpdates.some((deletedTx: any) =>
-              deletedTx.amount === newTx.amount &&
-              deletedTx.date === newTx.date &&
-              deletedTx.description === newTx.description &&
-              deletedTx.category === newTx.category
-            );
-          });
-
-          // Check for new transactions that match the category and are not in existingUpdates or deletedUpdates
-          const newTransactions = filteredTransactions.filter((newTx) => {
-            return newTx.category === goal.category && // Ensure it matches the goal's category
-              !existingUpdates.some((existingTx: any) =>
-                existingTx.amount === newTx.amount &&
-                existingTx.date === newTx.date &&
-                existingTx.description === newTx.description &&
-                existingTx.category === newTx.category
-              );
-          });
-
-          if (newTransactions.length > 0) {
-            // Update current_amount with new transactions
-            for (let i = 0; i < newTransactions.length; i++) {
-              goal.current_amount += newTransactions[i].amount;
-            }
-
-            // Append new transactions to the existing updates
-            goal.updates = JSON.stringify([...existingUpdates, ...newTransactions]);
-
-            // Update the goal's `monthly_updates` field with aggregated amounts per month
-            const monthlyUpdates = aggregateMonthlyUpdates([...existingUpdates, ...newTransactions]);
-            goal.monthly_updates = JSON.stringify(monthlyUpdates);
-
-            // Store the current date and time in `last_update`
-            goal.last_update = new Date().toISOString();
-
-            handleGoalUpdate(goal);  // Updates the state
-            await updateDB();  // Updates Firestore with new goal data
-            alert("Your category-based transactions have been updated.");
-          } else {
-            alert("No new transactions to update.");
-          }
-        } else {
-          console.log("No matching transactions found for the category.");
-        }
-      } else {
-        console.log("No account numbers found for the goal or no category specified.");
-      }
-    } catch (error) {
-      console.error("Error in handleCategoryUpdateClick:", error);
-    }
-  };
-  
-
-  const updateDB = async () => {
-    try {
-      const goalDocRef = doc(db, "goals", goal.id);
-      await updateDoc(goalDocRef, {
-        updates: goal.updates,
-        current_amount: goal.current_amount,  // Optionally update the current amount if needed
-        monthly_updates: goal.monthly_updates, // Update monthly_updates in Firestore
-        last_update: goal.last_update  // Update last_update in Firestore
-      });
-    } catch (error) {
-      console.error("Error updating goal in Firestore:", error);
-    }
-  };
-
   const timeSinceLastUpdate = (lastUpdate: string): string => {
     const now = new Date();
     const lastUpdateDate = new Date(lastUpdate);
 
     const diffInMilliseconds = now.getTime() - lastUpdateDate.getTime();
 
-    // Convert milliseconds into minutes, hours, and days
     const diffInMinutes = Math.floor(diffInMilliseconds / (1000 * 60));
     const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60));
     const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
 
-    // Return the appropriate time ago message
     if (diffInMinutes < 60) {
       return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
     } else if (diffInHours < 24) {
@@ -765,14 +402,117 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
     }
   };
 
+  const calculateRemainingSavings = (goal: Goal): number => {
+    if (goal.target_amount != undefined && goal.current_amount != undefined) {
+      return goal.target_amount - goal.current_amount;
+    }
+    return 0;
+  };
 
+  const calculateAverageSavings = (goal: Goal): number => {
+    if (goal.monthly_updates) {
+      const monthlyUpdates = JSON.parse(goal.monthly_updates);
+      const totalSaved = monthlyUpdates.reduce((sum: number, update: { amount: number }) => sum + update.amount, 0);
+      return totalSaved / monthlyUpdates.length;
+    }
+    return 0;
+  };
+
+  const calculateSavingsGoalStatus = (goal: Goal): JSX.Element => {
+    if (goal.target_date) {
+      const remainingSavings = calculateRemainingSavings(goal);
+      const averageSavings = calculateAverageSavings(goal);
+      const monthsLeft = calculateMonthsLeft(goal.target_date);
+      const requiredSavingsPerMonth = remainingSavings / monthsLeft;
+
+      if (goal.current_amount == 0) {
+        return <></>;
+      }
+      else if (requiredSavingsPerMonth > averageSavings) {
+        const percentageIncrease = ((requiredSavingsPerMonth - averageSavings) / averageSavings) * 100;
+        return <p>Going forward, you need to save {percentageIncrease.toFixed(2)}% more per month than your average to reach your goal in time.</p>;
+      }
+
+      else {
+        const percentageOfAverage = (requiredSavingsPerMonth / averageSavings) * 100;
+        return <p>Going forward, you only need to save {percentageOfAverage.toFixed(2)}% of your average savings per month to reach your goal in time.</p>;
+      }
+    }
+    return <></>
+  };
+
+  const calculateSavingsPerMonth = (goal: Goal): number => {
+    if (goal.target_amount != undefined && goal.current_amount != undefined && goal.target_date !== undefined) {
+      const months = Math.max(1, calculateMonthsLeft(goal.target_date))
+      return (goal.target_amount - goal.current_amount) / months;
+    }
+    return 0;
+  };
+
+  const calculateMonthsLeft = (targetDate: string): number => {
+    const currentDate = new Date();
+    const target = new Date(targetDate);
+    const diffMonths = (target.getFullYear() - currentDate.getFullYear()) * 12 + (target.getMonth() - currentDate.getMonth());
+    return Math.max(diffMonths, 0);
+  };
+
+  const calculateAverageSpending = (goal: Goal): number => {
+    if (goal.monthly_updates) {
+      const monthlyUpdates = JSON.parse(goal.monthly_updates);
+      const totalSpent = monthlyUpdates.reduce((sum: number, update: { amount: number }) => sum + update.amount, 0);
+      return totalSpent / monthlyUpdates.length;
+    }
+    return 0;
+  };
+
+  const calculateSpendingDifferencePercentage = (goal: Goal): number => {
+    const averageSpending = calculateAverageSpending(goal);
+    const monthlyLimit = goal.spending_limit || 0;
+    return ((averageSpending - monthlyLimit) / monthlyLimit) * 100;
+  };
+
+  const calculateBiggestExpense = (goal: Goal): Update => {
+    if (goal.updates) {
+      const updates = JSON.parse(goal.updates);
+      return updates.reduce((biggest: Update, current: Update) => {
+        return current.amount > biggest.amount ? current : biggest;
+      }, updates[0]);
+    }
+    return { amount: 0, date: '', description: '' };
+  };
+
+  const calculateBiggestExpenseMonth = (goal: Goal): string => {
+    const biggestExpense = calculateBiggestExpense(goal);
+    return new Date(biggestExpense.date).toLocaleString('default', { month: 'long' });
+  };
+
+  const calculateBiggestExpensePercentage = (goal: Goal): number => {
+    const biggestExpense = calculateBiggestExpense(goal);
+    const monthlyLimit = goal.spending_limit || 1;
+    return (biggestExpense.amount / monthlyLimit) * 100;
+  };
+
+  const calculateRemainingDebt = (goal: Goal): number => {
+    if (goal.initial_amount && goal.current_amount) {
+      return goal.current_amount;
+    }
+    return 0;
+  };
+
+  const calculateAverageDebtPayments = (goal: Goal): number => {
+    if (goal.monthly_updates) {
+      const monthlyUpdates = JSON.parse(goal.monthly_updates);
+      const totalPaid = monthlyUpdates.reduce((sum: number, update: { amount: number }) => sum + update.amount, 0);
+      return totalPaid / monthlyUpdates.length;
+    }
+    return 0;
+  };
 
   return (
     <div className={styles.mainPage} style={{ position: 'fixed', right: 0, top: 0, height: '100%', zIndex: "11", paddingTop: '2rem' }}>
       <div className={styles.goalPage}>
         <div className="flex flex-col gap-8">
-          {/* Fixed top section */}
-          <div className="fixed top-0 right-0 z-10  bg-[var(--main-background)] p-2 shadow-md" style={{ width: '85vw' }}>
+          <div className="flex shadow-lg z-10 justify-center fixed top-0 right-0 z-10  bg-[var(--block-background)] p-2" style={{ width: '85vw' }}>
             <div className="container mx-auto">
               <div className="flex-1 flex flex-col justify-center text-center p-3">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '1rem' }}>
@@ -794,27 +534,11 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                     {editPopupOpen && (
                       <EditGoalPopup togglePopup={handleEditGoalPopup} goal={goal} toggleMainPopup={onClose} />
                     )}
-                    {goal.update_type == 'manual' && (
-                      <>
-                        <div className={styles.updateViewButton} onClick={handleUpdateGoalPopup}>
-                          Update Progress
-                        </div>
-                        {updatePopupOpen && <UpdateGoalPopup togglePopup={handleUpdateGoalPopup} goal={goal} />}
-                      </>
-                    )}
-                    {(goal.update_type == 'assign-description') && (
-                      <>
-                        <div className={styles.updateViewButton} onClick={handleDescriptionUpdateClick}>
-                          Check for Updates
-                        </div>
-                      </>
-                    )}
-                    {(goal.update_type == 'assign-category') && (
-                      <>
-                        <div className={styles.updateViewButton} onClick={handleCategoryUpdateClick}>
-                          Check for Updates
-                        </div>
-                      </>
+                    <div className={styles.updateViewButton} onClick={handleUpdateGoalPopup}>
+                      Add an Update
+                    </div>
+                    {updatePopupOpen && (
+                      <UpdateGoalPopup togglePopup={handleUpdateGoalPopup} goal={goal} />
                     )}
                   </div>
                 </div>
@@ -823,7 +547,6 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
           </div>
 
           <div className="mt-[8rem]">
-            {/* First Row */}
             <div className="container mx-auto p-4">
               <div className="flex items-stretch space-x-4">
                 <div className="flex-1 flex flex-col items-center justify-between text-center bg-[var(--block-background)] rounded-lg shadow-md p-8">
@@ -836,41 +559,32 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                     <div className={styles.goalPair}>
                       <div className={styles.goalLabel}>Update Type:</div>
                       <div className={styles.goalValue}>
-                        {goal.update_type == 'assign-all' && 'Assigned Account/s'}
-                        {goal.update_type == 'assign-description' && 'By Transaction Descriptions'}
-                        {goal.update_type == 'assign-transactions' && 'Manual Transaction Assignment'}
-                        {goal.update_type == 'assign-category' && 'By Transaction Category'}
-                        {goal.update_type == 'manual' && 'Manual Updates'}
+                        {goal.update_type == 'automatic' && 'Automatic'}
+                        {goal.update_type == 'manual' && 'Manual Only'}
                       </div>
                     </div>
-                    {goal.target_date && (
-                      <div className={styles.goalPair}>
-                        <div className={styles.goalLabel}>Target Date:</div>
-                        <div className={styles.goalValue}>{goal.target_date}</div>
-                      </div>
-                    )}
                     {goal.initial_amount !== undefined && (
                       <div className={styles.goalPair}>
                         <div className={styles.goalLabel}>Initial Amount:</div>
                         <div className={styles.goalValue}>R {goal.initial_amount.toFixed(2)}</div>
                       </div>
                     )}
-                    {goal.current_amount !== undefined && goal.type != 'Spending Limit' &&(
+                    {goal.current_amount !== undefined && goal.type != 'Spending Limit' && (
                       <div className={styles.goalPair}>
                         <div className={styles.goalLabel}>Current Amount:</div>
                         <div className={styles.goalValue}>R {goal.current_amount.toFixed(2)}</div>
                       </div>
                     )}
-                    {goal.spending_limit !== undefined && goal.type == 'Spending Limit' &&(
+                    {goal.spending_limit !== undefined && goal.type == 'Spending Limit' && (
                       <div className={styles.goalPair}>
                         <div className={styles.goalLabel}>Monthly Limit:</div>
                         <div className={styles.goalValue}>R {goal.spending_limit.toFixed(2)}</div>
                       </div>
                     )}
-                    {goal.monthly_updates !== undefined && goal.type == 'Spending Limit' &&(
+                    {goal.monthly_updates !== undefined && goal.type == 'Spending Limit' && (
                       <div className={styles.goalPair}>
                         <div className={styles.goalLabel}>Spent this Month:</div>
-                        <div className={styles.goalValue}>R {monthlyBudgetSpent(goal)}</div>
+                        <div className={styles.goalValue}>R {monthlyBudgetSpent(goal).toFixed(2)}</div>
                       </div>
                     )}
                     {goal.target_amount !== undefined && (
@@ -880,12 +594,18 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                       </div>
                     )}
                     {goal.target_date !== undefined && (
-                      <div className={styles.goalPair}>
-                        <div className={styles.goalLabel}>Days Left:</div>
-                        <div className={styles.goalValue}>
-                          {calculateDaysLeft(goal.target_date) > 0 ? `${calculateDaysLeft(goal.target_date)} days` : 'Target Date Passed'}
+                      <>
+                        <div className={styles.goalPair}>
+                          <div className={styles.goalLabel}>Target Date:</div>
+                          <div className={styles.goalValue}>{goal.target_date}</div>
                         </div>
-                      </div>
+                        <div className={styles.goalPair}>
+                          <div className={styles.goalLabel}>Days Left:</div>
+                          <div className={styles.goalValue}>
+                            {calculateDaysLeft(goal.target_date) > 0 ? `${calculateDaysLeft(goal.target_date)} days` : 'Target Date Passed'}
+                          </div>
+                        </div>
+                      </>
                     )}
                     {goal.last_update !== undefined && (
                       <div className={styles.goalPair}>
@@ -933,8 +653,57 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
               </div>
             </div>
 
-            {/* Second Row - Updates and Bar Chart */}
-            {goal.updates && (
+            <div className="container mx-auto p-4">
+              <div className="flex flex-col justify-center items-center bg-[var(--block-background)] rounded-lg shadow-md p-8 w-full">
+                <h2 className="text-xl font-semibold mb-4">Insights</h2>
+                <div className='justify-left items-left bg-grey w-full' style={{ fontSize: 'calc(1.2rem*var(--font-size-multiplier))' }}>
+                  {goal.target_date && calculateMonthsLeft(goal.target_date) == 0 && calculateDaysLeft(goal.target_date) == 0 && (
+                    <>
+                      <p>This goal's target date has passed.</p>
+                      <br></br>
+                      <p>You can set a new date by clicking "Edit Details" above.</p>
+                    </>
+                  )}
+                  {goal.type === 'Savings' && goal.target_amount && goal.target_amount > goal.current_amount && goal.target_date && (
+                    <>
+                      <p>You still need to save R{calculateRemainingSavings(goal).toFixed(2)}.</p>
+                      <br></br>
+                      <p>This means you need to save R{calculateSavingsPerMonth(goal).toFixed(2)} per month in order to reach your goal by {goal.target_date}.</p>
+                      <br></br>
+                      <p>The average amount you have saved per month is R{calculateAverageSavings(goal).toFixed(2)}.</p>
+                      <br></br>
+                      {calculateSavingsGoalStatus(goal)}
+                    </>
+                  )}
+                  {goal.type === 'Savings' && goal.target_amount && goal.target_amount <= goal.current_amount && (
+                    (<p>You've reached your goal!</p>)
+                  )}
+                  {goal.type === 'Spending Limit' && (
+                    <>
+                      <p>On average, you have spent R{calculateAverageSpending(goal).toFixed(2)} per month.</p>
+                      <br></br>
+                      <p>Your average spending is {Math.abs(calculateSpendingDifferencePercentage(goal)).toFixed(2)}% {calculateSpendingDifferencePercentage(goal) > 0 ? 'above' : 'below'} your monthly limit.</p>
+                      <br></br>
+                      <p>Your biggest expense was "{calculateBiggestExpense(goal).description}" in {calculateBiggestExpenseMonth(goal)}. This used {calculateBiggestExpensePercentage(goal).toFixed(2)}% of that month's limit.</p>
+                    </>
+                  )}
+                  {goal.type === 'Debt Reduction' && goal.target_date !== undefined && goal.current_amount > 0 && goal.target_date && calculateMonthsLeft(goal.target_date) > 0 && (
+                    <>
+                      <p>You still need to pay R{calculateRemainingDebt(goal).toFixed(2)} towards this debt.</p>
+                      <br></br>
+                      <p>This means you need to pay R{(calculateRemainingDebt(goal) / calculateMonthsLeft(goal.target_date)).toFixed(2)} per month in order to reach your goal by {goal.target_date}.</p>
+                      <br></br>
+                      <p>Your average monthly payment is R{calculateAverageDebtPayments(goal).toFixed(2)}.</p>
+                    </>
+                  )}
+                  {goal.type === 'Debt Reduction' && goal.current_amount <= 0 && (
+                    (<p>You've reached your goal!</p>)
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {goal.updates && JSON.parse(goal.updates).length > 0 && (
               <>
                 <div className="container mx-auto p-4">
                   <div className="flex justify-between items-start gap-8">
@@ -945,7 +714,8 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                       <ResponsiveContainer width="100%" height="80%">
                         <BarChart
                           data={getUpdates()}
-                          margin={{ top: 20, right: 30, bottom: 20, left: 30 }}
+                          margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
+                          startAngle={180}
                         >
                           <XAxis
                             dataKey="month"
@@ -956,6 +726,8 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                             tick={{ fill: 'var(--main-text)', fontSize: 12 }}
                             stroke="var(--main-text)"
                             width={50}
+                            allowDataOverflow={true}
+                            domain={['auto', 'auto']}
                           >
                             <Label
                               value="Amount"
@@ -974,15 +746,17 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                             }}
                           />
                           <CartesianGrid stroke="rgba(255, 255, 255, 0.1)" vertical={false} />
-                          <Bar
-                            dataKey="amount"
-                            fill="var(--primary-1)"
-                            radius={[10, 10, 0, 0]}
-                            barSize={40}
-                            stroke="var(--main-border)"
-                            strokeWidth={1}
-                            stackId="a"
-                          />
+                          <Bar dataKey="amount" fill="var(--primary-1)" barSize={40} stroke="var(--main-border)" strokeWidth={1}>
+                            {getUpdates().map((entry: { amount: number; }, index: any) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={goal.type === 'Spending Limit' && goal.spending_limit ?
+                                  (entry.amount > goal.spending_limit ? 'red' : 'var(--primary-1)')
+                                  :
+                                  (entry.amount < 0 ? 'var(--primary-2)' : 'var(--primary-1)')}
+                              />
+                            ))}
+                          </Bar>
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -992,7 +766,7 @@ const GoalInfoPage = ({ goal, onClose, onUpdateGoal }: GoalInfoPageProps & { onU
                 {currentGoal.updates && JSON.parse(currentGoal.updates).length > 0 && (
                   <div className="container mx-auto p-4">
                     <div className="flex justify-between items-start gap-8">
-                      <div className="flex-1 flex flex-col justify-center text-center bg-[var(--block-background)] rounded-lg shadow-md p-8">
+                      <div className="flex-1 flex flex-col justify-center text-center bg-[var(--block-background)] rounded-lg shadow-md p-8 pl-20 pr-20">
                         <h2 className="text-xl font-semibold mb-10">Updates</h2>
                         <UpdateTable goal={currentGoal} onUpdateGoal={handleGoalUpdate} />
                       </div>
@@ -1016,12 +790,6 @@ export interface GoalsPageProps {
 export function GoalsPage() {
   const [Goals, setGoals] = useState<Goal[]>([]);
   const [isGoalPopupOpen, setIsGoalPopupOpen] = useState(false);
-  const [editPopupOpen, setEditPopupOpen] = useState<{
-    [key: number]: boolean;
-  }>({});
-  const [updatePopupOpen, setUpdatePopupOpen] = useState<{
-    [key: number]: boolean;
-  }>({});
   const [sortOption, setSortOption] = useState('name');
   const [hasGoals, setHasGoals] = useState(false);
   const user = useContext(UserContext);
@@ -1065,7 +833,6 @@ export function GoalsPage() {
                 ? calculateProgressPercentage(b)
                 : 0;
 
-      // Compare values
       if (aValue < bValue) return -1;
       if (aValue > bValue) return 1;
       return 0;
@@ -1095,6 +862,29 @@ export function GoalsPage() {
     return 0;
   };
 
+  const updateGoalTransactions = async (goal: Goal) => {
+    try {
+      const existingUpdates = goal.updates ? JSON.parse(goal.updates) : [];
+
+      let updatedCurrentAmount = 0;
+      existingUpdates.forEach((tx: any) => {
+        if (goal.type === 'Debt Reduction') {
+          updatedCurrentAmount -= tx.amount;
+        } else {
+          updatedCurrentAmount += tx.amount;
+        }
+      });
+
+      goal.current_amount = updatedCurrentAmount;
+      await updateDoc(doc(db, 'goals', goal.id), { current_amount: updatedCurrentAmount });
+
+      handleGoalUpdate(goal);
+
+    } catch (error) {
+      console.error('Error updating goal transactions:', error);
+    }
+  };
+
   const fetchGoals = async () => {
     if (user && user.uid) {
       try {
@@ -1108,15 +898,30 @@ export function GoalsPage() {
             ...data,
           };
         });
+
         if (goalsList.length > 0) {
           setHasGoals(true);
         }
-        setGoals(sortGoals(goalsList, sortOption));
+
+        const sortedGoals = sortGoals(goalsList, sortOption);
+        setGoals(sortedGoals);
+
+        for (let goal of sortedGoals) {
+          await updateGoalTransactions(goal);
+        }
+
+        const automaticGoals = sortedGoals.filter((goal) => goal.update_type === "automatic");
+        automaticGoals.forEach(async (goal) => {
+          await updateTransactionsForGoal(goal);
+          handleGoalUpdate(goal);
+        });
+
       } catch (error) {
         console.error('Error getting goals document:', error);
       }
     }
   };
+
 
   const addGoalPopup = () => {
     setIsGoalPopupOpen(!isGoalPopupOpen);
@@ -1124,8 +929,11 @@ export function GoalsPage() {
   };
 
   useEffect(() => {
-    fetchGoals();
+    if (!selectedGoal) {
+      fetchGoals();
+    }
   }, [sortOption, selectedGoal]);
+
 
   const monthlyBudgetSpent = (goal: Goal): number => {
     if (goal.monthly_updates !== undefined) {
@@ -1149,20 +957,230 @@ export function GoalsPage() {
     setSelectedGoal(goal);
   };
 
+  const getAccountNumbersForCondition = async (aliases: string[]): Promise<string[]> => {
+    const accountNumbers: string[] = [];
+    if (user && user.uid && aliases.length > 0) {
+      try {
+        const accountsCollectionRef = collection(db, "accounts");
+        const batchSize = 10;
+        for (let i = 0; i < aliases.length; i += batchSize) {
+          const batch = aliases.slice(i, i + batchSize);
+          const q = query(
+            accountsCollectionRef,
+            where("uid", "==", user.uid),
+            where("alias", "in", batch)
+          );
+          const querySnapshot = await getDocs(q);
+
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.account_number) {
+              accountNumbers.push(data.account_number);
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error getting account numbers for condition:", error);
+      }
+    }
+    return accountNumbers;
+  };
+
+  const getTransactionsForAccounts = async (accountNumbers: string[], goal: Goal): Promise<any[]> => {
+    if (user && user.uid) {
+      let transactionsList: any[] = [];
+      const currentYear = new Date().getFullYear();
+      const years = [];
+
+      for (let year = 1980; year <= currentYear; year++) {
+        years.push(`transaction_data_${year}`);
+      }
+
+      try {
+        for (let year of years) {
+          for (let accountNumber of accountNumbers) {
+            const q = query(
+              collection(db, year),
+              where("account_number", "==", accountNumber),
+              where("uid", "==", user.uid)
+            );
+            const querySnapshot = await getDocs(q);
+
+            querySnapshot.forEach((doc) => {
+              const docData = doc.data();
+              const months = [
+                "january", "february", "march", "april", "may", "june",
+                "july", "august", "september", "october", "november", "december"
+              ];
+
+              let negation = -1;
+              if (goal.type == "Savings") { negation = 1; }
+
+              months.forEach((month) => {
+                if (docData[month]) {
+                  const transactions = JSON.parse(docData[month]);
+                  transactionsList = transactionsList.concat(transactions.map((transaction: { amount: number }) => ({
+                    ...transaction,
+                    amount: (transaction.amount) * negation
+                  })));
+                }
+              });
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+
+      return transactionsList;
+    }
+    return [];
+  };
+
+  const filterTransactionsByCategory = (transactions: any[], category: string): any[] => {
+    if (!category || category === "Any") {
+      return transactions;
+    }
+
+    return transactions.filter((transaction: { category: string }) => transaction.category === category);
+  };
+
+  const filterTransactionsByKeywords = (transactions: any[], keywords: string[]): any[] => {
+    const matchingTransactions: any[] = [];
+    const remainingTransactions = [...transactions];
+
+    keywords.forEach((keyword) => {
+      for (let i = remainingTransactions.length - 1; i >= 0; i--) {
+        const transaction = remainingTransactions[i];
+        if (transaction.description.toLowerCase().includes(keyword.toLowerCase())) {
+          matchingTransactions.push(transaction);
+          remainingTransactions.splice(i, 1);
+        }
+      }
+    });
+
+    if (keywords.length === 0) {
+      return remainingTransactions;
+    }
+
+    return matchingTransactions;
+  };
+
+  const updateTransactionsForGoal = async (goal: Goal) => {
+    try {
+      const conditions = goal.conditions ? JSON.parse(goal.conditions) : [];
+      let allMatchingTransactions: any[] = [];
+
+      for (let condition of conditions) {
+        const { accounts, category, keywords } = condition;
+        const conditionAccountNumbers = await getAccountNumbersForCondition(accounts);
+        let transactionsForCondition = await getTransactionsForAccounts(conditionAccountNumbers, goal);
+        transactionsForCondition = filterTransactionsByCategory(transactionsForCondition, category);
+        const keywordFilteredTransactions = filterTransactionsByKeywords(transactionsForCondition, keywords || []);
+        allMatchingTransactions = allMatchingTransactions.concat(keywordFilteredTransactions);
+      }
+
+      if (allMatchingTransactions.length > 0) {
+        const existingUpdates = goal.updates ? JSON.parse(goal.updates) : [];
+        const deletedUpdates = goal.deleted_updates ? JSON.parse(goal.deleted_updates) : [];
+        const filteredTransactions = allMatchingTransactions.filter((newTx) => {
+          return !deletedUpdates.some((deletedTx: any) =>
+            deletedTx.amount === newTx.amount &&
+            deletedTx.date === newTx.date &&
+            deletedTx.description === newTx.description &&
+            deletedTx.category === newTx.category
+          );
+        });
+        const newTransactions = filteredTransactions.filter((newTx) => {
+          return !existingUpdates.some((existingTx: any) =>
+            existingTx.amount === newTx.amount &&
+            existingTx.date === newTx.date &&
+            existingTx.description === newTx.description &&
+            existingTx.category === newTx.category
+          );
+        });
+
+        if (newTransactions.length > 0) {
+          for (let i = 0; i < newTransactions.length; i++) {
+            if (goal.type !== 'Debt Reduction') {
+              goal.current_amount += newTransactions[i].amount;
+            } else {
+              goal.current_amount -= newTransactions[i].amount;
+            }
+          }
+          goal.updates = JSON.stringify([...existingUpdates, ...newTransactions]);
+          const monthlyUpdates = aggregateMonthlyUpdates([...existingUpdates, ...newTransactions]);
+          goal.monthly_updates = JSON.stringify(monthlyUpdates);
+          goal.last_update = new Date().toISOString();
+
+          await updateGoalInDB(goal);
+        }
+      }
+    } catch (error) {
+      console.error("Error updating transactions for goal:", error);
+    }
+  };
+
+  const aggregateMonthlyUpdates = (transactions: any[]): { amount: number; month: string }[] => {
+    const monthlySums: { [key: string]: number } = {};
+
+    transactions.forEach((transaction) => {
+      const date = new Date(transaction.date);
+      const monthYear = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+
+      if (!monthlySums[monthYear]) {
+        monthlySums[monthYear] = 0;
+      }
+
+      monthlySums[monthYear] += transaction.amount;
+    });
+
+    return Object.entries(monthlySums).map(([month, amount]) => ({
+      amount: parseFloat(amount.toFixed(2)),
+      month,
+    }));
+  };
+
+  const updateGoalInDB = async (goal: Goal) => {
+    try {
+      const goalDocRef = doc(db, "goals", goal.id);
+      await updateDoc(goalDocRef, {
+        updates: goal.updates,
+        current_amount: goal.current_amount,
+        monthly_updates: goal.monthly_updates,
+        last_update: goal.last_update
+      });
+    } catch (error) {
+      console.error("Error updating goal in Firestore:", error);
+    }
+  };
+
   return (
     <>
+      {isGoalPopupOpen && (
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, width: '100%', height: '100%', zIndex: 100 }}>
+          <AddGoalPopup togglePopup={addGoalPopup} />
+        </div>
+      )}
+      {selectedGoal && (
+        <div style={{ position: 'relative'}} className='relative'>
+          <GoalInfoPage goal={selectedGoal} onClose={() => setSelectedGoal(null)} onUpdateGoal={handleGoalUpdate}></GoalInfoPage>
+        </div>
+      )}
       {!hasGoals ? (
         <>
-          <div className={styles.noGoalScreen}>
-            <div className={styles.noGoalText}>Add your first goal:</div>
-            <button className={styles.addGoalsButton} onClick={addGoalPopup}>
-              Add a Goal
+          <div className="flex flex-col items-center justify-center bg-[var(--main-background)] h-full">
+            <div className="text-2xl">Add your first goal:</div>
+            <button
+              className="text-2xl mt-4 bg-BudgieBlue2 hover:bg-BudgieAccentHover transition-colors text-white p-4 rounded-2xl"
+              onClick={addGoalPopup}
+            >
+              Add Goal
             </button>
-            {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
           </div>
         </>
       ) : (
-        <>
+        <div style={{ position: 'relative' }} className='relative'>
           <div className={styles.header}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <p className={styles.sortHeader}>Sort By:</p>
@@ -1180,15 +1198,9 @@ export function GoalsPage() {
             <button className={styles.addAGoalButton} onClick={addGoalPopup}>
               Add a Goal
             </button>
-            {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
+
+
           </div>
-          <div
-            style={{
-              width: '85vw',
-              backgroundColor: 'var(--main-background)',
-              marginBottom: 'calc((6rem * var(--font-size-multiplier)))',
-            }}
-          ></div>
           <div className={styles.planningModalContainer}>
             <div className="p-4">
               <table className="min-w-full table-auto border-collapse border border-gray-200">
@@ -1216,11 +1228,10 @@ export function GoalsPage() {
                             <div
                               className="absolute top-0 left-0 h-full bg-green-500 rounded"
                               style={{
-                                width: `${calculateProgressPercentage(goal)}%`,
+                                width: goal.current_amount < 0 ? 0 : `${Math.min(100, calculateProgressPercentage(goal))}%`,
                                 backgroundColor: 'var(--primary-2)',
                               }}
                             />
-
                           </div>
                           <span className="ml-3 text-sm" style={{ color: 'var(--main-text' }}>
                             {calculateProgressPercentage(goal).toFixed(2)}%
@@ -1233,13 +1244,9 @@ export function GoalsPage() {
               </table>
             </div>
 
-            {selectedGoal && (
-              <>
-                <GoalInfoPage goal={selectedGoal} onClose={() => setSelectedGoal(null)} onUpdateGoal={handleGoalUpdate}></GoalInfoPage>
-              </>
-            )}
+
           </div>
-        </>
+        </div>
       )}
     </>
   );

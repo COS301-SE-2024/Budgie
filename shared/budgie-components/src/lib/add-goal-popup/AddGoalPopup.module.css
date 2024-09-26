@@ -5,6 +5,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 80%;
 }
 
 .updateGoalInfo {
@@ -23,7 +24,7 @@
 .goalForm {
   margin: 0 auto;
   text-align: left;
-  width: 90%;
+  width: 100%;
 }
 
 .goalForm .formGroup {
@@ -217,12 +218,12 @@
   font-weight: 200;
 }
 
-.icon:hover + .popupText {
+.icon:hover+.popupText {
   visibility: visible;
   opacity: 1;
 }
 
-.icon:hover + .noAccountPopupText {
+.icon:hover+.noAccountPopupText {
   visibility: visible;
   opacity: 1;
 }
@@ -243,7 +244,7 @@
   background-color: var(--main-background);
   border: none;
   background-image: none;
-  margin-top: 2rem;
+  margin-bottom: 1rem;
 }
 
 .categoryDropdown option {

@@ -74,16 +74,12 @@ interface GoalFormProps {
 
 const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   const [goalName, setGoalName] = useState(props.goal.name);
-  const [goalID, setID] = useState(props.goal.id);
   const [currentAmount, setCurrentAmount] = useState(props.goal.current_amount);
   const [targetAmount, setTargetAmount] = useState(props.goal.target_amount);
-  const [startDate, setStartDate] = useState(props.goal.start_date);
   const [spendingLimit, setSpendingLimit] = useState(props.goal.spending_limit);
   const [spentAmount, setSpentAmount] = useState(0);
   const [updateAmount, setUpdateAmount] = useState(0);
-  const [updateDate, setupdateDate] = useState(
-    new Date().toISOString().split('T')[0]
-  );
+  const [updateDate, setupdateDate] = useState(new Date().toISOString().split('T')[0]);
   const user = useContext(UserContext);
 
   interface Goal {
@@ -126,12 +122,12 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   };
 
   const calculateNewCurrentAmount = (goal: Goal): string => {
-    if (
-      updateAmount &&
-      goal.current_amount !== undefined
+    if (updateAmount && goal.current_amount !== undefined
     ) {
       if (goal.initial_amount !== undefined) {
-        return Math.min(goal.current_amount - updateAmount).toFixed(2);
+        let amount = goal.current_amount - updateAmount;
+        if (amount<0){amount = 0}
+        return amount.toFixed(2);
       }
       return (currentAmount + updateAmount).toFixed(2);
     } else {
@@ -190,7 +186,6 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
         const goalDocRef = doc(db, 'goals', props.goal.id);
         const goalDoc = await getDoc(goalDocRef);
   
-        // Parse existing updates safely
         const existingUpdates = goalDoc.exists()
           ? goalDoc.data()?.updates || '[]'
           : '[]';
@@ -203,14 +198,13 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           updatesArray = [];
         }
   
-        // Add new update
+        const formattedDate = new Date(updateDate).toISOString().slice(0, 10).replace(/-/g, '/');  // Format the date as yyyy/mm/dd
+  
         const newUpdate = {
           amount: updateAmount,
-          date: updateDate,
+          date: formattedDate,  // Save the formatted date
         };
-        updatesArray.push(newUpdate);
-  
-        // Sort updates by date (newest first)
+        updatesArray.push(newUpdate);  
         updatesArray.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
   
         const existingMonthlyUpdates = goalDoc.exists()
@@ -227,7 +221,6 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           updatedMonthlyUpdatesArray = [];
         }
   
-        // Add or update the monthly update entry
         const newMonthlyUpdate = {
           amount: updateAmount,
           month: getMonthName(updateDate) + ' ' + getYear(updateDate),
@@ -244,7 +237,6 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           updatedMonthlyUpdatesArray.push(newMonthlyUpdate);
         }
   
-        // Sort monthly updates by month (you can adjust this if necessary)
         updatedMonthlyUpdatesArray.sort((a: any, b: any) => 
           new Date(b.month).getTime() - new Date(a.month).getTime()
         );
@@ -256,6 +248,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
           ...goalData,
           monthly_updates: JSON.stringify(updatedMonthlyUpdatesArray),
           updates: JSON.stringify(updatesArray),
+          last_update: new Date().toISOString()
         });
   
         props.togglePopup();
@@ -264,10 +257,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
       }
     }
   };
-  
-  
-  
-  
+   
 
   function getMonthName(dateString: string) {
     const date = new Date(dateString);
@@ -329,11 +319,9 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
 
   const calculateNewAmountLeft = (goal: Goal): string => {
     if (updateAmount) {
-      return (
-        spendingLimit -
-        monthlyBudgetSpent(props.goal) -
-        updateAmount
-      ).toFixed(2);
+      let amount = (spendingLimit - monthlyBudgetSpent(props.goal) -updateAmount)
+      if (amount < 0){amount = 0;}
+      return amount.toFixed(2);
     } else {
       return (spendingLimit - monthlyBudgetSpent(props.goal)).toFixed(2);
     }
@@ -360,8 +348,8 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   return (
     <div className={styles.goalForm}>
       <form onSubmit={handleSubmit}>
-        <p className={styles.goalDescription}>
-          Update your progress on {props.goal.name} below:
+        <p className={styles.goalHeading}>
+          Add a manual update to {props.goal.name} below:
         </p>
         {props.activeTab === 'Savings' && (
           <>
@@ -546,12 +534,6 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
                   <div>New Amount Left in Budget:</div>
                   <p>R {calculateNewAmountLeft(props.goal)}</p>
                 </div>
-                {/*<div className={styles.progressInfo}>
-                  <div>New Debt Amount:</div>
-                  <p>R {calculateNewCurrentAmount(props.goal)}</p>
-                  <div>New Goal Progress:</div>
-                  <p>{calculateNewProgress(props.goal)} %</p>
-                </div>*/}
               </div>
             </div>
           </>

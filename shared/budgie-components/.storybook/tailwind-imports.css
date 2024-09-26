@@ -6,21 +6,65 @@
   @font-face {
     font-family: 'TripSans';
     font-weight: 400;
-    src: url('../public/fonts/TripSans-Regular.woff2') format('woff2');
+    src: url('../../public/fonts/TripSans-Regular.woff2') format('woff2');
   }
   @font-face {
     font-family: 'TripSans';
     font-weight: 500;
-    src: url('../public/fonts/TripSans-Medium.woff2') format('woff2');
+    src: url('../../public/fonts/TripSans-Medium.woff2') format('woff2');
   }
   @font-face {
     font-family: 'TripSans';
     font-weight: 700;
-    src: url('../public/fonts/TripSans-Bold.woff2') format('woff2');
+    src: url('../../public/fonts/TripSans-Bold.woff2') format('woff2');
   }
   @font-face {
     font-family: 'TripSans';
     font-weight: 800;
-    src: url('../public/fonts/TripSans-Ultra.woff2') format('woff2');
+    src: url('../../public/fonts/TripSans-Ultra.woff2') format('woff2');
   }
+}
+
+@keyframes gradientAnimation {
+  0% {
+    stop-color: #a0e9af;
+  }
+  50% {
+    stop-color: #b2f5a8;
+  }
+  100% {
+    stop-color: #a0e9af;
+  }
+}
+
+@keyframes gradientAnimation2 {
+  0% {
+    stop-color: #c0f0c0;
+  }
+  50% {
+    stop-color: #e0f8d1;
+  }
+  100% {
+    stop-color: #c0f0c0;
+  }
+}
+
+#waveGradient stop:nth-child(1),
+#waveGradientTop stop:nth-child(1) {
+  animation: gradientAnimation 8s ease-in-out infinite;
+}
+
+#waveGradient stop:nth-child(2),
+#waveGradientTop stop:nth-child(2) {
+  animation: gradientAnimation2 8s ease-in-out infinite;
+}
+
+#waveGradient stop:nth-child(3),
+#waveGradientTop stop:nth-child(3) {
+  animation: gradientAnimation 8s ease-in-out infinite;
+}
+
+#waveGradient stop:nth-child(4),
+#waveGradientTop stop:nth-child(4) {
+  animation: gradientAnimation2 8s ease-in-out infinite;
 }

@@ -1,5 +1,4 @@
 'use client';
-import styles from './page.module.css';
 import React, { useContext, useEffect, useState } from 'react';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';
@@ -13,11 +12,11 @@ export default function overview() {
 
   useEffect(() => {
     if (!user) {
-      router.push('/');
+      return router.push('/');
     } else {
       setLoading(false);
     }
   }, [user]);
 
-  return <>{!loading && <AccountsPage></AccountsPage>}</>;
+  return !loading && <AccountsPage></AccountsPage>;
 }

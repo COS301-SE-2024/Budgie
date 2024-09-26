@@ -1,4 +1,4 @@
-import './global.css';
+import './globals.css';
 import { Providers } from './providers';
 import { Metadata } from 'next';
 import type { Viewport } from 'next';
@@ -21,7 +21,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head></head>
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=block"
+          rel="stylesheet"
+        />
+      </head>
       <body className="bg-BudgieWhite w-screen h-screen">
         <Providers>{children}</Providers>
       </body>

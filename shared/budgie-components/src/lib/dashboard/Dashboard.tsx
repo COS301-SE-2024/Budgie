@@ -10,7 +10,7 @@ import { useThemeSettings } from '../../useThemes';
 import '../../root.css';
 import styles from './Dashboard.module.css';
 
-export interface DashboardProps {}
+export interface DashboardProps { }
 
 export function Dashboard(props: DashboardProps) {
   const user = useContext(UserContext);
@@ -143,27 +143,23 @@ export function Dashboard(props: DashboardProps) {
   }
 
   return (
-    <div>
-      <div className={styles.topBar}>
+    <div className="mainPage flex flex-col w-[85vw] items-center" style={{overflowY: 'hidden', overflowX:'hidden'}}>
+      <div className=" flex shadow-lg z-2 justify-between rounded-2xl bg-[var(--block-background)] p-2 w-[98%] m-6">
         <div></div>
-        <div>
-          <button
-            className={`${styles.button} ${
-              viewMode === 'all' ? styles.activeButton : ''
+        <button
+          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-BudgieBlue2 hover:text-BudgieWhite font-medium mr-16 cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${viewMode === 'all' ? 'border-b-4 border-BudgieBlue2' : ''
             }`}
-            onClick={() => setViewMode('all')}
-          >
-            Yearly
-          </button>
-          <button
-            className={`${styles.button} ${
-              viewMode === 'monthly' ? styles.activeButton : ''
+          onClick={() => setViewMode('all')}
+        >
+          Yearly
+        </button>
+        <button
+          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-BudgieBlue2 hover:text-BudgieWhite font-medium cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${viewMode === 'monthly' ? 'border-b-4 border-BudgieBlue2' : ''
             }`}
-            onClick={() => setViewMode('monthly')}
-          >
-            Monthly
-          </button>
-        </div>
+          onClick={() => setViewMode('monthly')}
+        >
+          Monthly
+        </button>
         <select
           className={styles.accountDropdown}
           value={selectedAlias}
@@ -177,7 +173,7 @@ export function Dashboard(props: DashboardProps) {
         </select>
       </div>
 
-      <div>
+      <div >
         {isLoading ? (
           <div className={styles.loadScreen}>
             <div className={styles.loaderContainer}>

@@ -17,6 +17,7 @@ import {
   QueryDocumentSnapshot,
   DocumentReference,
 } from 'firebase/firestore';
+import '../../root.css';
 import styles from './add-accounts-page.module.css';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';
@@ -50,72 +51,65 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     }
 
     return (
-      <div className="mainPage">
-        <div
-          className="flex items-center justify-center bg-BudgieGray h-full w-full"
-          style={{ backgroundColor: 'var(--main-background)', color: 'black' }}
-        >
-          <div className="flex bg-black w-[72rem] h-3/4 rounded-[3rem] shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)]">
-            <div
-              onClick={() => OnAddAccountTypeClick('current')}
-              className="flex flex-col items-center cursor-pointer bg-[rgb(228,228,228)] w-96 h-full rounded-l-[2.5rem] hover:z-50 hover:shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)] transition-shadow ease-in duration-200"
+      <div className="flex items-center justify-center h-full w-full">
+        <div className="flex flex-col md:flex-row md:bg-black md:w-[80%] md:h-2/3 h-full md:min-h-96 rounded-[3rem] md:shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)]">
+          <div
+            onClick={() => OnAddAccountTypeClick('current')}
+            className="p-2 mb-5 md:mb-0 flex flex-col items-center justify-center cursor-pointer md:bg-[rgb(228,228,228)] bg-[rgb(248,248,248)] md:w-1/3 md:h-full md:rounded-l-[2.5rem] rounded-[2.5rem] md:rounded-r-none hover:z-50 hover:shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)] transition-shadow ease-in duration-200"
+          >
+            <span
+              className=" text-black material-symbols-outlined"
+              style={{
+                fontSize: '9rem',
+              }}
             >
-              <span
-                className="mt-24 text-black material-symbols-outlined"
-                style={{
-                  fontSize: '9rem',
-                }}
-              >
-                account_balance
-              </span>
-              <span className=" text-2xl font-TripSans font-medium">
-                Current Account
-              </span>
-              <span className="mt-16 text-[rgba(160,160,160,0.8)] text-center text-xl font-TripSans font-medium">
-                This is an account where you receive <br /> your paycheque and
-                make daily <br /> payments.
-              </span>
-            </div>
-            <div
-              onClick={() => OnAddAccountTypeClick('savings')}
-              className="flex flex-col items-center cursor-pointer bg-[rgb(238,238,238)] w-96 h-full hover:z-50 hover:shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)] transition-shadow ease-in duration-200"
+              account_balance
+            </span>
+            <span className="mt-6 text-2xl font-TripSans font-medium text-center">
+              Current Account
+            </span>
+            <span className="mt-6 text-[rgba(160,160,160,0.8)] text-center text-xl font-TripSans font-medium">
+              This is an account where you receive <br /> make daily payments
+            </span>
+          </div>
+          <div
+            onClick={() => OnAddAccountTypeClick('savings')}
+            className="p-2 flex flex-col items-center justify-center cursor-pointer rounded-[2.5rem] md:rounded-none md:bg-[rgb(238,238,238)] bg-[rgb(248,248,248)] md:w-1/3 md:h-full hover:z-50 hover:shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)] transition-shadow ease-in duration-200"
+          >
+            <span
+              className="text-black material-symbols-outlined"
+              style={{
+                fontSize: '9rem',
+              }}
             >
-              <span
-                className="mt-24 text-black material-symbols-outlined"
-                style={{
-                  fontSize: '9rem',
-                }}
-              >
-                savings
-              </span>
-              <span className=" text-2xl font-TripSans font-medium">
-                Savings Account
-              </span>
-              <span className="mt-16 text-[rgba(160,160,160,0.8)] text-center text-xl font-TripSans font-medium">
-                This is an account where you save and earn interest on your
-                money.
-              </span>
-            </div>
-            <div
-              onClick={() => OnAddAccountTypeClick('custom')}
-              className="flex flex-col items-center cursor-pointer bg-[rgb(248,248,248)] w-96 h-full rounded-r-[2.5rem] hover:z-50 hover:shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)] transition-shadow ease-in duration-200"
+              savings
+            </span>
+            <span className="mt-6 text-2xl font-TripSans font-medium text-center">
+              Savings Account
+            </span>
+            <span className="mt-6 text-[rgba(160,160,160,0.8)] text-center text-xl font-TripSans font-medium">
+              This is an account where you save and earn interest on your money.
+            </span>
+          </div>
+          <div
+            onClick={() => OnAddAccountTypeClick('custom')}
+            className="p-2 mt-5 md:mt-0 flex flex-col items-center justify-center cursor-pointer bg-[rgb(248,248,248)] md:w-1/3 md:h-full rounded-r-[2.5rem] rounded-l-[2.5rem] md:rounded-l-none hover:z-50 hover:shadow-[0px_0px_40px_0px_rgba(0,0,15,0.2)] transition-shadow ease-in duration-200"
+          >
+            <span
+              className=" text-black material-symbols-outlined"
+              style={{
+                fontSize: '9rem',
+              }}
             >
-              <span
-                className="mt-24 text-black material-symbols-outlined"
-                style={{
-                  fontSize: '9rem',
-                }}
-              >
-                tune
-              </span>
-              <span className=" text-2xl font-TripSans font-medium">
-                Custom Account
-              </span>
-              <span className="mt-16 text-[rgba(160,160,160,0.8)] text-center text-xl font-TripSans font-medium">
-                Add any additional account you feel <br /> does not fit into the
-                previous two categories.
-              </span>
-            </div>
+              tune
+            </span>
+            <span className="mt-6 text-2xl font-TripSans font-medium text-center">
+              Custom Account
+            </span>
+            <span className="mt-6 text-[rgba(160,160,160,0.8)] text-center text-xl font-TripSans font-medium">
+              Add any additional account you feel <br /> does not fit into the
+              previous two categories.
+            </span>
           </div>
         </div>
       </div>
@@ -176,24 +170,27 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     return (
-      <div onClick={handleExit} className={styles.mainPageBlurModal}>
+      <div
+        onClick={handleExit}
+        className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
+      >
         <div
-          className="flex flex-col items-center justify-start rounded-[2rem] w-96 h-96 bg-BudgieWhite "
+          className="flex flex-col items-center justify-center p-2 md:justify-start rounded-[2rem] w-60 h-60 md:w-96 md:h-96 bg-BudgieWhite "
           onClick={(e) => handleChildElementClick(e)}
           style={{ backgroundColor: 'var(--main-background)' }}
         >
-          <span className="text-2xl text-center mt-[5rem]">
+          <span className="md:text-2xl text-center md:mt-[5rem]">
             Upload your transaction history <br /> in the form of a CSV <br />{' '}
             to auto-detect account information.
           </span>
-          <div className="mt-7">
+          <div className="md:mt-7 mt-3">
             <button
               className="bg-BudgieWhite cursor-pointer rounded-3xl hover:bg-white hover:shadow-2xl transition-all ease-in"
               onClick={() => {
                 handleButtonClick('FNB');
               }}
             >
-              <Image src={fnb} width={150} alt="FNB"></Image>
+              <Image className="p-2" src={fnb} width={150} alt="FNB"></Image>
             </button>
             <input
               type="file"
@@ -683,55 +680,55 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     return (
-      <div onClick={handleExit} className={styles.mainPageBlurModal}>
+      <div
+        onClick={handleExit}
+        className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
+      >
         <div
-          className="flex flex-col items-center justify-start rounded-[3rem] w-[45%] h-4/6 bg-BudgieGray "
+          className="flex flex-col px-2 md:px-6 items-center justify-around rounded-[3rem] w-80 md:w-auto md:h-1/2 min-h-[26rem] bg-BudgieGray "
           onClick={(e) => handleChildElementClick(e)}
           style={{ backgroundColor: 'var(--main-background)' }}
         >
-          <span className="mt-3 text-3xl font-TripSans font-medium">
-            Account Summary
-          </span>
           <div
-            className="bg-BudgieWhite shadow-lg mt-6 py-8 px-6 rounded-3xl flex flex-col items-start justify-center"
+            className="bg-BudgieWhite py-6 px-6 rounded-3xl flex flex-col items-start justify-around max-w-[100%]"
             style={{ backgroundColor: 'var(--block-background)' }}
           >
-            <div className="">
-              <span className="mr-3 text-2xl font-TripSans font-medium">
+            <div className=" flex flex-col md:inline">
+              <span className="mr-3 md:text-2xl font-TripSans font-medium">
                 Type:
               </span>
               <span
-                className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium"
+                className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg md:text-2xl font-TripSans font-medium"
                 style={{ backgroundColor: 'var(--primary-1)' }}
               >
                 {accountType}
               </span>
             </div>
-            <div className="mt-5">
-              <span className="mr-3 text-2xl font-TripSans font-medium">
+            <div className="mt-5 flex flex-col md:inline">
+              <span className="mr-3 md:text-2xl font-TripSans font-medium">
                 Name:
               </span>
               <span
-                className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium"
+                className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg md:text-2xl font-TripSans font-medium"
                 style={{ backgroundColor: 'var(--primary-1)' }}
               >
                 {accountName}
               </span>
             </div>
-            <div className="mt-5">
-              <span className="mr-3 text-2xl font-TripSans font-medium">
+            <div className="mt-5 flex flex-col md:inline">
+              <span className="mr-3 md:text-2xl font-TripSans font-medium">
                 Account Number:
               </span>
               <span
-                className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg text-2xl font-TripSans font-medium"
+                className="text-BudgieWhite bg-BudgieBlue px-3 py-1 bg-opacity-90 rounded-lg md:text-2xl font-TripSans font-medium"
                 style={{ backgroundColor: 'var(--primary-1)' }}
               >
                 {accountNumber}
               </span>
             </div>
           </div>
-          <div className="flex justify-center items-baseline w-full mt-5">
-            <span className="mt-10 mr-4 text-3xl font-TripSans font-medium">
+          <div className="flex justify-center items-baseline w-full">
+            <span className=" mr-4 md:text-3xl text-xl font-TripSans font-medium">
               Alias:
             </span>
             <input
@@ -740,8 +737,8 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               onChange={handleChange}
               className={`${
                 !aliasError
-                  ? 'bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-[#07456F] outline-none focus:border-1 focus:border-BudgieAccentHover'
-                  : 'bg-white text-3xl w-2/3 mt-3 px-5 py-4 rounded-xl border-2 border-red-400 outline-none focus:border-1 focus:border-red-400'
+                  ? 'bg-white md:text-3xl text-xl w-2/3  px-5 py-4 rounded-xl border-2 border-[#07456F] outline-none focus:border-1 focus:border-BudgieAccentHover'
+                  : 'bg-white md:text-3xl text-xl w-2/3  px-5 py-4 rounded-xl border-2 border-red-400 outline-none focus:border-1 focus:border-red-400'
               }`}
               type="text"
               style={{ color: 'black' }}
@@ -749,7 +746,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
           </div>
           <button
             onClick={handleAddAccountClick}
-            className="mt-12 bg-[#07456F] hover:shadow-2xl hover:bg-BudgieAccentHover  text-BudgieWhite text-2xl p-3 rounded-3xl font-bold transition-all ease-in"
+            className=" bg-[#07456F] hover:shadow-2xl hover:bg-BudgieAccentHover  text-BudgieWhite md:text-2xl p-3 rounded-3xl font-bold transition-all ease-in"
           >
             Add Account
           </button>
@@ -769,22 +766,20 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     return (
-      <div onClick={handleExit} className={styles.mainPageBlurModal}>
+      <div
+        onClick={handleExit}
+        className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
+      >
         <div
-          className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
+          className="flex flex-col items-center justify-center rounded-[2rem] md:w-96 md:h-96 w-56 h-56 bg-BudgieWhite "
           onClick={(e) => handleChildElementClick(e)}
           style={{ backgroundColor: 'var(--block-background)' }}
         >
-          <span className="text-center text-3xl font-TripSans font-bold">
+          <span className="text-center md:text-3xl font-TripSans font-bold">
             Account and financial <br />
             data added
           </span>
-          <span
-            className="mt-6 text-BudgieGreen1 material-symbols-outlined"
-            style={{
-              fontSize: '9rem',
-            }}
-          >
+          <span className="mt-6 text-BudgieGreen1 material-symbols-outlined md:!text-[9rem] !text-[3rem]">
             verified
           </span>
         </div>
@@ -803,17 +798,20 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     return (
-      <div onClick={handleExit} className={styles.mainPageBlurModal}>
+      <div
+        onClick={handleExit}
+        className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
+      >
         <div
-          className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
+          className="flex flex-col items-center justify-center rounded-[2rem] md:w-96 md:h-96 w-56 h-56 bg-BudgieWhite "
           onClick={(e) => handleChildElementClick(e)}
         >
-          <span className="text-center text-3xl font-TripSans font-bold">
+          <span className="text-center md:text-3xl font-TripSans font-bold">
             Account already <br />
             tracking
           </span>
           <span
-            className="mt-6 text-red-400 material-symbols-outlined"
+            className="mt-6 text-red-400 material-symbols-outlined md:!text-[9rem] !text-[4rem]"
             style={{
               fontSize: '9rem',
             }}
@@ -834,9 +832,12 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
     };
 
     return (
-      <div onClick={handleExit} className={styles.mainPageBlurModal}>
+      <div
+        onClick={handleExit}
+        className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
+      >
         <div
-          className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
+          className="flex flex-col items-center justify-center rounded-[2rem] md:w-96 md:h-96 w-56 h-56 bg-BudgieWhite "
           onClick={(e) => handleChildElementClick(e)}
           style={{ backgroundColor: 'var(--block-background)' }}
         >
@@ -866,12 +867,14 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
 
   return (
     <>
-      <AddAccountModal></AddAccountModal>
-      {showUploadCSVModal && <UploadCSVModal></UploadCSVModal>}
-      {showAccountInfoModal && <AccountInfoModal></AccountInfoModal>}
-      {showSuccessModal && <SuccessModal></SuccessModal>}
-      {showAccountAlreadyTracked && <AlreadyTracked></AlreadyTracked>}
-      {loader && <SpinnerLoader></SpinnerLoader>}
+      <div className="mainPage">
+        <AddAccountModal></AddAccountModal>
+        {showUploadCSVModal && <UploadCSVModal></UploadCSVModal>}
+        {showAccountInfoModal && <AccountInfoModal></AccountInfoModal>}
+        {showSuccessModal && <SuccessModal></SuccessModal>}
+        {showAccountAlreadyTracked && <AlreadyTracked></AlreadyTracked>}
+        {loader && <SpinnerLoader></SpinnerLoader>}
+      </div>
     </>
   );
 }

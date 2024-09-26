@@ -8,6 +8,7 @@ import {
   updateDoc,
   query,
   where,
+  doc,
 } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from 'firebase/auth';
@@ -17,6 +18,23 @@ export interface MonthlyTransactionsViewProps {
   account: string;
   data: any;
   availableYears: number[];
+}
+
+interface Goal {
+  id: string;
+  name: string;
+  type: string;
+  initial_amount?: number;
+  current_amount: number;
+  target_amount?: number;
+  target_date?: string;
+  spending_limit?: number;
+  updates?: string;
+  deleted_updates?: string;
+  monthly_updates?: string;
+  update_type: string;
+  last_update?: string;
+  conditions?: string;
 }
 
 export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
@@ -31,6 +49,12 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   const dropdownRef = useRef<HTMLSelectElement>(null);
   const [LeftArrowStyle, setLeftArrowStyle] = useState('');
   const [RightArrowStyle, setRightArrowStyle] = useState('');
+
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [userGoals, setUserGoals] = useState<Goal[]>([]);
+  const [selectedGoal, setSelectedGoal] = useState<string>('');
+
 
   interface Transaction {
     date: string;
@@ -75,6 +99,12 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     }
   };
 
+  const handleDescriptionClick = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setShowPopup(true);
+  };
+
+
   const monthNames = [
     'january',
     'february',
@@ -89,6 +119,68 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     'november',
     'december',
   ];
+
+
+  useEffect(() => {
+    const fetchUserGoals = async () => {
+      if (user && user.uid) {
+        const q = query(collection(db, 'goals'), where('uid', '==', user.uid));
+        const querySnapshot = await getDocs(q);
+        const goalsList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Goal[];
+        setUserGoals(goalsList);
+      }
+    };
+
+    fetchUserGoals();
+  }, [user]);
+
+  const handleAddToGoal = async () => {
+    if (!selectedGoal || !selectedTransaction) {
+      alert('Please select a goal.');
+      return;
+    }
+
+    const goal = userGoals.find((goal) => goal.id === selectedGoal);
+    if (!goal) return;
+
+    const updates = JSON.parse(goal.updates || '[]');
+
+    const existingUpdate = updates.find(
+      (update: any) =>
+        update.date === selectedTransaction.date &&
+        update.amount === selectedTransaction.amount &&
+        update.description === selectedTransaction.description
+    );
+
+    if (existingUpdate) {
+      if (window.confirm('This transaction already exists in the goal. Add it again?')) {
+        addUpdateToGoal(goal, selectedTransaction);
+      }
+    } else {
+      addUpdateToGoal(goal, selectedTransaction);
+    }
+  };
+
+  const addUpdateToGoal = async (goal: Goal, transaction: Transaction) => {
+    const updates = JSON.parse(goal.updates || '[]');
+    updates.push({
+      date: transaction.date,
+      amount: transaction.amount,
+      description: transaction.description,
+    });
+    
+    await updateDoc(doc(db, 'goals', goal.id), {
+      updates: JSON.stringify(updates),
+      last_update: new Date().toISOString()
+    });
+
+    alert('Transaction added to goal.');
+    setShowPopup(false);
+    setSelectedGoal("Select a Goal")
+  };
 
   useEffect(() => {
     const getYearlyTransactions = async () => {
@@ -107,6 +199,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         }
       }
     };
+
 
     const auth = getAuth();
     if (auth) {
@@ -413,7 +506,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
           </p>
         </div>
       </div>
-
+<br />
       <div className={styles.transactionsList}>
         {moneyIn === 0 && moneyOut === 0 ? (
           <div className={styles.noTransactionsMessage}>
@@ -421,56 +514,122 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
           </div>
         ) : (
           <div className={styles.transactions}>
-            <br />
+            
             {transactions.map((transaction, index) => (
               <div
                 key={index}
                 className={styles.transactionCard}
                 style={{
-                  borderLeft:
-                    transaction.amount >= 0
-                      ? '15px solid #8EE5A2'
-                      : '15px solid var(--primary-1)',
+                  borderLeft: transaction.amount >= 0 ? '15px solid #8EE5A2' : '15px solid var(--primary-1)',
                 }}
               >
                 <div className={styles.transactionContent}>
-                  <div className={styles.transactionDate}>
-                    {transaction.date}
-                  </div>
-                  <div className={styles.transactionDescription}>
+                  <div className={styles.transactionDate}>{transaction.date}</div>
+                  <div
+                    className={styles.transactionDescription}
+                    onClick={() => handleDescriptionClick(transaction)}
+                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                  >
                     {transaction.description}
                   </div>
                   <div className={styles.transactionAmount}>
                     {formatTransactionValue(transaction.amount)}
                   </div>
                   <select
-                    className={`${styles.categoryDropdown} ${getCategoryStyle(
-                      transaction.category
-                    )}`}
-                    onChange={(event) => handleChange(event, index)}
-                    id={`${transaction.date}-${transaction.description}`}
-                    value={transaction.category}
-                  >
-                    <option value=""></option>
-                    <option value="Income">Income</option>
-                    <option value="Transport">Transport</option>
-                    <option value="Eating Out">Eating Out</option>
-                    <option value="Groceries">Groceries</option>
-                    <option value="Entertainment">Entertainment</option>
-                    <option value="Shopping">Shopping</option>
-                    <option value="Insurance">Insurance</option>
-                    <option value="Utilities">Utilities</option>
-                    <option value="Medical Aid">Medical Aid</option>
-                    <option value="Transfer">Transfer</option>
-                    <option value="Other">Other</option>
-                  </select>
+                      className={`${styles.categoryDropdown} ${getCategoryStyle(
+                        transaction.category
+                      )}`}
+                      data-testid="category-dropdown-income"
+                      onChange={(event) => handleChange(event, index)}
+                      id={`${transaction.date}-${transaction.description}`}
+                      value={transaction.category}
+                    >
+                      <option value=""></option>
+                      <option value="Income">Income</option>
+                      <option value="Transport">Transport</option>
+                      <option value="Eating Out">Eating Out</option>
+                      <option value="Groceries">Groceries</option>
+                      <option value="Entertainment">Entertainment</option>
+                      <option value="Shopping">Shopping</option>
+                      <option value="Insurance">Insurance</option>
+                      <option value="Utilities">Utilities</option>
+                      <option value="Medical Aid">Medical Aid</option>
+                      <option value="Transfer">Transfer</option>
+                      <option value="Other">Other</option>
+                    </select>
                 </div>
               </div>
+
             ))}
           </div>
         )}
-        <div></div>
+        <div>
+
+        </div>
       </div>
+      {showPopup && selectedTransaction && (
+        <div className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center z-50000 w-[85vw] text-sm md:text-lg lg:text-xl">
+
+          <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-full max-w-lg ">
+
+            <div className="mb-4">
+              <p className="font-semibold" style={{fontSize:'calc(1.2rem * var(--font-size-multiplier))'}}>Transaction Details</p>
+            </div>
+            <div className="flex flex-col items-center" style={{fontSize:'calc(1rem * var(--font-size-multiplier))'}}>
+              <div className="flex justify-between w-[50%]">
+                <div className="font-semibold">Date:</div>
+                <div>{selectedTransaction.date}</div>
+              </div>
+
+              <div className="flex justify-between w-[50%]">
+                <div className="font-semibold">Description:</div>
+                <div>{selectedTransaction.description}</div>
+              </div>
+
+
+              <div className="flex justify-between w-[50%]">
+                <div className="font-semibold">Amount:</div>
+                <div>{formatTransactionValue(selectedTransaction.amount)}</div>
+              </div>
+            </div>
+
+            {userGoals.length > 0 && (
+              <div className="mt-6">
+                <div className="mb-2 font-semibold" style={{fontSize:'calc(1rem * var(--font-size-multiplier))'}}>Add to a Goal:</div>
+                <div className="flex items-center space-x-2">
+                  <select
+                    className="flex-grow p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-black"
+                    value={selectedGoal}
+                    onChange={(e) => setSelectedGoal(e.target.value)}
+                  >
+                    <option value="">Select a Goal</option>
+                    {userGoals.map((goal) => (
+                      <option key={goal.id} value={goal.id}>
+                        {goal.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => handleAddToGoal()}
+                    className="text-[var(--primary-1)] font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+
+            )}
+
+            <button
+              className="mt-8 bg-[var(--primary-1)] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              onClick={() => setShowPopup(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
