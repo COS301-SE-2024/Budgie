@@ -763,7 +763,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
               </select>
             </div>
             <div className="mt-5 w-full flex lg:flex-row flex-col items-center justify-around">
-              <div className="p-2 flex flex-col items-center justify-start shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl lg:w-[30%] w-full lg:aspect-square lg:mt-0 mt-3">
+              <div className="p-2 flex flex-col items-center justify-start shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl lg:w-[30%] w-full lg:aspect-square lg:mt-0 mt-3 min-h-[30vh]">
                 <div className="bg-BudgieGrayLight w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
                   <span>Summary</span>
                 </div>
@@ -810,6 +810,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                     className=" 2xl:text-sm xl:text-xs lg:text-[0.5rem]"
                     width="100%"
                     height="100%"
+                    debounce={1}
                   >
                     <PieChart>
                       <Pie
@@ -844,7 +845,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                   </ResponsiveContainer>
                 </div>
               </div>
-              <div className="p-2 flex flex-col items-center justify-start shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl lg:w-[30%] w-full lg:aspect-square lg:mt-0 mt-3"></div>
+              <div className="p-2 flex flex-col items-center justify-start shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl lg:w-[30%] w-full lg:aspect-square lg:mt-0 mt-3 min-h-[30vh]"></div>
             </div>
             <div className="p-2 mt-5 w-full h-[500px] shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl mb-[5rem]">
               <div className="bg-BudgieGrayLight w-full h-14 rounded-3xl flex items-center justify-center text-lg font-medium">
