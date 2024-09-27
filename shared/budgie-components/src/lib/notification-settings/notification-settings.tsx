@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import styles from './notification-settings.module.css';
+import { getAuth } from 'firebase/auth';
 
 /* eslint-disable-next-line */
 export interface NotificationSettingsProps {
@@ -15,13 +17,34 @@ export function NotificationSettings(props: NotificationSettingsProps) {
   });
 
   useEffect(() => {
-    const storedSettings = {
-      budget: localStorage.getItem('budget') === 'true',
-      goal: localStorage.getItem('goal') === 'true',
-      spending: localStorage.getItem('spending') === 'true',
-      csv: localStorage.getItem('csv') === 'true',
-    };
-    setSettings(storedSettings);
+    const auth = getAuth(); // Get the Auth instance
+    const firestore = getFirestore(); // Get the Firestore instance
+    const user = auth.currentUser; // Get the current user
+
+    if (user) {
+      const storedSettings = {
+        budget: localStorage.getItem('budget') === 'true',
+        goal: localStorage.getItem('goal') === 'true',
+        spending: localStorage.getItem('spending') === 'true',
+        csv: localStorage.getItem('csv') === 'true',
+      };
+
+      setSettings(storedSettings);
+
+      const storeSettingsInFirestore = async () => {
+        try {
+          const userSettingsRef = doc(firestore, 'usersSettings', user.uid); // Create a reference to the user's settings document
+          await setDoc(userSettingsRef, storedSettings, { merge: true }); // Use setDoc to store settings
+          console.log('Settings stored in Firestore:', storedSettings);
+        } catch (error) {
+          console.error('Error storing settings in Firestore:', error);
+        }
+      };
+
+      storeSettingsInFirestore();
+    } else {
+      console.log('No user is signed in.');
+    }
   }, []);
 
   function handleCheckboxChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -50,18 +73,21 @@ export function NotificationSettings(props: NotificationSettingsProps) {
 
   return (
     <>
-      <div className="mainPage">
+      <div
+        className="flex flex-col shadow-lg z-10 fixed top-0 right-0  z-10  bg-[var(--main-background)] p-8 h-full"
+        style={{ width: '85vw' }}
+      >
         <div className="pageTitle">
           <span
-            className="material-symbols-outlined"
-            onClick={props.onClose}
+            className="material-symbols-outlined cursor-pointer left-100"
             style={{ marginRight: '0.5rem', fontSize: '1.5rem' }}
+            onClick={props.onClose}
           >
             arrow_back
           </span>
           Notification Settings
         </div>
-        <div className="bg-white rounded-lg shadow-lg w-96">
+        <div className="flex flex-col bg-white rounded-lg shadow-lg w-full">
           <div className="p-6 space-y-6">
             <div>
               <div className="mt-3 space-y-3">
@@ -92,7 +118,7 @@ export function NotificationSettings(props: NotificationSettingsProps) {
                     </p>
                     <p className="text-xs text-gray-500">
                       Updates and alerts directly to your email about your
-                      progress towards your goal
+                      progress towards your goal.
                     </p>
                   </div>
                   <label className="inline-flex items-center">
@@ -132,7 +158,7 @@ export function NotificationSettings(props: NotificationSettingsProps) {
                       CSV remainder
                     </p>
                     <p className="text-xs text-gray-500">
-                      Alert to upload a csv to make sure app is up to date with
+                      Alert to upload a CSV to ensure the app is up to date with
                       your spending.
                     </p>
                   </div>

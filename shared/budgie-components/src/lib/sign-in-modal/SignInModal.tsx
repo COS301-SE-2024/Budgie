@@ -76,8 +76,8 @@ export function SignInModal(props: SignInModalProps) {
       provider.addScope('email');
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+      console.log(user.email);
       console.log('User information:', user);
-      // Handle successful login (e.g., redirect)
       setError(false);
       setErrorMessage('');
     } catch (error) {

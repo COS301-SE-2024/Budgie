@@ -1,9 +1,19 @@
-// Dependencies for callable functions.
 const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const { logger } = require('firebase-functions/v2');
-//dependencies
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
+const admin = require('firebase-admin');
+const {
+  collection,
+  query,
+  where,
+  getDocs,
+} = require('firebase-admin/firestore');
+const { onSchedule } = require('firebase-functions/v2');
+const functions = require('firebase-functions');
+const sgMail = require('@sendgrid/mail');
+const cors = require('cors');
+sgMail.setApiKey('');
 
 initializeApp();
 let categoryEmbeddings;
@@ -260,3 +270,51 @@ exports.categoriseExpenses = onCall(
     await Promise.all(updatePromises);
   }
 );
+
+const corsHandler = cors({ origin: true });
+exports.sendGoalProgressEmail = functions.https.onRequest((req, res) => {
+  corsHandler(req, res, async () => {
+    if (req.method !== 'POST') {
+      return res.status(403).send('Forbidden!');
+    }
+
+    const { userId, userEmail, userName, title, progress } = req.body;
+    admin
+      .auth()
+      .getUser(userId)
+      .then((userRecord) => {
+        console.log('User Email:', userRecord.email);
+        userEmail = userRecord.email;
+      })
+      .catch((error) => {
+        console.error('Error fetching user data:', error);
+      });
+    if (progress >= 100) {
+      const msg = {
+        to: userEmail,
+        from: 'budgie202406@gmail.com',
+        subject: 'Congratulations! You achieved your goal!',
+        text: `Hi ${userName},\n\nYou've successfully reached your goal: ${title}. Great job!`,
+      };
+
+      await sgMail.send(msg);
+      console.log('Email sent for goal completion');
+      return res.status(200).send('Email sent successfully');
+    }
+
+    if (progress >= 50) {
+      const msg = {
+        to: userEmail,
+        from: 'budgie202406@gmail.com',
+        subject: 'Congratulations! You are halfway to your goal!',
+        text: `Hi ${userName},\n\nYou've successfully reached ${progress}% to your goal: ${title}. Keep going!`,
+      };
+
+      await sgMail.send(msg);
+      console.log('Email sent for ' + progress + '% mark');
+      return res.status(200).send('Email sent successfully');
+    }
+
+    return res.status(200).send('No email sent; progress not sufficient.');
+  });
+});
