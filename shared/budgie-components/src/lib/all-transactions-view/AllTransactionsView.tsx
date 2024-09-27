@@ -242,7 +242,6 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     const getYearlyTransactions = async () => {
       if (data && data.transactions) {
         try {
-          // Filter transactions for the current year and account number
           const filteredTransactions = data.transactions.filter(
             (transaction) => {
               return (
@@ -274,8 +273,6 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     setCurrentMonth(new Date(currentMonth.setFullYear(selectedYear)));
     display();
   };
-
-  //CHANGE
 
   useEffect(() => {
     if (Data !== null) {
@@ -335,7 +332,6 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     setShowPopup(true);
   };
 
-
   const handleAddToGoal = async () => {
     if (!selectedGoal || !selectedTransaction) {
       alert('Please select a goal.');
@@ -355,11 +351,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     );
 
     if (existingUpdate) {
-      if (
-        window.confirm(
-          'This transaction already exists in the goal. Add it again?'
-        )
-      ) {
+      if (window.confirm('This transaction already exists in the goal. Add it again?')) {
         addUpdateToGoal(goal, selectedTransaction);
       }
     } else {
@@ -389,7 +381,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
             updates: JSON.stringify(updates),
           };
         }
-        return goal;
+        return goalItem;
       }),
     });
 
