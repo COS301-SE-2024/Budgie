@@ -83,7 +83,7 @@ export function OpenQuestions(props: OpenQuestionsProps) {
 
   return (
     <div
-      className="flex flex-col shadow-lg z-10 fixed top-0 right-0 bg-gray-100 p-8 h-full overflow-y-auto"
+      className="flex flex-col shadow-lg z-10 fixed top-0 right-0 bg-[var(--main-background)] p-8 h-full overflow-y-auto"
       style={{ width: '85vw', maxHeight: '100vh' }}
     >
       <div className="flex items-center mb-4">

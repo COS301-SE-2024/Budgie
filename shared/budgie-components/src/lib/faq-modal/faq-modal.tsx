@@ -17,7 +17,8 @@ export interface FaqModalProps {
 
 export function FaqModal(props: FaqModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [userQuestions, setUserQuestions] = useState([]);
+  const [userQuestions, setUserQuestions] = useState([]); // Holds the top ranked questions
+  const [allQuestions, setAllQuestions] = useState([]); // Holds all questions
   const [openQuestions, setOpenQuestions] = useState([]);
   const [userVotes, setUserVotes] = useState({});
   const [showOpen, setOpen] = useState<boolean>(false);
@@ -53,6 +54,7 @@ export function FaqModal(props: FaqModalProps) {
       // Separate open and answered questions
       const openQuestions = rankedQuestions.filter((q) => q.isOpen);
       setUserQuestions(rankedQuestions);
+      setAllQuestions(questions); // Store all questions for filtering
       setOpenQuestions(openQuestions);
     });
 
@@ -134,18 +136,33 @@ export function FaqModal(props: FaqModalProps) {
     setUserVotes((prevVotes) => ({ ...prevVotes, [id]: type }));
   };
 
-  // Filter questions based on the search query
-  const filteredOpenQuestions = openQuestions.filter((question) =>
-    question.question.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter questions based on the search query for partial matches when there's input text
+  const filteredQuestions = [
+    ...openQuestions,
+    ...userQuestions,
+    ...allQuestions,
+  ]
+    .filter(
+      (question) =>
+        searchQuery.trim() !== '' // Only filter if there's text in the input
+          ? question.question.toLowerCase().includes(searchQuery.toLowerCase())
+          : true // If no text, include all questions
+    )
+    .reduce((acc, question) => {
+      // Use Set to filter out duplicates based on question ID
+      const questionIds = new Set(acc.map((q) => q.id));
+      if (!questionIds.has(question.id)) {
+        acc.push(question);
+      }
+      return acc;
+    }, []); // Initialize with an empty array
 
-  const filteredUserQuestions = userQuestions.filter((question) =>
-    question.question.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Sort the filtered questions if needed
+  filteredQuestions.sort((a, b) => b.likes - a.likes); // Sort by likes (or any other criteria)
 
   return (
     <div
-      className="flex flex-col shadow-lg z-10 fixed top-0 right-0 bg-gray-100 p-8 h-full overflow-y-auto"
+      className="flex flex-col shadow-lg z-10 fixed top-0 right-0 bg-[var(--main-background)] p-8 h-full overflow-y-auto"
       style={{ width: '85vw', maxHeight: '100vh' }}
     >
       <div className="pageTitle">
@@ -171,10 +188,6 @@ export function FaqModal(props: FaqModalProps) {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        {/* Open Questions Section */}
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          Open Questions
-        </h2>
         {/* Button to navigate to Open Questions page */}
         <button
           onClick={() => {
@@ -186,52 +199,9 @@ export function FaqModal(props: FaqModalProps) {
         </button>
         {showOpen && <OpenQuestions onClose={handleCloseQ} />}
 
-        {/* Answered Questions Section */}
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          Answered Questions
-        </h2>
-        {filteredUserQuestions.map((question) => (
-          <div
-            key={question.id}
-            className="p-6 bg-white shadow-lg rounded-lg mb-4"
-          >
-            <h3 className="text-lg font-semibold text-gray-900">
-              {question.question}
-            </h3>
-            <p className="text-gray-800">{question.answer}</p>
-            <div className="flex items-center space-x-2 mt-2">
-              <button
-                onClick={() => voteQuestion(question.id, 'upvote')}
-                disabled={userVotes[question.id] === 'downvote'} // Disable if already downvoted
-                className={`flex items-center ${
-                  userVotes[question.id] === 'upvote'
-                    ? 'text-green-600'
-                    : 'text-gray-600'
-                }`}
-              >
-                <span className="material-symbols-outlined">thumb_up</span>
-                Upvote
-              </button>
-              <span className="text-gray-800">{question.likes || 0}</span>
-              <button
-                onClick={() => voteQuestion(question.id, 'downvote')}
-                disabled={userVotes[question.id] === 'upvote'} // Disable if already upvoted
-                className={`flex items-center ${
-                  userVotes[question.id] === 'downvote'
-                    ? 'text-red-600'
-                    : 'text-gray-600'
-                }`}
-              >
-                <span className="material-symbols-outlined">thumb_down</span>
-                Downvote
-              </button>
-              <span className="text-gray-800">{question.dislikes || 0}</span>
-            </div>
-          </div>
-        ))}
-        {/* Display filtered open questions */}
-        {filteredOpenQuestions.length > 0 ? (
-          filteredOpenQuestions.map((question) => (
+        {/* Display filtered questions */}
+        {filteredQuestions.length > 0 ? (
+          filteredQuestions.map((question) => (
             <div
               key={question.id}
               className="p-6 bg-white shadow-lg rounded-lg mb-4"
@@ -239,6 +209,9 @@ export function FaqModal(props: FaqModalProps) {
               <h3 className="text-lg font-semibold text-gray-900">
                 {question.question}
               </h3>
+              {question.isOpen ? null : (
+                <p className="text-gray-800">{question.answer}</p>
+              )}
               <div className="flex items-center space-x-2 mt-2">
                 <button
                   onClick={() => voteQuestion(question.id, 'upvote')}
@@ -270,7 +243,7 @@ export function FaqModal(props: FaqModalProps) {
             </div>
           ))
         ) : (
-          <p className="text-gray-800">No open questions found.</p>
+          <p className="text-gray-700">No questions found.</p>
         )}
       </div>
     </div>
