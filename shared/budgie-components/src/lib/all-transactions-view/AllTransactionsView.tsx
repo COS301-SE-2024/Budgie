@@ -36,7 +36,6 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
   const [showPopup, setShowPopup] = useState(false);
-  const [userGoals, setUserGoals] = useState<Goal[]>([]);
   const [selectedGoal, setSelectedGoal] = useState<string>('');
 
   useThemeSettings();
@@ -225,10 +224,11 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
         setData({
           ...data,
           transactions: data.transactions.map((transaction) => {
-            if (transaction.year === currentYear) {              
+            if (transaction.year === currentYear) {
               return {
                 ...transaction,
-                [monthNames[transactionMonth]]: JSON.stringify(filteredTransactions),
+                [monthNames[transactionMonth]]:
+                  JSON.stringify(filteredTransactions),
               };
             }
             return transaction;
@@ -267,6 +267,13 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
 
     getYearlyTransactions();
   }, [currentYear]);
+
+  const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedYear = parseInt(event.target.value);
+    setCurrentYear(selectedYear);
+    setCurrentMonth(new Date(currentMonth.setFullYear(selectedYear)));
+    display();
+  };
 
   //CHANGE
 
@@ -322,35 +329,12 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
       setMoneyOut(0);
     }
   };
-  
-
-  const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedYear = parseInt(event.target.value);
-    setCurrentYear(selectedYear);
-    setCurrentMonth(new Date(currentMonth.setFullYear(selectedYear)));
-    display();
-  };
 
   const handleDescriptionClick = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
     setShowPopup(true);
   };
 
-  useEffect(() => {
-    const fetchUserGoals = async () => {
-      if (user && user.uid) {
-        const q = query(collection(db, 'goals'), where('uid', '==', user.uid));
-        const querySnapshot = await getDocs(q);
-        const goalsList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Goal[];
-        setUserGoals(goalsList);
-      }
-    };
-
-    fetchUserGoals();
-  }, [user]);
 
   const handleAddToGoal = async () => {
     if (!selectedGoal || !selectedTransaction) {
@@ -358,7 +342,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
       return;
     }
 
-    const goal = userGoals.find((goal) => goal.id === selectedGoal);
+    const goal = data.goals.find((goal) => goal.id === selectedGoal);
     if (!goal) return;
 
     const updates = JSON.parse(goal.updates || '[]');
@@ -394,6 +378,19 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     await updateDoc(doc(db, 'goals', goal.id), {
       updates: JSON.stringify(updates),
       last_update: new Date().toISOString(),
+    });
+
+    setData({
+      ...data,
+      goals: data.goals.map((goalItem) => {
+        if (goalItem.name === goal.name) {
+          return {
+            ...goalItem,
+            updates: JSON.stringify(updates),
+          };
+        }
+        return goal;
+      }),
     });
 
     alert('Transaction added to goal.');
@@ -550,7 +547,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
               </div>
             </div>
 
-            {userGoals.length > 0 && (
+            {data.goals.length > 0 && (
               <div className="mt-6">
                 <div
                   className="mb-2 font-semibold"
@@ -567,7 +564,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
                     onChange={(e) => setSelectedGoal(e.target.value)}
                   >
                     <option value="">Select a Goal</option>
-                    {userGoals.map((goal) => (
+                    {data.goals.map((goal) => (
                       <option key={goal.id} value={goal.id}>
                         {goal.name}
                       </option>
