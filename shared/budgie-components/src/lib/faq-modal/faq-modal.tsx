@@ -189,6 +189,7 @@ export function FaqModal(props: FaqModalProps) {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         {/* Button to navigate to Open Questions page */}
+        <h1 className="text-2xl font-bold text-gray-900">Open Questions</h1>
         <button
           onClick={() => {
             setOpen(!showOpen);
@@ -200,6 +201,7 @@ export function FaqModal(props: FaqModalProps) {
         {showOpen && <OpenQuestions onClose={handleCloseQ} />}
 
         {/* Display filtered questions */}
+        <h1 className="text-2xl font-bold text-gray-900">Answered Questions</h1>
         {filteredQuestions.length > 0 ? (
           filteredQuestions.map((question) => (
             <div
