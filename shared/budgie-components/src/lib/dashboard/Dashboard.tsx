@@ -9,97 +9,43 @@ import { useThemeSettings } from '../../useThemes';
 
 import '../../root.css';
 import styles from './Dashboard.module.css';
+import { useDataContext } from '../data-context/DataContext';
 
-export interface DashboardProps { }
+export interface DashboardProps {}
+
+interface Account {
+  name: string;
+  alias: string;
+  type: string;
+  account_number: string;
+}
 
 export function Dashboard(props: DashboardProps) {
+  const { data, setData, refreshData } = useDataContext();
   const user = useContext(UserContext);
-  const [data, setData] = useState<any>(null);
+  const [datas, setDatas] = useState<any>(null);
   const [viewMode, setViewMode] = useState('monthly');
   const currentYear = new Date().getFullYear();
-  const [accountOptions, setAccountOptions] = useState<
-    { alias: string; accountNumber: string }[]
-  >([]);
   const [selectedAlias, setSelectedAlias] = useState<string>('');
   const [currentAccountNumber, setCurrentAccountNumber] = useState<string>('');
-  const [yearsWithData, setYearsWithData] = useState<number[]>([]);
-  const [hasAccount, setHasAccount] = useState<'Yes' | 'No' | 'Loading'>(
-    'Loading'
-  );
-  const [isLoading, setIsLoading] = useState(true);
+  const [hasAccount, setHasAccount] = useState<'Yes' | 'No'>('No');
   const [error, setError] = useState<string | null>(null);
   const [showNoData, setShowNoData] = useState(false);
+  const [yearsWithData, setYearsWithData] = useState<number[]>([]);
+
 
   useThemeSettings();
-
-  const fetchData = useCallback(async () => {
-    if (user && user.uid && currentAccountNumber) {
-      setIsLoading(true);
-      setError(null);
-      setShowNoData(false);
-      try {
-        // Fetch yearly transactions
-        const yearlyQ = query(
-          collection(db, `transaction_data_${currentYear}`),
-          where('uid', '==', user.uid),
-          where('account_number', '==', currentAccountNumber)
-        );
-        const yearlySnapshot = await getDocs(yearlyQ);
-        const yearlyData = yearlySnapshot.docs.map((doc) => doc.data());
-        setData(yearlyData[0] || null);
-
-        // Fetch available years
-        const years: number[] = [];
-        for (let year = 2000; year <= currentYear; year++) {
-          const yearQ = query(
-            collection(db, `transaction_data_${year}`),
-            where('uid', '==', user.uid),
-            where('account_number', '==', currentAccountNumber)
-          );
-          const yearSnapshot = await getDocs(yearQ);
-          if (!yearSnapshot.empty) {
-            years.push(year);
-          }
-        }
-        setYearsWithData(years);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setError('Failed to fetch data. Please try again later.');
-      } finally {
-        setIsLoading(false);
-        // Delay showing the "No data" message
-        setTimeout(() => {
-          setShowNoData(true);
-        }, 500); // 500ms delay
-      }
-    }
-  }, [user, currentAccountNumber, currentYear]);
 
   useEffect(() => {
     const fetchAccounts = async () => {
       if (user && user.uid) {
-        try {
-          const q = query(
-            collection(db, 'accounts'),
-            where('uid', '==', user.uid)
-          );
-          const querySnapshot = await getDocs(q);
-          const accountOptionsList = querySnapshot.docs.map((doc) => ({
-            alias: doc.data().alias,
-            accountNumber: doc.data().account_number,
-          }));
-          setAccountOptions(accountOptionsList);
-
-          if (accountOptionsList.length > 0) {
-            setSelectedAlias(accountOptionsList[0].alias);
-            setCurrentAccountNumber(accountOptionsList[0].accountNumber);
-            setHasAccount('Yes');
-          } else {
-            setHasAccount('No');
-          }
-        } catch (error) {
-          console.error('Error fetching aliases: ', error);
-          setError('Failed to fetch accounts. Please try again later.');
+        refreshData();
+        if (data.accounts.length > 0) {
+          setSelectedAlias(data.accounts[0].alias);
+          setCurrentAccountNumber(data.accounts[0].account_number);
+          setHasAccount('Yes');
+        } else {
+          setHasAccount('No');
         }
       }
     };
@@ -108,20 +54,31 @@ export function Dashboard(props: DashboardProps) {
   }, [user]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    const calculateYearsWithData = () => {
+      if (data && data.transactions) {
+        const years = data.transactions
+          .filter(transaction => transaction.account_number === currentAccountNumber)
+          .map(transaction => transaction.year);
+  
+        setYearsWithData(Array.from(new Set(years)));
+      }
+    };
+  
+    calculateYearsWithData();
+  }, [data.transactions, currentAccountNumber]);
+  
 
   const handleAccountDropdownChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const selected = event.target.value;
-    const selectedOption = accountOptions.find(
+    const selectedOption = data.accounts.find(
       (option) => option.alias === selected
     );
     if (selectedOption) {
       setSelectedAlias(selected);
-      setCurrentAccountNumber(selectedOption.accountNumber);
-      setData(null);
+      setCurrentAccountNumber(selectedOption.account_number);
+      setDatas(null);
       setShowNoData(false);
     }
   };
@@ -143,19 +100,24 @@ export function Dashboard(props: DashboardProps) {
   }
 
   return (
-    <div className="mainPage flex flex-col w-[85vw] items-center" style={{overflowY: 'hidden', overflowX:'hidden'}}>
+    <div
+      className="mainPage flex flex-col w-[85vw] items-center"
+      style={{ overflowY: 'hidden', overflowX: 'hidden' }}
+    >
       <div className=" flex shadow-lg z-2 justify-between rounded-2xl bg-[var(--block-background)] p-2 w-[98%] m-6">
         <div></div>
         <button
-          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-BudgieBlue2 hover:text-BudgieWhite font-medium mr-16 cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${viewMode === 'all' ? 'border-b-4 border-BudgieBlue2' : ''
-            }`}
+          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-BudgieBlue2 hover:text-BudgieWhite font-medium mr-16 cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
+            viewMode === 'all' ? 'border-b-4 border-BudgieBlue2' : ''
+          }`}
           onClick={() => setViewMode('all')}
         >
           Yearly
         </button>
         <button
-          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-BudgieBlue2 hover:text-BudgieWhite font-medium cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${viewMode === 'monthly' ? 'border-b-4 border-BudgieBlue2' : ''
-            }`}
+          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-BudgieBlue2 hover:text-BudgieWhite font-medium cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
+            viewMode === 'monthly' ? 'border-b-4 border-BudgieBlue2' : ''
+          }`}
           onClick={() => setViewMode('monthly')}
         >
           Monthly
@@ -165,7 +127,7 @@ export function Dashboard(props: DashboardProps) {
           value={selectedAlias}
           onChange={handleAccountDropdownChange}
         >
-          {accountOptions.map((option, index) => (
+          {data.accounts.map((option, index) => (
             <option key={index} value={option.alias}>
               {option.alias}
             </option>
@@ -174,35 +136,15 @@ export function Dashboard(props: DashboardProps) {
       </div>
 
       <div >
-        {isLoading ? (
-          <div className={styles.loadScreen}>
-            <div className={styles.loaderContainer}>
-              <div className={styles.loader}></div>
-            </div>
-            <div className={styles.loaderText}>Loading...</div>
-          </div>
-        ) : error ? (
+        {error ? (
           <div className={styles.errorScreen}>
             <div className={styles.errorText}>{error}</div>
           </div>
-        ) : viewMode === 'monthly' && data && yearsWithData.length > 0 ? (
-          <MonthlyTransactionsView
-            account={currentAccountNumber}
-            data={data}
-            availableYears={yearsWithData}
-          />
-        ) : viewMode === 'all' && yearsWithData.length > 0 ? (
-          <AllTransactionsView
-            account={currentAccountNumber}
-            availableYears={yearsWithData}
-          />
-        ) : showNoData ? (
-          <div className={styles.noDataScreen}>
-            <div className={styles.noDataText}>
-              No transaction data available for the selected account.
-            </div>
-          </div>
-        ) : null}
+        ) : viewMode === 'monthly'?(
+          <MonthlyTransactionsView account={currentAccountNumber} availableYears={yearsWithData}/>
+        ) : (
+          <AllTransactionsView account={currentAccountNumber} availableYears={yearsWithData}/>
+        ) }
       </div>
     </div>
   );

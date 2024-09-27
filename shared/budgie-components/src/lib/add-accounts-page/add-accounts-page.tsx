@@ -23,11 +23,14 @@ import { UserContext } from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import Image from 'next/image';
+import { useDataContext } from '../data-context/DataContext';
+
 
 /* eslint-disable-next-line */
 export interface AddAccountsPageProps {}
 
 export function AddAccountsPage(props: AddAccountsPageProps) {
+  const { data, setData, refreshData } = useDataContext();
   const [showUploadCSVModal, setShowUploadCSVModal] = useState(false);
   const [showAccountInfoModal, setShowAccountInfoModal] = useState(false);
   const [accountType, setAccountType] = useState('');
@@ -665,6 +668,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               alias: inputValue,
               bank: bankRef.current,
             });
+            refreshData();
             //TODO:success modal for upload success
             await delay(1000);
             setLoader(false);

@@ -24,6 +24,8 @@ import {
   where,
 } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import { useDataContext } from '../data-context/DataContext';
+
 
 /* eslint-disable-next-line */
 export interface SpecificAccountPageProps {
@@ -224,6 +226,8 @@ export function isDuplicate(
 }
 
 async function updateYears(year: string, user: any) {
+  const {refreshData } = useDataContext();
+
   if (user && user.uid) {
     const q = query(
       collection(db, 'years_uploaded'),
@@ -246,6 +250,7 @@ async function updateYears(year: string, user: any) {
       await updateDoc(doc.ref, {
         years: JSON.stringify(years),
       });
+      refreshData();
     }
   }
 }
@@ -256,6 +261,8 @@ async function MergeTransactions(
   accountNumber: string,
   user: any
 ) {
+  const { data, setData, refreshData } = useDataContext();
+
   //determine merged record
   for (const Year in UniqueYearMonths) {
     updateYears(Year, user);
@@ -302,6 +309,7 @@ async function MergeTransactions(
             } catch (error) {
               console.log(error);
             }
+            refreshData();
           }
         } else {
           //empty month can just merge
@@ -320,6 +328,7 @@ async function MergeTransactions(
           } catch (error) {
             console.log(error);
           }
+          refreshData();
         }
       }
       //call categorize function
@@ -368,6 +377,7 @@ async function MergeTransactions(
             } catch (error) {
               console.log(error);
             }
+            refreshData();
           }
         }
       }
@@ -554,6 +564,8 @@ function InfoSection(props: InfoSectionProps) {
   }
 
   async function SetUploadDate(accountNo: string) {
+    const { data, setData, refreshData } = useDataContext();
+
     if (user && user.uid) {
       if (accountNo.length == 0) {
         return;
@@ -588,10 +600,13 @@ function InfoSection(props: InfoSectionProps) {
           date: currentDate,
         });
       }
+      refreshData();
     }
   }
 
   const handleTypeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { data, setData, refreshData } = useDataContext();
+
     if (user && user.uid) {
       if (e.target.value == props.account.type) {
         return;
@@ -607,6 +622,7 @@ function InfoSection(props: InfoSectionProps) {
       await updateDoc(doc.ref, {
         type: e.target.value,
       });
+      refreshData();
       props.setAccount({
         name: props.account.name,
         alias: props.account.alias,
@@ -836,6 +852,8 @@ function EditAliasModal(props: EditAliasModalProps) {
   };
 
   const submitAlias = async () => {
+    const { data, setData, refreshData } = useDataContext();
+
     if (user && user.uid) {
       if (inputValue == '') {
         setAliasError(true);
@@ -861,6 +879,7 @@ function EditAliasModal(props: EditAliasModalProps) {
         number: props.account.number,
       });
       props.setSpinner(false);
+      refreshData();
     }
   };
 

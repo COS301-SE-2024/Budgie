@@ -38,6 +38,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<string>('');
 
+
   useThemeSettings();
 
   interface Transaction {
@@ -265,7 +266,12 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     };
 
     getYearlyTransactions();
-  }, [currentYear]);
+
+    setCurrentYear(currentMonth.getFullYear());
+    if (Data) {
+      display();
+    }
+  }, [currentYear, props.account]);
 
   const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedYear = parseInt(event.target.value);
@@ -389,6 +395,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     setShowPopup(false);
     setSelectedGoal('Select a Goal');
   };
+
 
   return (
     <div className={styles.mainPage}>

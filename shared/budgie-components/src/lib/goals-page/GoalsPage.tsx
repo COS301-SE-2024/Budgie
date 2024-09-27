@@ -1198,8 +1198,6 @@ export function GoalsPage() {
             <button className={styles.addAGoalButton} onClick={addGoalPopup}>
               Add a Goal
             </button>
-
-
           </div>
           <div className={styles.planningModalContainer}>
             <div className="p-4">
@@ -1243,8 +1241,6 @@ export function GoalsPage() {
                 </tbody>
               </table>
             </div>
-
-
           </div>
         </div>
       )}

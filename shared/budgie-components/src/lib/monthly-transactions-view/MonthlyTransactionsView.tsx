@@ -17,7 +17,6 @@ import { useDataContext } from '../data-context/DataContext';
 
 export interface MonthlyTransactionsViewProps {
   account: string;
-  data: any;
   availableYears: number[];
 }
 
@@ -51,6 +50,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   const dropdownRef = useRef<HTMLSelectElement>(null);
   const [LeftArrowStyle, setLeftArrowStyle] = useState('');
   const [RightArrowStyle, setRightArrowStyle] = useState('');
+
 
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
@@ -185,39 +185,43 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     setSelectedGoal('Select a Goal');
   };
 
-  useEffect(() => {
-    const getYearlyTransactions = async () => {
-      if (data && data.transactions) {
-        try {
-          // Filter transactions for the current year and account number
-          const filteredTransactions = data.transactions.filter(
-            (transaction) => {
-              return (
-                transaction.account_number == props.account &&
-                transaction.year == currentYear
-              );
-            }
+  const getYearlyTransactions = async () => {
+    if (data && data.transactions) {
+      try {
+        const filteredTransactions = data.transactions.filter((transaction) => {
+          return (
+            transaction.account_number == props.account &&
+            transaction.year == currentYear
           );
+        });
 
-          if (filteredTransactions.length > 0) {
-            setDisplayData(filteredTransactions[0]);
-          } else {
-            console.error(
-              'No transactions found for the current year and account'
-            );
-          }
-        } catch (error) {
-          console.error('Error processing transactions from context:', error);
+        if (filteredTransactions.length > 0) {
+          setDisplayData(filteredTransactions[0]);
+          display();
+        } else {
+          console.error(
+            'No transactions found for the current year and account'
+          );
         }
+      } catch (error) {
+        console.error('Error processing transactions from context:', error);
       }
-    };
-
-    getYearlyTransactions();
-  }, [currentYear]);
+    }
+  };
 
   useEffect(() => {
-    setDisplayData(props.data);
-  }, []);
+    getYearlyTransactions();
+    setCurrentMonth(new Date());
+    setCurrentYear(currentMonth.getFullYear());
+    display();
+  }, [currentYear, props.account]);
+
+  useEffect(() => {
+    setCurrentYear(currentMonth.getFullYear());
+    if (Data) {
+      display();
+    }    
+  }, [Data, currentMonth]);
 
   const display = async () => {
     if (
@@ -242,15 +246,9 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
       .toLocaleString('default', { month: 'long' })
       .toLocaleLowerCase();
     if (
-      Data === undefined ||
-      Data[month] === undefined ||
-      Data[month] === null
+      Data && // Ensure Data is not null or undefined
+      Data[monthNames[currentMonth.getMonth()]] // Ensure month data exists
     ) {
-      setTransactions([]);
-      setBalance(0);
-      setMoneyIn(0);
-      setMoneyOut(0);
-    } else {
       const transactionsList = JSON.parse(Data[month]);
       setTransactions(transactionsList);
       setBalance(JSON.parse(Data[month])[0].balance);
@@ -271,6 +269,11 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
 
       setMoneyIn(moneyInTotal);
       setMoneyOut(Math.abs(moneyOutTotal)); // money out should be positive for display
+    } else {
+      setTransactions([]);
+      setBalance(0);
+      setMoneyIn(0);
+      setMoneyOut(0);
     }
   };
 
@@ -302,10 +305,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
             [monthNames[currentMonth.getMonth()]]:
               JSON.stringify(updatedTransactions),
           });
-
-          const querySnapshot2 = await getDocs(q);
-          const transactionList = querySnapshot2.docs.map((doc) => doc.data());
-          setDisplayData(transactionList[0]);
         }
         setTransactions(updatedTransactions);
 
@@ -315,8 +314,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
             if (transaction.year === currentYear) {
               return {
                 ...transaction,
-                [currentMonth.getMonth()]:
-                  JSON.stringify(updatedTransactions),
+                [currentMonth.getMonth()]: JSON.stringify(updatedTransactions),
               };
             }
             return transaction;
@@ -427,8 +425,9 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
 
   const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedYear = parseInt(event.target.value);
-    setCurrentYear(selectedYear);
-    setCurrentMonth(new Date(currentMonth.setFullYear(selectedYear)));
+    const updatedDate = new Date(currentMonth.setFullYear(selectedYear));
+    setCurrentYear(selectedYear); 
+    setCurrentMonth(updatedDate); 
     display();
   };
 
