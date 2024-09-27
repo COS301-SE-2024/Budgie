@@ -198,31 +198,29 @@ export const formatTransactionValue = (value: number): string => {
 function NoAccountsPage(props: NoAccountsPageProps) {
   useThemeSettings();
   return (
-    <div className="mainPage">
+    <div
+      className="flex items-center justify-center h-full w-full"
+      style={{ backgroundColor: 'var(--main-background)' }}
+    >
       <div
-        className="flex items-center justify-center h-full w-full"
+        onClick={props.onAddClick}
+        className="flex flex-col items-center justify-center p-2 bg-BudgieGray hover:bg-black hover:bg-opacity-5 h-40 w-40 md:h-80 md:w-80 border-dashed border-2 border-gray-400 border-opacity-40 hover:border-opacity-100 cursor-pointer  rounded-3xl"
         style={{ backgroundColor: 'var(--main-background)' }}
       >
-        <div
-          onClick={props.onAddClick}
-          className="flex flex-col items-center justify-center p-2 bg-BudgieGray hover:bg-black hover:bg-opacity-5 h-40 w-40 md:h-80 md:w-80 border-dashed border-2 border-gray-400 border-opacity-40 hover:border-opacity-100 cursor-pointer  rounded-3xl"
-          style={{ backgroundColor: 'var(--main-background)' }}
+        <span className="md:text-2xl text-gray-400 text-opacity-60 text-center">
+          No Accounts Added Yet
+        </span>
+        <span className="mt-5 md:text-xl text-gray-400 text-opacity-60 text-center">
+          Add an Account
+        </span>
+        <span
+          className="md:mt-2 text-opacity-50 text-gray-400 material-symbols-outlined "
+          style={{
+            fontSize: '3rem',
+          }}
         >
-          <span className="md:text-2xl text-gray-400 text-opacity-60 text-center">
-            No Accounts Added Yet
-          </span>
-          <span className="mt-5 md:text-xl text-gray-400 text-opacity-60 text-center">
-            Add an Account
-          </span>
-          <span
-            className="md:mt-2 text-opacity-50 text-gray-400 material-symbols-outlined "
-            style={{
-              fontSize: '3rem',
-            }}
-          >
-            add
-          </span>
-        </div>
+          add
+        </span>
       </div>
     </div>
   );
@@ -378,6 +376,7 @@ export function AccountsPage(props: AccountsPageProps) {
   useThemeSettings();
   const router = useRouter();
   const user = useContext(UserContext);
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -429,53 +428,83 @@ export function AccountsPage(props: AccountsPageProps) {
         setGraphY(yAxis);
       };
 
-      fetchGraphData();
-      fetchAccounts();
+      await fetchGraphData();
+      await fetchAccounts();
     };
-    fetchData();
+    fetchData().then(() => {
+      setDataLoading(false);
+    });
   }, []);
 
   return (
-    <>
-      {showNoAccounts && (
-        <NoAccountsPage
-          onAddClick={() => {
-            router.push('/accounts/new');
-          }}
-        ></NoAccountsPage>
-      )}
-      {!showNoAccounts && (
-        <div className="mainPage">
-          <div className="w-full h-full flex flex-col items-center justify-center">
-            <div className="md:w-[85%] w-[100%] h-full min-w-60">
+    <div className="mainPage">
+      {dataLoading ? (
+        <div className="w-full h-full flex flex-col items-center justify-center">
+          <div className="md:w-[85%] w-[100%] h-full min-w-60">
+            <div
+              className="w-full animate-pulse [animation-duration:1s] h-[10%] mt-8 min-h-20 flex items-center md:justify-between justify-center shadow-md bg-BudgieWhite rounded-[2rem]"
+              style={{ backgroundColor: 'var(--block-background)' }}
+            ></div>
+            <div
+              className="w-full animate-pulse [animation-duration:1s] h-[40%] min-h-80 mt-[1rem] shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center"
+              style={{ backgroundColor: 'var(--block-background)' }}
+            ></div>
+            <div className="w-full grid grid-cols-3 place-items-center lg:px-0 py-4 gap-4">
               <div
-                className="w-full h-[10%] mt-8 min-h-20 flex items-center md:justify-between justify-center shadow-md bg-BudgieWhite rounded-[2rem]"
+                className="cursor-pointer animate-pulse [animation-duration:1s] p-2 shadow-md w-full lg:min-h-80 md:max-h-60 md:min-h-60 max-h-40 min-h-40 rounded-[2rem] flex flex-col items-center justify-center bg-BudgieWhite hover:shadow-2xl transition-shadow"
                 style={{ backgroundColor: 'var(--block-background)' }}
-              >
-                <InfoSection xAxis={graphX} yAxis={graphY}></InfoSection>
-              </div>
+              ></div>
               <div
-                className="w-full h-[40%] min-h-80 mt-[1rem] shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center"
+                className="cursor-pointer animate-pulse [animation-duration:1s] p-2 shadow-md w-full lg:min-h-80 md:max-h-60 md:min-h-60 max-h-40 min-h-40 rounded-[2rem] flex flex-col items-center justify-center bg-BudgieWhite hover:shadow-2xl transition-shadow"
                 style={{ backgroundColor: 'var(--block-background)' }}
-              >
-                {graphX.length != 0 && graphY.length != 0 && (
-                  <GraphSection xAxis={graphX} yAxis={graphY}></GraphSection>
-                )}
-              </div>
-              <div className="w-full grid grid-cols-3 place-items-center lg:px-0 py-4 gap-4">
-                {accountsArray.map((account) => (
-                  <AccountUnit
-                    account={account}
-                    key={account.number}
-                  ></AccountUnit>
-                ))}
-                <AddAccountIcon></AddAccountIcon>
-              </div>
+              ></div>
+              <div
+                className="cursor-pointer animate-pulse [animation-duration:1s] p-2 shadow-md w-full lg:min-h-80 md:max-h-60 md:min-h-60 max-h-40 min-h-40 rounded-[2rem] flex flex-col items-center justify-center bg-BudgieWhite hover:shadow-2xl transition-shadow"
+                style={{ backgroundColor: 'var(--block-background)' }}
+              ></div>
             </div>
           </div>
         </div>
+      ) : (
+        <>
+          {showNoAccounts ? (
+            <NoAccountsPage
+              onAddClick={() => {
+                router.push('/accounts/new');
+              }}
+            ></NoAccountsPage>
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center">
+              <div className="md:w-[85%] w-[100%] h-full min-w-60">
+                <div
+                  className="w-full h-[10%] mt-8 min-h-20 flex items-center md:justify-between justify-center shadow-md bg-BudgieWhite rounded-[2rem]"
+                  style={{ backgroundColor: 'var(--block-background)' }}
+                >
+                  <InfoSection xAxis={graphX} yAxis={graphY}></InfoSection>
+                </div>
+                <div
+                  className="w-full h-[40%] min-h-80 mt-[1rem] shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center"
+                  style={{ backgroundColor: 'var(--block-background)' }}
+                >
+                  {graphX.length !== 0 && graphY.length !== 0 && (
+                    <GraphSection xAxis={graphX} yAxis={graphY}></GraphSection>
+                  )}
+                </div>
+                <div className="w-full grid grid-cols-3 place-items-center lg:px-0 py-4 gap-4">
+                  {accountsArray.map((account) => (
+                    <AccountUnit
+                      account={account}
+                      key={account.number}
+                    ></AccountUnit>
+                  ))}
+                  <AddAccountIcon></AddAccountIcon>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
-    </>
+    </div>
   );
 }
 

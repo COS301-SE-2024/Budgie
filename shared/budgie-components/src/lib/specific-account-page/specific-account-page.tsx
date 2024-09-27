@@ -60,6 +60,7 @@ interface InfoSectionProps {
   setShowSuccess: Dispatch<SetStateAction<boolean>>;
   refreshGraph: boolean;
   setRefreshGraph: Dispatch<SetStateAction<boolean>>;
+  setError: Dispatch<SetStateAction<string>>;
 }
 
 interface AreYouSureProps {
@@ -73,6 +74,10 @@ interface EditAliasModalProps {
   setShow: Dispatch<SetStateAction<boolean>>;
   setSpinner: Dispatch<SetStateAction<boolean>>;
   setAccount: Dispatch<SetStateAction<AccountInfo>>;
+}
+
+interface ErrorModalProps {
+  error: string;
 }
 //helpers
 
@@ -488,6 +493,7 @@ function GraphSection(props: GraphSectionProps) {
   const router = useRouter();
   const [graphX, setGraphX] = useState<string[]>([]);
   const [graphY, setGraphY] = useState<number[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -515,7 +521,9 @@ function GraphSection(props: GraphSectionProps) {
       };
       await fetchGraphData();
     };
-    fetchData();
+    fetchData().then(() => {
+      setDataLoading(false);
+    });
   }, [props.refresh]);
 
   let dataset = [];
@@ -523,10 +531,23 @@ function GraphSection(props: GraphSectionProps) {
   for (let i = 0; i < 12; i++) {
     dataset.push({ monthyear: graphX[i], Balance: graphY[i] });
   }
+
+  if (dataLoading) {
+    return (
+      <div
+        className="w-full h-[40%] min-h-80 animate-pulse [animation-duration:1s] mt-[1rem] shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center"
+        style={{ backgroundColor: 'var(--block-background)' }}
+      ></div>
+    );
+  }
+
   return (
     graphX.length != 0 &&
     graphY.length != 0 && (
-      <>
+      <div
+        className="w-full h-[40%] min-h-80 mt-[1rem] shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center"
+        style={{ backgroundColor: 'var(--block-background)' }}
+      >
         <span className="font-TripSans  lg:text-2xl">Account Balance</span>
         <AreaChart
           className=" w-[90%] h-[80%] "
@@ -539,7 +560,7 @@ function GraphSection(props: GraphSectionProps) {
           showLegend={true}
           showAnimation={true}
         />
-      </>
+      </div>
     )
   );
 }
@@ -645,10 +666,10 @@ function InfoSection(props: InfoSectionProps) {
       if (InfoLine) {
         const InfoLineArray = InfoLine.split(',').map((item) => item.trim());
         if (InfoLineArray[1] == props.account.number) {
-          UploadTransactions(file, props.account.number, user).then(
+          await UploadTransactions(file, props.account.number, user).then(
             async () => {
-              props.setUploadLoading(false);
               await SetUploadDate(props.account.number);
+              props.setUploadLoading(false);
               props.setShowSuccess(true);
               setTimeout(() => {
                 props.setShowSuccess(false);
@@ -657,10 +678,18 @@ function InfoSection(props: InfoSectionProps) {
             }
           );
         } else {
-          alert('error incorrect account');
+          props.setUploadLoading(false);
+          props.setError('account');
+          setTimeout(() => {
+            props.setError('');
+          }, 1000);
         }
       } else {
-        alert('error incorrect csv format');
+        props.setUploadLoading(false);
+        props.setError('csv');
+        setTimeout(() => {
+          props.setError('');
+        }, 1000);
       }
     };
     reader.readAsText(file);
@@ -783,6 +812,34 @@ function SpinnerLoader() {
           </svg>
           <span className="sr-only">Loading...</span>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function ErrorModal(props: ErrorModalProps) {
+  const handleExit = () => {};
+
+  const handleChildElementClick = (e: { stopPropagation: () => void }) => {
+    //ignore clicks
+    e.stopPropagation();
+  };
+
+  return (
+    <div
+      onClick={handleExit}
+      className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
+    >
+      <div
+        className="flex flex-col items-center justify-center rounded-[2rem] md:w-96 md:h-96 w-44 h-44 bg-BudgieWhite "
+        onClick={(e) => handleChildElementClick(e)}
+      >
+        <span className="text-center md:text-3xl font-TripSans font-bold">
+          {props.error == 'csv' ? 'Problem with CSV format' : 'Wrong Account'}
+        </span>
+        <span className="mt-6 text-red-400 material-symbols-outlined md:!text-[9rem] !text-[3rem]">
+          close
+        </span>
       </div>
     </div>
   );
@@ -1011,6 +1068,8 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
 
   const router = useRouter();
   const user = useContext(UserContext);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -1037,12 +1096,39 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
             alert('problem fetching account');
           }
         };
-        getInfoData();
+        getInfoData().then(() => {
+          setDataLoading(false);
+        });
       }
     };
 
     fetchData();
   }, []);
+
+  if (dataLoading) {
+    return (
+      <div className="mainPage">
+        <div className="w-full h-full flex flex-col items-center justify-center">
+          <div className="md:w-[85%] w-[100%] h-full min-w-60">
+            <div
+              className="w-full animate-pulse [animation-duration:1s] h-[10%] mt-8 min-h-20 flex items-center justify-center shadow-md bg-BudgieWhite rounded-[2rem] relative"
+              style={{ backgroundColor: 'var(--block-background)' }}
+            ></div>
+            <div
+              className="w-full h-[40%] animate-pulse [animation-duration:1s] min-h-80 mt-[1rem] shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center"
+              style={{ backgroundColor: 'var(--block-background)' }}
+            ></div>
+            <div className="mt-4">
+              <div
+                className="w-full flex animate-pulse lg:min-h-52 min-h-96 [animation-duration:1s] lg:flex-row flex-col lg:items-start justify-around shadow-md bg-BudgieWhite rounded-[2rem] p-5"
+                style={{ backgroundColor: 'var(--block-background)' }}
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -1065,18 +1151,14 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
                 {account.alias}
               </span>
             </div>
-            <div
-              className="w-full h-[40%] min-h-80 mt-[1rem] shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center"
-              style={{ backgroundColor: 'var(--block-background)' }}
-            >
-              <GraphSection
-                accNo={props.number}
-                account={account}
-                refresh={refreshGraph}
-              ></GraphSection>
-            </div>
+            <GraphSection
+              accNo={props.number}
+              account={account}
+              refresh={refreshGraph}
+            ></GraphSection>
             <div className="mt-4">
               <InfoSection
+                setError={setError}
                 account={account}
                 setShowAreYouSure={setShowAreYouSureModal}
                 setShowEditAlias={setEditAliasModal}
@@ -1106,6 +1188,7 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
         )}
         {uploadLoading && <SpinnerLoader></SpinnerLoader>}
         {successModal && <SuccessModal></SuccessModal>}
+        {error != '' && <ErrorModal error={error}></ErrorModal>}
       </div>
     </>
   );
