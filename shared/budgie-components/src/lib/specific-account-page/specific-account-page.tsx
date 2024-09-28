@@ -551,6 +551,14 @@ function InfoSection(props: InfoSectionProps) {
 
   async function handleDelete() {
     props.setShowAreYouSure(true);
+    const accountKey = `incomeProgress_${props.account.number}`;
+    const storedProgress = {
+      reached25: false,
+      reached50: false,
+      reached75: false,
+      reached100: false,
+    };
+    localStorage.setItem(accountKey, JSON.stringify(storedProgress));
   }
 
   async function SetUploadDate(accountNo: string) {

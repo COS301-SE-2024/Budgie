@@ -1197,7 +1197,7 @@ export function GoalsPage() {
     const user = getAuth().currentUser;
     try {
       await axios.post(
-        'http://127.0.0.1:5001/budgieapp-70251/us-central1/sendGoalProgressEmail',
+        'https://us-central1-budgieapp-70251.cloudfunctions.net/sendGoalProgressEmail',
         {
           uid: user?.uid,
           userEmail: user?.email,

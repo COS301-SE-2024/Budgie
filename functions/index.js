@@ -318,3 +318,38 @@ exports.sendGoalProgressEmail = functions.https.onRequest((req, res) => {
     return res.status(200).send('No email sent; progress not sufficient.');
   });
 });
+
+exports.sendEmailNotification = functions.https.onRequest((req, res) => {
+  corsHandler(req, res, async () => {
+    if (req.method !== 'POST') {
+      return res.status(403).send('Forbidden! Only POST requests are allowed.');
+    }
+    const { userId, userEmail, threshold, spentPercentage } = req.body;
+
+    try {
+      console.log('User Email:', userEmail);
+      if (spentPercentage >= threshold) {
+        const msg = {
+          to: userEmail,
+          from: 'budgie202406@gmail.com',
+          subject: `You have spent over ${threshold}% of your income`,
+          text: `Hi, you have reached ${spentPercentage.toFixed(
+            2
+          )}% of your income. Please monitor your spending.`,
+        };
+
+        await sgMail.send(msg);
+        console.log(`Email sent for ${threshold}% income usage`);
+        return res.status(200).send('Email sent successfully');
+      }
+      return res
+        .status(200)
+        .send('No email sent; spending is below the threshold.');
+    } catch (error) {
+      console.error('Error sending email or fetching user data:', error);
+      return res
+        .status(500)
+        .send('Failed to send email or retrieve user information');
+    }
+  });
+});
