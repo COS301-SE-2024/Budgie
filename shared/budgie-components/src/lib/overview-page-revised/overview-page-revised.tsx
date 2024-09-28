@@ -75,6 +75,13 @@ type pageData = {
   pieChart: pieChartData;
   incomeExpense: IncomeExpensesData;
   latestTransaction: Transaction;
+  latestMonthYear: String;
+};
+
+type accountStatus = {
+  account: Account;
+  last_uploaded: string;
+  recent_data: string;
 };
 
 export function getCurrentMonthYear(): string {
@@ -288,8 +295,6 @@ function getSummaryAll(data: allAccData): pageData | null {
       }
     }
 
-    console.log(lastMonthYear);
-
     for (const account of data.accounts) {
       const yearMonthMap = data.transactionMonthYears.get(account.number);
       if (!yearMonthMap) continue;
@@ -316,7 +321,6 @@ function getSummaryAll(data: allAccData): pageData | null {
       if (lastMonthYear) {
         const lastTransactions = yearMonthMap.get(lastMonthYear);
         if (lastTransactions && lastTransactions.length > 0) {
-          console.log('last month data for:' + account.alias);
           const transactionDate = new Date(lastTransactions[0].date);
 
           // Update latest transaction
@@ -385,9 +389,9 @@ function getSummaryAll(data: allAccData): pageData | null {
         description: '',
         category: '',
       },
+      latestMonthYear: getMonthYearString(lastMonthYear),
     };
 
-    console.log(pageData);
     return pageData;
   }
 
@@ -425,6 +429,7 @@ function getSummarySpecific(data: specificAccData): pageData | null {
     pieChart: pieChart,
     incomeExpense: incomeExpense,
     latestTransaction: latestTransaction,
+    latestMonthYear: '',
   };
 
   //summary data vars
@@ -515,6 +520,7 @@ function getSummarySpecific(data: specificAccData): pageData | null {
       summary: summary,
       incomeExpense: incomeExpense,
       latestTransaction: latestTransaction,
+      latestMonthYear: getMonthYearString(lastMonthYear),
     };
 
     return pageData;
@@ -545,6 +551,8 @@ const getCategoryStyle = (category: string | undefined) => {
       return 'bg-[#9a9a9a]'; // Gray for Medical Aid
     case 'Other':
       return 'bg-[#d6d6d6] text-black'; // Black for Other
+    case 'Transfer':
+      return 'bg-black text-white';
     default:
       return 'bg-white text-black'; // Default style
   }
@@ -573,16 +581,22 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
   const user = useContext(UserContext);
   const router = useRouter();
   let pageData: pageData | null = null;
+  const globalLatestData = useRef<String | undefined>('');
+  const [accountStatuses, setAccountStatuses] = useState<
+    accountStatus[] | null
+  >(null);
 
   const [showLegend, setShowLegend] = useState(true);
 
   if (selectedAccount == 'All Accounts' && allAccountData != null) {
     pageData = getSummaryAll(allAccountData);
+    globalLatestData.current = pageData?.latestMonthYear;
   }
   if (selectedAccount != 'All Accounts' && specificAccountData != null) {
     pageData = getSummarySpecific(specificAccountData);
   }
 
+  //legend window even listener
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 1280) {
@@ -599,6 +613,64 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    if (allAccountData != null && allAccountData.accounts != null) {
+      const getAccountStatus = async (
+        accounts: Account[]
+      ): Promise<accountStatus[]> => {
+        if (accounts && user && allAccountData.transactionMonthYears) {
+          const accRef = collection(db, 'upload_dates');
+          const q = query(accRef, where('uid', '==', user.uid));
+          const querySnapshot = await getDocs(q);
+
+          let statuses: accountStatus[] = [];
+
+          for (const account of accounts) {
+            let lastUploadedDate = '';
+            let lastMonthsData = '011001';
+
+            //determine last uploaded date
+            querySnapshot.forEach((doc) => {
+              const data = doc.data();
+              if (data.account_number == account.number) {
+                lastUploadedDate = data.date;
+              }
+            });
+
+            //determine last month with data
+            const yearMonthMap = allAccountData.transactionMonthYears.get(
+              account.number
+            );
+
+            if (yearMonthMap) {
+              for (const [monthYear, transactions] of yearMonthMap.entries()) {
+                if (isLaterMonthYear(monthYear, lastMonthsData)) {
+                  lastMonthsData = monthYear;
+                }
+              }
+            }
+
+            lastMonthsData = getMonthYearString(lastMonthsData);
+
+            //create and push
+            let statusObject: accountStatus = {
+              account: account,
+              last_uploaded: lastUploadedDate,
+              recent_data: lastMonthsData,
+            };
+            statuses.push(statusObject);
+          }
+          return statuses;
+        }
+        return [];
+      };
+
+      getAccountStatus(allAccountData.accounts).then((statusinfo) => {
+        setAccountStatuses(statusinfo);
+      });
+    }
+  }, [allAccountData]);
 
   useEffect(() => {
     const fetchAllAccounts = async (): Promise<Account[]> => {
@@ -715,6 +787,10 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
     setSelectedAccount(e.target.value);
   };
 
+  const handleUploadClick = (accountNumber: string) => {
+    router.push('/accounts/' + accountNumber);
+  };
+
   if (noAccounts == true) {
     return (
       <div className="mainPage">
@@ -743,9 +819,15 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
         <div className="w-full h-full flex flex-col items-center justify-center">
           <div className="2xl:w-[85%] w-[100%] h-full min-w-60">
             <div
-              className="w-full h-[10%] mt-8 min-h-20 flex items-center justify-center shadow-md bg-BudgieWhite rounded-[2rem]"
+              className="w-full h-[10%] mt-4 min-h-20 flex items-center justify-between px-6 shadow-md bg-BudgieWhite rounded-[2rem]"
               style={{ backgroundColor: 'var(--block-background)' }}
             >
+              <span className="font-TripSans font-medium text-sm ">
+                Data as of: <br />
+                <span className="text-xl font-TripSans font-medium">
+                  {pageData.latestMonthYear}
+                </span>
+              </span>
               <select
                 id="dropdown"
                 value={selectedAccount}
@@ -763,8 +845,8 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
               </select>
             </div>
             <div className="mt-5 w-full flex lg:flex-row flex-col items-center justify-around">
-              <div className="p-2 flex flex-col items-center justify-start shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl lg:w-[30%] w-full lg:aspect-square lg:mt-0 mt-3 min-h-[30vh]">
-                <div className="bg-BudgieGrayLight w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
+              <div className="p-2 flex flex-col items-center justify-start shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl lg:w-[30%] w-full lg:aspect-square lg:mt-0 mt-3 lg:min-h-[30vh]">
+                <div className="bg-BudgieBlue2 text-white w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
                   <span>Summary</span>
                 </div>
                 <div className="flex flex-col items-center lg:justify-center grow w-full">
@@ -777,7 +859,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                     </span>
                     <span className="xl:text-2xl md:text-base text-center 2xl:mt-6 xl:mt-2 mt-2  font-medium">
                       Average Daily Spend:{' '}
-                      <span className="shadow-md xl:text-2xl  md:text-base bg-BudgieBlue2 px-2 py-1 rounded-lg text-BudgieWhite">
+                      <span className="shadow-md xl:text-2xl mt-2 md:text-base bg-BudgieBlue2 px-2 py-1 rounded-lg text-BudgieWhite">
                         R{pageData?.summary?.averageDaily?.toFixed(2)}
                       </span>
                     </span>
@@ -802,7 +884,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                 </div>
               </div>
               <div className="p-2 flex flex-col items-center justify-start shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl lg:w-[30%] w-full lg:aspect-square lg:mt-0 mt-3 min-h-[30vh]">
-                <div className="bg-BudgieGrayLight w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
+                <div className="bg-BudgieBlue2 text-white  w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
                   <span>Spending by Category</span>
                 </div>
                 <div className="grow w-full flex flex-col items-center justify-center">
@@ -845,15 +927,41 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                   </ResponsiveContainer>
                 </div>
               </div>
-              <div className="p-2 flex flex-col items-center justify-start shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl lg:w-[30%] w-full lg:aspect-square lg:mt-0 mt-3 min-h-[30vh]"></div>
+              <div className="p-2 flex flex-col items-center justify-start shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl lg:w-[30%] w-full lg:aspect-square lg:mt-0 mt-3 min-h-[30vh]">
+                <div className="bg-BudgieBlue2 text-white w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
+                  <span>Latest Transaction</span>
+                </div>
+                <div className="grow flex items-center justify-center">
+                  <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center">
+                    <div className="text-3xl font-bold mb-4">
+                      R {pageData.latestTransaction.amount.toFixed(2)}
+                    </div>
+                    <div className="text-xl mb-3 px-4">
+                      {pageData.latestTransaction.description}
+                    </div>
+                    <div
+                      className={`text-lg px-4 py-2 rounded-full ${getCategoryStyle(
+                        pageData.latestTransaction.category
+                      )} mb-3`}
+                    >
+                      {pageData.latestTransaction.category}
+                    </div>
+                    <div className="text-md text-gray-600">
+                      {new Date(
+                        pageData.latestTransaction.date
+                      ).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="p-2 mt-5 w-full h-[500px] shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl mb-[5rem]">
-              <div className="bg-BudgieGrayLight w-full h-14 rounded-3xl flex items-center justify-center text-lg font-medium">
+            <div className="p-2 mt-5 w-full h-[40%] min-h-80 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl">
+              <div className="bg-BudgieBlue2 text-white w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
                 <span>Income vs Expenses</span>
               </div>
               <div className="grow flex items-center justify-center h-[90%]">
                 <AreaChart
-                  className="w-full h-full"
+                  className=" w-[90%] h-[85%] "
                   data={pageData.incomeExpense.data}
                   index="date"
                   categories={['Income', 'Expenses']}
@@ -864,6 +972,78 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                 ></AreaChart>
               </div>
             </div>
+            <div className="p-2 mt-5 w-full h-[30%] min-h-60 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl">
+              <div className="bg-BudgieBlue2 text-white w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
+                <span>Accounts</span>
+              </div>
+              <div className="grow flex flex-col items-center justify-center">
+                {/* Header */}
+                <div className="w-full flex mt-4 mb-5">
+                  <span className="w-1/5 text-xl font-semibold text-center">
+                    Account
+                  </span>
+                  <span className="w-1/5 text-xl font-semibold text-center">
+                    Name
+                  </span>
+                  <span className="w-1/5 text-xl font-semibold text-center">
+                    Last Uploaded
+                  </span>
+                  <span className="w-1/5 text-xl font-semibold text-center">
+                    Most Recent Data
+                  </span>
+                  <span className="w-1/5 text-xl font-semibold text-center">
+                    Actions
+                  </span>
+                </div>
+                <div className="grow flex w-full flex-col items-center justify-center space-y-5">
+                  {accountStatuses?.map((status) => (
+                    <div
+                      key={status.account.number}
+                      className="w-full flex bg-BudgieGrayLight shadow-md py-2 rounded-2xl items-center"
+                    >
+                      <span className="w-1/5 text-xl text-center">
+                        {status.account.alias}
+                      </span>
+                      <span className="w-1/5 text-lg text-center">
+                        {status.account.name}
+                      </span>
+                      <span className="w-1/5 text-xl text-center">
+                        {status.last_uploaded}
+                      </span>
+                      <span
+                        className={`relative w-1/5 text-xl py-2 text-center rounded-xl ${
+                          globalLatestData.current === status.recent_data
+                            ? 'bg-green-400 text-BudgieWhite'
+                            : 'bg-red-400 text-BudgieWhite'
+                        }`}
+                      >
+                        {/* Conditionally Render the Ping Animation */}
+                        {globalLatestData.current != status.recent_data && (
+                          <span className="absolute top-[-4px] right-[-4px] flex h-4 w-4">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span>
+                          </span>
+                        )}
+
+                        {/* Display the Recent Data */}
+                        {status.recent_data}
+                      </span>
+                      <span className="w-1/5 text-center flex flex-col items-center justify-start">
+                        <button
+                          onClick={() => {
+                            handleUploadClick(status.account.number);
+                          }}
+                          className="px-4 py-2 bg-BudgieBlue2 text-white rounded-xl hover:bg-BudgieAccentHover transition-colors"
+                        >
+                          Upload
+                        </button>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="p-2 mt-5 w-full h-[30%] rounded-3xl"></div>
           </div>
         </div>
       </div>
@@ -872,185 +1052,3 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
 }
 
 export default OverviewPageRevised;
-
-//   {/*<div className="h-[40%] mt-5 w-full flex items-center justify-center">
-//   <div className=" p-2 mr-5 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl w-1/3 h-full">
-//     <div className="bg-BudgieGrayLight w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
-//       <span>Latest Transaction</span>
-//     </div>
-//     <div className="grow flex items-center justify-center">
-//       <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center">
-//         <div className="text-3xl font-bold mb-4">
-//           R {Math.abs(pageData.latestTransaction.amount).toFixed(2)}
-//         </div>
-//         <div className="text-xl mb-3 px-4">
-//           {pageData.latestTransaction.description}
-//         </div>
-//         <div
-//           className={`text-lg px-4 py-2 rounded-full ${getCategoryStyle(
-//             pageData.latestTransaction.category
-//           )} mb-3`}
-//         >
-//           {pageData.latestTransaction.category}
-//         </div>
-//         <div className="text-md text-gray-600">
-//           {new Date(
-//             pageData.latestTransaction.date
-//           ).toLocaleDateString()}
-//         </div>
-//       </div>
-//     </div>
-//   </div>
-//   <div className=" p-2 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl w-2/3 h-full">
-//     <div className="bg-BudgieGrayLight w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
-//       <span>Financial Health Score</span>
-//     </div>
-//     <div className="grow flex items-center justify-center"></div>
-//   </div>
-// </div>*/}
-
-//ignore old summary function
-// function getSummaryAll(data: allAccData): pageData | null {
-//   const currMonthYear = getCurrentMonthYear();
-//   const affectedYears = rollingYears(currMonthYear);
-//   const affectedMonthYears = getRollingMonthYears(currMonthYear);
-//   const pieDataInit = [
-//     { name: 'Transport', value: 0 },
-//     { name: 'Eating Out', value: 0 },
-//     { name: 'Groceries', value: 0 },
-//     { name: 'Entertainment', value: 0 },
-//     { name: 'Shopping', value: 0 },
-//     { name: 'Insurance', value: 0 },
-//     { name: 'Utilities', value: 0 },
-//     { name: 'Medical Aid', value: 0 },
-//     { name: 'Other', value: 0 },
-//   ];
-//   let summary: summaryData = { net: 0, averageDaily: 0, topThree: [] };
-//   let pieChart: pieChartData = { data: pieDataInit };
-//   let incomeExpense: IncomeExpensesData = { data: [] };
-//   let latestTransaction: Transaction = {
-//     date: '',
-//     amount: 0,
-//     balance: 0,
-//     description: '',
-//     category: '',
-//   };
-
-//   let pageData: pageData = {
-//     summary: summary,
-//     pieChart: pieChart,
-//     incomeExpense: incomeExpense,
-//     latestTransaction: latestTransaction,
-//   };
-
-//   //summary data vars
-//   let net = 0;
-//   let averageSum = 0;
-//   let averageDivisor = 30;
-//   let topThree: string[] = [];
-//   let catMap = new Map<string, number>();
-
-//   if (data.accounts && data.transactionMonthYears) {
-//     let i = 0;
-//     for (const monthYear of affectedMonthYears) {
-//       incomeExpense.data[i++] = {
-//         date: getMonthYearString(monthYear),
-//         Income: 0,
-//         Expenses: 0,
-//       };
-//     }
-//     for (const account of data.accounts) {
-//       let lastMonthYear = '';
-//       for (const monthYear of affectedMonthYears) {
-//         let yearMonthMap = data.transactionMonthYears.get(account.number);
-//         if (yearMonthMap) {
-//           let Transactions = yearMonthMap.get(monthYear);
-//           if (Transactions) {
-//             lastMonthYear = monthYear;
-//             const foundElement = incomeExpense.data.find(
-//               (item) => item.date === getMonthYearString(monthYear)
-//             );
-//             if (foundElement) {
-//               foundElement.date = getMonthYearString(monthYear);
-//               foundElement.Income += getIncome(Transactions);
-//               foundElement.Expenses += getExpenses(Transactions);
-//             }
-//           }
-//         }
-//       }
-//       if (lastMonthYear != '') {
-//         let lastMonthYearTransactions = data.transactionMonthYears
-//           .get(account.number)
-//           ?.get(lastMonthYear);
-
-//         if (lastMonthYearTransactions) {
-//           if (latestTransaction.date == '') {
-//             latestTransaction = lastMonthYearTransactions[0];
-//           } else {
-//             const parsedDate1 = new Date(latestTransaction.date);
-//             const parsedDate2 = new Date(lastMonthYearTransactions[0].date);
-
-//             if (parsedDate2 > parsedDate1) {
-//               latestTransaction = lastMonthYearTransactions[0];
-//             }
-//           }
-//           net += lastMonthYearTransactions[0].balance;
-
-//           for (const transaction of lastMonthYearTransactions) {
-//             if (transaction.amount < 0 && transaction.category != 'Transfer') {
-//               averageSum += Math.abs(transaction.amount);
-
-//               if (catMap.get(transaction.category)) {
-//                 let prev = catMap.get(transaction.category) || 0;
-//                 catMap.set(
-//                   transaction.category,
-//                   Math.abs(transaction.amount) + prev
-//                 );
-//               } else {
-//                 catMap.set(transaction.category, Math.abs(transaction.amount));
-//               }
-
-//               if (transaction.category != 'Income') {
-//                 const categoryCell = pieChart.data.find(
-//                   (cell) => cell.name === transaction.category
-//                 );
-//                 if (categoryCell) {
-//                   categoryCell.value = parseFloat(
-//                     (categoryCell.value + Math.abs(transaction.amount)).toFixed(
-//                       2
-//                     )
-//                   );
-//                 }
-//               }
-//             }
-//           }
-//         }
-//       }
-//     }
-
-//     let average;
-//     if (averageDivisor === 0) {
-//       average = 0;
-//     } else {
-//       average = averageSum / averageDivisor;
-//     }
-
-//     topThree = Array.from(catMap.entries()) // Convert map to array of [key, value]
-//       .sort((a, b) => b[1] - a[1]) // Sort by value in descending order
-//       .slice(0, 3) // Get top 3 entries
-//       .map((entry) => entry[0]);
-
-//     summary = { net: net, averageDaily: average, topThree: topThree };
-//     pageData = {
-//       ...pageData,
-//       pieChart: pieChart,
-//       summary: summary,
-//       incomeExpense: incomeExpense,
-//       latestTransaction: latestTransaction,
-//     };
-//     console.log(pageData);
-//     return pageData;
-//   }
-
-//   return null;
-// }
