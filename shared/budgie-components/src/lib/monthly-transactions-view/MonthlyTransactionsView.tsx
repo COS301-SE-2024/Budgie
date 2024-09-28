@@ -363,7 +363,13 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         ) {
           storedProgress.reached75 = true;
           localStorage.setItem(accountKey, JSON.stringify(storedProgress));
-          await sendEmail(userId, userEmail, 75, progressPercentage);
+          await sendEmail(
+            userId,
+            userEmail,
+            75,
+            progressPercentage,
+            accountKey
+          );
         } else if (progressPercentage >= 100 && !storedProgress.reached75) {
           storedProgress.reached75 = true;
           localStorage.setItem(accountKey, JSON.stringify(storedProgress));
@@ -371,7 +377,13 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         if (progressPercentage >= 100 && !storedProgress.reached100) {
           storedProgress.reached100 = true;
           localStorage.setItem(accountKey, JSON.stringify(storedProgress));
-          await sendEmail(userId, userEmail, 100, progressPercentage);
+          await sendEmail(
+            userId,
+            userEmail,
+            100,
+            progressPercentage,
+            accountKey
+          );
         }
       }
     }

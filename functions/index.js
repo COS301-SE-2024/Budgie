@@ -14,7 +14,6 @@ const functions = require('firebase-functions');
 const sgMail = require('@sendgrid/mail');
 const cors = require('cors');
 sgMail.setApiKey('');
-
 initializeApp();
 let categoryEmbeddings;
 let pipe;
@@ -327,7 +326,6 @@ exports.sendEmailNotification = functions.https.onRequest((req, res) => {
     const { userId, userEmail, threshold, spentPercentage } = req.body;
 
     try {
-      console.log('User Email:', userEmail);
       if (spentPercentage >= threshold) {
         const msg = {
           to: userEmail,
@@ -335,11 +333,10 @@ exports.sendEmailNotification = functions.https.onRequest((req, res) => {
           subject: `You have spent over ${threshold}% of your income`,
           text: `Hi, you have reached ${spentPercentage.toFixed(
             2
-          )}% of your income. Please monitor your spending.`,
+          )}% of your income in account. Please monitor your spending.`,
         };
 
         await sgMail.send(msg);
-        console.log(`Email sent for ${threshold}% income usage`);
         return res.status(200).send('Email sent successfully');
       }
       return res
