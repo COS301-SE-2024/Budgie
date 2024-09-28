@@ -813,6 +813,29 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
     );
   }
 
+  if (dataLoading) {
+    return (
+      <div className="mainPage">
+        <div className="w-full h-full flex flex-col items-center justify-center">
+          <div className="2xl:w-[85%] w-[100%] h-full min-w-60">
+            <div
+              className="w-full animate-pulse [animation-duration:1s] h-[10%] mt-4 min-h-20 flex items-center justify-between px-6 shadow-md bg-BudgieWhite rounded-[2rem]"
+              style={{ backgroundColor: 'var(--block-background)' }}
+            ></div>
+            <div className="mt-5 w-full flex lg:flex-row flex-col items-center justify-around">
+              <div className="p-2 animate-pulse [animation-duration:1s] flex flex-col items-center justify-start shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl lg:w-[30%] w-full lg:aspect-square lg:mt-0 mt-3 min-h-[30vh]"></div>
+              <div className="p-2 animate-pulse [animation-duration:1s] flex flex-col items-center justify-start shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl lg:w-[30%] w-full lg:aspect-square lg:mt-0 mt-3 min-h-[30vh]"></div>
+              <div className="p-2 animate-pulse [animation-duration:1s] flex flex-col items-center justify-start shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl lg:w-[30%] w-full lg:aspect-square lg:mt-0 mt-3 min-h-[30vh]"></div>
+            </div>
+            <div className="p-2 animate-pulse [animation-duration:1s] mt-5 w-full h-[40%] min-h-80 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl"></div>
+            <div className="p-2 animate-pulse [animation-duration:1s] pb-10 mt-5 w-full min-h-60 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl"></div>
+            <div className="w-full h-[10%]"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     !(dataLoading || pageData == null) && (
       <div className="mainPage">
@@ -972,26 +995,26 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                 ></AreaChart>
               </div>
             </div>
-            <div className="p-2 mt-5 w-full h-[30%] min-h-60 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl">
+            <div className="p-2 pb-10 mt-5 w-full min-h-60 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl">
               <div className="bg-BudgieBlue2 text-white w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
                 <span>Accounts</span>
               </div>
               <div className="grow flex flex-col items-center justify-center">
                 {/* Header */}
-                <div className="w-full flex mt-4 mb-5">
-                  <span className="w-1/5 text-xl font-semibold text-center">
+                <div className="w-full flex mt-4 mb-5 sm:justify-normal justify-around">
+                  <span className="w-1/5 xl:text-xl sm:text-base text-xs font-semibold text-center">
                     Account
                   </span>
-                  <span className="w-1/5 text-xl font-semibold text-center">
+                  <span className="w-1/5 xl:text-xl sm:text-base text-xs font-semibold text-center sm:inline hidden">
                     Name
                   </span>
-                  <span className="w-1/5 text-xl font-semibold text-center">
+                  <span className="w-1/5 xl:text-xl sm:text-base text-xs font-semibold text-center">
                     Last Uploaded
                   </span>
-                  <span className="w-1/5 text-xl font-semibold text-center">
+                  <span className="w-1/5 xl:text-xl sm:text-base text-xs font-semibold text-center">
                     Most Recent Data
                   </span>
-                  <span className="w-1/5 text-xl font-semibold text-center">
+                  <span className="w-1/5 xl:text-xl sm:text-base text-xs font-semibold text-center">
                     Actions
                   </span>
                 </div>
@@ -999,19 +1022,19 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                   {accountStatuses?.map((status) => (
                     <div
                       key={status.account.number}
-                      className="w-full flex bg-BudgieGrayLight shadow-md py-2 rounded-2xl items-center"
+                      className="w-full flex bg-BudgieGrayLight shadow-md py-2 rounded-2xl items-center sm:justify-normal justify-around"
                     >
-                      <span className="w-1/5 text-xl text-center">
+                      <span className="w-1/5 xl:text-xl sm:text-base text-xs text-center">
                         {status.account.alias}
                       </span>
-                      <span className="w-1/5 text-lg text-center">
+                      <span className="w-1/5 xl:text-lg sm:text-base text-xs text-center sm:inline hidden">
                         {status.account.name}
                       </span>
-                      <span className="w-1/5 text-xl text-center">
+                      <span className="w-1/5 xl:text-xl sm:text-base text-xs text-center">
                         {status.last_uploaded}
                       </span>
                       <span
-                        className={`relative w-1/5 text-xl py-2 text-center rounded-xl ${
+                        className={`relative w-1/5 xl:text-xl sm:text-base text-xs py-2 text-center rounded-xl ${
                           globalLatestData.current === status.recent_data
                             ? 'bg-green-400 text-BudgieWhite'
                             : 'bg-red-400 text-BudgieWhite'
@@ -1028,7 +1051,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                         {/* Display the Recent Data */}
                         {status.recent_data}
                       </span>
-                      <span className="w-1/5 text-center flex flex-col items-center justify-start">
+                      <span className="w-1/5 text-center xl:text-xl sm:text-base text-xs flex flex-col items-center justify-start">
                         <button
                           onClick={() => {
                             handleUploadClick(status.account.number);
@@ -1043,7 +1066,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                 </div>
               </div>
             </div>
-            <div className="p-2 mt-5 w-full h-[30%] rounded-3xl"></div>
+            <div className="w-full h-[10%]"></div>
           </div>
         </div>
       </div>
