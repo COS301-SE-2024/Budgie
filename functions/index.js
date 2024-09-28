@@ -3,17 +3,11 @@ const { logger } = require('firebase-functions/v2');
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
 const admin = require('firebase-admin');
-const {
-  collection,
-  query,
-  where,
-  getDocs,
-} = require('firebase-admin/firestore');
-const { onSchedule } = require('firebase-functions/v2');
+const { onSchedule } = require('firebase-functions/v2/scheduler');
 const functions = require('firebase-functions');
 const sgMail = require('@sendgrid/mail');
 const cors = require('cors');
-sgMail.setApiKey('');
+
 initializeApp();
 let categoryEmbeddings;
 let pipe;
@@ -349,4 +343,81 @@ exports.sendEmailNotification = functions.https.onRequest((req, res) => {
         .send('Failed to send email or retrieve user information');
     }
   });
+});
+
+exports.csvUploadReminder = onSchedule('every 1 minutes', async () => {
+  const firestore = getFirestore();
+  const now = new Date();
+  const thresholdDays = 7;
+  let email;
+  try {
+    const userSettingsRef = firestore.collection('usersSettings');
+    const settingsSnapshot = await userSettingsRef
+      .where('csv', '==', true)
+      .get();
+    if ((await settingsSnapshot).size === 0) {
+      console.log('No users with CSV reminders enabled.');
+      return null;
+    }
+    console.log((await settingsSnapshot).docs.toString);
+    if (!settingsSnapshot.empty) {
+      const usersWithCsvNotifications =
+        settingsSnapshot.docs?.map((doc) => doc.id) || [];
+      console.log(
+        `Found ${await settingsSnapshot.size} users with CSV reminders enabled.`
+      );
+      console.log('Users with CSV notifications:', usersWithCsvNotifications);
+      const overdueUsers = [];
+      for (const userId of usersWithCsvNotifications) {
+        const userDocRef = firestore.collection('users').doc(userId);
+        const userDoc = await userDocRef.get();
+
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          console.log('User document found:', userData);
+          email = userData.email;
+          if (userData.lastCSVUpload) {
+            const daysSinceUpload = Math.floor(
+              (now - userData.lastCSVUpload.toDate()) / (1000 * 60 * 60 * 24)
+            );
+
+            if (daysSinceUpload >= thresholdDays) {
+              overdueUsers.push({
+                email: userData.email,
+                displayName: userData.displayName,
+              });
+            }
+          } else {
+            console.log(`No lastCSVUpload data found for user: ${userId}`);
+          }
+        } else {
+          console.log(`No user document found for user ID: ${userId}`);
+        }
+      }
+      if (email) {
+        if (overdueUsers.length > 0) {
+          const msg = {
+            to: email,
+            from: 'budgie202406@gmail.com',
+            subject: 'CSV Upload Reminder',
+            text: `Dear user, you haven't uploaded a CSV file in over ${thresholdDays} days.`,
+          };
+
+          return sgMail.send(msg);
+        }
+      } else {
+        console.log(`Skipping user as no email address is found.`);
+        return Promise.resolve();
+      }
+      await Promise.all(emailPromises);
+      console.log(`Sent ${overdueUsers.length} CSV upload reminders.`);
+    } else {
+      console.log('No overdue users to send reminders to.');
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error sending CSV upload reminders:', error);
+    return null;
+  }
 });

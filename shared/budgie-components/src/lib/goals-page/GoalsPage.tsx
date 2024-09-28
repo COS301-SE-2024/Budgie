@@ -1197,7 +1197,7 @@ export function GoalsPage() {
     const user = getAuth().currentUser;
     try {
       await axios.post(
-        'https://us-central1-budgieapp-70251.cloudfunctions.net/sendGoalProgressEmail',
+        'http://127.0.0.1:5001/budgieapp-70251/us-central1/sendGoalProgressEmail',
         {
           uid: user?.uid,
           userEmail: user?.email,
@@ -1245,11 +1245,9 @@ export function GoalsPage() {
           } else if (progress >= 50 && previousProgress < 50) {
             sendGoalProgressEmail(50);
           }
-
           updatedMap[goal.id] = progress;
         });
 
-        // Avoid unnecessary state updates if updatedMap hasn't changed
         if (
           JSON.stringify(updatedMap) !== JSON.stringify(previousProgressMap)
         ) {

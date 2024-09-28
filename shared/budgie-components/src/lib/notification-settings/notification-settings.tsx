@@ -10,7 +10,6 @@ export interface NotificationSettingsProps {
 
 export function NotificationSettings(props: NotificationSettingsProps) {
   const [settings, setSettings] = useState({
-    budget: false,
     goal: false,
     spending: false,
     csv: false,
@@ -23,7 +22,6 @@ export function NotificationSettings(props: NotificationSettingsProps) {
 
     if (user) {
       const storedSettings = {
-        budget: localStorage.getItem('budget') === 'true',
         goal: localStorage.getItem('goal') === 'true',
         spending: localStorage.getItem('spending') === 'true',
         csv: localStorage.getItem('csv') === 'true',
@@ -56,7 +54,6 @@ export function NotificationSettings(props: NotificationSettingsProps) {
   }
 
   function saveSettings() {
-    localStorage.setItem('budget', settings.budget.toString());
     localStorage.setItem('goal', settings.goal.toString());
     localStorage.setItem('spending', settings.spending.toString());
     localStorage.setItem('csv', settings.csv.toString());
@@ -64,7 +61,6 @@ export function NotificationSettings(props: NotificationSettingsProps) {
 
   function uncheckAll() {
     setSettings({
-      budget: false,
       goal: false,
       spending: false,
       csv: false,

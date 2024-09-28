@@ -17,6 +17,8 @@ import {
   QueryDocumentSnapshot,
   DocumentReference,
 } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 import '../../root.css';
 import styles from './add-accounts-page.module.css';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
@@ -159,6 +161,31 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
         const file = files[0];
         handleCSVUpload(file);
         event.target.value = '';
+
+        const auth = getAuth();
+        const user = auth.currentUser;
+
+        if (user) {
+          const storeDateInFirestore = async () => {
+            const firestore = getFirestore();
+            try {
+              const data = {
+                lastCSVUpload: new Date(), // Update date on upload
+                email: user.email, // Store the user's email
+              };
+              const userDocRef = doc(firestore, 'users', user.uid);
+              console.log(userDocRef);
+              await setDoc(userDocRef, data, { merge: true });
+              console.log('User data stored successfully:', data);
+            } catch (error) {
+              console.error('Error storing user data in Firestore:', error);
+            }
+          };
+
+          storeDateInFirestore();
+        } else {
+          console.warn('No authenticated user found when uploading CSV.');
+        }
       }
     };
 
