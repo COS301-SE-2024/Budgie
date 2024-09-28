@@ -316,60 +316,63 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
       const progressPercentage = (Math.abs(moneyOutTotal) / moneyInTotal) * 100;
 
       // Retrieve or initialize stored progress
-      const accountKey = `incomeProgress_${props.account}`;
-      const storedProgress = JSON.parse(localStorage.getItem(accountKey)) || {
-        reached25: false,
-        reached50: false,
-        reached75: false,
-        reached100: false,
-      };
-      const user = getAuth().currentUser;
-      const userId = user?.uid;
-      const userEmail = user?.email;
+      const isSpendingEnabled = localStorage.getItem('spending') === 'true';
+      if (isSpendingEnabled) {
+        const accountKey = `incomeProgress_${props.account}`;
+        const storedProgress = JSON.parse(localStorage.getItem(accountKey)) || {
+          reached25: false,
+          reached50: false,
+          reached75: false,
+          reached100: false,
+        };
+        const user = getAuth().currentUser;
+        const userId = user?.uid;
+        const userEmail = user?.email;
 
-      // Check and update progress thresholds, sending emails as needed
-      if (
-        progressPercentage >= 25 &&
-        !storedProgress.reached25 &&
-        progressPercentage < 50
-      ) {
-        storedProgress.reached25 = true;
-        localStorage.setItem(accountKey, JSON.stringify(storedProgress));
-        await sendEmail(userId, userEmail, 25, progressPercentage);
-      } else if (progressPercentage >= 50 && !storedProgress.reached25) {
-        storedProgress.reached25 = true;
-        localStorage.setItem(accountKey, JSON.stringify(storedProgress));
-      }
+        // Check and update progress thresholds, sending emails as needed
+        if (
+          progressPercentage >= 25 &&
+          !storedProgress.reached25 &&
+          progressPercentage < 50
+        ) {
+          storedProgress.reached25 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+          await sendEmail(userId, userEmail, 25, progressPercentage);
+        } else if (progressPercentage >= 50 && !storedProgress.reached25) {
+          storedProgress.reached25 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+        }
 
-      if (
-        progressPercentage >= 50 &&
-        !storedProgress.reached50 &&
-        progressPercentage < 75
-      ) {
-        storedProgress.reached50 = true;
-        localStorage.setItem(accountKey, JSON.stringify(storedProgress));
-        await sendEmail(userId, userEmail, 50, progressPercentage);
-      } else if (progressPercentage >= 75 && !storedProgress.reached50) {
-        storedProgress.reached50 = true;
-        localStorage.setItem(accountKey, JSON.stringify(storedProgress));
-      }
+        if (
+          progressPercentage >= 50 &&
+          !storedProgress.reached50 &&
+          progressPercentage < 75
+        ) {
+          storedProgress.reached50 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+          await sendEmail(userId, userEmail, 50, progressPercentage);
+        } else if (progressPercentage >= 75 && !storedProgress.reached50) {
+          storedProgress.reached50 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+        }
 
-      if (
-        progressPercentage >= 75 &&
-        !storedProgress.reached75 &&
-        progressPercentage < 100
-      ) {
-        storedProgress.reached75 = true;
-        localStorage.setItem(accountKey, JSON.stringify(storedProgress));
-        await sendEmail(userId, userEmail, 75, progressPercentage);
-      } else if (progressPercentage >= 100 && !storedProgress.reached75) {
-        storedProgress.reached75 = true;
-        localStorage.setItem(accountKey, JSON.stringify(storedProgress));
-      }
-      if (progressPercentage >= 100 && !storedProgress.reached100) {
-        storedProgress.reached100 = true;
-        localStorage.setItem(accountKey, JSON.stringify(storedProgress));
-        await sendEmail(userId, userEmail, 100, progressPercentage);
+        if (
+          progressPercentage >= 75 &&
+          !storedProgress.reached75 &&
+          progressPercentage < 100
+        ) {
+          storedProgress.reached75 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+          await sendEmail(userId, userEmail, 75, progressPercentage);
+        } else if (progressPercentage >= 100 && !storedProgress.reached75) {
+          storedProgress.reached75 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+        }
+        if (progressPercentage >= 100 && !storedProgress.reached100) {
+          storedProgress.reached100 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+          await sendEmail(userId, userEmail, 100, progressPercentage);
+        }
       }
     }
   };
