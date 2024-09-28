@@ -32,7 +32,15 @@ export function Dashboard(props: DashboardProps) {
   const [error, setError] = useState<string | null>(null);
   const [showNoData, setShowNoData] = useState(false);
   const [yearsWithData, setYearsWithData] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useThemeSettings();
 
@@ -57,16 +65,17 @@ export function Dashboard(props: DashboardProps) {
     const calculateYearsWithData = () => {
       if (data && data.transactions) {
         const years = data.transactions
-          .filter(transaction => transaction.account_number === currentAccountNumber)
-          .map(transaction => transaction.year);
-  
+          .filter(
+            (transaction) => transaction.account_number === currentAccountNumber
+          )
+          .map((transaction) => transaction.year);
+
         setYearsWithData(Array.from(new Set(years)));
       }
     };
-  
+
     calculateYearsWithData();
   }, [data.transactions, currentAccountNumber]);
-  
 
   const handleAccountDropdownChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -135,16 +144,29 @@ export function Dashboard(props: DashboardProps) {
         </select>
       </div>
 
-      <div >
-        {error ? (
+      <div>
+        {loading ? (
+          <div className={styles.loadScreen}>
+            <div className={styles.loaderContainer}>
+              <div className={styles.loader}></div>
+            </div>
+            <div className={styles.loaderText}>Loading...</div>
+          </div>
+        ) : error ? (
           <div className={styles.errorScreen}>
             <div className={styles.errorText}>{error}</div>
           </div>
-        ) : viewMode === 'monthly'?(
-          <MonthlyTransactionsView account={currentAccountNumber} availableYears={yearsWithData}/>
+        ) : viewMode === 'monthly' ? (
+          <MonthlyTransactionsView
+            account={currentAccountNumber}
+            availableYears={yearsWithData}
+          />
         ) : (
-          <AllTransactionsView account={currentAccountNumber} availableYears={yearsWithData}/>
-        ) }
+          <AllTransactionsView
+            account={currentAccountNumber}
+            availableYears={yearsWithData}
+          />
+        )}
       </div>
     </div>
   );
