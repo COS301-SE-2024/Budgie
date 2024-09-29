@@ -4,7 +4,9 @@ import {
     getUser,
     getAccounts,
     getMonthlyIncome,
-    getPosition
+    getPosition,
+    getIndustry,
+    getExpensesByCategory,
  } from './services';
  import { collection, getDocs, query, where } from 'firebase/firestore';
 
@@ -197,3 +199,86 @@ describe('getPosition', () => {
       await expect(getPosition('Software Engineer')).rejects.toThrow('Firestore error');
   });
 });
+
+
+describe('getIndustry', () => {
+
+  it('should return default stats when no documents are found', async () => {
+      (getDocs as jest.Mock).mockResolvedValue({
+          empty: true,
+      });
+
+      const result = await getIndustry('Technology');
+
+      expect(result).toEqual([-1, -1, -1]); // Default stats
+  });
+
+  it('should return rounded stats from Firestore documents', async () => {
+      const mockDocs = [
+          { data: () => ({ minimum: 72000, median: 96000, maximum: 120000 }) },
+      ];
+
+      (getDocs as jest.Mock).mockResolvedValue({
+          empty: false,
+          forEach: jest.fn((callback) => {
+              mockDocs.forEach(callback);
+          }),
+      });
+
+      const result = await getIndustry('Technology');
+
+      expect(result).toEqual([6000, 8000, 10000]); // Rounded values in thousands
+  });
+
+  it('should return default stats when documents do not contain expected fields', async () => {
+      const mockDocs = [
+          { data: () => ({ otherField: 50000 }) }, // No minimum, median, maximum
+      ];
+
+      (getDocs as jest.Mock).mockResolvedValue({
+          empty: false,
+          forEach: jest.fn((callback) => {
+              mockDocs.forEach(callback);
+          }),
+      });
+
+      const result = await getIndustry('Technology');
+
+      expect(result).toEqual([-1, -1, -1]); // Default stats
+  });
+
+  it('should handle errors gracefully', async () => {
+      (getDocs as jest.Mock).mockRejectedValue(new Error('Firestore error'));
+
+      await expect(getIndustry('Technology')).rejects.toThrow('Firestore error');
+  });
+});
+
+
+describe('getExpensesByCategory', () => {
+
+  it('should correctly sum expenses for the current month', async () => {
+      const transactions = [
+          { date: '2024/08/01', amount: 100, category: 'Groceries' },
+          { date: '2024/08/05', amount: 50, category: 'Utilities' },
+          { date: '2024/08/15', amount: 200, category: 'Entertainment' },
+          { date: '2024/08/20', amount: 75, category: 'Transport' },
+      ];
+
+      const result = await getExpensesByCategory(transactions);
+      expect(result).toEqual([-100, -50, -200, -75, 0, 0, 0, 0, 0]); // Total expenses for each category
+  });
+
+  it('should return previous month when no transactions for last month', async () => {
+      const transactions = [
+          { date: '2024/07/01', amount: 100, category: 'Groceries' },
+          { date: '2024/07/05', amount: 50, category: 'Utilities' },
+          { date: '2024/07/15', amount: 200, category: 'Entertainment' },
+      ];
+
+      const result = await getExpensesByCategory(transactions);
+      expect(result).toEqual([-100, -50, -200, 0, 0, 0, 0, 0, 0]); 
+  });
+
+});
+
