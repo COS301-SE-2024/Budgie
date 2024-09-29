@@ -156,45 +156,78 @@ export function HelpModal(props: HelpModalProps) {
     }
   };
   return (
-    <div className="flex flex-col shadow-lg z-10 fixed top-0 right-0 z-10  bg-[var(--block-background)] p-8 h-full" style={{ width: '85vw' }}>
-      <div className="pageTitle">
-        <span
-          className="material-symbols-outlined cursor-pointer"
-          style={{ marginRight: '0.5rem', fontSize: '1.5rem' }}
-          onClick={props.onClose}
-        >
-          arrow_back
-        </span>
-        Usage Guidance
-      </div>
-      <section className="bg-white p-6 rounded-lg shadow-md">
-        <div className={styles.helpPage}>
-          <nav className={styles.nav}>
-            <ul>
-              <li onClick={() => setSelectedSection('introduction')}>
-                Introduction
-              </li>
-              <li onClick={() => setSelectedSection('gettingStarted')}>
-                Getting Started
-              </li>
-              <li onClick={() => setSelectedSection('coreFeatures')}>
-                Core Features
-              </li>
-              <li onClick={() => setSelectedSection('tips')}>Tips</li>
-              <li onClick={() => setSelectedSection('settings')}>Settings</li>
-              <li onClick={() => setSelectedSection('troubleshooting')}>
-                Troubleshooting
-              </li>
-              <li onClick={() => setSelectedSection('support')}>
-                Contact Support
-              </li>
-              <li onClick={() => setSelectedSection('legal')}>Legal</li>
-            </ul>
-          </nav>
-          <div className={styles.content}>{renderContent()}</div>
+    <>
+      {/* <div className="w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex flex-col bg-[var(--block-background)]"></div> */}
+      <div className="w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex flex-col bg-[var(--block-background)] p-8">
+        <div className="pageTitle">
+          <span
+            className="material-symbols-outlined cursor-pointer"
+            style={{ marginRight: '0.5rem', fontSize: '1.5rem' }}
+            onClick={props.onClose}
+          >
+            arrow_back
+          </span>
+          Usage Guidance
         </div>
-      </section>
-    </div>
+        <section className="bg-white p-6 rounded-[2rem] shadow-lg mt-4">
+          <div className={styles.helpPage}>
+            <nav className={styles.nav}>
+              <ul>
+                <li
+                  className="!text-BudgieBlue2"
+                  onClick={() => setSelectedSection('introduction')}
+                >
+                  Introduction
+                </li>
+                <li
+                  className="!text-BudgieBlue2"
+                  onClick={() => setSelectedSection('gettingStarted')}
+                >
+                  Getting Started
+                </li>
+                <li
+                  className="!text-BudgieBlue2"
+                  onClick={() => setSelectedSection('coreFeatures')}
+                >
+                  Core Features
+                </li>
+                <li
+                  className="!text-BudgieBlue2"
+                  onClick={() => setSelectedSection('tips')}
+                >
+                  Tips
+                </li>
+                <li
+                  className="!text-BudgieBlue2"
+                  onClick={() => setSelectedSection('settings')}
+                >
+                  Settings
+                </li>
+                <li
+                  className="!text-BudgieBlue2"
+                  onClick={() => setSelectedSection('troubleshooting')}
+                >
+                  Troubleshooting
+                </li>
+                <li
+                  className="!text-BudgieBlue2"
+                  onClick={() => setSelectedSection('support')}
+                >
+                  Contact Support
+                </li>
+                <li
+                  className="!text-BudgieBlue2"
+                  onClick={() => setSelectedSection('legal')}
+                >
+                  Legal
+                </li>
+              </ul>
+            </nav>
+            <div className={styles.content}>{renderContent()}</div>
+          </div>
+        </section>
+      </div>
+    </>
   );
 }
 export default HelpModal;

@@ -8,7 +8,7 @@ import NotificationSettings from '../notification-settings/notification-settings
 import Support from '../support-page/support';
 import { useThemeSettings } from '../../useThemes';
 
-export interface SettingsProps { }
+export interface SettingsProps {}
 
 export function Settings(props: SettingsProps) {
   const [currentOverlay, setCurrentOverlay] = useState<string | null>(null);
