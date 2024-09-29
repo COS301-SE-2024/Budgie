@@ -1,5 +1,4 @@
 'use client';
-import styles from './page.module.css';
 import React, { useContext, useEffect, useState } from 'react';
 import {
   OverviewPageRevised,
@@ -16,7 +15,7 @@ export default function overview() {
 
   useEffect(() => {
     if (!user) {
-      router.push('/');
+      return router.push('/');
     } else {
       setLoading(false);
     }

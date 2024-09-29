@@ -22,31 +22,70 @@ import {
 
 export async function getLastPetrolPrices() {
     const currentDate = new Date();
-    const currentYear = currentDate.getFullYear(); // Returns the current year as a number
+    const currentYear = currentDate.getFullYear(); 
     const currentMonth = (currentDate.getMonth()).toString().padStart(2, '0');
-    const date = currentYear + "/" + currentMonth + "/01 ";
-    try {
-        const q = query(
-            collection(db, 'petrol prices'),
-            where('date', '==', date),
-        );
-        const result = await getDocs(q)
-    } catch (error) {
-        throw error;
-    }
+    const date = currentYear + "/" + currentMonth + "/01";
+    let prices; 
+    const a = query(
+        collection(db, 'petrol_prices'),
+        where('date', '==', date)
+    );
+    const result = await getDocs(a);
+    result.forEach(doc => {
+        prices = doc.data() as PetrolPrices;
+    });
+    return prices;
 }
 
 export async function getThisPetrolPrices() {
-
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear(); 
+    const currentMonth = (currentDate.getMonth()+1).toString().padStart(2, '0');
+    const date = currentYear + "/" + currentMonth + "/01";
+    let prices;
+    const a = query(
+        collection(db, 'petrol_prices'),
+        where('date', '==', date)
+    );
+    const result = await getDocs(a);
+    result.forEach(doc => {
+        prices = doc.data() as PetrolPrices;
+    });
+    return prices;
 }
 
 export async function getNextPetrolPrices() {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear(); 
+    const currentMonth = (currentDate.getMonth()+2).toString().padStart(2, '0');
+    const date = currentYear + "/" + currentMonth + "/01";
+    let prices; 
+    const a = query(
+        collection(db, 'petrol_prices'),
+        where('date', '==', date)
+    );
+    const result = await getDocs(a);
+    result.forEach(doc => {
+        prices = doc.data() as PetrolPrices;
+    });
+    return prices;
+}
 
+interface PetrolPrices {
+    diesel_coastal: number;
+    diesel_inland: number;
+    petrol_93_coastal: number;
+    petrol_93_inland: number;
+    petrol_95_coastal: number;
+    petrol_95_inland : number
 }
 
 export function InsightsPage() {
 
     const [currentBank, setCurrentBank] = useState("fnb");
+    const [lastMonth, setLastMonth] = useState<PetrolPrices | null>(null);
+    const [thisMonth, setThisMonth] = useState<PetrolPrices | null>(null);
+    const [nextMonth, setNextMonth] = useState<PetrolPrices | null>(null);
 
     const formatCurrency = (value: number) => {
         const formatter = new Intl.NumberFormat('en-ZA', {
@@ -58,8 +97,24 @@ export function InsightsPage() {
     };
 
     useEffect(() => {
-        getLastPetrolPrices();
-    });
+        async function fetchData() {
+            const [last, thisM, next] = await Promise.all([
+                getLastPetrolPrices(),
+                getThisPetrolPrices(),
+                getNextPetrolPrices()
+            ]);
+            if (last) { 
+                setLastMonth(last);
+            }
+            if (thisM) { 
+                setThisMonth(thisM);
+            }
+            if (next) { 
+                setNextMonth(next);
+            }
+        }
+        fetchData();
+    }, [lastMonth]);
 
     return (
         <div className={styles.mainContainer}>
@@ -80,24 +135,24 @@ export function InsightsPage() {
                                 <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
                                 <span>95 Unleaded Petrol</span>
                             </div>
-                            <span>R22.32</span>
-                            <span>R23.11</span>
+                            <span>{lastMonth ? formatCurrency(lastMonth.petrol_95_coastal) : '-'}</span>
+                            <span>{lastMonth ? formatCurrency(lastMonth.petrol_95_inland) : '-'}</span>
                         </div>
                         <div className={styles.tableRow}>
                             <div className={styles.productName}>
                                 <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
                                 <span>93 Unleaded Petrol</span>
                             </div>
-                            <span>R21.92</span>
-                            <span>R22.71</span>
+                            <span>{lastMonth ? formatCurrency(lastMonth.petrol_93_coastal) : '-'}</span>
+                            <span>{lastMonth ? formatCurrency(lastMonth.petrol_93_inland) : '-'}</span>
                         </div>
                         <div className={styles.tableRow}>
                             <div className={styles.productName}>
                                 <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
                                 <span>Diesel 50ppm</span>
                             </div>
-                            <span>R19.98</span>
-                            <span>R20.74</span>
+                            <span>{lastMonth ? formatCurrency(lastMonth.diesel_coastal) : '-'}</span>
+                            <span>{lastMonth ? formatCurrency(lastMonth.diesel_inland) : '-'}</span>
                         </div>
                     </div>
                     <div className={styles.table}>
@@ -111,24 +166,24 @@ export function InsightsPage() {
                                 <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
                                 <span>95 Unleaded Petrol</span>
                             </div>
-                            <span>R21.40</span>
-                            <span>R22.19</span>
+                            <span>{thisMonth ? formatCurrency(thisMonth.petrol_95_coastal) : '-'}</span>
+                            <span>{thisMonth ? formatCurrency(thisMonth.petrol_95_inland) : '-'}</span>
                         </div>
                         <div className={styles.tableRow}>
                             <div className={styles.productName}>
                                 <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
                                 <span>93 Unleaded Petrol</span>
                             </div>
-                            <span>R21.00</span>
-                            <span>R21.79</span>
+                            <span>{thisMonth ? formatCurrency(thisMonth.petrol_93_coastal) : '-'}</span>
+                            <span>{thisMonth ? formatCurrency(thisMonth.petrol_93_inland) : '-'}</span>
                         </div>
                         <div className={styles.tableRow}>
                             <div className={styles.productName}>
                                 <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
                                 <span>Diesel 50ppm</span>
                             </div>
-                            <span>R18.93</span>
-                            <span>R19.69</span>
+                            <span>{thisMonth ? formatCurrency(thisMonth.diesel_coastal) : '-'}</span>
+                            <span>{thisMonth ? formatCurrency(thisMonth.diesel_inland) : '-'}</span>
                         </div>
                     </div>
                     <div className={styles.table}>
@@ -142,24 +197,24 @@ export function InsightsPage() {
                                 <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
                                 <span>95 Unleaded Petrol</span>
                             </div>
-                            <span>-</span>
-                            <span>-</span>
+                            <span>{nextMonth ? formatCurrency(nextMonth.petrol_95_coastal) : '-'}</span>
+                            <span>{nextMonth ? formatCurrency(nextMonth.petrol_95_inland) : '-'}</span>
                         </div>
                         <div className={styles.tableRow}>
                             <div className={styles.productName}>
                                 <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
                                 <span>93 Unleaded Petrol</span>
                             </div>
-                            <span>-</span>
-                            <span>-</span>
+                            <span>{nextMonth ? formatCurrency(nextMonth.petrol_93_coastal) : '-'}</span>
+                            <span>{nextMonth ? formatCurrency(nextMonth.petrol_93_inland) : '-'}</span>
                         </div>
                         <div className={styles.tableRow}>
                             <div className={styles.productName}>
                                 <FontAwesomeIcon icon={faGasPump} className={styles.icon} />
                                 <span>Diesel 50ppm</span>
                             </div>
-                            <span>-</span>
-                            <span>-</span>
+                            <span>{nextMonth ? formatCurrency(nextMonth.diesel_coastal) : '-'}</span>
+                            <span>{nextMonth ? formatCurrency(nextMonth.diesel_inland) :'-'}</span>
                         </div>
                     </div>
                 </div>
