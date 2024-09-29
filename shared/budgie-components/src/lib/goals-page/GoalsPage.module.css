@@ -75,22 +75,6 @@
   margin-top: 2rem;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem;
-  margin-left: 1rem;
-  border-bottom: 1px solid var(--greyed-text);
-  background-color: var(--main-background);
-  z-index: 10;
-  font-size: calc(1.2rem * var(--font-size-multiplier));
-}
-
-.sortHeader {
-  font-weight: bold;
-  margin-right: 1rem;
-}
-
 .sortDropdown {
   background-color: var(--block-background);
   padding-right: 2.5vw;

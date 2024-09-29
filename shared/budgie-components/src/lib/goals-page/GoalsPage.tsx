@@ -1116,6 +1116,59 @@ export function GoalsPage() {
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
   const { data, setData, refreshData } = useDataContext();
 
+  const monthlyBudgetSpent = (goal: Goal): number => {
+    if (goal.monthly_updates !== undefined) {
+      const data = JSON.parse(goal.monthly_updates);
+      const currentMonthYear = `${
+        monthNames[new Date().getMonth()]
+      } ${new Date().getFullYear()}`;
+      const currentMonthData = data.find(
+        (item: { month: string }) => item.month === currentMonthYear
+      );
+      const amountForCurrentMonth = currentMonthData
+        ? currentMonthData.amount
+        : 0;
+      return amountForCurrentMonth;
+    }
+    return 0;
+  };
+
+  const calculateProgressPercentage = (goal: Goal): number => {
+    if (
+      goal.current_amount !== undefined &&
+      goal.initial_amount !== undefined &&
+      goal.type == 'Debt Reduction'
+    ) {
+      if (goal.initial_amount) {
+        return Math.min(
+          100,
+          ((goal.initial_amount - goal.current_amount) / goal.initial_amount) *
+            100
+        );
+      } else {
+        return Math.min(100, goal.current_amount * 100);
+      }
+    }
+
+    if (
+      goal.current_amount !== undefined &&
+      goal.target_amount !== undefined &&
+      goal.type == 'Savings'
+    ) {
+      return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
+    }
+
+    if (
+      goal.spending_limit !== undefined &&
+      goal.monthly_updates !== undefined &&
+      goal.type == 'Spending Limit'
+    ) {
+      const amountForCurrentMonth = monthlyBudgetSpent(goal);
+      return (amountForCurrentMonth / goal.spending_limit) * 100;
+    }
+    return 0;
+  };
+
   const handleGoalUpdate = (updatedGoal: Goal) => {
     setGoals((prevGoals) =>
       prevGoals.map((goal) => (goal.id === updatedGoal.id ? updatedGoal : goal))
@@ -1162,61 +1215,8 @@ export function GoalsPage() {
 
   const sortedGoals = sortGoals(Goals, sortOption);
 
-  const calculateProgressPercentage = (goal: Goal): number => {
-    if (
-      goal.current_amount !== undefined &&
-      goal.initial_amount !== undefined &&
-      goal.type == 'Debt Reduction'
-    ) {
-      if (goal.initial_amount) {
-        return Math.min(
-          100,
-          ((goal.initial_amount - goal.current_amount) / goal.initial_amount) *
-            100
-        );
-      } else {
-        return Math.min(100, goal.current_amount * 100);
-      }
-    }
-
-    if (
-      goal.current_amount !== undefined &&
-      goal.target_amount !== undefined &&
-      goal.type == 'Savings'
-    ) {
-      return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
-    }
-
-    if (
-      goal.spending_limit !== undefined &&
-      goal.monthly_updates !== undefined &&
-      goal.type == 'Spending Limit'
-    ) {
-      const amountForCurrentMonth = monthlyBudgetSpent(goal);
-      return (amountForCurrentMonth / goal.spending_limit) * 100;
-    }
-    return 0;
-  };
-
   const addGoalPopup = () => {
     setIsGoalPopupOpen(!isGoalPopupOpen);
-  };
-
-  const monthlyBudgetSpent = (goal: Goal): number => {
-    if (goal.monthly_updates !== undefined) {
-      const data = JSON.parse(goal.monthly_updates);
-      const currentMonthYear = `${
-        monthNames[new Date().getMonth()]
-      } ${new Date().getFullYear()}`;
-      const currentMonthData = data.find(
-        (item: { month: string }) => item.month === currentMonthYear
-      );
-      const amountForCurrentMonth = currentMonthData
-        ? currentMonthData.amount
-        : 0;
-      return amountForCurrentMonth;
-    }
-    return 0;
   };
 
   useEffect(() => {
@@ -1241,14 +1241,13 @@ export function GoalsPage() {
           current_amount: goal.current_amount,
           monthly_updates: goal.monthly_updates,
         });
-      } else if (goal.type == 'Debt Reduction' && goal.initial_amount){
+      } else if (goal.type == 'Debt Reduction' && goal.initial_amount) {
         await updateDoc(goalRef, {
           updates: goal.updates,
           current_amount: goal.initial_amount - goal.current_amount,
           monthly_updates: goal.monthly_updates,
         });
-      }
-      else {
+      } else {
         await updateDoc(goalRef, {
           updates: goal.updates,
           monthly_updates: goal.monthly_updates,
@@ -1357,7 +1356,7 @@ export function GoalsPage() {
             amount:
               goal.type !== 'Savings'
                 ? -transaction.amount
-                : transaction.amount, 
+                : transaction.amount,
             description: transaction.description,
             category: transaction.category,
           }));
@@ -1383,15 +1382,14 @@ export function GoalsPage() {
             current_amount: currentAmount,
             monthly_updates: JSON.stringify(monthlyUpdates),
           };
-        } else if (goal.type == 'Debt Reduction' && goal.initial_amount){
+        } else if (goal.type == 'Debt Reduction' && goal.initial_amount) {
           return {
             ...goal,
             updates: JSON.stringify(updatedUpdates),
             current_amount: goal.initial_amount - currentAmount,
             monthly_updates: JSON.stringify(monthlyUpdates),
           };
-        }
-        else {
+        } else {
           return {
             ...goal,
             updates: JSON.stringify(updatedUpdates),
@@ -1431,14 +1429,18 @@ export function GoalsPage() {
     }));
   }
 
+  const refresh = () => {
+    refreshData();
+  };
+
   const test = () => {
-    //refreshData();
     console.log(data);
   };
 
   return (
     <>
-      <button onClick={test}>TEST</button>
+      {/*<button onClick={refresh}>REFRESH</button><br></br>
+      <button onClick={test}>PRINT</button>*/}
       {isGoalPopupOpen && (
         <div
           style={{
@@ -1476,10 +1478,10 @@ export function GoalsPage() {
           </div>
         </>
       ) : (
-        <div style={{ position: 'relative' }} className="relative">
-          <div className={styles.header}>
+        <>
+          <div className="flex justify-between p-4 bg-[var(--main-background)] text-[calc(1.2rem*var(--font-size-multiplier))]">
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <p className={styles.sortHeader}>Sort By:</p>
+              <p className="font-bold mr-4">Sort By:</p>
               <select
                 value={sortOption}
                 onChange={handleSortChange}
@@ -1495,88 +1497,80 @@ export function GoalsPage() {
               Add a Goal
             </button>
           </div>
-          <div className={styles.planningModalContainer}>
-            <div className="p-4">
-              <table className="min-w-full table-auto border-collapse border border-gray-200">
-                <thead>
+          <div className="w-full h-full text-[calc(1.5rem*var(--font-size-multiplier))] overflow-y-auto">
+            <table className="min-w-full table-auto border-collapse border border-gray-200">
+              <thead>
+                <tr
+                  style={{
+                    color: 'var(--secondary-text)',
+                    backgroundColor: 'var(--primary-1)',
+                  }}
+                >
+                  <th className="border border-gray-200 p-2 text-left">Name</th>
+                  <th className="border border-gray-200 p-2 text-left">Type</th>
+                  <th className="border border-gray-200 p-2 text-left">
+                    Target Date
+                  </th>
+                  <th className="border border-gray-200 p-2 text-left">
+                    Progress
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedGoals.map((goal, index) => (
                   <tr
+                    key={index}
+                    className="cursor-pointer bg-[var(--block-background)] hover:bg-[var(--main-background)]"
                     style={{
-                      color: 'var(--secondary-text)',
-                      backgroundColor: 'var(--primary-1)',
+                      fontSize: 'calc(1.2rem * var(--font-size-multiplier))',
                     }}
+                    onClick={() => setSelectedGoal(goal)}
                   >
-                    <th className="border border-gray-200 p-2 text-left">
-                      Name
-                    </th>
-                    <th className="border border-gray-200 p-2 text-left">
-                      Type
-                    </th>
-                    <th className="border border-gray-200 p-2 text-left">
-                      Target Date
-                    </th>
-                    <th className="border border-gray-200 p-2 text-left">
-                      Progress
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedGoals.map((goal, index) => (
-                    <tr
-                      key={index}
-                      style={{
-                        backgroundColor: 'var(--block-background)',
-                        fontSize: 'calc(1.2rem * var(--font-size-multiplier))',
-                      }}
-                    >
-                      <td
-                        className="border p-2 underline cursor-pointer hover:text-blue-700"
-                        onClick={() => setSelectedGoal(goal)}
-                      >
-                        {goal.name}
-                      </td>
-                      <td className="border border-gray-200 p-2">
-                        {goal.type}
-                      </td>
-                      <td className="border border-gray-200 p-2">
-                        {goal.target_date}
-                      </td>
-                      <td className="border border-gray-200 p-2">
-                        <div className="flex items-center">
+                    <td className="border border-gray-200 p-2">{goal.name}</td>
+                    <td className="border border-gray-200 p-2">{goal.type}</td>
+                    <td className="border border-gray-200 p-2">
+                      {goal.target_date}
+                    </td>
+                    <td className="border border-gray-200 p-2">
+                      <div className="flex items-center">
+                        <div
+                          className="relative w-full h-8 rounded"
+                          style={{
+                            backgroundColor: 'var(--main-background)',
+                          }}
+                        >
                           <div
-                            className="relative w-full h-8 rounded"
+                            className="absolute top-0 left-0 h-full rounded"
                             style={{
-                              backgroundColor: 'var(--main-background)',
+                              width:
+                                goal.current_amount < 0
+                                  ? 0
+                                  : `${Math.min(
+                                      100,
+                                      calculateProgressPercentage(goal)
+                                    )}%`,
+                              backgroundColor:
+                                goal.type == 'Spending Limit' &&
+                                calculateProgressPercentage(goal) >= 100
+                                  ? 'red'
+                                  : 'var(--primary-2)',
                             }}
-                          >
-                            <div
-                              className="absolute top-0 left-0 h-full bg-green-500 rounded"
-                              style={{
-                                width:
-                                  goal.current_amount < 0
-                                    ? 0
-                                    : `${Math.min(
-                                        100,
-                                        calculateProgressPercentage(goal)
-                                      )}%`,
-                                backgroundColor: 'var(--primary-2)',
-                              }}
-                            />
-                          </div>
-                          <span
-                            className="ml-3 text-sm"
-                            style={{ color: 'var(--main-text' }}
-                          >
-                            {calculateProgressPercentage(goal).toFixed(2)}%
-                          </span>
+                          />
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        <span
+                          className="ml-3 text-sm"
+                          style={{ color: 'var(--main-text' }}
+                        >
+                          {calculateProgressPercentage(goal).toFixed(2)}%
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
+        </>
       )}
     </>
   );
