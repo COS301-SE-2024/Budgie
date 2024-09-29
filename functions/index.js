@@ -8,6 +8,7 @@ const functions = require('firebase-functions');
 const sgMail = require('@sendgrid/mail');
 const cors = require('cors');
 
+sgMail.setApiKey();
 initializeApp();
 let categoryEmbeddings;
 let pipe;
@@ -345,7 +346,7 @@ exports.sendEmailNotification = functions.https.onRequest((req, res) => {
   });
 });
 
-exports.csvUploadReminder = onSchedule('every 1 minutes', async () => {
+exports.csvUploadReminder = onSchedule('every 24 hours', async () => {
   const firestore = getFirestore();
   const now = new Date();
   const thresholdDays = 7;

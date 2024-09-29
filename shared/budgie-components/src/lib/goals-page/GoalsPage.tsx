@@ -1195,9 +1195,10 @@ export function GoalsPage() {
 
   const sendGoalProgressEmail = async (progress: number) => {
     const user = getAuth().currentUser;
+    console.log(user?.uid, user?.email, user?.displayName, '', progress);
     try {
       await axios.post(
-        'http://127.0.0.1:5001/budgieapp-70251/us-central1/sendGoalProgressEmail',
+        'https://us-central1-budgieapp-70251.cloudfunctions.net/sendGoalProgressEmail',
         {
           uid: user?.uid,
           userEmail: user?.email,
@@ -1225,9 +1226,7 @@ export function GoalsPage() {
           setPreviousProgressMap(progressMap);
         }
       }
-
       const isGoalEnabled = localStorage.getItem('goal') === 'true';
-
       if (isGoalEnabled && Goals.length > 0) {
         const updatedMap = { ...progressMap };
 
@@ -1238,11 +1237,25 @@ export function GoalsPage() {
           console.log('goal id: ' + goal.id);
           const previousProgress = updatedMap[goal.id] || 0;
 
-          if (progress >= 100 && previousProgress < 100) {
+          if (
+            progress >= 100 &&
+            previousProgress < 100 &&
+            progress != previousProgress
+          ) {
             sendGoalProgressEmail(100);
-          } else if (progress >= 75 && previousProgress < 75) {
+          } else if (
+            progress >= 75 &&
+            previousProgress < 75 &&
+            progress < 100 &&
+            progress != previousProgress
+          ) {
             sendGoalProgressEmail(75);
-          } else if (progress >= 50 && previousProgress < 50) {
+          } else if (
+            progress >= 50 &&
+            previousProgress < 50 &&
+            progress < 75 &&
+            progress != previousProgress
+          ) {
             sendGoalProgressEmail(50);
           }
           updatedMap[goal.id] = progress;
@@ -1262,7 +1275,7 @@ export function GoalsPage() {
     if (Goals.length > 0) {
       populateAndProcessGoals();
     }
-  }, [Goals, previousProgressMap, calculateProgressPercentage]);
+  }, [Goals, previousProgressMap]);
 
   const updateGoalTransactions = async (goal: Goal) => {
     try {

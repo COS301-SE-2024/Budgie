@@ -77,7 +77,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   ) => {
     try {
       await axios.post(
-        'http://127.0.0.1:5001/budgieapp-70251/us-central1/sendEmailNotification',
+        'https://us-central1-budgieapp-70251.cloudfunctions.net/sendEmailNotification',
         {
           userId: UserId,
           userEmail: Email,
