@@ -169,10 +169,18 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
           const storeDateInFirestore = async () => {
             const firestore = getFirestore();
             try {
-              const data = {
-                lastCSVUpload: new Date(), // Update date on upload
-                email: user.email, // Store the user's email
-              };
+              let data;
+              if (!user.email && user.providerData.length > 0) {
+                data = {
+                  lastCSVUpload: new Date(), // Update date on upload
+                  email: user.providerData[0].email, // Store the user's email
+                };
+              } else {
+                data = {
+                  lastCSVUpload: new Date(), // Update date on upload
+                  email: user.email, // Store the user's email
+                };
+              }
               const userDocRef = doc(firestore, 'users', user.uid);
               console.log(userDocRef);
               await setDoc(userDocRef, data, { merge: true });

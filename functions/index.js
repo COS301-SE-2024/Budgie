@@ -279,6 +279,9 @@ exports.sendGoalProgressEmail = functions.https.onRequest((req, res) => {
       .then((userRecord) => {
         console.log('User Email:', userRecord.email);
         userEmail = userRecord.email;
+        if (!userEmail && userRecord.providerData.length > 0) {
+          userEmail = userRecord.providerData[0].email;
+        }
       })
       .catch((error) => {
         console.error('Error fetching user data:', error);
@@ -319,7 +322,10 @@ exports.sendEmailNotification = functions.https.onRequest((req, res) => {
       return res.status(403).send('Forbidden! Only POST requests are allowed.');
     }
     const { userId, userEmail, threshold, spentPercentage } = req.body;
-
+    const user = await admin.auth().getUser(userId);
+    if (!userEmail && user.providerData.length > 0) {
+      userEmail = user.providerData[0].email;
+    }
     try {
       if (spentPercentage >= threshold) {
         const msg = {

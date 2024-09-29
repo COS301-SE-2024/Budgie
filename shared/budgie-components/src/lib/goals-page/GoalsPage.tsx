@@ -1195,13 +1195,16 @@ export function GoalsPage() {
 
   const sendGoalProgressEmail = async (progress: number) => {
     const user = getAuth().currentUser;
-    console.log(user?.uid, user?.email, user?.displayName, '', progress);
+    let email = user?.email;
+    if (!email && user.providerData.length > 0) {
+      email = user?.providerData[0].email;
+    }
     try {
       await axios.post(
         'https://us-central1-budgieapp-70251.cloudfunctions.net/sendGoalProgressEmail',
         {
           uid: user?.uid,
-          userEmail: user?.email,
+          userEmail: email,
           userName: user?.displayName,
           title: '',
           progress,
@@ -1232,9 +1235,6 @@ export function GoalsPage() {
 
         Goals.forEach((goal) => {
           const progress = calculateProgressPercentage(goal);
-          console.log('previous: ' + previousProgressMap[goal.id]);
-          console.log('progress: ' + progress);
-          console.log('goal id: ' + goal.id);
           const previousProgress = updatedMap[goal.id] || 0;
 
           if (
