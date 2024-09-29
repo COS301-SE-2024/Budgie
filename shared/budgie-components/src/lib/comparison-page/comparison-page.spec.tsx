@@ -7,6 +7,9 @@ import {
     getPosition,
     getIndustry,
     getExpensesByCategory,
+    getUserInfo,
+    getIncomeByAge,
+    getSpendingByCategory,
  } from './services';
  import { collection, getDocs, query, where } from 'firebase/firestore';
 
@@ -282,3 +285,102 @@ describe('getExpensesByCategory', () => {
 
 });
 
+describe('getUserInfo', () => {
+  const mockUid = 'user123';
+  const mockUserInfo = { name: 'John Doe', email: 'john@example.com' };
+
+  it('should fetch user info from Firestore when user is authenticated', async () => {
+      (getDocs as jest.Mock).mockResolvedValue({
+          forEach: jest.fn((callback) => {
+              callback({ data: () => mockUserInfo }); // Simulate document retrieval
+          }),
+      });
+
+      const userInfo = await getUserInfo();
+
+  });
+
+  it('should alert when user is not authenticated', async () => {
+      global.alert = jest.fn(); // Mock alert to track calls
+
+      await getUserInfo();
+
+      expect(alert).toHaveBeenCalledWith('User is not authenticated'); // Check alert message
+  });
+
+  it('should alert an error if fetching user info fails', async () => {
+      (getDocs as jest.Mock).mockRejectedValue(new Error('Firestore error')); // Mock getDocs to reject
+      global.alert = jest.fn(); // Mock alert to track calls
+
+      await getUserInfo();
+
+      expect(alert).toHaveBeenCalledWith('User is not authenticated');
+  });
+});
+
+
+describe('getIncomeByAge', () => {
+  const mockAge = 30;
+  const mockQuerySnapshot = {
+    empty: false,
+    forEach: jest.fn(callback => {
+      const mockData = { average: 50000 }; // Mock data returned from Firestore
+      callback({ data: () => mockData }); // Simulating the document data
+    }),
+  };
+
+  it('should return the rounded average income for the given age', async () => {
+    (getDocs as jest.Mock).mockResolvedValue(mockQuerySnapshot); // Mock the response of getDocs
+    const result = await getIncomeByAge(mockAge);
+    expect(result).toBe(4200); 
+  });
+
+  it('should return 0 if no income data is found for the given age', async () => {
+    (getDocs as jest.Mock).mockResolvedValue({ empty: true }); // Mock empty result
+    const result = await getIncomeByAge(mockAge);
+    expect(result).toBe(0); // Expect amount to be 0
+  });
+
+  it('should throw an error if there is an exception', async () => {
+    (getDocs as jest.Mock).mockRejectedValue(new Error('Firestore error')); // Mock error
+    await expect(getIncomeByAge(mockAge)).rejects.toThrow('Firestore error'); // Expect error to be thrown
+  });
+});
+
+
+describe('getSpendingByCategory', () => {
+  const mockQuerySnapshot = {
+    empty: false,
+    forEach: jest.fn(callback => {
+      const mockData = { 
+        Groceries: 100, 
+        Utilities: 50, 
+        Entertainment: 75, 
+        Transport: 30, 
+        Insurance: 20, 
+        MedicalAid: 10, 
+        EatingOut: 40, 
+        Shopping: 60, 
+        Other: 25 
+      }; // Mock data returned from Firestore
+      callback({ data: () => mockData }); // Simulating the document data
+    }),
+  };
+
+  it('should return the spending amounts by category', async () => {
+    (getDocs as jest.Mock).mockResolvedValue(mockQuerySnapshot); // Mock the response of getDocs
+    const result = await getSpendingByCategory();
+    expect(result).toEqual([100, 50, 75, 30, 20, 10, 40, 60, 25]); // Expect categories to match mock data
+  });
+
+  it('should return a zeroed array if no spending data is found', async () => {
+    (getDocs as jest.Mock).mockResolvedValue({ empty: true }); // Mock empty result
+    const result = await getSpendingByCategory();
+    expect(result).toEqual(Array(9).fill(0)); // Expect categories to be zeroed
+  });
+
+  it('should throw an error if there is an exception', async () => {
+    (getDocs as jest.Mock).mockRejectedValue(new Error('Firestore error')); // Mock error
+    await expect(getSpendingByCategory()).rejects.toThrow('Firestore error'); // Expect error to be thrown
+  });
+});
