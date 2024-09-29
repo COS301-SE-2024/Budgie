@@ -10,6 +10,12 @@ import {
   getDoc,
 } from 'firebase/firestore';
 
+interface question {
+  id: string;
+  isOpen: boolean;
+  questionText: string;
+  likes: number;
+}
 export interface OpenQuestionsProps {
   onClose: () => void;
 }
@@ -28,12 +34,11 @@ export function OpenQuestions(props: OpenQuestionsProps) {
         ...doc.data(),
       }));
 
-      // Filter only open questions
       const filteredOpenQuestions = questions.filter((q) => q.isOpen);
       setOpenQuestions(filteredOpenQuestions);
     });
 
-    return () => unsubscribe(); // Cleanup listener on unmount
+    return () => unsubscribe();
   }, []);
 
   const voteQuestion = async (questionId, type) => {
@@ -160,7 +165,7 @@ export function OpenQuestions(props: OpenQuestionsProps) {
               onSubmit={(e) => {
                 e.preventDefault();
                 answerQuestion(question.id, e.target.answer.value);
-                e.target.answer.value = ''; // Clear input after submitting
+                e.target.answer.value = '';
               }}
               className="mt-4"
             >
