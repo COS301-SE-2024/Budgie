@@ -21,7 +21,7 @@ interface Account {
 }
 
 export function Dashboard(props: DashboardProps) {
-  const { data, setData, refreshData } = useDataContext();
+  const { data } = useDataContext();
   const user = useContext(UserContext);
   const [datas, setDatas] = useState<any>(null);
   const [viewMode, setViewMode] = useState('monthly');
@@ -47,7 +47,6 @@ export function Dashboard(props: DashboardProps) {
   useEffect(() => {
     const fetchAccounts = async () => {
       if (user && user.uid) {
-        refreshData();
         if (data.accounts.length > 0) {
           setSelectedAlias(data.accounts[0].alias);
           setCurrentAccountNumber(data.accounts[0].account_number);

@@ -22,7 +22,7 @@ export interface AllTransactionsViewProps {
 }
 
 export function AllTransactionsView(props: AllTransactionsViewProps) {
-  const { data, setData, refreshData } = useDataContext();
+  const { data, setData} = useDataContext();
   const [balance, setBalance] = useState(0);
   const [moneyIn, setMoneyIn] = useState(0);
   const [moneyOut, setMoneyOut] = useState(0);

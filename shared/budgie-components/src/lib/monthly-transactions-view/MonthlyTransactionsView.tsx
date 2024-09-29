@@ -38,7 +38,7 @@ interface Goal {
 }
 
 export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
-  const { data, setData, refreshData } = useDataContext();
+  const { data, setData} = useDataContext();
   const [balance, setBalance] = useState(0);
   const [moneyIn, setMoneyIn] = useState(1);
   const [moneyOut, setMoneyOut] = useState(0);

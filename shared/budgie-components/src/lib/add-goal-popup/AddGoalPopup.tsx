@@ -118,7 +118,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       setSelectedCategory('Any');
       handleBack();
     }
-    console.log('ADD');
   };
 
   const removeCondition = (index: number) => {
@@ -222,7 +221,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       case 'Transfer':
         return styles.transfer;
       default:
-        return styles.default;
+        return styles.other;
     }
   };
 
@@ -713,7 +712,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Enter keyword"
-                    className="border border-gray-300 rounded px-2 py-1 mr-2 w-full max-w-xs"
+                    className="border border-gray-300 rounded px-2 py-1 mr-2 w-full max-w-xs text-black"
                   />
                   <button
                     onClick={addKeyword}
@@ -736,7 +735,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                   {keywords.map((keyword, index) => (
                     <div
                       key={index}
-                      className="inline-flex items-center bg-gray-200 px-3 py-1 rounded-sm mr-2 mb-2"
+                      className="inline-flex items-center bg-gray-200 px-3 py-1 rounded-sm mr-2 mb-2 text-black"
                     >
                       <span className="mr-2">{keyword}</span>
                       <button

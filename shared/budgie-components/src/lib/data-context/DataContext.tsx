@@ -4,14 +4,14 @@ import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 
 // Interfaces for the data models
-interface Account {
+export interface Account {
   name: string;
   alias: string;
   type: string;
   account_number: string;
 }
 
-interface Transaction {
+export interface Transaction {
   account_number: string;
   date: string;
   amount: number;
@@ -19,9 +19,22 @@ interface Transaction {
   description: string;
   category: string;
   year: number;
+
+  january?: string;
+  february?: string;
+  march?: string;
+  april?: string;
+  may?: string;
+  june?: string;
+  july?: string;
+  august?: string;
+  september?: string;
+  october?: string;
+  november?: string;
+  december?: string;
 }
 
-interface Goal {
+export interface Goal {
   id: string;
   name: string;
   type: string;
@@ -42,7 +55,7 @@ interface YearsUploaded {
   years: string; // This will store a JSON string of years
 }
 
-interface UserData {
+export interface UserData {
   accounts: Account[];
   goals: Goal[];
   transactions: Transaction[];
@@ -155,6 +168,7 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       setLoading(false);
     }
+    console.log("REF");
   };
 
   useEffect(() => {
