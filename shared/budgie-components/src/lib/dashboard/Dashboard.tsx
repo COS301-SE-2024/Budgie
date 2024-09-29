@@ -1,7 +1,5 @@
 'use client';
-import React, { useState, useContext, useEffect, useCallback } from 'react';
-import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import React, { useState, useContext, useEffect } from 'react';
 import AllTransactionsView from '../all-transactions-view/AllTransactionsView';
 import MonthlyTransactionsView from '../monthly-transactions-view/MonthlyTransactionsView';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
@@ -13,24 +11,13 @@ import { useDataContext } from '../data-context/DataContext';
 
 export interface DashboardProps {}
 
-interface Account {
-  name: string;
-  alias: string;
-  type: string;
-  account_number: string;
-}
-
 export function Dashboard(props: DashboardProps) {
   const { data } = useDataContext();
   const user = useContext(UserContext);
-  const [datas, setDatas] = useState<any>(null);
   const [viewMode, setViewMode] = useState('monthly');
-  const currentYear = new Date().getFullYear();
   const [selectedAlias, setSelectedAlias] = useState<string>('');
   const [currentAccountNumber, setCurrentAccountNumber] = useState<string>('');
   const [hasAccount, setHasAccount] = useState<'Yes' | 'No'>('No');
-  const [error, setError] = useState<string | null>(null);
-  const [showNoData, setShowNoData] = useState(false);
   const [yearsWithData, setYearsWithData] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -86,8 +73,6 @@ export function Dashboard(props: DashboardProps) {
     if (selectedOption) {
       setSelectedAlias(selected);
       setCurrentAccountNumber(selectedOption.account_number);
-      setDatas(null);
-      setShowNoData(false);
     }
   };
 
@@ -150,10 +135,6 @@ export function Dashboard(props: DashboardProps) {
               <div className={styles.loader}></div>
             </div>
             <div className={styles.loaderText}>Loading...</div>
-          </div>
-        ) : error ? (
-          <div className={styles.errorScreen}>
-            <div className={styles.errorText}>{error}</div>
           </div>
         ) : viewMode === 'monthly' ? (
           <MonthlyTransactionsView
