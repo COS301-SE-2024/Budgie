@@ -377,7 +377,7 @@ export function ComparisonPage(props: ComparisonPage) {
                                     />
                                 </ComposedChart>
                             </div>
-
+                            <br/>
                             <div className={styles.gridContainer}>
                                 {/* Position and Industry Grids */}
                                 {/* Position Grid */}

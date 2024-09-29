@@ -82,15 +82,18 @@ export async function getTransactions(accountNumber:string) {
 
 export async function getMonthlyIncome(transactions:any){
   let balance = 0;
-  const currentMonth = new Date().getMonth();
+  let currentMonth = new Date().getMonth();
 
-  for(let i=0; i<transactions.length; i++){
-    const dateString = transactions[i].date;
-    const parts = dateString.split('/');
-    const month = parseInt(parts[1], 10);
-    if(month==currentMonth && transactions[i].amount>0){
-      balance += transactions[i].amount;
+  while(balance==0){
+    for(let i=0; i<transactions.length; i++){
+      const dateString = transactions[i].date;
+      const parts = dateString.split('/');
+      const month = parseInt(parts[1], 10);
+      if(month==currentMonth && transactions[i].amount>0){
+        balance += transactions[i].amount;
+      }
     }
+    currentMonth -= 1;
   }
   return balance;
 }
@@ -152,41 +155,55 @@ export async function getIndustry(type : string){
 
 export async function getExpensesByCategory(transactions:any){
   let result:any = Array(9).fill(0);
+  let all = 0;
 
-  const currentMonth = new Date().getMonth();
-  for(let i=0; i<transactions.length; i++){
-    const dateString = transactions[i].date;
-    const parts = dateString.split('/');
-    const month = parseInt(parts[1], 10);
-    if(month==currentMonth){
-      if(transactions[i].category=='Groceries'){
-        result[0] -= transactions[i].amount; 
-      }
-      else if(transactions[i].category=='Utilities'){
-        result[1] -= transactions[i].amount; 
-      }
-      else if(transactions[i].category=='Entertainment'){
-        result[2] -= transactions[i].amount; 
-      }
-      else if(transactions[i].category=='Transport'){
-        result[3] -= transactions[i].amount; 
-      }
-      else if(transactions[i].category=='Insurance'){
-        result[4] -= transactions[i].amount; 
-      }
-      else if(transactions[i].category=='Medical Aid'){
-        result[5] -= transactions[i].amount; 
-      }
-      else if(transactions[i].category=='Eating Out'){
-        result[6] -= transactions[i].amount; 
-      }
-      else if(transactions[i].category=='Shopping'){
-        result[7] -= transactions[i].amount; 
-      }
-      else if(transactions[i].category=='Other'){
-        result[8] -= transactions[i].amount; 
+  let currentMonth = new Date().getMonth();
+
+  while(all==0){
+    for(let i=0; i<transactions.length; i++){
+      const dateString = transactions[i].date;
+      const parts = dateString.split('/');
+      const month = parseInt(parts[1], 10);
+      if(month==currentMonth){
+        if(transactions[i].category=='Groceries'){
+          result[0] -= transactions[i].amount; 
+          all -= transactions[i].amount;
+        }
+        else if(transactions[i].category=='Utilities'){
+          result[1] -= transactions[i].amount; 
+          all -= transactions[i].amount;
+        }
+        else if(transactions[i].category=='Entertainment'){
+          result[2] -= transactions[i].amount; 
+          all -= transactions[i].amount;
+        }
+        else if(transactions[i].category=='Transport'){
+          result[3] -= transactions[i].amount; 
+          all -= transactions[i].amount;
+        }
+        else if(transactions[i].category=='Insurance'){
+          result[4] -= transactions[i].amount; 
+          all -= transactions[i].amount;
+        }
+        else if(transactions[i].category=='Medical Aid'){
+          result[5] -= transactions[i].amount; 
+          all -= transactions[i].amount;
+        }
+        else if(transactions[i].category=='Eating Out'){
+          result[6] -= transactions[i].amount; 
+          all -= transactions[i].amount;
+        }
+        else if(transactions[i].category=='Shopping'){
+          result[7] -= transactions[i].amount; 
+          all -= transactions[i].amount;
+        }
+        else if(transactions[i].category=='Other'){
+          result[8] -= transactions[i].amount; 
+          all -= transactions[i].amount;
+        }
       }
     }
+    currentMonth -= 1;
   }
   return result;
 }
