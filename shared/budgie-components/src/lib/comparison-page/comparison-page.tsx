@@ -81,15 +81,15 @@ export function ComparisonPage(props: ComparisonPage) {
     const handleCloseForm = () => setShowForm(false);
 
     const data = [
-        { category: 'Groceries', average: averageCategory[0], you: yourCategory[0], color: '#ff6f61' },
-        { category: 'Utilities', average: averageCategory[1], you: yourCategory[1], color: '#ffcc00' },
-        { category: 'Entertainment', average: averageCategory[2], you: yourCategory[2], color: '#00bfae' },
-        { category: 'Transport', average: averageCategory[3], you: yourCategory[3], color: '#e74c3c' },
-        { category: 'Insurance', average: averageCategory[4], you: yourCategory[4], color: '#e67e22' },
-        { category: 'Medical Aid', average: averageCategory[5], you: yourCategory[5], color: '#2ecc71' },
-        { category: 'Eating Out', average: averageCategory[6], you: yourCategory[6], color: '#3498db' },
-        { category: 'Shopping', average: averageCategory[7], you: yourCategory[7], color: '#8e44ad' },
-        { category: 'Other', average: averageCategory[8], you: yourCategory[8], color: '#9b59b6' }
+        { category: 'Groceries', average: averageCategory[0], you: Math.round(yourCategory[0] * 100) / 100, color: '#ff6f61' },
+        { category: 'Utilities', average: averageCategory[1], you: Math.round(yourCategory[1] * 100) / 100, color: '#ffcc00' },
+        { category: 'Entertainment', average: averageCategory[2], you: Math.round(yourCategory[2] * 100) / 100, color: '#00bfae' },
+        { category: 'Transport', average: averageCategory[3], you: Math.round(yourCategory[3] * 100) / 100, color: '#e74c3c' },
+        { category: 'Insurance', average: averageCategory[4], you: Math.round(yourCategory[4] * 100) / 100, color: '#e67e22' },
+        { category: 'Medical Aid', average: averageCategory[5], you: Math.round(yourCategory[5] * 100) / 100, color: '#2ecc71' },
+        { category: 'Eating Out', average: averageCategory[6], you: Math.round(yourCategory[6] * 100) / 100, color: '#3498db' },
+        { category: 'Shopping', average: averageCategory[7], you: Math.round(yourCategory[7] * 100) / 100, color: '#8e44ad' },
+        { category: 'Other', average: averageCategory[8], you: Math.round(yourCategory[8] * 100) / 100, color: '#9b59b6' }        
     ];
 
     const positionData = [
