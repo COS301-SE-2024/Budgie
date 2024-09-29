@@ -21,6 +21,6 @@ export const auth = getAuth(app);
 export const functions = getFunctions(app);
 
 // //Using emulators
-//connectAuthEmulator(auth, 'http://127.0.0.1:9099');
-//connectFirestoreEmulator(db, '127.0.0.1', 8080);
-//connectFunctionsEmulator(functions, '127.0.0.1', 5001);
+connectAuthEmulator(auth, 'http://127.0.0.1:9099');
+connectFirestoreEmulator(db, '127.0.0.1', 8080);
+connectFunctionsEmulator(functions, '127.0.0.1', 5001);

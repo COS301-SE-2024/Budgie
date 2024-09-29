@@ -75,12 +75,17 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     thresh: number,
     percentage: number
   ) => {
+    const user = getAuth().currentUser;
+    let email = user?.email;
+    if (!email && user.providerData.length > 0) {
+      email = user?.providerData[0].email;
+    }
     try {
       await axios.post(
         'https://us-central1-budgieapp-70251.cloudfunctions.net/sendEmailNotification',
         {
           userId: UserId,
-          userEmail: Email,
+          userEmail: email,
           threshold: thresh,
           spentPercentage: percentage,
         }
@@ -325,10 +330,10 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
           reached100: false,
         };
         const user = getAuth().currentUser;
-        const userId = user?.uid;
-        const userEmail = user?.email;
-
-        // Check and update progress thresholds, sending emails as needed
+        let userEmail = user?.email;
+        if (!userEmail && user.providerData.length > 0) {
+          userEmail = user.providerData[0].email;
+        }
         if (
           progressPercentage >= 25 &&
           !storedProgress.reached25 &&
@@ -336,7 +341,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         ) {
           storedProgress.reached25 = true;
           localStorage.setItem(accountKey, JSON.stringify(storedProgress));
-          await sendEmail(userId, userEmail, 25, progressPercentage);
+          await sendEmail(user.uid, userEmail, 25, progressPercentage);
         } else if (progressPercentage >= 50 && !storedProgress.reached25) {
           storedProgress.reached25 = true;
           localStorage.setItem(accountKey, JSON.stringify(storedProgress));
@@ -349,7 +354,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         ) {
           storedProgress.reached50 = true;
           localStorage.setItem(accountKey, JSON.stringify(storedProgress));
-          await sendEmail(userId, userEmail, 50, progressPercentage);
+          await sendEmail(user.uid, userEmail, 50, progressPercentage);
         } else if (progressPercentage >= 75 && !storedProgress.reached50) {
           storedProgress.reached50 = true;
           localStorage.setItem(accountKey, JSON.stringify(storedProgress));
@@ -362,7 +367,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         ) {
           storedProgress.reached75 = true;
           localStorage.setItem(accountKey, JSON.stringify(storedProgress));
-          await sendEmail(userId, userEmail, 75, progressPercentage);
+          await sendEmail(user.uid, userEmail, 75, progressPercentage);
         } else if (progressPercentage >= 100 && !storedProgress.reached75) {
           storedProgress.reached75 = true;
           localStorage.setItem(accountKey, JSON.stringify(storedProgress));
@@ -370,7 +375,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         if (progressPercentage >= 100 && !storedProgress.reached100) {
           storedProgress.reached100 = true;
           localStorage.setItem(accountKey, JSON.stringify(storedProgress));
-          await sendEmail(userId, userEmail, 100, progressPercentage);
+          await sendEmail(user.uid, userEmail, 100, progressPercentage);
         }
       }
     }

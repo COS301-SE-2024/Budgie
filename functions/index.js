@@ -2,13 +2,13 @@ const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const { logger } = require('firebase-functions/v2');
 const { initializeApp } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
-const admin = require('firebase-admin');
 const { onSchedule } = require('firebase-functions/v2/scheduler');
 const functions = require('firebase-functions');
 const sgMail = require('@sendgrid/mail');
 const cors = require('cors');
+const { getAuth } = require('firebase-admin/auth');
 
-sgMail.setApiKey();
+sgMail.setApiKey('');
 initializeApp();
 let categoryEmbeddings;
 let pipe;
@@ -273,19 +273,6 @@ exports.sendGoalProgressEmail = functions.https.onRequest((req, res) => {
     }
 
     const { userId, userEmail, userName, title, progress } = req.body;
-    admin
-      .auth()
-      .getUser(userId)
-      .then((userRecord) => {
-        console.log('User Email:', userRecord.email);
-        userEmail = userRecord.email;
-        if (!userEmail && userRecord.providerData.length > 0) {
-          userEmail = userRecord.providerData[0].email;
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching user data:', error);
-      });
     if (progress >= 100) {
       const msg = {
         to: userEmail,
@@ -298,7 +285,6 @@ exports.sendGoalProgressEmail = functions.https.onRequest((req, res) => {
       console.log('Email sent for goal completion');
       return res.status(200).send('Email sent successfully');
     }
-
     if (progress >= 50) {
       const msg = {
         to: userEmail,
@@ -316,16 +302,14 @@ exports.sendGoalProgressEmail = functions.https.onRequest((req, res) => {
   });
 });
 
+const corsHandler = cors({ origin: true });
 exports.sendEmailNotification = functions.https.onRequest((req, res) => {
   corsHandler(req, res, async () => {
     if (req.method !== 'POST') {
       return res.status(403).send('Forbidden! Only POST requests are allowed.');
     }
     const { userId, userEmail, threshold, spentPercentage } = req.body;
-    const user = await admin.auth().getUser(userId);
-    if (!userEmail && user.providerData.length > 0) {
-      userEmail = user.providerData[0].email;
-    }
+    console.log('start');
     try {
       if (spentPercentage >= threshold) {
         const msg = {
@@ -336,8 +320,8 @@ exports.sendEmailNotification = functions.https.onRequest((req, res) => {
             2
           )}% of your income in account. Please monitor your spending.`,
         };
-
         await sgMail.send(msg);
+        console.log('end');
         return res.status(200).send('Email sent successfully');
       }
       return res
