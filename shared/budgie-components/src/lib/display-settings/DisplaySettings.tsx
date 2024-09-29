@@ -159,18 +159,8 @@ export function DisplaySettings(props: DisplaySettingsProps) {
   };
 
   return (
-    <div
-      className="flex flex-col shadow-lg z-10 fixed top-0 right-0 bg-[var(--main-background)] p-8 h-full"
-      style={{ width: '85vw' }}
-    >
+    <div className="mainPage">
       <div className="pageTitle">
-        <span
-          className="material-symbols-outlined cursor-pointer left-100"
-          style={{ marginRight: '0.5rem', fontSize: '1.5rem' }}
-          onClick={props.onClose}
-        >
-          arrow_back
-        </span>
         Display Settings
       </div>
       <div className={styles.settingsOptionsContainer}>

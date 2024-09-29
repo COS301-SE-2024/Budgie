@@ -72,13 +72,12 @@ export function SignInModal(props: SignInModalProps) {
     setLoading(true);
     try {
       const provider = new GoogleAuthProvider();
+      provider.addScope('profile');
       provider.addScope('email');
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      let email = user.email;
-      if (!email && user.providerData.length > 0) {
-        email = user.providerData[0].email;
-      }
+      console.log('User information:', user);
+      // Handle successful login (e.g., redirect)
       setError(false);
       setErrorMessage('');
     } catch (error) {

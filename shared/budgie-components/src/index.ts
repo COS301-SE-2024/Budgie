@@ -20,4 +20,3 @@ export { OverviewPageRevised } from './lib/overview-page-revised/overview-page-r
 export { PlanningPageRevised } from './lib/planning-page-revised/planning-page-revised';
 export { GoalPageRevised } from './lib/goal-page-revised/goal-page-revised';
 export { GoalsPage } from './lib/goals-page/GoalsPage';
-export { OpenQuestions } from './lib/OpenQuestions/OpenQuestions';

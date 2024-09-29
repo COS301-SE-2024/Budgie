@@ -22,11 +22,8 @@
     "firestore": {
       "port": 8080
     },
-    "pubsub": {
-      "port": 5550
-    },
     "ui": {
-      "enabled": false
+      "enabled": true
     },
     "singleProjectMode": true
   }

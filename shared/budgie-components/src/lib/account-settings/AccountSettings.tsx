@@ -9,7 +9,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   deleteUser,
-  updatePassword,
+  updatePassword
 } from 'firebase/auth';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import { FirebaseError } from 'firebase/app';
@@ -45,25 +45,18 @@ export function AccountSettings(props: AccountSettingsProps) {
     if (user.email) {
       try {
         // Reauthenticate user with old password
-        const credential = EmailAuthProvider.credential(
-          user.email,
-          oldPassword
-        );
+        const credential = EmailAuthProvider.credential(user.email, oldPassword);
         await reauthenticateWithCredential(user, credential);
         console.log('Authenticated successfully');
 
         // Check password complexity
-        if (newPassword.length < 6) {
-          alert(
-            'New password is too weak. It must contain at least one uppercase letter, one lowercase letter, one number, and one special character.'
-          );
+        if (newPassword.length<6) {
+          alert('New password is too weak. It must contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
           return;
         }
 
         if (newPassword !== conPassword) {
-          alert(
-            'Password mismatch. The new password and confirmation do not match.'
-          );
+          alert('Password mismatch. The new password and confirmation do not match.');
           return;
         }
 
@@ -83,6 +76,7 @@ export function AccountSettings(props: AccountSettingsProps) {
       }
     }
   };
+
 
   const handleDeleteUser = async () => {
     if (!user) {
@@ -109,10 +103,7 @@ export function AccountSettings(props: AccountSettingsProps) {
         }
 
         // Create credential with email and password
-        const credential = EmailAuthProvider.credential(
-          user.email || '',
-          password
-        );
+        const credential = EmailAuthProvider.credential(user.email || '', password);
 
         // Attempt reauthentication with email/password
         await reauthenticateWithCredential(user, credential);
@@ -124,6 +115,7 @@ export function AccountSettings(props: AccountSettingsProps) {
       alert('Your account has been deleted.');
       auth.signOut();
       setMessage('Account successfully deleted');
+
     } catch (error) {
       // Ensure that the error is an instance of FirebaseError
       if (error instanceof FirebaseError) {
@@ -133,6 +125,7 @@ export function AccountSettings(props: AccountSettingsProps) {
           alert('Incorrect password. Please try again.');
         } else if (error.code === 'auth/popup-closed-by-user') {
           setErrorMessage('Popup closed before reauthentication.');
+
         } else {
           console.log('Error deleting user:', error);
           setErrorMessage('Failed to delete user: ' + error.message);
@@ -152,9 +145,9 @@ export function AccountSettings(props: AccountSettingsProps) {
   if (user) {
     user.providerData.forEach((profile) => {
       if (profile.providerId === 'google.com') {
-        signUpType = 'Google';
+        signUpType = "Google";
       } else if (profile.providerId === 'password') {
-        signUpType = 'Manual';
+        signUpType = "Manual";
       } else {
         signUpType = profile.providerId;
       }
@@ -183,22 +176,13 @@ export function AccountSettings(props: AccountSettingsProps) {
   };
 
   return (
-    <div
-      className="flex flex-col shadow-lg z-10 fixed top-0 right-0  z-10  bg-[var(--main-background)] p-8 h-full"
-      style={{ width: '85vw' }}
-    >
+    <div className="mainPage">
       <div className="pageTitle">
-        <span
-          className="material-symbols-outlined cursor-pointer left-100"
-          style={{ marginRight: '0.5rem', fontSize: '1.5rem' }}
-          onClick={props.onClose}
-        >
-          arrow_back
-        </span>
+
         Account Settings
       </div>
       <div className={styles.settingsOptionsContainer}>
-        {signUpType == 'Manual' && (
+        {signUpType == "Manual" && (
           <div className={styles.settingsOption}>
             <p className={styles.settingTitle}>Password Management</p>
             <p className={styles.settingDescription}>Change your password.</p>
@@ -265,12 +249,7 @@ export function AccountSettings(props: AccountSettingsProps) {
             Click the button below to start deleting your account. Learn about
             our deletion policy here.
           </p>
-          <button
-            className={styles.actionButton}
-            onClick={
-              signUpType == 'Google' ? handleDeleteUser : handleDeleteClick
-            }
-          >
+          <button className={styles.actionButton} onClick={signUpType == "Google" ? handleDeleteUser : handleDeleteClick}>
             <div className={styles.deleteButton}>Delete Account</div>
           </button>
           {isPopupVisible && (
