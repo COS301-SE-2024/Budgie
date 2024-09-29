@@ -819,7 +819,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
         <div className="w-full h-full flex flex-col items-center justify-center">
           <div className="2xl:w-[85%] w-[100%] h-full min-w-60">
             <div
-              className="w-full animate-pulse [animation-duration:1s] h-[10%] mt-4 min-h-20 flex items-center justify-between px-6 shadow-md bg-BudgieWhite rounded-[2rem]"
+              className="w-full animate-pulse [animation-duration:1s] h-[10%] min-h-20 flex items-center justify-between px-6 shadow-md bg-BudgieWhite rounded-[2rem]"
               style={{ backgroundColor: 'var(--block-background)' }}
             ></div>
             <div className="mt-5 w-full flex lg:flex-row flex-col items-center justify-around">
@@ -842,7 +842,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
         <div className="w-full h-full flex flex-col items-center justify-center">
           <div className="2xl:w-[85%] w-[100%] h-full min-w-60">
             <div
-              className="w-full h-[10%] mt-4 min-h-20 flex items-center justify-between px-6 shadow-md bg-BudgieWhite rounded-[2rem]"
+              className="w-full h-[10%] min-h-20 flex items-center justify-between px-6 shadow-md bg-BudgieWhite rounded-[2rem]"
               style={{ backgroundColor: 'var(--block-background)' }}
             >
               <span className="font-TripSans font-medium text-sm ">
