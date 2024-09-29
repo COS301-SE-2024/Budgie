@@ -72,7 +72,7 @@ export interface AddGoalPopupProps {
 }
 
 export function AddGoalPopup(props: AddGoalPopupProps) {
-  const { data, setData, refreshData } = useDataContext();
+  const { data, setData } = useDataContext();
   const [accountOptions, setAccountOptions] = useState<Account[]>([]);
   const [selectedAliases, setSelectedAliases] = useState<string[]>([]);
   const [goalType, setGoalType] = useState<string | null>(null);
@@ -196,6 +196,12 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
     }
   };
 
+  function getAliasesByAccountNumbers(accountNumbers: string[]): string[] {
+    return data.accounts
+      .filter((account) => accountNumbers.includes(account.account_number))
+      .map((account) => account.alias);
+  }
+
   const getCategoryStyle = (category: string) => {
     switch (category) {
       case 'Income':
@@ -301,11 +307,12 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
   const popupWidth = getPopupWidth();
 
   return (
-    <div className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center z-50000 text-sm md:text-lg lg:text-xl w-full">
+    <div className="text-sm md:text-lg lg:text-xl w-full h-full flex justify-center items-center flex-col">
+
       {/*1: Select Goal Type */}
       {step === 1 && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
-          <p className={styles.goalHeading}>Select a Goal Types:</p>
+        <div className="bg-[var(--block-background)] p-5 m-6 rounded-lg text-center z-2 h-[60vh] w-full flex flex-col justify-between items-center shadow-md ">
+          <p className={styles.goalHeading}>Select a Goal Type</p>
           <div className={styles.goalInfo}>
             <button
               className={`${styles.goalTypeButton} ${
@@ -360,7 +367,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
       {/*2: Goal Details */}
       {step === 2 && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
+        <div className="bg-[var(--block-background)] p-5 m-6 rounded-lg text-center z-2 h-[60vh] w-full flex flex-col justify-between items-center shadow-md ">
           <p className={styles.goalHeading}>
             {goalType === 'Savings'
               ? 'Savings Goal Details'
@@ -373,7 +380,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
               {/*Goal Name */}
               <div className={styles.formGroup}>
                 <span
-                  className={`material-symbols-outlined ${styles.icon}`}
+                  className={`material-symbols-outlined ${styles.icon} cursor-default`}
                   style={{
                     fontSize: 'calc(1rem * var(--font-size-multiplier))',
                     color: 'var(--greyed-text)',
@@ -400,7 +407,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
               {goalType === 'Savings' && (
                 <div className={styles.formGroup}>
                   <span
-                    className={`material-symbols-outlined ${styles.icon}`}
+                    className={`material-symbols-outlined ${styles.icon} cursor-default`}
                     style={{
                       fontSize: 'calc(1rem * var(--font-size-multiplier))',
                       color: 'var(--greyed-text)',
@@ -426,7 +433,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
               {goalType === 'Spending Limit' && (
                 <div className={styles.formGroup}>
                   <span
-                    className={`material-symbols-outlined ${styles.icon}`}
+                    className={`material-symbols-outlined ${styles.icon} cursor-default`}
                     style={{
                       fontSize: 'calc(1rem * var(--font-size-multiplier))',
                       color: 'var(--greyed-text)',
@@ -454,7 +461,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
               {goalType === 'Debt Reduction' && (
                 <div className={styles.formGroup}>
                   <span
-                    className={`material-symbols-outlined ${styles.icon}`}
+                    className={`material-symbols-outlined ${styles.icon} cursor-default`}
                     style={{
                       fontSize: 'calc(1rem * var(--font-size-multiplier))',
                       color: 'var(--greyed-text)',
@@ -477,7 +484,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
               {(goalType === 'Savings' || goalType === 'Debt Reduction') && (
                 <div className={styles.formGroup}>
                   <span
-                    className={`material-symbols-outlined ${styles.icon}`}
+                    className={`material-symbols-outlined ${styles.icon} cursor-default`}
                     style={{
                       fontSize: 'calc(1rem * var(--font-size-multiplier))',
                       color: 'var(--greyed-text)',
@@ -518,7 +525,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
 
       {/*3: Set Automatic Update Conditions */}
       {step === 3 && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
+        <div className="bg-[var(--block-background)] p-5 m-6 rounded-lg text-center z-2 h-[60vh] w-full flex flex-col justify-between items-center shadow-md ">
           <p className={styles.goalHeading}>Set Automatic Update Conditions</p>
           <div className="flex flex-col items-center w-full max-h-[40vh]">
             <p
@@ -543,11 +550,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
             </button>
 
             <div
-              className="flex-grow border overflow-y-auto p-4"
-              style={{
-                backgroundColor: 'var(--main-background)',
-                width: '100%',
-              }}
+              className="flex-grow border overflow-y-auto p-4 bg-[var(--main-background)] w-[90%]"
             >
               {conditions.length == 0 && (
                 <p
@@ -575,7 +578,12 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                       Condition {index + 1}
                     </p>
                     {condition.accounts.length > 0 && (
-                      <p>Accounts: {condition.accounts.join(', ')}</p>
+                      <p>
+                        Accounts:{' '}
+                        {getAliasesByAccountNumbers(condition.accounts).join(
+                          ', '
+                        )}
+                      </p>
                     )}
                     {condition.keywords.length > 0 && (
                       <p>Keywords: {condition.keywords.join(', ')}</p>
@@ -611,16 +619,12 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
       )}
 
       {step === 4 && (
-        <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-[50vw] h-[60vh] flex flex-col justify-between items-center">
+        <div className="bg-[var(--block-background)] p-5 m-6 rounded-lg text-center z-2 h-[60vh] w-full flex flex-col justify-between items-center shadow-md ">
           <p className={styles.goalHeading} style={{ marginBottom: '0' }}>
-            Add Condition
+            Add an Update Condition
           </p>
           <div
-            className="overflow-y-auto max-h-[75%] w-full px-4 py-2 space-y-4"
-            style={{
-              backgroundColor: 'var(--main-background)',
-              border: '2px solid var(--primary-1)',
-            }}
+            className="overflow-y-auto max-h-[75%] w-full px-4 py-2 space-y-4 bg-[var(--main-background)] border border-gray-200"
           >
             <div
               className="border border-gray-300 p-4 rounded-lg"
@@ -659,7 +663,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                           )?.account_number;
 
                           if (e.target.checked && selectedAccount) {
-                            // Add alias and account number
                             setSelectedAliases((prevAliases) => [
                               ...prevAliases,
                               selectedAlias,
@@ -669,7 +672,6 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                               selectedAccount,
                             ]);
                           } else {
-                            // Remove alias and account number
                             setSelectedAliases((prevAliases) =>
                               prevAliases.filter(
                                 (alias) => alias !== selectedAlias
@@ -726,7 +728,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                   </button>
                 </div>
                 <div
-                  className="mt-4"
+                  className="mt-4 w-full bg-red flex justify-center flex-wrap"
                   style={{
                     textAlign: 'left',
                     fontSize: 'calc(1rem * var(--font-size-multiplier))',
@@ -735,7 +737,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
                   {keywords.map((keyword, index) => (
                     <div
                       key={index}
-                      className="inline-flex items-center bg-gray-200 px-3 py-1 rounded-sm mr-2 mb-2 text-black"
+                      className="inline-flex items-center bg-gray-200 px-3 py-1 rounded-sm mr-2 mb-2 text-black max-w-full break-all"
                     >
                       <span className="mr-2">{keyword}</span>
                       <button

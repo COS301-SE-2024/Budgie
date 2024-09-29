@@ -1441,21 +1441,7 @@ export function GoalsPage() {
     <>
       {/*<button onClick={refresh}>REFRESH</button><br></br>
       <button onClick={test}>PRINT</button>*/}
-      {isGoalPopupOpen && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: 100,
-          }}
-        >
-          <AddGoalPopup togglePopup={addGoalPopup} />
-        </div>
-      )}
+      {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
       {selectedGoal && (
         <div style={{ position: 'relative' }} className="relative">
           <GoalInfoPage
@@ -1465,7 +1451,7 @@ export function GoalsPage() {
           ></GoalInfoPage>
         </div>
       )}
-      {!hasGoals ? (
+      {!hasGoals && (
         <>
           <div className="flex flex-col items-center justify-center bg-[var(--main-background)] h-full">
             <div className="text-2xl">Add your first goal:</div>
@@ -1477,7 +1463,8 @@ export function GoalsPage() {
             </button>
           </div>
         </>
-      ) : (
+      )}
+      {hasGoals && !isGoalPopupOpen && (
         <>
           <div className="flex justify-between p-4 bg-[var(--main-background)] text-[calc(1.2rem*var(--font-size-multiplier))]">
             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -1549,11 +1536,7 @@ export function GoalsPage() {
                                       100,
                                       calculateProgressPercentage(goal)
                                     )}%`,
-                              backgroundColor:
-                                goal.type == 'Spending Limit' &&
-                                calculateProgressPercentage(goal) >= 100
-                                  ? 'red'
-                                  : 'var(--primary-2)',
+                              backgroundColor: 'var(--primary-2)',
                             }}
                           />
                         </div>
