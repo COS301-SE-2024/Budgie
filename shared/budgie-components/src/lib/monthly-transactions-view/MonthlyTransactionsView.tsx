@@ -9,9 +9,14 @@ import {
   query,
   where,
   doc,
+  getFirestore,
+  getDoc,
 } from 'firebase/firestore';
+import axios from 'axios';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from 'firebase/auth';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '../../../../../apps/budgie-app/firebase/clientApp';
 import '../../root.css';
 
 export interface MonthlyTransactionsViewProps {
@@ -50,11 +55,11 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   const [LeftArrowStyle, setLeftArrowStyle] = useState('');
   const [RightArrowStyle, setRightArrowStyle] = useState('');
 
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<Transaction | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [userGoals, setUserGoals] = useState<Goal[]>([]);
   const [selectedGoal, setSelectedGoal] = useState<string>('');
-
 
   interface Transaction {
     date: string;
@@ -63,6 +68,51 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     description: string;
     category: string;
   }
+
+  const sendEmail = async (
+    UserId: string,
+    Email: string,
+    thresh: number,
+    percentage: number
+  ) => {
+    const user = getAuth().currentUser;
+    let email = user?.email;
+    if (!email && user.providerData.length > 0) {
+      email = user?.providerData[0].email;
+    }
+    try {
+      await axios.post(
+        'https://us-central1-budgieapp-70251.cloudfunctions.net/sendEmailNotification',
+        {
+          userId: UserId,
+          userEmail: email,
+          threshold: thresh,
+          spentPercentage: percentage,
+        }
+      );
+      console.log(`Email sent for over ${percentage}%`);
+    } catch (error) {
+      console.error('Error sending email:', error);
+      const accountKey = `incomeProgress_${props.account}`;
+      const storedProgress = JSON.parse(localStorage.getItem(accountKey));
+      if (thresh === 25) {
+        storedProgress.reached25 = false;
+        localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+      }
+      if (thresh === 50) {
+        storedProgress.reached50 = false;
+        localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+      }
+      if (thresh === 75) {
+        storedProgress.reached75 = false;
+        localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+      }
+      if (thresh === 100) {
+        storedProgress.reached100 = false;
+        localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+      }
+    }
+  };
 
   const handleNextMonth = () => {
     //change year
@@ -104,7 +154,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     setShowPopup(true);
   };
 
-
   const monthNames = [
     'january',
     'february',
@@ -119,7 +168,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     'november',
     'december',
   ];
-
 
   useEffect(() => {
     const fetchUserGoals = async () => {
@@ -156,7 +204,11 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     );
 
     if (existingUpdate) {
-      if (window.confirm('This transaction already exists in the goal. Add it again?')) {
+      if (
+        window.confirm(
+          'This transaction already exists in the goal. Add it again?'
+        )
+      ) {
         addUpdateToGoal(goal, selectedTransaction);
       }
     } else {
@@ -171,15 +223,15 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
       amount: transaction.amount,
       description: transaction.description,
     });
-    
+
     await updateDoc(doc(db, 'goals', goal.id), {
       updates: JSON.stringify(updates),
-      last_update: new Date().toISOString()
+      last_update: new Date().toISOString(),
     });
 
     alert('Transaction added to goal.');
     setShowPopup(false);
-    setSelectedGoal("Select a Goal")
+    setSelectedGoal('Select a Goal');
   };
 
   useEffect(() => {
@@ -199,7 +251,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         }
       }
     };
-
 
     const auth = getAuth();
     if (auth) {
@@ -221,9 +272,12 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   }, []);
 
   const display = async () => {
+    const currentDate = new Date();
+
+    // Update arrow styles based on current month and year
     if (
-      currentMonth.getMonth() == new Date().getMonth() &&
-      currentYear == new Date().getFullYear()
+      currentMonth.getMonth() === currentDate.getMonth() &&
+      currentYear === currentDate.getFullYear()
     ) {
       setRightArrowStyle('Greyed');
     } else {
@@ -231,8 +285,8 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     }
 
     if (
-      currentYear == props.availableYears[0] &&
-      currentMonth.getMonth() == 0
+      currentYear === props.availableYears[0] &&
+      currentMonth.getMonth() === 0
     ) {
       setLeftArrowStyle('Greyed');
     } else {
@@ -241,12 +295,9 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
 
     const month = currentMonth
       .toLocaleString('default', { month: 'long' })
-      .toLocaleLowerCase();
-    if (
-      Data === undefined ||
-      Data[month] === undefined ||
-      Data[month] === null
-    ) {
+      .toLowerCase();
+
+    if (!Data || !Data[month]) {
       setTransactions([]);
       setBalance(0);
       setMoneyIn(0);
@@ -254,61 +305,78 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     } else {
       const transactionsList = JSON.parse(Data[month]);
       setTransactions(transactionsList);
-      setBalance(JSON.parse(Data[month])[0].balance);
+      setBalance(transactionsList[0].balance);
 
       const moneyInTotal = transactionsList
-        .filter((transaction: { amount: number }) => transaction.amount > 0)
-        .reduce(
-          (acc: any, transaction: { amount: any }) => acc + transaction.amount,
-          0
-        );
+        .filter((transaction) => transaction.amount > 0)
+        .reduce((acc, transaction) => acc + transaction.amount, 0);
 
       const moneyOutTotal = transactionsList
-        .filter((transaction: { amount: number }) => transaction.amount < 0)
-        .reduce(
-          (acc: any, transaction: { amount: any }) => acc + transaction.amount,
-          0
-        );
+        .filter((transaction) => transaction.amount < 0)
+        .reduce((acc, transaction) => acc + transaction.amount, 0);
 
       setMoneyIn(moneyInTotal);
-      setMoneyOut(Math.abs(moneyOutTotal)); // money out should be positive for display
-    }
-  };
+      setMoneyOut(Math.abs(moneyOutTotal));
+      const progressPercentage = (Math.abs(moneyOutTotal) / moneyInTotal) * 100;
 
-  const handleChange = async (
-    event: React.ChangeEvent<HTMLSelectElement>,
-    index: number
-  ) => {
-    if (user && user.uid) {
-      const selectedCategory = event.target.value;
-      if (selectedCategory === 'Add category') {
-        alert('under construction');
-      } else {
-        const updatedTransactions = transactions.map((transaction, i) =>
-          i === index
-            ? { ...transaction, category: selectedCategory }
-            : transaction
-        );
-
-        const q = query(
-          collection(db, `transaction_data_${currentYear}`),
-          where('uid', '==', user.uid),
-          where('account_number', '==', props.account)
-        );
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-          const docRef = querySnapshot.docs[0].ref;
-          await updateDoc(docRef, {
-            [monthNames[currentMonth.getMonth()]]:
-              JSON.stringify(updatedTransactions),
-          });
-
-          const querySnapshot2 = await getDocs(q);
-          const transactionList = querySnapshot2.docs.map((doc) => doc.data());
-          setData(transactionList[0]);
+      // Retrieve or initialize stored progress
+      const isSpendingEnabled = localStorage.getItem('spending') === 'true';
+      if (isSpendingEnabled) {
+        const accountKey = `incomeProgress_${props.account}`;
+        const storedProgress = JSON.parse(localStorage.getItem(accountKey)) || {
+          reached25: false,
+          reached50: false,
+          reached75: false,
+          reached100: false,
+        };
+        const user = getAuth().currentUser;
+        let userEmail = user?.email;
+        if (!userEmail && user.providerData.length > 0) {
+          userEmail = user.providerData[0].email;
         }
-        setTransactions(updatedTransactions);
+        if (
+          progressPercentage >= 25 &&
+          !storedProgress.reached25 &&
+          progressPercentage < 50
+        ) {
+          storedProgress.reached25 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+          await sendEmail(user.uid, userEmail, 25, progressPercentage);
+        } else if (progressPercentage >= 50 && !storedProgress.reached25) {
+          storedProgress.reached25 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+        }
+
+        if (
+          progressPercentage >= 50 &&
+          !storedProgress.reached50 &&
+          progressPercentage < 75
+        ) {
+          storedProgress.reached50 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+          await sendEmail(user.uid, userEmail, 50, progressPercentage);
+        } else if (progressPercentage >= 75 && !storedProgress.reached50) {
+          storedProgress.reached50 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+        }
+
+        if (
+          progressPercentage >= 75 &&
+          !storedProgress.reached75 &&
+          progressPercentage < 100
+        ) {
+          storedProgress.reached75 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+          await sendEmail(user.uid, userEmail, 75, progressPercentage);
+        } else if (progressPercentage >= 100 && !storedProgress.reached75) {
+          storedProgress.reached75 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+        }
+        if (progressPercentage >= 100 && !storedProgress.reached100) {
+          storedProgress.reached100 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+          await sendEmail(user.uid, userEmail, 100, progressPercentage);
+        }
       }
     }
   };
@@ -506,7 +574,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
           </p>
         </div>
       </div>
-<br />
+      <br />
       <div className={styles.transactionsList}>
         {moneyIn === 0 && moneyOut === 0 ? (
           <div className={styles.noTransactionsMessage}>
@@ -514,17 +582,21 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
           </div>
         ) : (
           <div className={styles.transactions}>
-            
             {transactions.map((transaction, index) => (
               <div
                 key={index}
                 className={styles.transactionCard}
                 style={{
-                  borderLeft: transaction.amount >= 0 ? '15px solid #8EE5A2' : '15px solid var(--primary-1)',
+                  borderLeft:
+                    transaction.amount >= 0
+                      ? '15px solid #8EE5A2'
+                      : '15px solid var(--primary-1)',
                 }}
               >
                 <div className={styles.transactionContent}>
-                  <div className={styles.transactionDate}>{transaction.date}</div>
+                  <div className={styles.transactionDate}>
+                    {transaction.date}
+                  </div>
                   <div
                     className={styles.transactionDescription}
                     onClick={() => handleDescriptionClick(transaction)}
@@ -536,46 +608,51 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
                     {formatTransactionValue(transaction.amount)}
                   </div>
                   <select
-                      className={`${styles.categoryDropdown} ${getCategoryStyle(
-                        transaction.category
-                      )}`}
-                      data-testid="category-dropdown-income"
-                      onChange={(event) => handleChange(event, index)}
-                      id={`${transaction.date}-${transaction.description}`}
-                      value={transaction.category}
-                    >
-                      <option value=""></option>
-                      <option value="Income">Income</option>
-                      <option value="Transport">Transport</option>
-                      <option value="Eating Out">Eating Out</option>
-                      <option value="Groceries">Groceries</option>
-                      <option value="Entertainment">Entertainment</option>
-                      <option value="Shopping">Shopping</option>
-                      <option value="Insurance">Insurance</option>
-                      <option value="Utilities">Utilities</option>
-                      <option value="Medical Aid">Medical Aid</option>
-                      <option value="Transfer">Transfer</option>
-                      <option value="Other">Other</option>
-                    </select>
+                    className={`${styles.categoryDropdown} ${getCategoryStyle(
+                      transaction.category
+                    )}`}
+                    data-testid="category-dropdown-income"
+                    onChange={(event) => handleChange(event, index)}
+                    id={`${transaction.date}-${transaction.description}`}
+                    value={transaction.category}
+                  >
+                    <option value=""></option>
+                    <option value="Income">Income</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Eating Out">Eating Out</option>
+                    <option value="Groceries">Groceries</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Insurance">Insurance</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Medical Aid">Medical Aid</option>
+                    <option value="Transfer">Transfer</option>
+                    <option value="Other">Other</option>
+                  </select>
                 </div>
               </div>
-
             ))}
           </div>
         )}
-        <div>
-
-        </div>
+        <div></div>
       </div>
       {showPopup && selectedTransaction && (
         <div className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center z-50000 w-[85vw] text-sm md:text-lg lg:text-xl">
-
           <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-full max-w-lg ">
-
             <div className="mb-4">
-              <p className="font-semibold" style={{fontSize:'calc(1.2rem * var(--font-size-multiplier))'}}>Transaction Details</p>
+              <p
+                className="font-semibold"
+                style={{
+                  fontSize: 'calc(1.2rem * var(--font-size-multiplier))',
+                }}
+              >
+                Transaction Details
+              </p>
             </div>
-            <div className="flex flex-col items-center" style={{fontSize:'calc(1rem * var(--font-size-multiplier))'}}>
+            <div
+              className="flex flex-col items-center"
+              style={{ fontSize: 'calc(1rem * var(--font-size-multiplier))' }}
+            >
               <div className="flex justify-between w-[50%]">
                 <div className="font-semibold">Date:</div>
                 <div>{selectedTransaction.date}</div>
@@ -586,7 +663,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
                 <div>{selectedTransaction.description}</div>
               </div>
 
-
               <div className="flex justify-between w-[50%]">
                 <div className="font-semibold">Amount:</div>
                 <div>{formatTransactionValue(selectedTransaction.amount)}</div>
@@ -595,7 +671,14 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
 
             {userGoals.length > 0 && (
               <div className="mt-6">
-                <div className="mb-2 font-semibold" style={{fontSize:'calc(1rem * var(--font-size-multiplier))'}}>Add to a Goal:</div>
+                <div
+                  className="mb-2 font-semibold"
+                  style={{
+                    fontSize: 'calc(1rem * var(--font-size-multiplier))',
+                  }}
+                >
+                  Add to a Goal:
+                </div>
                 <div className="flex items-center space-x-2">
                   <select
                     className="flex-grow p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-black"
@@ -617,7 +700,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
                   </button>
                 </div>
               </div>
-
             )}
 
             <button
@@ -629,7 +711,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
           </div>
         </div>
       )}
-
     </div>
   );
 }
