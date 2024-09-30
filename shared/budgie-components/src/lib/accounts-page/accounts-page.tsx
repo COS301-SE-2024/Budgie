@@ -442,7 +442,7 @@ export function AccountsPage(props: AccountsPageProps) {
         <div className="w-full h-full flex flex-col items-center justify-center">
           <div className="md:w-[85%] w-[100%] h-full min-w-60">
             <div
-              className="w-full animate-pulse [animation-duration:1s] h-[10%] mt-8 min-h-20 flex items-center md:justify-between justify-center shadow-md bg-BudgieWhite rounded-[2rem]"
+              className="w-full animate-pulse [animation-duration:1s] h-[10%] min-h-20 flex items-center md:justify-between justify-center shadow-md bg-BudgieWhite rounded-[2rem]"
               style={{ backgroundColor: 'var(--block-background)' }}
             ></div>
             <div
@@ -477,7 +477,7 @@ export function AccountsPage(props: AccountsPageProps) {
             <div className="w-full h-full flex flex-col items-center justify-center">
               <div className="md:w-[85%] w-[100%] h-full min-w-60">
                 <div
-                  className="w-full h-[10%] mt-8 min-h-20 flex items-center md:justify-between justify-center shadow-md bg-BudgieWhite rounded-[2rem]"
+                  className="w-full h-[10%] min-h-20 flex items-center md:justify-between justify-center shadow-md bg-BudgieWhite rounded-[2rem]"
                   style={{ backgroundColor: 'var(--block-background)' }}
                 >
                   <InfoSection xAxis={graphX} yAxis={graphY}></InfoSection>

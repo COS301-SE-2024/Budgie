@@ -13,7 +13,7 @@ export default function settings() {
 
   useEffect(() => {
     if (!user) {
-      router.push('/');
+      return router.push('/');
     } else {
       setLoading(false);
     }
