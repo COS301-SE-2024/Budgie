@@ -136,9 +136,9 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         'https://us-central1-budgieapp-70251.cloudfunctions.net/sendEmailNotification',
         {
           userId: UserId,
-          userEmail: email,
-          thresh,
-          percentage,
+          email,
+          threshold: thresh,
+          spentPercentage: percentage,
         }
       );
       console.log(`Email sent for over ${percentage}%`);
@@ -331,8 +331,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         };
         const user = getAuth().currentUser;
         let userEmail = user?.email;
-        console.log('bool: ' + storedProgress);
-        console.log('prog: ' + progressPercentage);
         if (!userEmail && user.providerData.length > 0) {
           userEmail = user.providerData[0].email;
         }

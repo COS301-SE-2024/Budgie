@@ -36,8 +36,76 @@ export function HelpModal(props: HelpModalProps) {
             </p>
             <p className="text-s text-gray-500">
               <strong>Account Setup:</strong> Open the app and tap 'Sign Up' to
-              create a new account. Sign in either using google or using your
-              email.
+              create a new account by entering your email and password. Sign in
+              either using google or using your email and password.
+            </p>
+            <p className="text-s text-gray-500">
+              <strong>Add Bank Account</strong> Click on Accounts Tab and then
+              click on Add Account pane. Choose from the three options the type
+              of account you want to add. Upload a csv to begin the tracking of
+              your data. Enter an alias for the account you just added to make
+              it distinct. Click on the "Add Account" button and now the account
+              is being tracked.
+            </p>
+            <p className="text-s text-gray-500">
+              <strong>Transactions</strong> Once an account is added and a csv
+              provided, the transactions for the account are visible on this
+              page. Each transaction is categorized and placed as either an
+              expense or income. The transactions can be manually categorized by
+              clicking on the transaction and manually choosing a category. It's
+              possible to traverse the transactions of different accounts by
+              choosing to view another account by clicking on it's alias name.
+              The transactions can be viewed yearly or monthly based on
+              preference.
+            </p>
+            <p className="text-s text-gray-500">
+              <strong>Overview</strong> The overview page provides a summary of
+              the bank account information and the results obtained from
+              analyzing this data. It provided a quick glimpse at information
+              such as the last transaction, your average spending and spending
+              by category.
+            </p>
+            <p className="text-s text-gray-500">
+              <strong>Goals</strong> The goals page allows a user to set a goal
+              that they would like to obtain, by setting a interval to achieve
+              that goal. The goal can either be a "savings","limit spending" and
+              "debt reduction" goal. The goal can either be updated manually or
+              automatically using the uploaded transaction data. There can be
+              conditions to the goal such as only a specific category od
+              transactions being noticed.
+            </p>
+            <p className="text-s text-gray-500">
+              <strong>Comparisons</strong> The comparisons page takes a user's
+              information such as job and age, this information is then used to
+              provide some comparisons between the users. These include monthly
+              income and average spending between users within the same bracket.
+              Click on user info button and enter your date of birth, job type
+              and industry.
+            </p>
+            <p className="text-s text-gray-500">
+              <strong>Insights</strong> <h1>Petrol Prices</h1> This section
+              provides an overview of fuel prices, including 95 Unleaded, 93
+              Unleaded, and Diesel 50ppm, for both coastal and inland regions.
+              Users can track price changes from the previous month, current
+              month, and upcoming month. <h1>Bank Insights</h1> Here, users can
+              view information about different banks. It outlines the pros (such
+              as stability, wide networks, and diverse products) and cons (like
+              fees, customer satisfaction, and technology adoption) to help
+              users make informed decisions. <h1>Property and Rent</h1> This
+              section gives users an idea of average rent and purchase prices
+              for apartments in different areas (city centre vs outside city
+              centre). It helps users gauge housing costs and make better
+              budgeting decisions. <h1>Tax Brackets</h1> This page outlines the
+              different income tax brackets and the applicable tax rates for
+              each bracket, helping users understand how much tax they need to
+              pay based on their income. <h1>Utility Prices</h1> Provides
+              information about the average cost of basic utilities (like
+              electricity, water, heating, and garbage collection), mobile phone
+              plans, and internet services. This helps users anticipate monthly
+              living costs. <h1>Transport Prices</h1> This section offers a
+              breakdown of transport-related expenses, including one-way
+              tickets, monthly passes, and taxi fares. It gives users a better
+              idea of their commuting and travel costs.
             </p>
           </div>
         );
