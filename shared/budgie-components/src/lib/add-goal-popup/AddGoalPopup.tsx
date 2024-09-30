@@ -566,7 +566,7 @@ export function AddGoalPopup(props: AddGoalPopupProps) {
               {conditions.map((condition, index) => (
                 <div
                   key={index}
-                  className="flex justify-between bg-gray-100 px-3 py-1 mb-2 rounded"
+                  className="flex justify-between bg-[var(--block-background)] px-3 py-1 mb-2 rounded"
                 >
                   <div style={{ textAlign: 'left' }}>
                     <p

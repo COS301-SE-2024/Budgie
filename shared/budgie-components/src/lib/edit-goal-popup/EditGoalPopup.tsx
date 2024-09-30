@@ -13,10 +13,8 @@ import styles from './EditGoalPopup.module.css';
 import '../../root.css';
 import {
   useDataContext,
-  UserData,
   Goal,
   Account,
-  Transaction,
 } from '../data-context/DataContext';
 
 /* eslint-disable-next-line */
@@ -132,7 +130,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   const [targetDate, setTargetDate] = useState(props.goal.target_date);
   const [spendingLimit, setSpendingLimit] = useState(props.goal.spending_limit);
   const user = useContext(UserContext);
-  const { data} = useDataContext();
+  const { data, setData} = useDataContext();
 
   const handleSubmit = async (e: React.FormEvent) => {
     if (user) {
@@ -192,6 +190,11 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
       try {
         const goalDocRef = doc(db, 'goals', props.goal.id);
         await updateDoc(goalDocRef, { uid: 'User has deleted this goal.' });
+        const updatedGoals = data.goals.filter(goal => goal.id !== props.goal.id);
+        setData({
+          ...data,
+          goals: updatedGoals, 
+        });
         props.togglePopup();
         props.toggleMainPopup();
       } catch (error) {

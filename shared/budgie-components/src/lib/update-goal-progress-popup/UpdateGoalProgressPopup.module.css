@@ -31,6 +31,12 @@
 .goalForm {
   margin: 0 auto;
   text-align: left;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-content: space-between;
 }
 
 .goalForm .formGroup {
@@ -76,7 +82,6 @@
 .goalForm button:hover {
   filter: brightness(1.1);
 }
-
 .cancelButton {
   padding: 10px;
   background-color: var(--main-background);
@@ -143,13 +148,13 @@
 }
 
 .progressInfo div {
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 .progressInfo p {
   color: var(--primary-1);
   font-weight: bold;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .target {

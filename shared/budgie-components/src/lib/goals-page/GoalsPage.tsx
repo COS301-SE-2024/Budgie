@@ -394,10 +394,12 @@ const GoalInfoPage = ({
 
   const handleUpdateGoalPopup = () => {
     setUpdatePopupOpen(!updatePopupOpen);
+    setEditPopupOpen(false);
   };
 
   const handleEditGoalPopup = () => {
     setEditPopupOpen(!editPopupOpen);
+    setUpdatePopupOpen(false);
   };
 
   const monthlyBudgetSpent = (goal: Goal): number => {
@@ -641,12 +643,6 @@ const GoalInfoPage = ({
             >
               Add an Update
             </div>
-            {updatePopupOpen && (
-              <UpdateGoalPopup
-                togglePopup={handleUpdateGoalPopup}
-                goal={goal}
-              />
-            )}
           </div>
         </div>
       </div>
@@ -836,8 +832,8 @@ const GoalInfoPage = ({
                   }}
                 >
                   {goal.target_date &&
-                    calculateMonthsLeft(goal.target_date) == 0 &&
-                    calculateDaysLeft(goal.target_date) == 0 && (
+                    calculateMonthsLeft(goal.target_date) <= 0 &&
+                    calculateDaysLeft(goal.target_date) <= 0 && (
                       <>
                         <p>This goal's target date has passed.</p>
                         <br></br>
@@ -852,7 +848,7 @@ const GoalInfoPage = ({
                     goal.target_amount > goal.current_amount &&
                     goal.target_date && (
                       <>
-                        <div className="flex">
+                        <div className="flex flex-wrap">
                           <p>You still need to save</p>
                           <p className="text-[var(--primary-1)] font-semibold ml-1">
                             R{calculateRemainingSavings(goal).toFixed(2)}
@@ -860,7 +856,7 @@ const GoalInfoPage = ({
                           <p>.</p>
                         </div>
                         <br></br>
-                        <div className="flex">
+                        <div className="flex flex-wrap">
                           <p>This means you need to save </p>
                           <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
                             R{calculateSavingsPerMonth(goal).toFixed(2)}
@@ -872,7 +868,7 @@ const GoalInfoPage = ({
                           JSON.parse(goal.updates).length > 0 && (
                             <>
                               <br></br>
-                              <div className="flex">
+                              <div className="flex flex-wrap">
                                 <p>
                                   The average amount you have saved per month is
                                 </p>
@@ -893,7 +889,7 @@ const GoalInfoPage = ({
                     )}
                   {goal.type === 'Spending Limit' && (
                     <>
-                      <div className="flex">
+                      <div className="flex ">
                         <p>On average, you have spent</p>
                         <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
                           R{calculateAverageSpending(goal).toFixed(2)}
@@ -901,7 +897,7 @@ const GoalInfoPage = ({
                         <p>per month.</p>
                       </div>
                       <br></br>
-                      <div className="flex">
+                      <div className="flex flex-wrap">
                         <p>Your average spending is</p>
                         <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
                           {Math.abs(
@@ -920,8 +916,8 @@ const GoalInfoPage = ({
                       {goal.updates && JSON.parse(goal.updates).length > 0 && (
                         <>
                           <br></br>
-                          <div className="flex">
-                            <p>Your biggest expense was "</p>
+                          <div className="flex flex-wrap">
+                            <p> Your biggest expense was "</p>
                             <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
                               {calculateBiggestExpense(goal).description}
                             </p>
@@ -948,7 +944,7 @@ const GoalInfoPage = ({
                     goal.target_date &&
                     calculateMonthsLeft(goal.target_date) > 0 && (
                       <>
-                        <div className="flex">
+                        <div className="flex flex-wrap">
                           <p>You still need to pay</p>
                           <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
                             R{calculateRemainingDebt(goal).toFixed(2)}{' '}
@@ -956,7 +952,7 @@ const GoalInfoPage = ({
                           <p>towards this debt.</p>
                         </div>
                         <br></br>
-                        <div className="flex">
+                        <div className="flex flex-wrap">
                           <p>This means you need to pay</p>
                           <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
                             R
@@ -972,7 +968,7 @@ const GoalInfoPage = ({
                           JSON.parse(goal.updates).length > 0 && (
                             <>
                               <br></br>
-                              <div className="flex">
+                              <div className="flex flex-wrap">
                                 <p>Your average monthly payment is</p>
                                 <p className="text-[var(--primary-1)] font-semibold ml-1">
                                   R
@@ -1100,6 +1096,9 @@ const GoalInfoPage = ({
           goal={goal}
           toggleMainPopup={onClose}
         />
+      )}
+      {updatePopupOpen && (
+        <UpdateGoalPopup togglePopup={handleUpdateGoalPopup} goal={goal} />
       )}
     </div>
   );
@@ -1229,10 +1228,8 @@ export function GoalsPage() {
         updateDB(updatedData.goals);
         setData(updatedData);
 
-        for (let i = 0; i<updatedData.goals.length; i++)
-        {
-          if(selectedGoal && updatedData.goals[i].id == selectedGoal.id)
-          {
+        for (let i = 0; i < updatedData.goals.length; i++) {
+          if (selectedGoal && updatedData.goals[i].id == selectedGoal.id) {
             setSelectedGoal(updatedData.goals[i]);
             break;
           }
