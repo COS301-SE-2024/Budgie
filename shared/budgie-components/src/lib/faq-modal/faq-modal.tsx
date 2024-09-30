@@ -8,6 +8,7 @@ import {
   getDoc,
   setDoc,
 } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 import { OpenQuestions } from '../OpenQuestions/OpenQuestions';
 
 /* eslint-disable-next-line */
@@ -22,6 +23,7 @@ export function FaqModal(props: FaqModalProps) {
   const [openQuestions, setOpenQuestions] = useState([]);
   const [userVotes, setUserVotes] = useState({});
   const [showOpen, setOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true); // Loading state
 
   const handleCloseQ = () => {
     setOpen(false);
@@ -31,7 +33,8 @@ export function FaqModal(props: FaqModalProps) {
   const questionsCollectionRef = collection(db, 'questions');
 
   // Simulate a user ID (replace this with actual user identification logic)
-  const userId = 'user123'; // This should be replaced with actual user ID from authentication
+  const user = getAuth();
+  const userId = user.currentUser.uid; // This should be replaced with actual user ID from authentication
 
   useEffect(() => {
     const unsubscribe = onSnapshot(questionsCollectionRef, (snapshot) => {
@@ -56,6 +59,7 @@ export function FaqModal(props: FaqModalProps) {
       setUserQuestions(rankedQuestions);
       setAllQuestions(questions); // Store all questions for filtering
       setOpenQuestions(openQuestions);
+      setLoading(false); // Set loading to false once data is loaded
     });
 
     return () => unsubscribe(); // Cleanup listener on unmount
@@ -200,52 +204,70 @@ export function FaqModal(props: FaqModalProps) {
         </button>
         {showOpen && <OpenQuestions onClose={handleCloseQ} />}
 
-        {/* Display filtered questions */}
-        <h1 className="text-2xl font-bold text-gray-900">Answered Questions</h1>
-        {filteredQuestions.length > 0 ? (
-          filteredQuestions.map((question) => (
-            <div
-              key={question.id}
-              className="p-6 bg-white shadow-lg rounded-lg mb-4"
-            >
-              <h3 className="text-lg font-semibold text-gray-900">
-                {question.question}
-              </h3>
-              {question.isOpen ? null : (
-                <p className="text-gray-800">{question.answer}</p>
-              )}
-              <div className="flex items-center space-x-2 mt-2">
-                <button
-                  onClick={() => voteQuestion(question.id, 'upvote')}
-                  disabled={userVotes[question.id] === 'downvote'} // Disable if already downvoted
-                  className={`flex items-center ${
-                    userVotes[question.id] === 'upvote'
-                      ? 'text-green-600'
-                      : 'text-gray-600'
-                  }`}
-                >
-                  <span className="material-symbols-outlined">thumb_up</span>
-                  Upvote
-                </button>
-                <span className="text-gray-800">{question.likes || 0}</span>
-                <button
-                  onClick={() => voteQuestion(question.id, 'downvote')}
-                  disabled={userVotes[question.id] === 'upvote'} // Disable if already upvoted
-                  className={`flex items-center ${
-                    userVotes[question.id] === 'downvote'
-                      ? 'text-red-600'
-                      : 'text-gray-600'
-                  }`}
-                >
-                  <span className="material-symbols-outlined">thumb_down</span>
-                  Downvote
-                </button>
-                <span className="text-gray-800">{question.dislikes || 0}</span>
-              </div>
-            </div>
-          ))
+        {/* Loading Indicator */}
+        {loading ? (
+          <div className="text-center py-4">
+            <p>Loading questions...</p>
+            {/* You can add a spinner here */}
+          </div>
         ) : (
-          <p className="text-gray-700">No questions found.</p>
+          <>
+            {/* Display filtered questions */}
+            <h1 className="text-2xl font-bold text-gray-900">
+              Answered Questions
+            </h1>
+            {filteredQuestions.length > 0 ? (
+              filteredQuestions.map((question) => (
+                <div
+                  key={question.id}
+                  className="p-6 bg-white shadow-lg rounded-lg mb-4"
+                >
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {question.question}
+                  </h3>
+                  {question.isOpen ? null : (
+                    <p className="text-gray-800">{question.answer}</p>
+                  )}
+                  <div className="flex items-center space-x-2 mt-2">
+                    <button
+                      onClick={() => voteQuestion(question.id, 'upvote')}
+                      disabled={userVotes[question.id] === 'downvote'} // Disable if already downvoted
+                      className={`flex items-center ${
+                        userVotes[question.id] === 'upvote'
+                          ? 'text-green-600'
+                          : 'text-gray-600'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined">
+                        thumb_up
+                      </span>
+                      Upvote
+                    </button>
+                    <span className="text-gray-800">{question.likes || 0}</span>
+                    <button
+                      onClick={() => voteQuestion(question.id, 'downvote')}
+                      disabled={userVotes[question.id] === 'upvote'} // Disable if already upvoted
+                      className={`flex items-center ${
+                        userVotes[question.id] === 'downvote'
+                          ? 'text-red-600'
+                          : 'text-gray-600'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined">
+                        thumb_down
+                      </span>
+                      Downvote
+                    </button>
+                    <span className="text-gray-800">
+                      {question.dislikes || 0}
+                    </span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-700">No questions found.</p>
+            )}
+          </>
         )}
       </div>
     </div>
