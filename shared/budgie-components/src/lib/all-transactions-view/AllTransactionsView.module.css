@@ -27,7 +27,13 @@
 }
 
 .leftNavButton {
-  color: var(--main-text);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+.rightNavButton {
+  color: white;
   border: none;
   cursor: pointer;
   transition: 0.3s ease;
@@ -38,7 +44,7 @@
 }
 
 .greyedleftNavButton {
-  color: var(--greyed-text);
+  color: gray;
   border: none;
   transition: 0.3s ease;
 }
@@ -55,7 +61,7 @@
 }
 
 .greyedrightNavButton {
-  color: var(--greyed-text);
+  color: gray;
   border: none;
   transition: 0.3s ease;
 }
@@ -92,6 +98,7 @@
   display: flex;
   align-items: center;
   height: calc(6vh * var(--font-size-multiplier));
+  width: 100%;
 }
 
 .transactionCard:hover {
@@ -246,7 +253,8 @@
 }
 
 .dateDropdown {
-  background-color: var(--main-background);
+  background-color: transparent;
+  color: white;
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;

@@ -869,7 +869,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
             </div>
             <div className="mt-5 w-full flex lg:flex-row flex-col items-center justify-around">
               <div className="p-2 flex flex-col items-center justify-start shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl lg:w-[30%] w-full lg:aspect-square lg:mt-0 mt-3 lg:min-h-[30vh]">
-                <div className="bg-BudgieBlue2 text-white w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
+                <div className="bg-BudgieGrayLight text-black w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
                   <span>Summary</span>
                 </div>
                 <div className="flex flex-col items-center lg:justify-center grow w-full">
@@ -907,7 +907,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                 </div>
               </div>
               <div className="p-2 flex flex-col items-center justify-start shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl lg:w-[30%] w-full lg:aspect-square lg:mt-0 mt-3 min-h-[30vh]">
-                <div className="bg-BudgieBlue2 text-white  w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
+                <div className="bg-BudgieGrayLight text-black  w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
                   <span>Spending by Category</span>
                 </div>
                 <div className="grow w-full flex flex-col items-center justify-center">
@@ -951,7 +951,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
                 </div>
               </div>
               <div className="p-2 flex flex-col items-center justify-start shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl lg:w-[30%] w-full lg:aspect-square lg:mt-0 mt-3 min-h-[30vh]">
-                <div className="bg-BudgieBlue2 text-white w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
+                <div className="bg-BudgieGrayLight text-black w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
                   <span>Latest Transaction</span>
                 </div>
                 <div className="grow flex items-center justify-center">
@@ -979,7 +979,7 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
               </div>
             </div>
             <div className="p-2 mt-5 w-full h-[40%] min-h-80 shadow-[0px_0px_30px_0px_rgba(0,0,15,0.2)] bg-BudgieWhite rounded-3xl">
-              <div className="bg-BudgieBlue2 text-white w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
+              <div className="bg-BudgieGrayLight text-black w-full h-12 rounded-3xl flex items-center justify-center text-lg font-medium">
                 <span>Income vs Expenses</span>
               </div>
               <div className="grow flex items-center justify-center h-[90%]">

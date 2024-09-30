@@ -24,9 +24,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import {
-  useDataContext
-} from '../data-context/DataContext';
+import { useDataContext } from '../data-context/DataContext';
 
 /* eslint-disable-next-line */
 export interface SpecificAccountPageProps {
@@ -1068,7 +1066,7 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
     type: '',
     number: '',
   });
-  const {refreshData, loading} = useDataContext();
+  const { refreshData, loading } = useDataContext();
 
   const router = useRouter();
   const user = useContext(UserContext);
@@ -1109,9 +1107,9 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
     fetchData();
   }, []);
 
-  if (dataLoading||loading) {
+  if (dataLoading || loading) {
     return (
-      <div className="mainPage fixed right-0 top-0 z-100">
+      <div className="mainPage">
         <div className="w-full h-full flex flex-col items-center justify-center">
           <div className="md:w-[85%] w-[100%] h-full min-w-60">
             <div
@@ -1144,7 +1142,10 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
               style={{ backgroundColor: 'var(--block-background)' }}
             >
               <span
-                onClick={() => {router.back(); refreshData();}}
+                onClick={() => {
+                  router.back();
+                  refreshData();
+                }}
                 aria-label="back"
                 className="cursor-pointer material-symbols-outlined absolute left-4 transition-all bg-gray-200 p-1.5 hover:bg-gray-300 rounded-lg text-BudgieBlue2"
                 style={{ fontSize: '1.5rem' }}
