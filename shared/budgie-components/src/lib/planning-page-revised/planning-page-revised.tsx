@@ -59,24 +59,24 @@ export function PlanningPageRevised(props: PlanningPageRevisedProps) {
     <div className="mainPage flex flex-col h-screen items-center overflow-hidden">
       <div className="flex shadow-lg z-2 justify-center rounded-2xl bg-[var(--block-background)] p-2 w-[98%] m-6">
         <button
-          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-BudgieBlue2 hover:text-BudgieWhite font-medium mr-16 cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
-            viewMode === 'goals' ? 'border-b-4 border-BudgieBlue2' : ''
+          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-[var(--primary-2)] hover:text-BudgieWhite font-medium mr-16 cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
+            viewMode === 'goals' ? 'border-b-4 border-[var(--primary-1)]' : ''
           }`}
           onClick={() => setViewMode('goals')}
         >
           Goals
         </button>
         <button
-          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-BudgieBlue2 hover:text-BudgieWhite font-medium cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
-            viewMode === 'comparisons' ? 'border-b-4 border-BudgieBlue2' : ''
+          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-[var(--primary-2)] hover:text-BudgieWhite font-medium cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
+            viewMode === 'comparisons' ? 'border-b-4 border-[var(--primary-1)]' : ''
           }`}
           onClick={() => setViewMode('comparisons')}
         >
           Comparisons
         </button>
         <button
-          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-BudgieBlue2 hover:text-BudgieWhite font-medium ml-16 cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
-            viewMode === 'insight' ? 'border-b-4 border-BudgieBlue2' : ''
+          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-[var(--primary-2)] hover:text-BudgieWhite font-medium ml-16 cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
+            viewMode === 'insight' ? 'border-b-4 border-[var(--primary-1)]' : ''
           }`}
           onClick={() => setViewMode('insight')}
         >
@@ -84,7 +84,7 @@ export function PlanningPageRevised(props: PlanningPageRevisedProps) {
         </button>
       </div>
 
-      <div className="flex-grow w-[98%] m-6 mt-0 overflow-y-hidden bg-black ">
+      <div className="flex-grow w-[98%] m-6 mt-0 overflow-y-hidden">
         {viewMode === 'goals' ? (
           <GoalsPage />
         ) : viewMode === 'comparisons' ? (

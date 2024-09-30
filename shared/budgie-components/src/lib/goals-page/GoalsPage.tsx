@@ -615,6 +615,7 @@ const GoalInfoPage = ({
     const biggestExpense = calculateBiggestExpense(goal);
     return new Date(biggestExpense.date).toLocaleString('default', {
       month: 'long',
+      year: 'numeric',
     });
   };
 
@@ -644,462 +645,481 @@ const GoalInfoPage = ({
   };
 
   return (
-    <div
-      className={styles.mainPage}
-      style={{
-        position: 'fixed',
-        right: 0,
-        top: 0,
-        height: '100%',
-        zIndex: '11',
-        paddingTop: '2rem',
-      }}
-    >
-      <div className={styles.goalPage}>
-        <div className="flex flex-col gap-8">
-          <div
-            className="flex shadow-lg z-10 justify-center fixed top-0 right-0 z-10  bg-[var(--block-background)] p-2"
-            style={{ width: '85vw' }}
-          >
-            <div className="container mx-auto">
-              <div className="flex-1 flex flex-col justify-center text-center p-3">
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                    marginBottom: '1rem',
-                  }}
-                >
-                  <h1
-                    className="text-3xl font-bold"
-                    style={{
-                      color: 'var(--primary-1)',
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <span
-                      className="material-symbols-outlined"
-                      onClick={onClose}
-                      style={{
-                        marginRight: '0.8rem',
-                        fontSize: 'calc(1.5rem * var(--font-size-multiplier))',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      arrow_back
-                    </span>
-                    {goal.name}
-                  </h1>
+    <div className="flex flex-col h-full overflow-y-hidden">
+      <div
+        className="flex flex-col lg:flex-row justify-center lg:justify-between w-full items-center container mx-auto pb-4"
+        style={{ borderBottom: '1px solid gray' }}
+      >
+        <div className="flex justify-between items-center w-full">
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--primary-1)] flex items-center mr-[0.5rem] lg:mr-[1rem]">
+            <span
+              className="material-symbols-outlined mr-[0.5rem] sm:mr-[1rem] text-[1.25rem] sm:text-[calc(1.5rem * var(--font-size-multiplier))] cursor-pointer"
+              onClick={onClose}
+            >
+              arrow_back
+            </span>
+            {goal.name}
+          </h1>
 
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '1rem',
-                    }}
-                  >
-                    <div
-                      className={styles.editViewButton}
-                      onClick={handleEditGoalPopup}
-                    >
-                      Edit Details
-                    </div>
-                    {editPopupOpen && (
-                      <EditGoalPopup
-                        togglePopup={handleEditGoalPopup}
-                        goal={goal}
-                        toggleMainPopup={onClose}
-                      />
-                    )}
-                    <div
-                      className={styles.updateViewButton}
-                      onClick={handleUpdateGoalPopup}
-                    >
-                      Add an Update
-                    </div>
-                    {updatePopupOpen && (
-                      <UpdateGoalPopup
-                        togglePopup={handleUpdateGoalPopup}
-                        goal={goal}
-                      />
-                    )}
-                  </div>
-                </div>
-              </div>
+          <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-4">
+            <div
+              className="h-full p-2 text-[var(--primary-1)] border-none cursor-pointer transition ease-in-out duration-300 rounded-md text-center font-bold hover:bg-[var(--main-background)]"
+              onClick={handleEditGoalPopup}
+            >
+              Edit Goal Details
             </div>
+            {editPopupOpen && (
+              <EditGoalPopup
+                togglePopup={handleEditGoalPopup}
+                goal={goal}
+                toggleMainPopup={onClose}
+              />
+            )}
+            <div
+              className="h-full p-2 bg-[var(--primary-1)] text-[var(--secondary-text)] cursor-pointer transition ease-in-out duration-300 rounded-md text-center font-bold hover:bg-[var(--block-background)] border border-[var(--primary-1)] hover:text-[var(--primary-1)]"
+              onClick={handleUpdateGoalPopup}
+            >
+              Add an Update
+            </div>
+            {updatePopupOpen && (
+              <UpdateGoalPopup
+                togglePopup={handleUpdateGoalPopup}
+                goal={goal}
+              />
+            )}
           </div>
+        </div>
+      </div>
 
-          <div className="mt-[8rem]">
-            <div className="container mx-auto p-4">
-              <div className="flex items-stretch space-x-4">
-                <div className="flex-1 flex flex-col items-center justify-between text-center bg-[var(--block-background)] rounded-lg shadow-md p-8">
-                  <h2 className="text-xl font-semibold mb-4">Goal Details</h2>
-                  <div
-                    className="flex flex-col space-y-2 h-full justify-center"
-                    style={{ width: 'auto' }}
-                  >
-                    <div className={styles.goalPair}>
-                      <div className={styles.goalLabel}>Goal Type:</div>
-                      <div className={styles.goalValue}>{goal.type}</div>
-                    </div>
-                    <div className={styles.goalPair}>
-                      <div className={styles.goalLabel}>Update Type:</div>
-                      <div className={styles.goalValue}>
-                        {goal.update_type == 'automatic' && 'Automatic'}
-                        {goal.update_type == 'manual' && 'Manual Only'}
-                      </div>
-                    </div>
-                    {goal.initial_amount !== undefined && (
-                      <div className={styles.goalPair}>
-                        <div className={styles.goalLabel}>Initial Amount:</div>
-                        <div className={styles.goalValue}>
-                          R {goal.initial_amount.toFixed(2)}
-                        </div>
-                      </div>
-                    )}
-                    {goal.current_amount !== undefined &&
-                      goal.type != 'Spending Limit' && (
-                        <div className={styles.goalPair}>
-                          <div className={styles.goalLabel}>
-                            Current Amount:
-                          </div>
-                          <div className={styles.goalValue}>
-                            R {goal.current_amount.toFixed(2)}
-                          </div>
-                        </div>
-                      )}
-                    {goal.spending_limit !== undefined &&
-                      goal.type == 'Spending Limit' && (
-                        <div className={styles.goalPair}>
-                          <div className={styles.goalLabel}>Monthly Limit:</div>
-                          <div className={styles.goalValue}>
-                            R {goal.spending_limit.toFixed(2)}
-                          </div>
-                        </div>
-                      )}
-                    {goal.monthly_updates !== undefined &&
-                      goal.type == 'Spending Limit' && (
-                        <div className={styles.goalPair}>
-                          <div className={styles.goalLabel}>
-                            Spent this Month:
-                          </div>
-                          <div className={styles.goalValue}>
-                            R {monthlyBudgetSpent(goal).toFixed(2)}
-                          </div>
-                        </div>
-                      )}
-                    {goal.target_amount !== undefined && (
-                      <div className={styles.goalPair}>
-                        <div className={styles.goalLabel}>Target Amount:</div>
-                        <div className={styles.goalValue}>
-                          R {goal.target_amount.toFixed(2)}
-                        </div>
-                      </div>
-                    )}
-                    {goal.target_date !== undefined && (
-                      <>
-                        <div className={styles.goalPair}>
-                          <div className={styles.goalLabel}>Target Date:</div>
-                          <div className={styles.goalValue}>
-                            {goal.target_date}
-                          </div>
-                        </div>
-                        <div className={styles.goalPair}>
-                          <div className={styles.goalLabel}>Days Left:</div>
-                          <div className={styles.goalValue}>
-                            {calculateDaysLeft(goal.target_date) > 0
-                              ? `${calculateDaysLeft(goal.target_date)} days`
-                              : 'Target Date Passed'}
-                          </div>
-                        </div>
-                      </>
-                    )}
-                    {goal.last_update !== undefined && (
-                      <div className={styles.goalPair}>
-                        <div className={styles.goalLabel}>Last Update:</div>
-                        <div className={styles.goalValue}>
-                          {timeSinceLastUpdate(goal.last_update)}
-                        </div>
-                      </div>
-                    )}
+      <div className="h-full overflow-y-auto overflow-x-hidden">
+        <div className="container mx-auto p-4">
+          <div className="flex flex-col lg:flex-row space-y-4 lg:space-x-4 lg:space-y-0 h-fit">
+            <div className="lg:w-1/2 flex flex-col items-center justify-between text-center bg-[var(--block-background)] rounded-lg shadow-md p-8 w-full">
+              <h2 className="text-xl font-semibold mb-4">Goal Details</h2>
+              <div className="flex flex-col space-y-2 h-full justify-center">
+                <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                  <div className="font-bold whitespace-nowrap mr-[5rem]">
+                    Goal Type:
+                  </div>
+                  <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                    {goal.type}
                   </div>
                 </div>
 
-                <div
-                  className="flex flex-col justify-between items-center text-center bg-[var(--block-background)] rounded-lg shadow-md p-8"
-                  style={{ width: '20vw' }}
-                >
-                  <h2 className="text-xl font-semibold mb-4">
-                    {goal.type != 'Spending Limit'
-                      ? 'Overall Goal Progress'
-                      : 'Spent This Month'}
-                  </h2>
-                  <div className="relative flex-grow flex justify-center items-center h-full">
-                    <div className="w-[20vh] h-[20vh]">
-                      <CircularProgressbar
-                        value={calculateProgressPercentage(goal)}
-                        styles={buildStyles({
-                          pathColor: getColorForValue(
-                            calculateProgressPercentage(goal),
-                            goal.type
-                          ),
-                          trailColor: '#d6d6d6',
-                          strokeLinecap: 'round',
-                        })}
-                      />
-                      <div
-                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold"
-                        style={{
-                          color: getColorForValue(
-                            calculateProgressPercentage(goal),
-                            goal.type
-                          ),
-                        }}
-                      >
-                        {`${calculateProgressPercentage(goal).toFixed(2)}%`}
-                      </div>
-                    </div>
+                <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                  <div className="font-bold whitespace-nowrap mr-[5rem]">
+                    Update Type:
+                  </div>
+                  <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                    {goal.update_type === 'automatic'
+                      ? 'Automatic'
+                      : 'Manual Only'}
                   </div>
                 </div>
 
-                {goal.type != 'Spending Limit' && (
-                  <div
-                    className="flex flex-col items-center justify-center text-center bg-[var(--block-background)] rounded-lg shadow-md p-8"
-                    style={{ width: '20vw' }}
-                  >
-                    <h2 className="text-xl font-semibold mb-4">Goal Wingman</h2>
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Image
-                        src={getGif(calculateProgressPercentage(goal))}
-                        alt="Goal GIF"
-                        className="object-contain w-full h-full"
-                      />
+                {goal.initial_amount !== undefined && (
+                  <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                    <div className="font-bold whitespace-nowrap">
+                      Initial Amount:
+                    </div>
+                    <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                      R {goal.initial_amount.toFixed(2)}
+                    </div>
+                  </div>
+                )}
+
+                {goal.current_amount !== undefined &&
+                  goal.type !== 'Spending Limit' && (
+                    <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                      <div className="font-bold whitespace-nowrap">
+                        Current Amount:
+                      </div>
+                      <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                        R {goal.current_amount.toFixed(2)}
+                      </div>
+                    </div>
+                  )}
+
+                {goal.spending_limit !== undefined &&
+                  goal.type === 'Spending Limit' && (
+                    <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                      <div className="font-bold whitespace-nowrap">
+                        Monthly Limit:
+                      </div>
+                      <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                        R {goal.spending_limit.toFixed(2)}
+                      </div>
+                    </div>
+                  )}
+
+                {goal.monthly_updates !== undefined &&
+                  goal.type === 'Spending Limit' && (
+                    <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                      <div className="font-bold whitespace-nowrap">
+                        Spent this Month:
+                      </div>
+                      <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                        R {monthlyBudgetSpent(goal).toFixed(2)}
+                      </div>
+                    </div>
+                  )}
+
+                {goal.target_amount !== undefined && (
+                  <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                    <div className="font-bold whitespace-nowrap">
+                      Target Amount:
+                    </div>
+                    <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                      R {goal.target_amount.toFixed(2)}
+                    </div>
+                  </div>
+                )}
+
+                {goal.target_date !== undefined && (
+                  <>
+                    <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                      <div className="font-bold whitespace-nowrap">
+                        Target Date:
+                      </div>
+                      <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                        {goal.target_date}
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                      <div className="font-bold whitespace-nowrap">
+                        Days Left:
+                      </div>
+                      <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                        {calculateDaysLeft(goal.target_date) > 0
+                          ? `${calculateDaysLeft(goal.target_date)} days`
+                          : 'Date Passed'}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {goal.last_update !== undefined && (
+                  <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                    <div className="font-bold whitespace-nowrap">
+                      Last Update:
+                    </div>
+                    <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                      {timeSinceLastUpdate(goal.last_update)}
                     </div>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="container mx-auto p-4">
-              <div className="flex flex-col justify-center items-center bg-[var(--block-background)] rounded-lg shadow-md p-8 w-full">
-                <h2 className="text-xl font-semibold mb-4">Insights</h2>
-                <div
-                  className="justify-left items-left bg-grey w-full"
-                  style={{
-                    fontSize: 'calc(1.2rem*var(--font-size-multiplier))',
-                  }}
-                >
-                  {goal.target_date &&
-                    calculateMonthsLeft(goal.target_date) == 0 &&
-                    calculateDaysLeft(goal.target_date) == 0 && (
-                      <>
-                        <p>This goal's target date has passed.</p>
-                        <br></br>
-                        <p>
-                          You can set a new date by clicking "Edit Details"
-                          above.
-                        </p>
-                      </>
-                    )}
-                  {goal.type === 'Savings' &&
-                    goal.target_amount &&
-                    goal.target_amount > goal.current_amount &&
-                    goal.target_date && (
-                      <>
-                        <p>
-                          You still need to save R
-                          {calculateRemainingSavings(goal).toFixed(2)}.
-                        </p>
-                        <br></br>
-                        <p>
-                          This means you need to save R
-                          {calculateSavingsPerMonth(goal).toFixed(2)} per month
-                          in order to reach your goal by {goal.target_date}.
-                        </p>
-                        <br></br>
-                        <p>
-                          The average amount you have saved per month is R
-                          {calculateAverageSavings(goal).toFixed(2)}.
-                        </p>
-                        <br></br>
-                        {calculateSavingsGoalStatus(goal)}
-                      </>
-                    )}
-                  {goal.type === 'Savings' &&
-                    goal.target_amount &&
-                    goal.target_amount <= goal.current_amount && (
-                      <p>You've reached your goal!</p>
-                    )}
-                  {goal.type === 'Spending Limit' && (
+            <div className="lg:w-1/4 flex flex-col items-center justify-between text-center bg-[var(--block-background)] rounded-lg shadow-md p-8 w-full">
+              <h2 className="text-xl font-semibold mb-4">
+                {goal.type !== 'Spending Limit'
+                  ? 'Overall Goal Progress'
+                  : 'Spent This Month'}
+              </h2>
+              <div className="relative flex-grow flex justify-center items-center h-full w-full">
+                <div className="w-[20vh] h-[20vh]">
+                  <CircularProgressbar
+                    value={calculateProgressPercentage(goal)}
+                    styles={buildStyles({
+                      pathColor: getColorForValue(
+                        calculateProgressPercentage(goal),
+                        goal.type
+                      ),
+                      trailColor: '#d6d6d6',
+                      strokeLinecap: 'round',
+                    })}
+                  />
+                  <div
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold"
+                    style={{
+                      color: getColorForValue(
+                        calculateProgressPercentage(goal),
+                        goal.type
+                      ),
+                    }}
+                  >
+                    {`${calculateProgressPercentage(goal).toFixed(2)}%`}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {goal.type !== 'Spending Limit' && (
+              <div className="lg:w-1/4 flex flex-col items-center justify-between text-center bg-[var(--block-background)] rounded-lg shadow-md p-8 w-full">
+                <h2 className="text-xl font-semibold mb-4">Goal Wingman</h2>
+                <div className="w-full flex items-center justify-center">
+                  <Image
+                    src={getGif(calculateProgressPercentage(goal))}
+                    alt="Goal GIF"
+                    className="object-contain w-full h-full"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="container mx-auto p-4">
+          <div className="flex flex-col justify-center items-center bg-[var(--block-background)] rounded-lg shadow-md p-8 w-full">
+            <h2 className="text-xl font-semibold mb-4">Insights</h2>
+            <div
+              className="justify-left items-left bg-grey w-full"
+              style={{
+                fontSize: 'calc(1.2rem*var(--font-size-multiplier))',
+              }}
+            >
+              <div
+                className="justify-left items-left bg-grey w-full"
+                style={{
+                  fontSize: 'calc(1.2rem*var(--font-size-multiplier))',
+                }}
+              >
+                {goal.target_date &&
+                  calculateMonthsLeft(goal.target_date) == 0 &&
+                  calculateDaysLeft(goal.target_date) == 0 && (
                     <>
-                      <p>
-                        On average, you have spent R
-                        {calculateAverageSpending(goal).toFixed(2)} per month.
-                      </p>
+                      <p>This goal's target date has passed.</p>
                       <br></br>
                       <p>
-                        Your average spending is{' '}
+                        You can set a new date by clicking "Edit Details" above.
+                      </p>
+                    </>
+                  )}
+                {goal.type === 'Savings' &&
+                  goal.target_amount &&
+                  goal.target_amount > goal.current_amount &&
+                  goal.target_date && (
+                    <>
+                      <div className="flex">
+                        <p>You still need to save</p>
+                        <p className="text-[var(--primary-1)] font-semibold ml-1">
+                          R{calculateRemainingSavings(goal).toFixed(2)}
+                        </p>
+                        <p>.</p>
+                      </div>
+                      <br></br>
+                      <div className="flex">
+                        <p>This means you need to save </p>
+                        <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
+                          R{calculateSavingsPerMonth(goal).toFixed(2)}
+                        </p>
+                        <p>per month in order to reach your goal in time.</p>
+                      </div>
+                      
+                      {goal.updates && JSON.parse(goal.updates).length > 0 && (
+                        <>
+                        <br></br>
+                        <div className="flex">
+                          <p>The average amount you have saved per month is</p>
+                          <p className="text-[var(--primary-1)] font-semibold ml-1">
+                            R{calculateAverageSavings(goal).toFixed(2)}
+                          </p>
+                          <p>.</p>
+                          <br></br>
+                        </div>
+                        </>
+                      )}
+                    </>
+                  )}
+                {goal.type === 'Savings' &&
+                  goal.target_amount &&
+                  goal.target_amount <= goal.current_amount && (
+                    <p>You've reached your goal!</p>
+                  )}
+                {goal.type === 'Spending Limit' && (
+                  <>
+                    <div className="flex">
+                      <p>On average, you have spent</p>
+                      <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
+                        R{calculateAverageSpending(goal).toFixed(2)}
+                      </p>
+                      <p>per month.</p>
+                    </div>
+                    <br></br>
+                    <div className="flex">
+                      <p>Your average spending is</p>
+                      <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
                         {Math.abs(
                           calculateSpendingDifferencePercentage(goal)
                         ).toFixed(2)}
-                        %{' '}
+                        %
+                      </p>
+                      <p>
                         {calculateSpendingDifferencePercentage(goal) > 0
                           ? 'above'
                           : 'below'}{' '}
                         your monthly limit.
                       </p>
-                      <br></br>
-                      <p>
-                        Your biggest expense was "
-                        {calculateBiggestExpense(goal).description}" in{' '}
-                        {calculateBiggestExpenseMonth(goal)}. This used{' '}
-                        {calculateBiggestExpensePercentage(goal).toFixed(2)}% of
-                        that month's limit.
-                      </p>
-                    </>
-                  )}
-                  {goal.type === 'Debt Reduction' &&
-                    goal.target_date !== undefined &&
-                    goal.current_amount > 0 &&
-                    goal.target_date &&
-                    calculateMonthsLeft(goal.target_date) > 0 && (
+                    </div>
+                    
+                    {goal.updates && JSON.parse(goal.updates).length > 0 && (
                       <>
-                        <p>
-                          You still need to pay R
-                          {calculateRemainingDebt(goal).toFixed(2)} towards this
-                          debt.
+                      <br></br>
+                      <div className="flex">
+                        <p>Your biggest expense was "</p>
+                        <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
+                          {calculateBiggestExpense(goal).description}
                         </p>
-                        <br></br>
-                        <p>
-                          This means you need to pay R
+                        <p>" in</p>
+                        <p className="text-[var(--primary-1)] font-semibold ml-1">
+                          {calculateBiggestExpenseMonth(goal)}
+                        </p>
+                        <p>. This used</p>
+                        <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
+                          {calculateBiggestExpensePercentage(goal).toFixed(2)}%
+                        </p>
+                        <p>of that month's limit.</p>
+                      </div>
+                      </>
+                    )}
+                  </>
+                )}
+                {goal.type === 'Debt Reduction' &&
+                  goal.target_date !== undefined &&
+                  goal.current_amount > 0 &&
+                  goal.target_date &&
+                  calculateMonthsLeft(goal.target_date) > 0 && (
+                    <>
+                      <div className="flex">
+                        <p>You still need to pay</p>
+                        <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
+                          R{calculateRemainingDebt(goal).toFixed(2)}{' '}
+                        </p>
+                        <p>towards this debt.</p>
+                      </div>
+                      <br></br>
+                      <div className="flex">
+                        <p>This means you need to pay</p>
+                        <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
+                          R
                           {(
                             calculateRemainingDebt(goal) /
                             calculateMonthsLeft(goal.target_date)
-                          ).toFixed(2)}{' '}
-                          per month in order to reach your goal by{' '}
-                          {goal.target_date}.
+                          ).toFixed(2)}
                         </p>
+                        <p>per month in order to reach your goal in time.</p>
+                      </div>
+                      
+                      {goal.updates && JSON.parse(goal.updates).length > 0 && (
+                        <>
                         <br></br>
-                        <p>
-                          Your average monthly payment is R
-                          {calculateAverageDebtPayments(goal).toFixed(2)}.
+                      <div className="flex">
+                        <p>Your average monthly payment is</p>
+                        <p className="text-[var(--primary-1)] font-semibold ml-1">
+                          R{calculateAverageDebtPayments(goal).toFixed(2)}
                         </p>
+                        <p>.</p>
+                      </div>
                       </>
-                    )}
-                  {goal.type === 'Debt Reduction' &&
-                    goal.current_amount <= 0 && (
-                      <p>You've reached your goal!</p>
-                    )}
+                      )}
+                    </>
+                  )}
+                {goal.type === 'Debt Reduction' && goal.current_amount <= 0 && (
+                  <p>You've reached your goal!</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {goal.updates && JSON.parse(goal.updates).length > 0 && (
+          <>
+            <div className="container mx-auto p-4">
+              <div className="flex justify-between items-start gap-8">
+                <div className="flex-1 flex flex-col justify-center text-center bg-[var(--block-background)] rounded-lg shadow-md p-8 pl-4 pr-4 h-[40vh]">
+                  <h2 className="text-xl font-semibold mb-10">
+                    {goal.type != 'Spending Limit'
+                      ? 'Goal Progress Over Time'
+                      : 'Spending by Month'}
+                  </h2>
+                  <ResponsiveContainer width="100%" height="80%">
+                    <BarChart
+                      data={getUpdates()}
+                      margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
+                      startAngle={180}
+                    >
+                      <XAxis
+                        dataKey="month"
+                        stroke="var(--main-text)"
+                        tick={{ fill: 'var(--main-text)', fontSize: 12 }}
+                      />
+                      <YAxis
+                        tick={{ fill: 'var(--main-text)', fontSize: 12 }}
+                        stroke="var(--main-text)"
+                        width={50}
+                        allowDataOverflow={true}
+                        domain={['auto', 'auto']}
+                      >
+                        <Label
+                          value="Amount"
+                          angle={-90}
+                          position="insideLeft"
+                          style={{
+                            textAnchor: 'middle',
+                            fill: 'var(--main-text)',
+                            fontSize: '14px',
+                          }}
+                        />
+                      </YAxis>
+                      <Tooltip
+                        cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
+                        contentStyle={{
+                          backgroundColor: 'var(--main-background)',
+                          border: 'none',
+                          borderRadius: '8px',
+                          padding: '10px',
+                        }}
+                      />
+                      <CartesianGrid
+                        stroke="rgba(255, 255, 255, 0.1)"
+                        vertical={false}
+                      />
+                      <Bar
+                        dataKey="amount"
+                        fill="var(--primary-1)"
+                        barSize={40}
+                        stroke="var(--main-border)"
+                        strokeWidth={1}
+                      >
+                        {getUpdates().map(
+                          (entry: { amount: number }, index: any) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={
+                                goal.type === 'Spending Limit' &&
+                                goal.spending_limit
+                                  ? entry.amount > goal.spending_limit
+                                    ? 'red'
+                                    : 'var(--primary-1)'
+                                  : entry.amount < 0
+                                  ? 'var(--primary-2)'
+                                  : 'var(--primary-1)'
+                              }
+                            />
+                          )
+                        )}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               </div>
             </div>
 
-            {goal.updates && JSON.parse(goal.updates).length > 0 && (
-              <>
-                <div className="container mx-auto p-4">
-                  <div className="flex justify-between items-start gap-8">
-                    <div className="flex-1 flex flex-col justify-center text-center bg-[var(--block-background)] rounded-lg shadow-md p-8 h-[40vh]">
-                      <h2 className="text-xl font-semibold mb-10">
-                        {goal.type != 'Spending Limit'
-                          ? 'Goal Progress Over Time'
-                          : 'Spending by Month'}
-                      </h2>
-                      <ResponsiveContainer width="100%" height="80%">
-                        <BarChart
-                          data={getUpdates()}
-                          margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
-                          startAngle={180}
-                        >
-                          <XAxis
-                            dataKey="month"
-                            stroke="var(--main-text)"
-                            tick={{ fill: 'var(--main-text)', fontSize: 12 }}
-                          />
-                          <YAxis
-                            tick={{ fill: 'var(--main-text)', fontSize: 12 }}
-                            stroke="var(--main-text)"
-                            width={50}
-                            allowDataOverflow={true}
-                            domain={['auto', 'auto']}
-                          >
-                            <Label
-                              value="Amount"
-                              angle={-90}
-                              position="insideLeft"
-                              style={{
-                                textAnchor: 'middle',
-                                fill: 'var(--main-text)',
-                                fontSize: '14px',
-                              }}
-                            />
-                          </YAxis>
-                          <Tooltip
-                            cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
-                            contentStyle={{
-                              backgroundColor: 'var(--main-background)',
-                              border: 'none',
-                              borderRadius: '8px',
-                              padding: '10px',
-                            }}
-                          />
-                          <CartesianGrid
-                            stroke="rgba(255, 255, 255, 0.1)"
-                            vertical={false}
-                          />
-                          <Bar
-                            dataKey="amount"
-                            fill="var(--primary-1)"
-                            barSize={40}
-                            stroke="var(--main-border)"
-                            strokeWidth={1}
-                          >
-                            {getUpdates().map(
-                              (entry: { amount: number }, index: any) => (
-                                <Cell
-                                  key={`cell-${index}`}
-                                  fill={
-                                    goal.type === 'Spending Limit' &&
-                                    goal.spending_limit
-                                      ? entry.amount > goal.spending_limit
-                                        ? 'red'
-                                        : 'var(--primary-1)'
-                                      : entry.amount < 0
-                                      ? 'var(--primary-2)'
-                                      : 'var(--primary-1)'
-                                  }
-                                />
-                              )
-                            )}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
+            {currentGoal.updates &&
+              JSON.parse(currentGoal.updates).length > 0 && (
+                <div className="container mx-auto p-4 ">
+                  <div className="flex-1 flex flex-col justify-center text-center bg-[var(--block-background)] rounded-lg shadow-md p-8 pl-20 pr-20">
+                    <h2 className="text-xl font-semibold mb-10">Updates</h2>
+                    <UpdateTable
+                      goal={currentGoal}
+                      onUpdateGoal={handleGoalUpdate}
+                    />
                   </div>
                 </div>
-
-                {currentGoal.updates &&
-                  JSON.parse(currentGoal.updates).length > 0 && (
-                    <div className="container mx-auto p-4">
-                      <div className="flex justify-between items-start gap-8">
-                        <div className="flex-1 flex flex-col justify-center text-center bg-[var(--block-background)] rounded-lg shadow-md p-8 pl-20 pr-20">
-                          <h2 className="text-xl font-semibold mb-10">
-                            Updates
-                          </h2>
-                          <UpdateTable
-                            goal={currentGoal}
-                            onUpdateGoal={handleGoalUpdate}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-              </>
-            )}
-          </div>
-        </div>
+              )}
+          </>
+        )}
       </div>
     </div>
   );
@@ -1439,17 +1459,18 @@ export function GoalsPage() {
 
   return (
     <>
-      {/*<button onClick={refresh}>REFRESH</button><br></br>
-      <button onClick={test}>PRINT</button>*/}
+      <button onClick={refresh}>REFRESH</button>
+      <br></br>
+      <button onClick={test}>PRINT</button>
       {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
       {selectedGoal && (
-        <div style={{ position: 'relative' }} className="relative">
+        <>
           <GoalInfoPage
             goal={selectedGoal}
             onClose={() => setSelectedGoal(null)}
             onUpdateGoal={handleGoalUpdate}
           ></GoalInfoPage>
-        </div>
+        </>
       )}
       {!hasGoals && (
         <>
@@ -1464,9 +1485,12 @@ export function GoalsPage() {
           </div>
         </>
       )}
-      {hasGoals && !isGoalPopupOpen && (
+      {hasGoals && !isGoalPopupOpen && selectedGoal == null && (
         <>
-          <div className="flex justify-between p-4 bg-[var(--main-background)] text-[calc(1.2rem*var(--font-size-multiplier))]">
+          <div
+            className="flex justify-between bg-[var(--main-background)] text-[calc(1.2rem*var(--font-size-multiplier))] mb-4 pb-4 items-end"
+            style={{ borderBottom: '1px solid gray' }}
+          >
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <p className="font-bold mr-4">Sort By:</p>
               <select
