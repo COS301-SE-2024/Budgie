@@ -13,8 +13,8 @@ export default function DashboardLayout({
   const user = useContext(UserContext);
   return (
     <div className="flex w-full h-full">
-      <NewNavbar />
       <DataProvider user={user}>
+        <NewNavbar />
         {children}
       </DataProvider>
     </div>

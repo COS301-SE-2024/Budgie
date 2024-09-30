@@ -1031,7 +1031,7 @@ export function GoalsPage() {
   const [hasGoals, setHasGoals] = useState(false);
   const user = useContext(UserContext);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
-  const { data, setData, refreshData } = useDataContext();
+  const { data, setData } = useDataContext();
 
   const monthlyBudgetSpent = (goal: Goal): number => {
     if (goal.monthly_updates !== undefined) {
