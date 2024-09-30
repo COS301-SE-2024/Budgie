@@ -19,7 +19,6 @@ export function Dashboard(props: DashboardProps) {
   const [currentAccountNumber, setCurrentAccountNumber] = useState<string>('');
   const [yearsWithData, setYearsWithData] = useState<number[]>([]);
 
-
   useThemeSettings();
 
   useEffect(() => {
@@ -29,7 +28,7 @@ export function Dashboard(props: DashboardProps) {
         if (data.accounts.length > 0) {
           setSelectedAlias(data.accounts[0].alias);
           setCurrentAccountNumber(data.accounts[0].account_number);
-        } 
+        }
       }
     };
 
@@ -45,7 +44,7 @@ export function Dashboard(props: DashboardProps) {
           )
           .map((transaction) => transaction.year);
 
-          const sortedYears = Array.from(new Set(years)).sort((a, b) => a - b);
+        const sortedYears = Array.from(new Set(years)).sort((a, b) => a - b);
 
         setYearsWithData(sortedYears);
       }
@@ -84,60 +83,77 @@ export function Dashboard(props: DashboardProps) {
   }
 
   return (
-    <div
-      className="mainPage flex flex-col w-[85vw] items-center"
-      style={{ overflowY: 'hidden', overflowX: 'hidden' }}
-    >
-      <div className=" flex shadow-lg z-2 justify-between rounded-2xl bg-[var(--block-background)] p-2 w-[98%] m-6">
-        <div></div>
-        <button
-          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-BudgieBlue2 hover:text-BudgieWhite font-medium mr-16 cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
-            viewMode === 'all' ? 'border-b-4 border-BudgieBlue2' : ''
-          }`}
-          onClick={() => setViewMode('all')}
-        >
-          Yearly
-        </button>
-        <button
-          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-BudgieBlue2 hover:text-BudgieWhite font-medium cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
-            viewMode === 'monthly' ? 'border-b-4 border-BudgieBlue2' : ''
-          }`}
-          onClick={() => setViewMode('monthly')}
-        >
-          Monthly
-        </button>
-        <select
-          className={styles.accountDropdown}
-          value={selectedAlias}
-          onChange={handleAccountDropdownChange}
-        >
-          {data.accounts.map((option, index) => (
-            <option key={index} value={option.alias}>
-              {option.alias}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        {loading ? (
-          <div className={styles.loadScreen}>
-            <div className={styles.loaderContainer}>
-              <div className={styles.loader}></div>
-            </div>
-            <div className={styles.loaderText}>Loading...</div>
+    <div className="mainPage">
+      <div className="w-full  flex flex-col items-center justify-center">
+        <div className="2xl:w-[85%] w-[100%]  min-w-60">
+          <div className="flex shadow-md !z-0 justify-between !bg-BudgieBlue2  rounded-t-2xl bg-[var(--block-background)] w-full sticky top-0">
+            <div></div>
+            <button
+              className={`rounded-sm px-5 hover:bg-opacity-75 text-BudgieWhite font-medium mr-16 cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
+                viewMode === 'all' ? 'border-b-4 border-BudgieWhite' : ''
+              }`}
+              onClick={() => setViewMode('all')}
+            >
+              Yearly
+            </button>
+            <button
+              className={`rounded-sm px-5 hover:bg-opacity-75 text-BudgieWhite font-medium cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
+                viewMode === 'monthly' ? 'border-b-4 border-BudgieWhite ' : ''
+              }`}
+              onClick={() => setViewMode('monthly')}
+            >
+              Monthly
+            </button>
+            <select
+              className="
+                bg-BudgieBlue2
+                text-BudgieWhite
+                pr-[2.5vw]
+                text-[calc(1.2rem*var(--font-size-multiplier))]
+                font-bold
+                mr-8
+                transition
+                duration-200
+                ease
+                border-0
+                justify-self-end
+                text-right
+                [text-align-last: right]
+                h-[calc(3rem*var(--font-size-multiplier))]
+                leading-[calc(2rem*var(--font-size-multiplier))]
+              "
+              value={selectedAlias}
+              onChange={handleAccountDropdownChange}
+            >
+              {data.accounts.map((option, index) => (
+                <option key={index} value={option.alias}>
+                  {option.alias}
+                </option>
+              ))}
+            </select>
           </div>
-        ) : viewMode === 'monthly' ? (
-          <MonthlyTransactionsView
-            account={currentAccountNumber}
-            availableYears={yearsWithData}
-          />
-        ) : (
-          <AllTransactionsView
-            account={currentAccountNumber}
-            availableYears={yearsWithData}
-          />
-        )}
+
+          <div className="">
+            {loading ? (
+              <div className={styles.loadScreen}>
+                <div className={styles.loaderContainer}>
+                  <div className={styles.loader}></div>
+                </div>
+                <div className={styles.loaderText}>Loading...</div>
+              </div>
+            ) : viewMode === 'monthly' ? (
+              <MonthlyTransactionsView
+                account={currentAccountNumber}
+                availableYears={yearsWithData}
+              />
+            ) : (
+              <AllTransactionsView
+                account={currentAccountNumber}
+                availableYears={yearsWithData}
+              />
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

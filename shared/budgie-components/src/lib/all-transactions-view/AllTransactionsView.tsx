@@ -22,7 +22,7 @@ export interface AllTransactionsViewProps {
 }
 
 export function AllTransactionsView(props: AllTransactionsViewProps) {
-  const { data, setData} = useDataContext();
+  const { data, setData } = useDataContext();
   const [balance, setBalance] = useState(0);
   const [moneyIn, setMoneyIn] = useState(0);
   const [moneyOut, setMoneyOut] = useState(0);
@@ -37,7 +37,6 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     useState<Transaction | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<string>('');
-
 
   useThemeSettings();
 
@@ -98,8 +97,6 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     'november',
     'december',
   ];
-
-
 
   const getCategoryStyle = (category: string) => {
     switch (category) {
@@ -232,12 +229,10 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     };
 
     getYearlyTransactions();
-
   }, [currentYear, props.account]);
 
   useEffect(() => {
-    setCurrentYear(new Date().getFullYear())
-
+    setCurrentYear(new Date().getFullYear());
   }, [props.account]);
 
   const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -374,11 +369,10 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     setSelectedGoal('Select a Goal');
   };
 
-
   return (
-    <div className={styles.mainPage}>
-      <div className={styles.header}>
-        <div className={styles.monthNavigation}>
+    <div className="w-full bg-[var(--main-background)] !z-0">
+      <div className="flex justify-between items-center !z-0 !sticky !top-12  bg-BudgieAccentHover py-2 px-4 shadow-md  rounded-b-2xl">
+        <div className="flex items-center">
           <button className={styles.navButton} onClick={handlePrevYear}>
             <span
               className="material-symbols-outlined"
@@ -386,6 +380,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
                 fontSize: 'calc(1.4rem * var(--font-size-multiplier))',
                 alignContent: 'center',
                 display: 'flex',
+                color: 'white',
               }}
             >
               arrow_back_ios
@@ -404,96 +399,92 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
               ))}
             </select>
           </span>
-
-          <button
-            className={styles.navButton}
-            onClick={handleNextYear}
-          >
+          <button className={styles.navButton} onClick={handleNextYear}>
             <span
               className="material-symbols-outlined"
               style={{
                 fontSize: 'calc(1.4rem * var(--font-size-multiplier))',
                 alignContent: 'center',
                 display: 'flex',
+                color: 'white',
               }}
             >
               arrow_forward_ios
             </span>
           </button>
         </div>
-        <div className={styles.balanceInfo}>
+        <div className="font-bold text-2xl flex text-BudgieWhite justify-center items-center">
           Balance: {formatCurrency(balance)}
-          <p className={styles.moneyInfo}>
-            Money In: {formatCurrency(moneyIn)}
-          </p>
-          <p className={styles.moneyInfo}>
-            Money Out: {formatCurrency(moneyOut)}
-          </p>
+          <div className="ml-8">
+            <p className="text-green-300 font-bold text-base">
+              Money In: {formatCurrency(moneyIn)}
+            </p>
+            <p className="text-red-300 font-bold text-base">
+              Money Out: {formatCurrency(moneyOut)}
+            </p>
+          </div>
         </div>
       </div>
-      <br />
-      {balance !== null && (
-        <div className={styles.transactionsList}>
-          {transactions.length > 0 && (
-            <div className={styles.transactions}>
-              {transactions.map((transaction, index) => (
-                <div
-                  key={index}
-                  className={styles.transactionCard}
-                  style={{
-                    borderLeft:
-                      transaction.amount >= 0
-                        ? '15px solid #8EE5A2'
-                        : '15px solid var(--primary-1)',
-                  }}
-                >
-                  <div className={styles.transactionContent}>
-                    <div className={styles.transactionDate}>
-                      {transaction.date}
-                    </div>
-                    <div
-                      className={styles.transactionDescription}
-                      onClick={() => handleDescriptionClick(transaction)}
-                      style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                    >
-                      {transaction.description}
-                    </div>
-                    <div className={styles.transactionAmount}>
-                      {formatTransactionValue(transaction.amount)}
-                    </div>
-                    <select
-                      className={`${styles.categoryDropdown} ${getCategoryStyle(
-                        transaction.category
-                      )}`}
-                      data-testid="category-dropdown-income"
-                      onChange={(event) => handleCategoryChange(event, index)}
-                      id={`${transaction.date}-${transaction.description}`}
-                      value={transaction.category}
-                    >
-                      <option value=""></option>
-                      <option value="Income">Income</option>
-                      <option value="Transport">Transport</option>
-                      <option value="Eating Out">Eating Out</option>
-                      <option value="Groceries">Groceries</option>
-                      <option value="Entertainment">Entertainment</option>
-                      <option value="Shopping">Shopping</option>
-                      <option value="Insurance">Insurance</option>
-                      <option value="Utilities">Utilities</option>
-                      <option value="Medical Aid">Medical Aid</option>
-                      <option value="Transfer">Transfer</option>
-                      <option value="Other">Other</option>
-                    </select>
+      {balance !== null && transactions.length > 0 && (
+        <div className="w-full flex flex-col items-center justify-center">
+          <div className="text-black flex w-[98%] flex-col items-center justify-center gap-[10px] mt-4">
+            {transactions.map((transaction, index) => (
+              <div
+                key={index}
+                className={styles.transactionCard}
+                style={{
+                  borderLeft:
+                    transaction.amount >= 0
+                      ? '15px solid #8EE5A2'
+                      : '15px solid var(--primary-1)',
+                }}
+              >
+                <div className={styles.transactionContent}>
+                  <div className={styles.transactionDate}>
+                    {transaction.date}
                   </div>
+                  <div
+                    className={styles.transactionDescription}
+                    onClick={() => handleDescriptionClick(transaction)}
+                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                  >
+                    {transaction.description}
+                  </div>
+                  <div className={styles.transactionAmount}>
+                    {formatTransactionValue(transaction.amount)}
+                  </div>
+                  <select
+                    className={`${styles.categoryDropdown} ${getCategoryStyle(
+                      transaction.category
+                    )}`}
+                    data-testid="category-dropdown-income"
+                    onChange={(event) => handleCategoryChange(event, index)}
+                    id={`${transaction.date}-${transaction.description}`}
+                    value={transaction.category}
+                  >
+                    <option value=""></option>
+                    <option value="Income">Income</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Eating Out">Eating Out</option>
+                    <option value="Groceries">Groceries</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Insurance">Insurance</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Medical Aid">Medical Aid</option>
+                    <option value="Transfer">Transfer</option>
+                    <option value="Other">Other</option>
+                  </select>
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
       {showPopup && selectedTransaction && (
         <div className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center z-50000 w-[85vw] text-sm md:text-lg lg:text-xl">
-          <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-full max-w-lg ">
+          <div className="bg-[var(--block-background)] p-5 rounded-3xl text-center z-2 w-full max-w-lg ">
             <div className="mb-4">
               <p
                 className="font-semibold"

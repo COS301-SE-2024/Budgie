@@ -451,9 +451,9 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   }
 
   return (
-    <div className={styles.mainPage}>
-      <div className={styles.header}>
-        <div className={styles.monthNavigation}>
+    <div className="w-full bg-[var(--main-background)] !z-0">
+      <div className="flex justify-between items-center !z-0 !sticky !top-12  bg-BudgieAccentHover py-2 px-4 shadow-md  rounded-b-2xl">
+        <div className="flex items-center">
           <button
             className={`${getLeftArrowStyle()}`}
             onClick={handlePrevMonth}
@@ -495,7 +495,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
               ))}
             </select>
           </span>
-
           <button
             className={`${getRightArrowStyle()}`}
             onClick={handleNextMonth}
@@ -512,24 +511,25 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
             </span>
           </button>
         </div>
-        <div className={styles.balanceInfo}>
+        <div className="font-bold text-2xl flex text-BudgieWhite justify-center items-center">
           Balance: {formatCurrency(balance)}
-          <p className={styles.moneyInfo}>
-            Money In: {formatCurrency(moneyIn)}
-          </p>
-          <p className={styles.moneyInfo}>
-            Money Out: {formatCurrency(moneyOut)}
-          </p>
+          <div className="ml-8">
+            <p className="text-green-300 font-bold text-base">
+              Money In: {formatCurrency(moneyIn)}
+            </p>
+            <p className="text-red-300 font-bold text-base">
+              Money Out: {formatCurrency(moneyOut)}
+            </p>
+          </div>
         </div>
       </div>
-      <br />
-      <div className={styles.transactionsList}>
-        {moneyIn === 0 && moneyOut === 0 ? (
-          <div className={styles.noTransactionsMessage}>
-            There are no transactions to display for this month.
-          </div>
-        ) : (
-          <div className={styles.transactions}>
+      {moneyIn === 0 && moneyOut === 0 ? (
+        <div className={styles.noTransactionsMessage}>
+          There are no transactions to display for this month.
+        </div>
+      ) : (
+        <div className="w-full flex flex-col items-center justify-center">
+          <div className="text-black flex w-[98%] flex-col items-center justify-center gap-[10px] mt-4">
             {transactions.map((transaction, index) => (
               <div
                 key={index}
@@ -581,9 +581,10 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
               </div>
             ))}
           </div>
-        )}
-        <div></div>
-      </div>
+        </div>
+      )}
+      <div></div>
+
       {showPopup && selectedTransaction && (
         <div className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center z-50000 w-[85vw] text-sm md:text-lg lg:text-xl">
           <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-full max-w-lg ">
