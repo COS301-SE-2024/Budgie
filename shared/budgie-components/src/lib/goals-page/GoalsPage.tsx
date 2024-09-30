@@ -30,9 +30,7 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import '../../root.css';
 import {
   useDataContext,
-  UserData,
   Goal,
-  Account,
   Transaction,
 } from '../data-context/DataContext';
 

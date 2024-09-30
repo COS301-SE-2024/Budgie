@@ -7,6 +7,9 @@ import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { useRouter } from 'next/navigation';
 import { PieChart, Pie, Tooltip, Cell, Legend } from 'recharts';
 import { AreaChart } from '@tremor/react';
+import {
+  useDataContext
+} from '../data-context/DataContext';
 
 /* eslint-disable-next-line */
 export interface OverviewPageRevisedProps { }
@@ -535,6 +538,15 @@ export function OverviewPageRevised(props: OverviewPageRevisedProps) {
   const user = useContext(UserContext);
   const router = useRouter();
   let pageData: pageData | null = null;
+  const {data, refreshData, loading } = useDataContext();
+
+  useEffect
+
+  useEffect(() => {
+    if (!data.accounts.length && !data.goals.length && !data.transactions.length) {
+      //refreshData();
+    }
+  }, []);
 
   if (selectedAccount == 'All Accounts' && allAccountData != null) {
     pageData = getSummaryAll(allAccountData);
