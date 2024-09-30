@@ -12,26 +12,18 @@ import { useDataContext } from '../data-context/DataContext';
 export interface DashboardProps {}
 
 export function Dashboard(props: DashboardProps) {
-  const { data } = useDataContext();
+  const { data, loading, refreshData } = useDataContext();
   const user = useContext(UserContext);
   const [viewMode, setViewMode] = useState('monthly');
   const [selectedAlias, setSelectedAlias] = useState<string>('');
   const [currentAccountNumber, setCurrentAccountNumber] = useState<string>('');
-
   const [yearsWithData, setYearsWithData] = useState<number[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   useThemeSettings();
 
   useEffect(() => {
+    refreshData();
     const fetchAccounts = async () => {
       if (user && user.uid) {
         if (data.accounts.length > 0) {

@@ -28,11 +28,7 @@ import styles from './GoalsPage.module.css';
 import UpdateGoalPopup from '../update-goal-progress-popup/UpdateGoalProgressPopup';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import '../../root.css';
-import {
-  useDataContext,
-  Goal,
-  Transaction,
-} from '../data-context/DataContext';
+import { useDataContext, Goal, Transaction } from '../data-context/DataContext';
 
 import Image from 'next/image';
 
@@ -1031,7 +1027,7 @@ export function GoalsPage() {
   const [hasGoals, setHasGoals] = useState(false);
   const user = useContext(UserContext);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
-  const { data, setData } = useDataContext();
+  const { data, setData, loading } = useDataContext();
 
   const monthlyBudgetSpent = (goal: Goal): number => {
     if (goal.monthly_updates !== undefined) {
@@ -1400,6 +1396,14 @@ export function GoalsPage() {
 
   return (
     <>
+      {loading && (
+        <div className="flex-1 h-full w-full flex flex-col items-center justify-center bg-[var(--main-background)]">
+          <div className={styles.loaderContainer}>
+            <div className={styles.loader}></div>
+          </div>
+          <div className={styles.loaderText}>Loading...</div>
+        </div>
+      )}
       {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
       {selectedGoal && (
         <>
@@ -1409,21 +1413,8 @@ export function GoalsPage() {
             onUpdateGoal={handleGoalUpdate}
           ></GoalInfoPage>
         </>
-      )}
-      {!hasGoals && (
-        <>
-          <div className="flex flex-col items-center justify-center bg-[var(--main-background)] h-full">
-            <div className="text-2xl">Add your first goal:</div>
-            <button
-              className="text-2xl mt-4 bg-BudgieBlue2 hover:bg-BudgieAccentHover transition-colors text-white p-4 rounded-2xl"
-              onClick={addGoalPopup}
-            >
-              Add Goal
-            </button>
-          </div>
-        </>
-      )}
-      {hasGoals && !isGoalPopupOpen && selectedGoal == null && (
+      )}      
+      {data.goals.length >0 && !isGoalPopupOpen && selectedGoal == null && (
         <>
           <div
             className="flex justify-between bg-[var(--main-background)] text-[calc(1.2rem*var(--font-size-multiplier))] mb-4 pb-4 items-end"
@@ -1514,6 +1505,19 @@ export function GoalsPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </>
+      )}
+      {!hasGoals && (
+        <>
+          <div className="flex flex-col items-center justify-center bg-[var(--main-background)] h-full">
+            <div className="text-2xl">Add your first goal:</div>
+            <button
+              className="text-2xl mt-4 bg-BudgieBlue2 hover:bg-BudgieAccentHover transition-colors text-white p-4 rounded-2xl"
+              onClick={addGoalPopup}
+            >
+              Add Goal
+            </button>
           </div>
         </>
       )}

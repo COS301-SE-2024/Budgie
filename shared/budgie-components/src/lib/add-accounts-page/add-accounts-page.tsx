@@ -670,7 +670,6 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               alias: inputValue,
               bank: bankRef.current,
             });
-            refreshData();
             //TODO:success modal for upload success
             await delay(1000);
             setLoader(false);
@@ -679,6 +678,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               setShowSuccessModal(false);
               router.push('/accounts');
             }, 2000);
+            refreshData();
           }
         }
         //stop spinner

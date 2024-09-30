@@ -5,7 +5,6 @@ import { getAuth, signOut } from 'firebase/auth';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useDataContext } from '../data-context/DataContext';
-import styles from '../dashboard/Dashboard.module.css';
 
 /* eslint-disable-next-line */
 export interface NavbarProps {}
@@ -38,88 +37,6 @@ export function NewNavbar(props: NavbarProps) {
     }
   }, [pathname]);
 
-  if (loading) {
-    return (
-      <div className="flex h-screen fixed z-20 w-full top-0 left-0">
-        <div className="w-[5rem] min-w-[5rem] md:w-[15rem] md:min-w-[15rem] bg-[var(--block-background)] h-full [box-shadow:0_0_10px_rgba(0,0,0,0.5)] pt-6 z-[100]">
-          <ul className="mr-4 ml-4">
-            {/* Overview item */}
-            <Link href={'/overview'}>
-              <li
-                className={getNavItemClasses('overview')}
-              >
-                <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] font-[500] text-[min(2rem,calc(1.5rem_*_var(--font-size-multiplier)))]">
-                  home
-                </span>
-                <span className="hidden md:inline">Overview</span>
-              </li>
-            </Link>
-            {/* Accounts item */}
-            <Link href={'/accounts'}>
-              <li
-                className={getNavItemClasses('accounts')}
-              >
-                <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] font-[500] text-[min(2rem,calc(1.5rem_*_var(--font-size-multiplier)))]">
-                  account_balance
-                </span>
-                <span className="hidden md:inline">Accounts</span>
-              </li>
-            </Link>
-            {/* Transactions item */}
-            <Link href={'/transactions'}>
-              <li
-                className={getNavItemClasses('transactions')}
-              >
-                <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] font-[500] text-[min(2rem,calc(1.5rem_*_var(--font-size-multiplier)))]">
-                  receipt_long
-                </span>
-                <span className="hidden md:inline">Transactions</span>
-              </li>
-            </Link>
-            {/* Planning item */}
-            <Link href={'/planning'}>
-              <li
-                className={getNavItemClasses('planning')}
-              >
-                <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] font-[500] text-[min(2rem,calc(1.5rem_*_var(--font-size-multiplier)))]">
-                  browse_activity
-                </span>
-                <span className="hidden md:inline">Planning</span>
-              </li>
-            </Link>
-            {/* Settings item */}
-            <Link href={'/settings'}>
-              <li
-                className={getNavItemClasses('settings')}
-              >
-                <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] font-[500] text-[min(2rem,calc(1.5rem_*_var(--font-size-multiplier)))]">
-                  settings
-                </span>
-                <span className="hidden md:inline">Settings</span>
-              </li>
-            </Link>
-            {/* Logout item */}
-            <li
-              className="fixed bottom-4 w-[13vw] font-medium [font-family:'Trip Sans',_sans-serif] flex items-center rounded-[0.4rem] h-8 cursor-pointer text-[var(--main-text)] p-[calc(0.2rem_*_var(--font-size-multiplier))] text-[min(2rem,calc(1.2rem_*_var(--font-size-multiplier)))] hover:bg-[var(--hover)] transition duration-300 ease"
-              onClick={signout}
-            >
-              <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] text-[min(2rem,calc(1.2rem_*_var(--font-size-multiplier)))]">
-                logout
-              </span>
-              <span className="hidden md:inline">Logout</span>
-            </li>
-          </ul>
-        </div>
-
-        <div className="flex-1 h-full w-full flex flex-col items-center justify-center bg-[var(--main-background)]">
-          <div className={styles.loaderContainer}>
-            <div className={styles.loader}></div>
-          </div>
-          <div className={styles.loaderText}>Loading...</div>
-        </div>
-      </div>
-    );
-  }
 
   // Function to generate class names for nav items
   function getNavItemClasses(itemName: string) {

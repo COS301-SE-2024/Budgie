@@ -1,9 +1,4 @@
-.loadScreen {
-  background-color: var(--main-background);
-  width: 85vw;
-  height: calc(100vh - (6vh * var(--font-size-multiplier)));
-  padding-top: 40vh;
-}
+
 
 .loaderContainer {
   display: flex;
