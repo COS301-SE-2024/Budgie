@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { getAuth, signOut } from 'firebase/auth';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useDataContext } from '../data-context/DataContext';
 
 /* eslint-disable-next-line */
 export interface NavbarProps {}
@@ -23,10 +24,19 @@ export function NewNavbar(props: NavbarProps) {
   const [selectedItem, setSelectedItem] = useState<string>(
     getFirstSubstring(pathname)
   );
+  const { data, refreshData, loading } = useDataContext();
 
   useEffect(() => {
     setSelectedItem(getFirstSubstring(pathname));
+    if (
+      !data.accounts.length &&
+      !data.goals.length &&
+      !data.transactions.length
+    ) {
+      refreshData();
+    }
   }, [pathname]);
+
 
   // Function to generate class names for nav items
   function getNavItemClasses(itemName: string) {

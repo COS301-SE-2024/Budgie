@@ -13,10 +13,10 @@ import {
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from 'firebase/auth';
 import '../../root.css';
+import { useDataContext } from '../data-context/DataContext';
 
 export interface MonthlyTransactionsViewProps {
   account: string;
-  data: any;
   availableYears: number[];
 }
 
@@ -38,30 +38,33 @@ interface Goal {
 }
 
 export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
+  const { data, setData } = useDataContext();
   const [balance, setBalance] = useState(0);
   const [moneyIn, setMoneyIn] = useState(1);
   const [moneyOut, setMoneyOut] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-  const [Data, setData] = useState<any>(null);
+  const [Data, setDisplayData] = useState<any>(null);
   const user = useContext(UserContext);
   const dropdownRef = useRef<HTMLSelectElement>(null);
   const [LeftArrowStyle, setLeftArrowStyle] = useState('');
   const [RightArrowStyle, setRightArrowStyle] = useState('');
 
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<Transaction | null>(null);
   const [showPopup, setShowPopup] = useState(false);
-  const [userGoals, setUserGoals] = useState<Goal[]>([]);
   const [selectedGoal, setSelectedGoal] = useState<string>('');
 
-
   interface Transaction {
+    id: string;
+    account_number: string;
     date: string;
     amount: number;
     balance: number;
     description: string;
     category: string;
+    year: number;
   }
 
   const handleNextMonth = () => {
@@ -92,9 +95,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
       setCurrentMonth(
         new Date(currentMonth.setMonth(currentMonth.getMonth() - 1))
       );
-      if (currentMonth.getFullYear() != currentYear) {
-        setCurrentYear(currentMonth.getFullYear());
-      }
       display();
     }
   };
@@ -103,7 +103,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     setSelectedTransaction(transaction);
     setShowPopup(true);
   };
-
 
   const monthNames = [
     'january',
@@ -120,30 +119,13 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     'december',
   ];
 
-
-  useEffect(() => {
-    const fetchUserGoals = async () => {
-      if (user && user.uid) {
-        const q = query(collection(db, 'goals'), where('uid', '==', user.uid));
-        const querySnapshot = await getDocs(q);
-        const goalsList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Goal[];
-        setUserGoals(goalsList);
-      }
-    };
-
-    fetchUserGoals();
-  }, [user]);
-
   const handleAddToGoal = async () => {
     if (!selectedGoal || !selectedTransaction) {
       alert('Please select a goal.');
       return;
     }
 
-    const goal = userGoals.find((goal) => goal.id === selectedGoal);
+    const goal = data.goals.find((goal) => goal.id === selectedGoal);
     if (!goal) return;
 
     const updates = JSON.parse(goal.updates || '[]');
@@ -151,12 +133,17 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     const existingUpdate = updates.find(
       (update: any) =>
         update.date === selectedTransaction.date &&
-        update.amount === selectedTransaction.amount &&
+        (update.amount === selectedTransaction.amount ||
+          update.amount === -selectedTransaction.amount) &&
         update.description === selectedTransaction.description
     );
 
     if (existingUpdate) {
-      if (window.confirm('This transaction already exists in the goal. Add it again?')) {
+      if (
+        window.confirm(
+          'This transaction already exists in the goal. Add it again?'
+        )
+      ) {
         addUpdateToGoal(goal, selectedTransaction);
       }
     } else {
@@ -166,59 +153,79 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
 
   const addUpdateToGoal = async (goal: Goal, transaction: Transaction) => {
     const updates = JSON.parse(goal.updates || '[]');
+    let newAmount;
+    if (goal.type === 'Savings') {
+      newAmount = transaction.amount;
+    } else {
+      newAmount = -transaction.amount;
+    }
     updates.push({
       date: transaction.date,
-      amount: transaction.amount,
+      amount: newAmount,
       description: transaction.description,
     });
-    
+
     await updateDoc(doc(db, 'goals', goal.id), {
       updates: JSON.stringify(updates),
-      last_update: new Date().toISOString()
+      last_update: new Date().toISOString(),
+    });
+
+    setData({
+      ...data,
+      goals: data.goals.map((goalItem) => {
+        if (goalItem.id === goal.id) {
+          return {
+            ...goalItem,
+            updates: JSON.stringify(updates),
+          };
+        }
+        return goalItem;
+      }),
     });
 
     alert('Transaction added to goal.');
     setShowPopup(false);
-    setSelectedGoal("Select a Goal")
+    setSelectedGoal('Select a Goal');
+  };
+
+  const getYearlyTransactions = async () => {
+    if (data && data.transactions) {
+      try {
+        const filteredTransactions = data.transactions.filter((transaction) => {
+          return (
+            transaction.account_number == props.account &&
+            transaction.year == currentYear
+          );
+        });
+
+        if (filteredTransactions.length > 0) {
+          setDisplayData(filteredTransactions[0]);
+          display();
+        } else {
+          console.error(
+            'No transactions found for the current year and account'
+          );
+        }
+      } catch (error) {
+        console.error('Error processing transactions from context:', error);
+      }
+    }
   };
 
   useEffect(() => {
-    const getYearlyTransactions = async () => {
-      if (user && user.uid) {
-        try {
-          const q = query(
-            collection(db, `transaction_data_${currentYear}`),
-            where('uid', '==', user.uid),
-            where('account_number', '==', props.account)
-          );
-          const querySnapshot = await getDocs(q);
-          const transactionList = querySnapshot.docs.map((doc) => doc.data());
-          setData(transactionList[0]);
-        } catch (error) {
-          console.error('Error getting bank statement document:', error);
-        }
-      }
-    };
-
-
-    const auth = getAuth();
-    if (auth) {
-      const user = auth.currentUser;
-      if (user !== null) {
-        getYearlyTransactions();
-      }
-    }
-  }, [currentYear]);
+    setCurrentYear(currentMonth.getFullYear()); // Update when currentMonth changes
+  }, [currentMonth]);
 
   useEffect(() => {
-    if (Data !== null) {
+    getYearlyTransactions();
+    display();
+  }, [currentYear, props.account]);
+
+  useEffect(() => {
+    if (Data) {
       display();
     }
-  }, [Data]);
-
-  useEffect(() => {
-    setData(props.data);
-  }, []);
+  }, [Data, currentMonth]);
 
   const display = async () => {
     if (
@@ -243,15 +250,9 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
       .toLocaleString('default', { month: 'long' })
       .toLocaleLowerCase();
     if (
-      Data === undefined ||
-      Data[month] === undefined ||
-      Data[month] === null
+      Data && // Ensure Data is not null or undefined
+      Data[monthNames[currentMonth.getMonth()]] // Ensure month data exists
     ) {
-      setTransactions([]);
-      setBalance(0);
-      setMoneyIn(0);
-      setMoneyOut(0);
-    } else {
       const transactionsList = JSON.parse(Data[month]);
       setTransactions(transactionsList);
       setBalance(JSON.parse(Data[month])[0].balance);
@@ -272,6 +273,11 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
 
       setMoneyIn(moneyInTotal);
       setMoneyOut(Math.abs(moneyOutTotal)); // money out should be positive for display
+    } else {
+      setTransactions([]);
+      setBalance(0);
+      setMoneyIn(0);
+      setMoneyOut(0);
     }
   };
 
@@ -303,12 +309,21 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
             [monthNames[currentMonth.getMonth()]]:
               JSON.stringify(updatedTransactions),
           });
-
-          const querySnapshot2 = await getDocs(q);
-          const transactionList = querySnapshot2.docs.map((doc) => doc.data());
-          setData(transactionList[0]);
         }
         setTransactions(updatedTransactions);
+
+        setData({
+          ...data,
+          transactions: data.transactions.map((transaction) => {
+            if (transaction.year === currentYear) {
+              return {
+                ...transaction,
+                [currentMonth.getMonth()]: JSON.stringify(updatedTransactions),
+              };
+            }
+            return transaction;
+          }),
+        });
       }
     }
   };
@@ -414,8 +429,9 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
 
   const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedYear = parseInt(event.target.value);
+    const updatedDate = new Date(currentMonth.setFullYear(selectedYear));
     setCurrentYear(selectedYear);
-    setCurrentMonth(new Date(currentMonth.setFullYear(selectedYear)));
+    setCurrentMonth(updatedDate);
     display();
   };
 
@@ -506,7 +522,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
           </p>
         </div>
       </div>
-<br />
+      <br />
       <div className={styles.transactionsList}>
         {moneyIn === 0 && moneyOut === 0 ? (
           <div className={styles.noTransactionsMessage}>
@@ -514,17 +530,21 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
           </div>
         ) : (
           <div className={styles.transactions}>
-            
             {transactions.map((transaction, index) => (
               <div
                 key={index}
                 className={styles.transactionCard}
                 style={{
-                  borderLeft: transaction.amount >= 0 ? '15px solid #8EE5A2' : '15px solid var(--primary-1)',
+                  borderLeft:
+                    transaction.amount >= 0
+                      ? '15px solid #8EE5A2'
+                      : '15px solid var(--primary-1)',
                 }}
               >
                 <div className={styles.transactionContent}>
-                  <div className={styles.transactionDate}>{transaction.date}</div>
+                  <div className={styles.transactionDate}>
+                    {transaction.date}
+                  </div>
                   <div
                     className={styles.transactionDescription}
                     onClick={() => handleDescriptionClick(transaction)}
@@ -536,46 +556,51 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
                     {formatTransactionValue(transaction.amount)}
                   </div>
                   <select
-                      className={`${styles.categoryDropdown} ${getCategoryStyle(
-                        transaction.category
-                      )}`}
-                      data-testid="category-dropdown-income"
-                      onChange={(event) => handleChange(event, index)}
-                      id={`${transaction.date}-${transaction.description}`}
-                      value={transaction.category}
-                    >
-                      <option value=""></option>
-                      <option value="Income">Income</option>
-                      <option value="Transport">Transport</option>
-                      <option value="Eating Out">Eating Out</option>
-                      <option value="Groceries">Groceries</option>
-                      <option value="Entertainment">Entertainment</option>
-                      <option value="Shopping">Shopping</option>
-                      <option value="Insurance">Insurance</option>
-                      <option value="Utilities">Utilities</option>
-                      <option value="Medical Aid">Medical Aid</option>
-                      <option value="Transfer">Transfer</option>
-                      <option value="Other">Other</option>
-                    </select>
+                    className={`${styles.categoryDropdown} ${getCategoryStyle(
+                      transaction.category
+                    )}`}
+                    data-testid="category-dropdown-income"
+                    onChange={(event) => handleChange(event, index)}
+                    id={`${transaction.date}-${transaction.description}`}
+                    value={transaction.category}
+                  >
+                    <option value=""></option>
+                    <option value="Income">Income</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Eating Out">Eating Out</option>
+                    <option value="Groceries">Groceries</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Insurance">Insurance</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Medical Aid">Medical Aid</option>
+                    <option value="Transfer">Transfer</option>
+                    <option value="Other">Other</option>
+                  </select>
                 </div>
               </div>
-
             ))}
           </div>
         )}
-        <div>
-
-        </div>
+        <div></div>
       </div>
       {showPopup && selectedTransaction && (
         <div className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center z-50000 w-[85vw] text-sm md:text-lg lg:text-xl">
-
           <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-full max-w-lg ">
-
             <div className="mb-4">
-              <p className="font-semibold" style={{fontSize:'calc(1.2rem * var(--font-size-multiplier))'}}>Transaction Details</p>
+              <p
+                className="font-semibold"
+                style={{
+                  fontSize: 'calc(1.2rem * var(--font-size-multiplier))',
+                }}
+              >
+                Transaction Details
+              </p>
             </div>
-            <div className="flex flex-col items-center" style={{fontSize:'calc(1rem * var(--font-size-multiplier))'}}>
+            <div
+              className="flex flex-col items-center"
+              style={{ fontSize: 'calc(1rem * var(--font-size-multiplier))' }}
+            >
               <div className="flex justify-between w-[50%]">
                 <div className="font-semibold">Date:</div>
                 <div>{selectedTransaction.date}</div>
@@ -586,16 +611,22 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
                 <div>{selectedTransaction.description}</div>
               </div>
 
-
               <div className="flex justify-between w-[50%]">
                 <div className="font-semibold">Amount:</div>
                 <div>{formatTransactionValue(selectedTransaction.amount)}</div>
               </div>
             </div>
 
-            {userGoals.length > 0 && (
+            {data.goals.length > 0 && (
               <div className="mt-6">
-                <div className="mb-2 font-semibold" style={{fontSize:'calc(1rem * var(--font-size-multiplier))'}}>Add to a Goal:</div>
+                <div
+                  className="mb-2 font-semibold"
+                  style={{
+                    fontSize: 'calc(1rem * var(--font-size-multiplier))',
+                  }}
+                >
+                  Add to a Goal:
+                </div>
                 <div className="flex items-center space-x-2">
                   <select
                     className="flex-grow p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-black"
@@ -603,7 +634,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
                     onChange={(e) => setSelectedGoal(e.target.value)}
                   >
                     <option value="">Select a Goal</option>
-                    {userGoals.map((goal) => (
+                    {data.goals.map((goal) => (
                       <option key={goal.id} value={goal.id}>
                         {goal.name}
                       </option>
@@ -617,7 +648,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
                   </button>
                 </div>
               </div>
-
             )}
 
             <button
@@ -629,7 +659,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
           </div>
         </div>
       )}
-
     </div>
   );
 }

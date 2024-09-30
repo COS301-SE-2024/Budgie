@@ -195,7 +195,7 @@
   padding: 1rem;
   z-index: 1000000;
   position: fixed;
-  transform: translateX(calc(40vw * var(--font-size-multiplier)));
+  transform: translateX(calc(2rem * var(--font-size-multiplier)));
   opacity: 0;
   transition: opacity 0.3s;
   font-weight: 200;
@@ -219,11 +219,13 @@
 }
 
 .icon:hover+.popupText {
+  cursor: pointer;
   visibility: visible;
   opacity: 1;
 }
 
 .icon:hover+.noAccountPopupText {
+  cursor: pointer;
   visibility: visible;
   opacity: 1;
 }
@@ -232,7 +234,7 @@
   border: 1px solid #ccc;
   padding: 5px;
   border-radius: 10px;
-  width: calc(9vw * var(--font-size-multiplier));
+  width: fit-content;
   box-sizing: border-box;
   font-weight: bold;
   font-size: calc(16px * var(--font-size-multiplier));
