@@ -23,6 +23,9 @@ import { UserContext } from '@capstone-repo/shared/budgie-components';
 import { useRouter } from 'next/navigation';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import Image from 'next/image';
+import {
+  useDataContext
+} from '../data-context/DataContext';
 
 /* eslint-disable-next-line */
 export interface AddAccountsPageProps {}
@@ -43,6 +46,8 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
   const router = useRouter();
   //bank state to pass to account addition phase
   const bankRef = useRef('');
+  const {refreshData } = useDataContext();
+
 
   function AddAccountModal() {
     function OnAddAccountTypeClick(type: string) {
@@ -665,6 +670,7 @@ export function AddAccountsPage(props: AddAccountsPageProps) {
               alias: inputValue,
               bank: bankRef.current,
             });
+            refreshData();
             //TODO:success modal for upload success
             await delay(1000);
             setLoader(false);

@@ -47,7 +47,6 @@ export function NewNavbar(props: NavbarProps) {
             <Link href={'/overview'}>
               <li
                 className={getNavItemClasses('overview')}
-                onClick={() => setSelectedItem('overview')}
               >
                 <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] font-[500] text-[min(2rem,calc(1.5rem_*_var(--font-size-multiplier)))]">
                   home
@@ -59,7 +58,6 @@ export function NewNavbar(props: NavbarProps) {
             <Link href={'/accounts'}>
               <li
                 className={getNavItemClasses('accounts')}
-                onClick={() => setSelectedItem('accounts')}
               >
                 <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] font-[500] text-[min(2rem,calc(1.5rem_*_var(--font-size-multiplier)))]">
                   account_balance
@@ -71,7 +69,6 @@ export function NewNavbar(props: NavbarProps) {
             <Link href={'/transactions'}>
               <li
                 className={getNavItemClasses('transactions')}
-                onClick={() => setSelectedItem('transactions')}
               >
                 <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] font-[500] text-[min(2rem,calc(1.5rem_*_var(--font-size-multiplier)))]">
                   receipt_long
@@ -83,7 +80,6 @@ export function NewNavbar(props: NavbarProps) {
             <Link href={'/planning'}>
               <li
                 className={getNavItemClasses('planning')}
-                onClick={() => setSelectedItem('planning')}
               >
                 <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] font-[500] text-[min(2rem,calc(1.5rem_*_var(--font-size-multiplier)))]">
                   browse_activity
@@ -95,7 +91,6 @@ export function NewNavbar(props: NavbarProps) {
             <Link href={'/settings'}>
               <li
                 className={getNavItemClasses('settings')}
-                onClick={() => setSelectedItem('settings')}
               >
                 <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] font-[500] text-[min(2rem,calc(1.5rem_*_var(--font-size-multiplier)))]">
                   settings

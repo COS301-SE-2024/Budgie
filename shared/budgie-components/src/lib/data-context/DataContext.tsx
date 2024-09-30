@@ -150,6 +150,7 @@ export const DataProvider = ({ children, user }: { children: React.ReactNode; us
   const [error, setError] = useState<string | null>(null);
 
   const refreshData = async () => {
+    console.log("REFRESH");
     try {
       setLoading(true);
       setError(null);

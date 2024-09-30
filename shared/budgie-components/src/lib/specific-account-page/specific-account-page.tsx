@@ -24,6 +24,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import { useDataContext } from '../data-context/DataContext';
 
 /* eslint-disable-next-line */
 export interface SpecificAccountPageProps {
@@ -1070,6 +1071,7 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
   const user = useContext(UserContext);
   const [dataLoading, setDataLoading] = useState(true);
   const [error, setError] = useState('');
+  const {refreshData } = useDataContext();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -1140,7 +1142,7 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
               style={{ backgroundColor: 'var(--block-background)' }}
             >
               <span
-                onClick={() => router.back()}
+                onClick={() => {router.back(); refreshData();}}
                 aria-label="back"
                 className="cursor-pointer material-symbols-outlined absolute left-4 transition-all bg-gray-200 p-1.5 hover:bg-gray-300 rounded-lg text-BudgieBlue2"
                 style={{ fontSize: '1.5rem' }}
