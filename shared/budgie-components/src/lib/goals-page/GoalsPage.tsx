@@ -84,75 +84,9 @@ const UpdateTable = ({
   const [localUpdates, setLocalUpdates] = useState<Update[]>(
     goal.updates ? JSON.parse(goal.updates) : []
   );
+  const { data, setData } = useDataContext();
 
-  const handleDeleteUpdate = (amount: number, date: string) => {
-    if (
-      window.confirm('Do you really want to delete this update?') &&
-      goal.updates
-    ) {
-      let updatedCurrentAmount = goal.current_amount;
-
-      if (goal.type === 'Debt Reduction') {
-        updatedCurrentAmount += amount;
-      } else {
-        updatedCurrentAmount -= amount;
-      }
-
-      let removed = false;
-      const newUpdates: Update[] = [];
-      for (let i = 0; i < localUpdates.length; i++) {
-        const update = localUpdates[i];
-        if (!removed && update.amount === amount && update.date === date) {
-          removed = true;
-          continue;
-        }
-        newUpdates.push(update);
-      }
-
-      goal.current_amount = updatedCurrentAmount;
-      goal.updates = JSON.stringify(newUpdates);
-
-      let monthlyUpdatesArray = goal.monthly_updates
-        ? JSON.parse(goal.monthly_updates)
-        : [];
-      const updateMonth = new Date(date).toLocaleString('default', {
-        month: 'long',
-        year: 'numeric',
-      });
-      const monthlyUpdateIndex = monthlyUpdatesArray.findIndex(
-        (entry: { month: string }) => entry.month === updateMonth
-      );
-
-      if (monthlyUpdateIndex >= 0) {
-        monthlyUpdatesArray[monthlyUpdateIndex].amount -= amount;
-        if (monthlyUpdatesArray[monthlyUpdateIndex].amount == 0) {
-          monthlyUpdatesArray.splice(monthlyUpdateIndex, 1);
-        }
-      }
-
-      goal.monthly_updates = JSON.stringify(monthlyUpdatesArray);
-      setLocalUpdates(newUpdates);
-      onUpdateGoal(goal);
-      updateDB();
-    }
-  };
-
-  const updateDB = async () => {
-    try {
-      const goalData: any = {
-        updates: goal.updates,
-        current_amount: goal.current_amount,
-        monthly_updates: goal.monthly_updates,
-      };
-
-      const goalDocRef = doc(db, 'goals', goal.id);
-      await updateDoc(goalDocRef, goalData);
-    } catch (error) {
-      console.error('Error saving goal:', error);
-    }
-  };
-
-  const handleDeleteNonManualUpdate = (
+  const handleDeleteUpdate = async (
     amount: number,
     date: string,
     description: string
@@ -215,23 +149,36 @@ const UpdateTable = ({
 
       setLocalUpdates(newUpdates);
       onUpdateGoal(goal);
-      updateDBNonManual();
-    }
-  };
+      try {
+        const goalData: any = {
+          updates: goal.updates,
+          deleted_updates: goal.deleted_updates,
+          current_amount: goal.current_amount,
+          monthly_updates: goal.monthly_updates,
+        };
 
-  const updateDBNonManual = async () => {
-    try {
-      const goalData: any = {
-        updates: goal.updates,
-        deleted_updates: goal.deleted_updates,
-        current_amount: goal.current_amount,
-        monthly_updates: goal.monthly_updates,
-      };
+        const goalDocRef = doc(db, 'goals', goal.id);
+        await updateDoc(goalDocRef, goalData);
 
-      const goalDocRef = doc(db, 'goals', goal.id);
-      await updateDoc(goalDocRef, goalData);
-    } catch (error) {
-      console.error('Error saving goal:', error);
+        const updatedGoals = data.goals.map((g) =>
+          g.id === goal.id
+            ? {
+                ...g,
+                updates: goal.updates,
+                deleted_updates: goal.deleted_updates,
+                current_amount: goal.current_amount,
+                monthly_updates: goal.monthly_updates,
+              }
+            : g
+        );
+
+        setData({
+          ...data,
+          goals: updatedGoals,
+        });
+      } catch (error) {
+        console.error('Error saving goal:', error);
+      }
     }
   };
 
@@ -244,131 +191,74 @@ const UpdateTable = ({
         console.error('Failed to parse updates', error);
       }
     }
-    updateDB();
   }, [goal.updates, goal.current_amount]);
 
   return (
-    <div style={{ fontSize: 'calc(1.2rem * var(--font-size-multiplier))' }}>
-      {goal.update_type == 'manual' && (
-        <div>
-          <table className="min-w-full table-auto border-collapse border border-gray-200">
-            <thead>
-              <tr
+    <div className="overflow-x-auto">
+      <table className="min-w-full table-auto border-collapse border border-gray-200">
+        <thead>
+          <tr
+            style={{
+              color: 'var(--secondary-text)',
+              backgroundColor: 'var(--primary-1)',
+            }}
+            className="text-left text-sm"
+          >
+            <th
+              className="border p-2 text-center w-12"
+              style={{
+                backgroundColor: 'var(--block-background)',
+                borderLeft: '1px solid var(--block-background)',
+                borderTop: '1px solid var(--block-background)',
+                borderBottom: '1px solid var(--block-background)',
+              }}
+            ></th>
+            <th className="border p-2">Amount</th>
+            <th className="border p-2">Date</th>
+            <th className="border p-2">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {localUpdates.map((update: Update, index: number) => (
+            <tr
+              key={index}
+              className="odd:bg-white even:bg-gray-50 hover:bg-gray-100 text-sm"
+              style={{
+                backgroundColor: 'var(--block-background)',
+                fontSize: 'calc(1.2rem * var(--font-size-multiplier))',
+              }}
+            >
+              <td
+                className="border p-2 text-center"
                 style={{
-                  color: 'var(--secondary-text)',
-                  backgroundColor: 'var(--primary-1)',
+                  width: '1%',
+                  borderLeft: '1px solid var(--block-background)',
+                  borderBottom: '1px solid var(--block-background)',
                 }}
               >
-                <th
-                  className="border border-gray-200 p-2 text-left"
-                  style={{
-                    width: '1%',
-                    backgroundColor: 'var(--block-background)',
-                    borderLeft: '1px solid var(--block-background)',
-                    borderTop: '1px solid var(--block-background)',
-                    borderBottom: '1px solid var(--block-background)',
-                  }}
-                ></th>
-                <th className="border border-gray-200 p-2 text-left">Amount</th>
-                <th className="border border-gray-200 p-2 text-left">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {localUpdates.map(
-                (update: { amount: number; date: string }, index: number) => (
-                  <tr key={index}>
-                    <td
-                      className="border border-gray-200 p-2 text-center"
-                      style={{
-                        width: '1%',
-                        borderLeft: '1px solid var(--block-background)',
-                        borderBottom: '1px solid var(--block-background)',
-                      }}
-                    >
-                      <span
-                        style={{ cursor: 'pointer', color: 'red' }}
-                        onClick={() =>
-                          handleDeleteUpdate(update.amount, update.date)
-                        }
-                      >
-                        &#x2716;
-                      </span>
-                    </td>
-                    <td className="border border-gray-200 p-2">
-                      R {update.amount.toFixed(2)}
-                    </td>
-                    <td className="border border-gray-200 p-2">
-                      {update.date}
-                    </td>
-                  </tr>
-                )
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
-      {goal.update_type != 'manual' && (
-        <div>
-          <table className="min-w-full table-auto border-collapse border border-gray-200">
-            <thead>
-              <tr
-                style={{
-                  color: 'var(--secondary-text)',
-                  backgroundColor: 'var(--primary-1)',
-                }}
-              >
-                <th
-                  className="border border-gray-200 p-2 text-left"
-                  style={{
-                    width: '1%',
-                    backgroundColor: 'var(--block-background)',
-                    border: '1px solid var(--block-background)',
-                  }}
-                ></th>
-                <th className="border border-gray-200 p-2 text-left">Amount</th>
-                <th className="border border-gray-200 p-2 text-left">Date</th>
-                <th className="border border-gray-200 p-2 text-left">
-                  Description
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {localUpdates.map((update: Update, index: number) => (
-                <tr key={index}>
-                  <td
-                    className="border border-gray-200 p-2 text-center"
-                    style={{
-                      width: '1%',
-                      borderLeft: '1px solid var(--block-background)',
-                      borderBottom: '1px solid var(--block-background)',
-                    }}
-                  >
-                    <span
-                      style={{ cursor: 'pointer', color: 'red' }}
-                      onClick={() =>
-                        handleDeleteNonManualUpdate(
-                          update.amount,
-                          update.date,
-                          update.description || ''
-                        )
-                      }
-                    >
-                      &#x2716;
-                    </span>
-                  </td>
-                  <td className="border border-gray-200 p-2">
-                    R {update.amount.toFixed(2)}
-                  </td>
-                  <td className="border border-gray-200 p-2">{update.date}</td>
-                  <td className="border border-gray-200 p-2">
-                    {update.description || 'Manual Update'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+                <span
+                  className="cursor-pointer"
+                  style={{ color: 'red' }}
+                  onClick={() =>
+                    handleDeleteUpdate(
+                      update.amount,
+                      update.date,
+                      update.description || ''
+                    )
+                  }
+                >
+                  &#x2716;
+                </span>
+              </td>
+              <td className="border p-2">R {update.amount.toFixed(2)}</td>
+              <td className="border p-2">{update.date}</td>
+              <td className="border p-2">
+                {update.description || 'Manual Update'}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
@@ -403,7 +293,7 @@ const GoalInfoPage = ({
   };
 
   const monthlyBudgetSpent = (goal: Goal): number => {
-    if (goal.monthly_updates !== undefined) {
+    if (goal.monthly_updates !== undefined && goal.monthly_updates !== '') {
       const data = JSON.parse(goal.monthly_updates);
       const currentMonthYear = `${
         monthNames[new Date().getMonth()]
@@ -887,9 +777,39 @@ const GoalInfoPage = ({
                     goal.target_amount <= goal.current_amount && (
                       <p>You've reached your goal!</p>
                     )}
-                  {goal.type === 'Spending Limit' && (
+                  {goal.type === 'Spending Limit' && goal.spending_limit && (
                     <>
-                      <div className="flex ">
+                      {goal.spending_limit - monthlyBudgetSpent(goal) > 0 && (
+                        <>
+                          <div className="flex flex-wrap">
+                            <p>You still have</p>
+                            <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
+                              R
+                              {(
+                                goal.spending_limit - monthlyBudgetSpent(goal)
+                              ).toFixed(2)}
+                            </p>
+                            <p>in your limit this month.</p>
+                          </div>
+                          <br></br>
+                        </>
+                      )}
+                      {goal.spending_limit - monthlyBudgetSpent(goal) <= 0 && (
+                        <>
+                          <div className="flex flex-wrap">
+                            <p>You have exceeded this month's limit by</p>
+                            <p className="text-[var(--primary-1)] font-semibold ml-1">
+                              R
+                              {(
+                                -goal.spending_limit + monthlyBudgetSpent(goal)
+                              ).toFixed(2)}
+                            </p>
+                            <p>.</p>
+                          </div>
+                          <br></br>
+                        </>
+                      )}
+                      <div className="flex flex-wrap">
                         <p>On average, you have spent</p>
                         <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
                           R{calculateAverageSpending(goal).toFixed(2)}
@@ -925,7 +845,7 @@ const GoalInfoPage = ({
                             <p className="text-[var(--primary-1)] font-semibold ml-1">
                               {calculateBiggestExpenseMonth(goal)}
                             </p>
-                            <p>. This used</p>
+                            <p>, which used</p>
                             <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
                               {calculateBiggestExpensePercentage(goal).toFixed(
                                 2
@@ -1241,23 +1161,35 @@ export function GoalsPage() {
   const updateDB = async (goals: Goal[]) => {
     for (const goal of goals) {
       const goalRef = doc(db, 'goals', goal.id);
-      if (goal.type == 'Savings') {
-        await updateDoc(goalRef, {
-          updates: goal.updates,
-          current_amount: goal.current_amount,
-          monthly_updates: goal.monthly_updates,
-        });
-      } else if (goal.type == 'Debt Reduction' && goal.initial_amount) {
-        await updateDoc(goalRef, {
-          updates: goal.updates,
-          current_amount: goal.initial_amount - goal.current_amount,
-          monthly_updates: goal.monthly_updates,
-        });
+      if (goal.updates !== undefined) {
+        if (goal.type == 'Savings') {
+          await updateDoc(goalRef, {
+            updates: goal.updates,
+            current_amount: goal.current_amount,
+            monthly_updates: goal.monthly_updates,
+          });
+        } else if (goal.type == 'Debt Reduction' && goal.initial_amount) {
+          await updateDoc(goalRef, {
+            updates: goal.updates,
+            current_amount: goal.initial_amount - goal.current_amount,
+            monthly_updates: goal.monthly_updates,
+          });
+        } else {
+          await updateDoc(goalRef, {
+            updates: goal.updates,
+            monthly_updates: goal.monthly_updates,
+          });
+        }
       } else {
-        await updateDoc(goalRef, {
-          updates: goal.updates,
-          monthly_updates: goal.monthly_updates,
-        });
+        if (goal.type == 'Savings') {
+          await updateDoc(goalRef, {
+            current_amount: goal.current_amount,
+          });
+        } else if (goal.type == 'Debt Reduction' && goal.initial_amount) {
+          await updateDoc(goalRef, {
+            current_amount: goal.initial_amount - goal.current_amount,
+          });
+        }
       }
     }
   };
@@ -1366,8 +1298,10 @@ export function GoalsPage() {
             category: transaction.category,
           }));
 
+        let updateTime = new Date().toISOString();
+
         if (newUpdates.length === 0) {
-          return goal;
+          updateTime = goal.last_update || updateTime;
         }
 
         const updatedUpdates = [...existingUpdates, ...newUpdates].sort(
@@ -1379,6 +1313,7 @@ export function GoalsPage() {
           0
         );
         const monthlyUpdates = calculateMonthlyUpdates(updatedUpdates);
+        console.log(monthlyUpdates);
 
         if (goal.type == 'Savings') {
           return {
@@ -1386,6 +1321,7 @@ export function GoalsPage() {
             updates: JSON.stringify(updatedUpdates),
             current_amount: currentAmount,
             monthly_updates: JSON.stringify(monthlyUpdates),
+            last_update: updateTime,
           };
         } else if (goal.type == 'Debt Reduction' && goal.initial_amount) {
           return {
@@ -1393,15 +1329,45 @@ export function GoalsPage() {
             updates: JSON.stringify(updatedUpdates),
             current_amount: goal.initial_amount - currentAmount,
             monthly_updates: JSON.stringify(monthlyUpdates),
+            last_update: updateTime,
           };
         } else {
           return {
             ...goal,
             updates: JSON.stringify(updatedUpdates),
             monthly_updates: JSON.stringify(monthlyUpdates),
+            last_update: updateTime,
           };
         }
       } else {
+        if (goal.updates) {
+          const currentAmount = JSON.parse(goal.updates).reduce(
+            (sum: any, update: { amount: any }) => sum + update.amount,
+            0
+          );
+          const monthlyUpdates = calculateMonthlyUpdates(
+            JSON.parse(goal.updates)
+          );
+
+          if (goal.type == 'Savings') {
+            return {
+              ...goal,
+              current_amount: currentAmount,
+              monthly_updates: JSON.stringify(monthlyUpdates),
+            };
+          } else if (goal.type == 'Debt Reduction' && goal.initial_amount) {
+            return {
+              ...goal,
+              current_amount: goal.initial_amount - currentAmount,
+              monthly_updates: JSON.stringify(monthlyUpdates),
+            };
+          } else {
+            return {
+              ...goal,
+              monthly_updates: JSON.stringify(monthlyUpdates),
+            };
+          }
+        }
         return goal;
       }
     });
@@ -1434,20 +1400,8 @@ export function GoalsPage() {
     }));
   }
 
-  const refresh = () => {
-    updateGoalsBasedOnTransactions();
-    refreshData();
-  };
-
-  const test = () => {
-    console.log(data);
-  };
-
   return (
     <>
-      {/*<button onClick={refresh}>REFRESH</button>
-      <br></br>
-      <button onClick={test}>PRINT</button>*/}
       {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
       {selectedGoal && (
         <>

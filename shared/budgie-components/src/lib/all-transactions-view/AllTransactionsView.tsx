@@ -352,12 +352,17 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     const existingUpdate = updates.find(
       (update: any) =>
         update.date === selectedTransaction.date &&
-        update.amount === selectedTransaction.amount &&
+        (update.amount === selectedTransaction.amount ||
+          update.amount === -selectedTransaction.amount) &&
         update.description === selectedTransaction.description
     );
 
     if (existingUpdate) {
-      if (window.confirm('This transaction already exists in the goal. Add it again?')) {
+      if (
+        window.confirm(
+          'This transaction already exists in the goal. Add it again?'
+        )
+      ) {
         addUpdateToGoal(goal, selectedTransaction);
       }
     } else {
@@ -367,9 +372,15 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
 
   const addUpdateToGoal = async (goal: Goal, transaction: Transaction) => {
     const updates = JSON.parse(goal.updates || '[]');
+    let newAmount;
+    if (goal.type === 'Savings') {
+      newAmount = transaction.amount;
+    } else {
+      newAmount = -transaction.amount;
+    }
     updates.push({
       date: transaction.date,
-      amount: transaction.amount,
+      amount: newAmount,
       description: transaction.description,
     });
 
@@ -381,7 +392,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     setData({
       ...data,
       goals: data.goals.map((goalItem) => {
-        if (goalItem.name === goal.name) {
+        if (goalItem.id === goal.id) {
           return {
             ...goalItem,
             updates: JSON.stringify(updates),

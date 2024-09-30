@@ -38,7 +38,7 @@ interface Goal {
 }
 
 export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
-  const { data, setData} = useDataContext();
+  const { data, setData } = useDataContext();
   const [balance, setBalance] = useState(0);
   const [moneyIn, setMoneyIn] = useState(1);
   const [moneyOut, setMoneyOut] = useState(0);
@@ -50,7 +50,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   const dropdownRef = useRef<HTMLSelectElement>(null);
   const [LeftArrowStyle, setLeftArrowStyle] = useState('');
   const [RightArrowStyle, setRightArrowStyle] = useState('');
-
 
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
@@ -137,7 +136,8 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     const existingUpdate = updates.find(
       (update: any) =>
         update.date === selectedTransaction.date &&
-        update.amount === selectedTransaction.amount &&
+        (update.amount === selectedTransaction.amount ||
+          update.amount === -selectedTransaction.amount) &&
         update.description === selectedTransaction.description
     );
 
@@ -156,9 +156,15 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
 
   const addUpdateToGoal = async (goal: Goal, transaction: Transaction) => {
     const updates = JSON.parse(goal.updates || '[]');
+    let newAmount;
+    if (goal.type === 'Savings') {
+      newAmount = transaction.amount;
+    } else {
+      newAmount = -transaction.amount;
+    }
     updates.push({
       date: transaction.date,
-      amount: transaction.amount,
+      amount: newAmount,
       description: transaction.description,
     });
 
@@ -220,7 +226,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     setCurrentYear(currentMonth.getFullYear());
     if (Data) {
       display();
-    }    
+    }
   }, [Data, currentMonth]);
 
   const display = async () => {
@@ -426,8 +432,8 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedYear = parseInt(event.target.value);
     const updatedDate = new Date(currentMonth.setFullYear(selectedYear));
-    setCurrentYear(selectedYear); 
-    setCurrentMonth(updatedDate); 
+    setCurrentYear(selectedYear);
+    setCurrentMonth(updatedDate);
     display();
   };
 

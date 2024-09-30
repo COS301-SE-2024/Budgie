@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { getDocs, query, where, collection, Firestore } from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
-import { UserContext } from '@capstone-repo/shared/budgie-components';
 
 // Interfaces for the data models
 export interface Account {
@@ -61,7 +60,6 @@ export interface UserData {
   transactions: Transaction[];
   yearsUploaded: number[];
 }
-
 
 // Define the type for the DataContext
 interface DataContextType {
@@ -140,10 +138,8 @@ async function fetchTransactionData(db: Firestore, uid: string, years: number[])
   return transactionData;
 }
 
-
-// Create the provider component
-export const DataProvider = ({ children }: { children: React.ReactNode }) => {
-  const user = useContext(UserContext);
+// Create the provider component and accept `user` as a prop
+export const DataProvider = ({ children, user }: { children: React.ReactNode; user: { uid: string } | null }) => {
   const [data, setData] = useState<UserData>({
     accounts: [],
     goals: [],
@@ -168,7 +164,6 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       setLoading(false);
     }
-    console.log("REF");
   };
 
   useEffect(() => {

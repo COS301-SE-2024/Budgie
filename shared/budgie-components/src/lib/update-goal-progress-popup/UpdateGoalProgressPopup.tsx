@@ -278,6 +278,7 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
                 current_amount: goalData.current_amount!,
                 monthly_updates: JSON.stringify(updatedMonthlyUpdatesArray),
                 updates: JSON.stringify(updatesArray),
+                last_update: new Date().toISOString(),
               }
             : goal
         );
@@ -359,13 +360,15 @@ const GoalForm: React.FC<GoalFormProps> = (props: GoalFormProps) => {
   }
 
   const calculateNewAmountLeft = (date: string): number => {
+    if(props.goal.monthly_updates){
     const formattedDate = formatDate(date);
     const monthlyAmounts = JSON.parse(props.goal.monthly_updates);
     const entry = monthlyAmounts.find((item: { month: string }) => item.month === formattedDate);
     const monthAmount = entry ? entry.amount : 0;
     const newAmount = spendingLimit - monthAmount - updateAmount;
-
     return (newAmount);
+    }
+    return spendingLimit - updateAmount;
   };
 
   useEffect(() => {
