@@ -95,9 +95,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
       setCurrentMonth(
         new Date(currentMonth.setMonth(currentMonth.getMonth() - 1))
       );
-      if (currentMonth.getFullYear() != currentYear) {
-        setCurrentYear(currentMonth.getFullYear());
-      }
       display();
     }
   };
@@ -216,14 +213,15 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   };
 
   useEffect(() => {
+    setCurrentYear(currentMonth.getFullYear()); // Update when currentMonth changes
+  }, [currentMonth]);
+
+  useEffect(() => {
     getYearlyTransactions();
-    setCurrentMonth(new Date());
-    setCurrentYear(currentMonth.getFullYear());
     display();
   }, [currentYear, props.account]);
 
   useEffect(() => {
-    setCurrentYear(currentMonth.getFullYear());
     if (Data) {
       display();
     }

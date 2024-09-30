@@ -17,7 +17,7 @@ export function Dashboard(props: DashboardProps) {
   const [viewMode, setViewMode] = useState('monthly');
   const [selectedAlias, setSelectedAlias] = useState<string>('');
   const [currentAccountNumber, setCurrentAccountNumber] = useState<string>('');
-  const [hasAccount, setHasAccount] = useState<'Yes' | 'No'>('No');
+
   const [yearsWithData, setYearsWithData] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,10 +37,7 @@ export function Dashboard(props: DashboardProps) {
         if (data.accounts.length > 0) {
           setSelectedAlias(data.accounts[0].alias);
           setCurrentAccountNumber(data.accounts[0].account_number);
-          setHasAccount('Yes');
-        } else {
-          setHasAccount('No');
-        }
+        } 
       }
     };
 
@@ -56,7 +53,9 @@ export function Dashboard(props: DashboardProps) {
           )
           .map((transaction) => transaction.year);
 
-        setYearsWithData(Array.from(new Set(years)));
+          const sortedYears = Array.from(new Set(years)).sort((a, b) => a - b);
+
+        setYearsWithData(sortedYears);
       }
     };
 
@@ -76,7 +75,7 @@ export function Dashboard(props: DashboardProps) {
     }
   };
 
-  if (hasAccount === 'No') {
+  if (data.accounts.length == 0) {
     return (
       <div className={styles.noAccountScreen}>
         <div>

@@ -99,41 +99,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     'december',
   ];
 
-  useEffect(() => {
-    if (currentYear == new Date().getFullYear()) {
-      setRightArrowStyle('Greyed');
-    } else {
-      setRightArrowStyle('Normal');
-    }
 
-    if (currentYear == data.yearsUploaded[0]) {
-      setLeftArrowStyle('Greyed');
-    } else {
-      setLeftArrowStyle('Normal');
-    }
-  }, [data.yearsUploaded, currentYear]);
-
-  const getLeftArrowStyle = () => {
-    switch (LeftArrowStyle) {
-      case 'Normal':
-        return styles.leftNavButton;
-      case 'Greyed':
-        return styles.greyedleftNavButton;
-      default:
-        return styles.leftNavButton;
-    }
-  };
-
-  const getRightArrowStyle = () => {
-    switch (RightArrowStyle) {
-      case 'Normal':
-        return styles.rightNavButton;
-      case 'Greyed':
-        return styles.greyedrightNavButton;
-      default:
-        return styles.rightNavButton;
-    }
-  };
 
   const getCategoryStyle = (category: string) => {
     switch (category) {
@@ -267,11 +233,12 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
 
     getYearlyTransactions();
 
-    setCurrentYear(currentMonth.getFullYear());
-    if (Data) {
-      display();
-    }
   }, [currentYear, props.account]);
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear())
+
+  }, [props.account]);
 
   const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedYear = parseInt(event.target.value);
@@ -412,7 +379,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
     <div className={styles.mainPage}>
       <div className={styles.header}>
         <div className={styles.monthNavigation}>
-          <button className={`${getLeftArrowStyle()}`} onClick={handlePrevYear}>
+          <button className={styles.navButton} onClick={handlePrevYear}>
             <span
               className="material-symbols-outlined"
               style={{
@@ -439,7 +406,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
           </span>
 
           <button
-            className={`${getRightArrowStyle()}`}
+            className={styles.navButton}
             onClick={handleNextYear}
           >
             <span
