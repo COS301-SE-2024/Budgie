@@ -52,14 +52,14 @@ export interface Goal {
 }
 
 interface YearsUploaded {
-  years: string; // This will store a JSON string of years
+  years: string; 
 }
 
 export interface UserData {
   accounts: Account[];
   goals: Goal[];
   transactions: Transaction[];
-  yearsUploaded: number[]; // Change from string[] to number[]
+  yearsUploaded: number[];
 }
 
 
