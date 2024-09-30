@@ -8,7 +8,7 @@ export interface FaqModalProps {
 export function FaqModal(props: FaqModalProps) {
   return (
     <>
-      <div className="mainPage">
+      <div className="w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex flex-col bg-[var(--block-background)] p-8 overflow-y-auto">
         <div className="pageTitle">
           <span
             className="material-symbols-outlined cursor-pointer"
@@ -17,7 +17,7 @@ export function FaqModal(props: FaqModalProps) {
           >
             arrow_back
           </span>
-          Faq
+          FAQs
         </div>
         <div className="p-4 bg-gray-100">
           <h1 className="text-2xl font-bold text-green-600 mb-6">

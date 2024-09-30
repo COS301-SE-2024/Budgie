@@ -9,8 +9,17 @@ import {
   YAxis,
   ResponsiveContainer,
   Label,
+  CartesianGrid,
+  Cell,
 } from 'recharts';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from 'firebase/firestore';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
 import AddGoalPopup from '../add-goal-popup/AddGoalPopup';
@@ -19,19 +28,21 @@ import styles from './GoalsPage.module.css';
 import UpdateGoalPopup from '../update-goal-progress-popup/UpdateGoalProgressPopup';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import '../../root.css';
+import { useDataContext, Goal, Transaction } from '../data-context/DataContext';
 
-interface Goal {
-  id: string;
-  name: string;
-  type: string;
-  start_date: string;
-  initial_amount?: number;
-  current_amount?: number;
-  target_amount?: number;
-  target_date?: string;
-  spending_limit?: number;
-  updates?: string;
-  monthly_updates?: string;
+import Image from 'next/image';
+
+import gif1 from '../../../public/images/birdgif1.gif';
+import gif2 from '../../../public/images/birdgif2.gif';
+import gif3 from '../../../public/images/birdgif3.gif';
+import gif4 from '../../../public/images/birdgif4.gif';
+import gif5 from '../../../public/images/birdgif5.gif';
+import gif6 from '../../../public/images/birdgif6.gif';
+
+interface Condition {
+  accounts: string[];
+  keywords: string[];
+  category: string;
 }
 
 const monthNames = [
@@ -49,51 +60,238 @@ const monthNames = [
   'December',
 ];
 
-export interface GraphCarouselProps {
+interface Update {
+  amount: number;
+  date: string;
+  description?: string;
+  category?: string;
+}
+
+export interface TableProps {
   goal: Goal;
 }
 
-const GraphCarousel = ({ goal }: GraphCarouselProps) => {
-  const slides = ['Slide 1', 'Slide 2', 'Slide 3'];
-  const [currentIndex, setCurrentIndex] = useState(0);
+const UpdateTable = ({
+  goal,
+  onUpdateGoal,
+}: TableProps & { onUpdateGoal: (goal: Goal) => void }) => {
+  const [localUpdates, setLocalUpdates] = useState<Update[]>(
+    goal.updates ? JSON.parse(goal.updates) : []
+  );
+  const { data, setData } = useDataContext();
 
-  interface GoalUpdate {
-    amount: number;
-    date: string;
-  }
+  const handleDeleteUpdate = async (
+    amount: number,
+    date: string,
+    description: string
+  ) => {
+    if (
+      window.confirm(
+        'Do you really want to delete this update? The transaction will not be automatically added back to this goal.'
+      ) &&
+      goal.updates
+    ) {
+      let updatedCurrentAmount = goal.current_amount;
+      const newUpdates: Update[] = [];
+      const deletedUpdates: Update[] = goal.deleted_updates
+        ? JSON.parse(goal.deleted_updates)
+        : [];
 
-  interface GoalMonthlyUpdate {
-    amount: number;
-    month: string;
-  }
-
-  const calculateProgressPercentage = (goal: Goal): number => {
-    if (goal.current_amount && goal.target_amount !== undefined) {
-      if (goal.initial_amount) {
-        return Math.min(
-          100,
-          ((goal.initial_amount - goal.current_amount) /
-            (goal.initial_amount - goal.target_amount)) *
-            100
-        );
+      if (goal.type === 'Debt Reduction') {
+        updatedCurrentAmount += amount;
       } else {
-        return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
+        updatedCurrentAmount -= amount;
+      }
+
+      let removed = false;
+      for (let i = 0; i < localUpdates.length; i++) {
+        const update = localUpdates[i];
+        if (
+          !removed &&
+          update.amount === amount &&
+          update.date === date &&
+          update.description === description
+        ) {
+          deletedUpdates.push(update);
+          continue;
+        }
+        newUpdates.push(update);
+      }
+
+      let monthlyUpdatesArray = goal.monthly_updates
+        ? JSON.parse(goal.monthly_updates)
+        : [];
+      const updateMonth = new Date(date).toLocaleString('default', {
+        month: 'long',
+        year: 'numeric',
+      });
+      const monthlyUpdateIndex = monthlyUpdatesArray.findIndex(
+        (entry: { month: string }) => entry.month === updateMonth
+      );
+
+      if (monthlyUpdateIndex >= 0) {
+        monthlyUpdatesArray[monthlyUpdateIndex].amount -= amount;
+        if (monthlyUpdatesArray[monthlyUpdateIndex].amount == 0) {
+          monthlyUpdatesArray.splice(monthlyUpdateIndex, 1);
+        }
+      }
+
+      goal.current_amount = updatedCurrentAmount;
+      goal.updates = JSON.stringify(newUpdates);
+      goal.deleted_updates = JSON.stringify(deletedUpdates);
+      goal.monthly_updates = JSON.stringify(monthlyUpdatesArray);
+
+      setLocalUpdates(newUpdates);
+      onUpdateGoal(goal);
+      try {
+        const goalData: any = {
+          updates: goal.updates,
+          deleted_updates: goal.deleted_updates,
+          current_amount: goal.current_amount,
+          monthly_updates: goal.monthly_updates,
+        };
+
+        const goalDocRef = doc(db, 'goals', goal.id);
+        await updateDoc(goalDocRef, goalData);
+
+        const updatedGoals = data.goals.map((g) =>
+          g.id === goal.id
+            ? {
+                ...g,
+                updates: goal.updates,
+                deleted_updates: goal.deleted_updates,
+                current_amount: goal.current_amount,
+                monthly_updates: goal.monthly_updates,
+              }
+            : g
+        );
+
+        setData({
+          ...data,
+          goals: updatedGoals,
+        });
+      } catch (error) {
+        console.error('Error saving goal:', error);
       }
     }
-    if (
-      goal.spending_limit !== undefined &&
-      goal.monthly_updates !== undefined
-    ) {
-      const amountForCurrentMonth = monthlyBudgetSpent(now.getMonth());
-      return (amountForCurrentMonth / goal.spending_limit) * 100;
-    }
-    return 0;
   };
 
-  const monthlyBudgetSpent = (month: number): number => {
-    if (goal.monthly_updates !== undefined) {
+  useEffect(() => {
+    if (goal.updates) {
+      try {
+        const parsedUpdates = JSON.parse(goal.updates);
+        setLocalUpdates(parsedUpdates);
+      } catch (error) {
+        console.error('Failed to parse updates', error);
+      }
+    }
+  }, [goal.updates, goal.current_amount]);
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full table-auto border-collapse border border-gray-200">
+        <thead>
+          <tr
+            style={{
+              color: 'var(--secondary-text)',
+              backgroundColor: 'var(--primary-1)',
+            }}
+            className="text-left text-sm"
+          >
+            <th
+              className="border p-2 text-center w-12"
+              style={{
+                backgroundColor: 'var(--block-background)',
+                borderLeft: '1px solid var(--block-background)',
+                borderTop: '1px solid var(--block-background)',
+                borderBottom: '1px solid var(--block-background)',
+              }}
+            ></th>
+            <th className="border p-2">Amount</th>
+            <th className="border p-2">Date</th>
+            <th className="border p-2">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {localUpdates.map((update: Update, index: number) => (
+            <tr
+              key={index}
+              className="odd:bg-white even:bg-gray-50 hover:bg-gray-100 text-sm"
+              style={{
+                backgroundColor: 'var(--block-background)',
+                fontSize: 'calc(1.2rem * var(--font-size-multiplier))',
+              }}
+            >
+              <td
+                className="border p-2 text-center"
+                style={{
+                  width: '1%',
+                  borderLeft: '1px solid var(--block-background)',
+                  borderBottom: '1px solid var(--block-background)',
+                }}
+              >
+                <span
+                  className="cursor-pointer"
+                  style={{ color: 'red' }}
+                  onClick={() =>
+                    handleDeleteUpdate(
+                      update.amount,
+                      update.date,
+                      update.description || ''
+                    )
+                  }
+                >
+                  &#x2716;
+                </span>
+              </td>
+              <td className="border p-2">R {update.amount.toFixed(2)}</td>
+              <td className="border p-2">{update.date}</td>
+              <td className="border p-2">
+                {update.description || 'Manual Update'}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export interface GoalInfoPageProps {
+  goal: Goal;
+  onClose: () => void;
+}
+
+const GoalInfoPage = ({
+  goal,
+  onClose,
+  onUpdateGoal,
+}: GoalInfoPageProps & { onUpdateGoal: (goal: Goal) => void }) => {
+  const [updatePopupOpen, setUpdatePopupOpen] = useState(false);
+  const [currentGoal, setCurrentGoal] = useState(goal);
+  const [editPopupOpen, setEditPopupOpen] = useState(false);
+
+  const handleGoalUpdate = (updatedGoal: Goal) => {
+    setCurrentGoal({ ...updatedGoal });
+    onUpdateGoal(updatedGoal);
+  };
+
+  const handleUpdateGoalPopup = () => {
+    setUpdatePopupOpen(!updatePopupOpen);
+    setEditPopupOpen(false);
+  };
+
+  const handleEditGoalPopup = () => {
+    setEditPopupOpen(!editPopupOpen);
+    setUpdatePopupOpen(false);
+  };
+
+  const monthlyBudgetSpent = (goal: Goal): number => {
+    if (goal.monthly_updates !== undefined && goal.monthly_updates !== '') {
       const data = JSON.parse(goal.monthly_updates);
-      const currentMonthYear = `${currentMonthName} ${currentYear}`;
+      const currentMonthYear = `${
+        monthNames[new Date().getMonth()]
+      } ${new Date().getFullYear()}`;
       const currentMonthData = data.find(
         (item: { month: string }) => item.month === currentMonthYear
       );
@@ -105,496 +303,35 @@ const GraphCarousel = ({ goal }: GraphCarouselProps) => {
     return 0;
   };
 
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? slides.length - 1 : prevIndex - 1
-    );
-  };
-
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === 2 - 1 ? 0 : prevIndex + 1));
-  };
-
-  const getUpdates = () => {
-    if (goal.monthly_updates) {
-      const updatesData: GoalMonthlyUpdate[] = JSON.parse(goal.monthly_updates);
-
-      const parseMonth = (monthStr: string): Date => {
-        return new Date(`1 ${monthStr}`);
-      };
-
-      const formattedData = updatesData
-        .map((update) => ({
-          month: update.month,
-          amount: update.amount,
-          date: parseMonth(update.month),
-        }))
-        .sort((a, b) => a.date.getTime() - b.date.getTime())
-        .map(({ date, ...rest }) => rest);
-      return formattedData;
-    }
-  };
-
-  const getBudgetUpdates = () => {
-    if (goal.monthly_updates) {
-      const updatesData: GoalMonthlyUpdate[] = JSON.parse(goal.monthly_updates);
-
-      const parseMonth = (monthStr: string): Date => {
-        return new Date(`1 ${monthStr}`);
-      };
-
-      const spendingLimit = goal.spending_limit || Infinity;
-
-      const formattedData = updatesData
-        .map((update) => {
-          const amount = update.amount;
-          const excess = amount > spendingLimit ? amount - spendingLimit : 0;
-          const amountWithinLimit =
-            amount > spendingLimit ? spendingLimit : amount;
-
-          return {
-            month: update.month,
-            amount: amountWithinLimit,
-            excess,
-            date: parseMonth(update.month),
-          };
-        })
-        .sort((a, b) => a.date.getTime() - b.date.getTime())
-        .map(({ date, excess, ...rest }) => ({
-          ...rest,
-          excess,
-        }));
-
-      return formattedData;
-    }
-  };
-
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonthIndex = now.getMonth();
-
-  const currentMonthName = monthNames[currentMonthIndex];
-
-  const getColorForValue = (value: number): string => {
-    if (value < 100) return 'var(--primary-1)';
-    return '#FF0000';
-  };
-
-  return (
-    <div className={styles.carousel}>
-      <div
-        className={styles.carouselContainer}
-        style={{
-          transform: `translateX(-${currentIndex * 100}%)`,
-          transition: 'none',
-        }}
-      >
-        {goal.type === 'Savings' && (
-          <div className={styles.carouselSlide} key="progress">
-            <div className={styles.goalGraph}>
-              <CircularProgressbar
-                value={calculateProgressPercentage(goal)}
-                styles={buildStyles({
-                  pathColor: 'var(--primary-1)',
-                  trailColor: '#d6d6d6',
-                })}
-              />
-              <div className={styles.percentageDisplay}>
-                {`${calculateProgressPercentage(goal).toFixed(2)}%`}
-              </div>
-              </div>
-              <div
-                style={{
-                  marginTop: '1rem',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                }}
-              >
-                {goal.updates !== undefined ? (
-                  <span className={styles.arrow} onClick={prevSlide}>
-                    &#8592;
-                  </span>
-                ) : (
-                  <span></span>
-                )}
-                <span
-                  className={styles.goalLabel}
-                  style={{
-                    marginLeft: '1rem',
-                    marginRight: '1rem',
-                    color: 'var(--main-text)',
-                  }}
-                >
-                  Goal Progress
-                </span>
-                {goal.updates !== undefined ? (
-                  <span className={styles.arrow} onClick={nextSlide}>
-                    &#8594;
-                  </span>
-                ) : (
-                  <span></span>
-                )}
-              </div>
-          </div>
-        )}
-
-        {goal.type === 'Savings' && goal.updates !== undefined && (
-          <div className={styles.carouselSlide} key="chart">
-            <div className={styles.goalGraph}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={getUpdates()}
-                  margin={{ top: 0, right: 0, bottom: 0, left: 10 }}
-                >
-                  <XAxis
-                    dataKey="month"
-                    tick={false}
-                    stroke="var(--main-text)"
-                  />
-                  <YAxis
-                    tick={{ fill: 'var(--main-text)' }}
-                    stroke="var(--main-text)"
-                  >
-                    <Label
-                      value="Amount"
-                      angle={-90}
-                      position="left"
-                      style={{ textAnchor: 'middle', fill: 'var(--main-text)' }}
-                    />
-                  </YAxis>
-                  <Tooltip cursor={{ fill: 'var(--main-background)' }} />
-                  <Bar dataKey="amount" fill="var(--primary-1)" />
-                </BarChart>
-              </ResponsiveContainer>
-              </div>
-
-              <div
-                style={{
-                  marginTop: '1rem',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                }}
-              >
-                <span className={styles.arrow} onClick={prevSlide}>
-                  &#8592;
-                </span>
-                <span
-                  className={styles.goalLabel}
-                  style={{
-                    marginLeft: '1rem',
-                    marginRight: '1rem',
-                    color: 'var(--main-text)',
-                  }}
-                >
-                  Savings per Month
-                </span>
-                <span className={styles.arrow} onClick={nextSlide}>
-                  &#8594;
-                </span>
-              </div>
-            </div>
-        )}
-
-        {goal.type === 'Debt' && (
-          <div className={styles.carouselSlide} key="progress">
-            <div className={styles.goalGraph}>
-              <CircularProgressbar
-                value={calculateProgressPercentage(goal)}
-                styles={buildStyles({
-                  pathColor: 'var(--primary-1)',
-                  trailColor: '#d6d6d6',
-                })}
-              />
-              <div className={styles.percentageDisplay}>
-                {`${calculateProgressPercentage(goal).toFixed(2)}%`}
-              </div>
-              </div>
-              <div
-                style={{
-                  marginTop: '1rem',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                }}
-              >
-                {goal.updates !== undefined ? (
-                  <span className={styles.arrow} onClick={prevSlide}>
-                    &#8592;
-                  </span>
-                ) : (
-                  <span></span>
-                )}
-                <span
-                  className={styles.goalLabel}
-                  style={{
-                    marginLeft: '1rem',
-                    marginRight: '1rem',
-                    color: 'var(--main-text)',
-                  }}
-                >
-                  Goal Progress
-                </span>
-                {goal.updates !== undefined ? (
-                  <span className={styles.arrow} onClick={nextSlide}>
-                    &#8594;
-                  </span>
-                ) : (
-                  <span></span>
-                )}
-              </div>
-            </div>
-        )}
-
-        {goal.type === 'Debt' && goal.updates !== undefined && (
-          <div className={styles.carouselSlide} key="chart">
-            <div className={styles.goalGraph}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={getUpdates()}
-                  margin={{ top: 0, right: 0, bottom: 0, left: 10 }}
-                >
-                  <XAxis
-                    dataKey="month"
-                    tick={false}
-                    stroke="var(--main-text)"
-                  />
-                  <YAxis
-                    tick={{ fill: 'var(--main-text)' }}
-                    stroke="var(--main-text)"
-                  >
-                    <Label
-                      value="Amount"
-                      angle={-90}
-                      position="left"
-                      style={{ textAnchor: 'middle', fill: 'var(--main-text)' }}
-                    />
-                  </YAxis>
-                  <Tooltip cursor={{ fill: 'var(--main-background)' }} />
-                  <Bar dataKey="amount" fill="var(--primary-1)" />
-                </BarChart>
-              </ResponsiveContainer>
-              </div>
-              <div
-                style={{
-                  marginTop: '1rem',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                }}
-              >
-                <span className={styles.arrow} onClick={prevSlide}>
-                  &#8592;
-                </span>
-                <span
-                  className={styles.goalLabel}
-                  style={{
-                    marginLeft: '1rem',
-                    marginRight: '1rem',
-                    color: 'var(--main-text)',
-                  }}
-                >
-                  Debt Payments per Month
-                </span>
-                <span className={styles.arrow} onClick={nextSlide}>
-                  &#8594;
-                </span>
-              </div>
-            </div>
-        )}
-
-        {goal.type === 'Spending' && (
-          <div className={styles.carouselSlide} key="progress">
-            <div className={styles.goalGraph}>
-              <CircularProgressbar
-                value={calculateProgressPercentage(goal)}
-                styles={buildStyles({
-                  pathColor: getColorForValue(
-                    calculateProgressPercentage(goal)
-                  ),
-                  trailColor: '#d6d6d6',
-                })}
-              />
-              <div
-                className={styles.percentageDisplay}
-                style={{
-                  color: getColorForValue(calculateProgressPercentage(goal)),
-                }}
-              >
-                {`${calculateProgressPercentage(goal).toFixed(2)}%`}
-              </div>
-              </div>
-              <div
-                style={{
-                  marginTop: '1rem',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                }}
-              >
-                {goal.updates !== undefined ? (
-                  <span className={styles.arrow} onClick={prevSlide}>
-                    &#8592;
-                  </span>
-                ) : (
-                  <span></span>
-                )}
-                <span
-                  className={styles.goalLabel}
-                  style={{
-                    marginLeft: '1rem',
-                    marginRight: '1rem',
-                    color: 'var(--main-text)',
-                  }}
-                >
-                  Budget Used for {currentMonthName} {currentYear}
-                </span>
-                {goal.updates !== undefined ? (
-                  <span className={styles.arrow} onClick={nextSlide}>
-                    &#8594;
-                  </span>
-                ) : (
-                  <span></span>
-                )}
-              </div>
-            </div>
-        )}
-
-        {goal.type === 'Spending' && goal.updates !== undefined && (
-          <div className={styles.carouselSlide} key="chart">
-            <div className={styles.goalGraph}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={getBudgetUpdates()}
-                  margin={{ top: 0, right: 0, bottom: 0, left: 10 }}
-                >
-                  <XAxis
-                    dataKey="month"
-                    tick={false}
-                    stroke="var(--main-text)"
-                  />
-                  <YAxis
-                    tick={{ fill: 'var(--main-text)' }}
-                    stroke="var(--main-text)"
-                  >
-                    <Label
-                      value="Amount"
-                      angle={-90}
-                      position="left"
-                      style={{ textAnchor: 'middle', fill: 'var(--main-text)' }}
-                    />
-                  </YAxis>
-                  <Tooltip cursor={{ fill: 'var(--main-background)' }} />
-                  <Bar dataKey="amount" stackId="a" fill="var(--primary-1)" />
-                  <Bar dataKey="excess" stackId="a" fill="red" />
-                </BarChart>
-              </ResponsiveContainer>
-              </div>
-              <div
-                style={{
-                  marginTop: '1rem',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                }}
-              >
-                <span className={styles.arrow} onClick={prevSlide}>
-                  &#8592;
-                </span>
-                <span
-                  className={styles.goalLabel}
-                  style={{
-                    marginLeft: '1rem',
-                    marginRight: '1rem',
-                    color: 'var(--main-text)',
-                  }}
-                >
-                  Amount Spent per Month
-                </span>
-                <span className={styles.arrow} onClick={nextSlide}>
-                  &#8594;
-                </span>
-              </div>
-            </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export interface GoalsPageProps {}
-
-export function GoalsPage() {
-  const [Goals, setGoals] = useState<Goal[]>([]);
-  const [isGoalPopupOpen, setIsGoalPopupOpen] = useState(false);
-  const [editPopupOpen, setEditPopupOpen] = useState<{
-    [key: number]: boolean;
-  }>({});
-  const [updatePopupOpen, setUpdatePopupOpen] = useState<{
-    [key: number]: boolean;
-  }>({});
-  const [sortOption, setSortOption] = useState('name');
-  const [hasGoals, setHasGoals] = useState(false);
-  const user = useContext(UserContext);
-
-  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSortOption(event.target.value);
-  };
-  const sortGoals = (goals: Goal[], option: string) => {
-    return [...goals].sort((a, b) => {
-      const aValue =
-        option === 'name'
-          ? a.name
-          : option === 'type'
-          ? a.type
-          : option === 'start_date'
-          ? new Date(a.start_date || '').getTime()
-          : option === 'end_date'
-          ? new Date(a.target_date || '').getTime()
-          : option === 'progress'
-          ? calculateProgressPercentage(a)
-          : 0;
-
-      const bValue =
-        option === 'name'
-          ? b.name
-          : option === 'type'
-          ? b.type
-          : option === 'start_date'
-          ? new Date(b.start_date || '').getTime()
-          : option === 'end_date'
-          ? new Date(b.target_date || '2100-01-01').getTime()
-          : option === 'progress'
-          ? calculateProgressPercentage(b)
-          : 0;
-
-      if (aValue === null && bValue !== null) return -1;
-      if (bValue === null && aValue !== null) return 1;
-
-      // Compare values if both are present
-      if (aValue < bValue) return -1;
-      if (aValue > bValue) return 1;
-      return 0;
-    });
-  };
-
   const calculateProgressPercentage = (goal: Goal): number => {
-    if (goal.current_amount && goal.target_amount !== undefined) {
+    if (
+      goal.current_amount !== undefined &&
+      goal.initial_amount !== undefined &&
+      goal.type == 'Debt Reduction'
+    ) {
       if (goal.initial_amount) {
         return Math.min(
           100,
-          ((goal.initial_amount - goal.current_amount) /
-            (goal.initial_amount - goal.target_amount)) *
+          ((goal.initial_amount - goal.current_amount) / goal.initial_amount) *
             100
         );
       } else {
-        return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
+        return Math.min(100, goal.current_amount * 100);
       }
     }
+
+    if (
+      goal.current_amount !== undefined &&
+      goal.target_amount !== undefined &&
+      goal.type == 'Savings'
+    ) {
+      return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
+    }
+
     if (
       goal.spending_limit !== undefined &&
-      goal.monthly_updates !== undefined
+      goal.monthly_updates !== undefined &&
+      goal.type == 'Spending Limit'
     ) {
       const amountForCurrentMonth = monthlyBudgetSpent(goal);
       return (amountForCurrentMonth / goal.spending_limit) * 100;
@@ -609,51 +346,688 @@ export function GoalsPage() {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  const fetchGoals = async () => {
-    try {
-      const goalsCollection = collection(db, 'goals');
-      const goalsQuery = query(goalsCollection, where('uid', '==', user.uid));
-      const goalsSnapshot = await getDocs(goalsQuery);
-      const goalsList = goalsSnapshot.docs.map((doc) => {
-        const data = doc.data() as Omit<Goal, 'id'>;
-        return {
-          id: doc.id,
-          ...data,
-        };
+  const getGif = (progress: number) => {
+    if (progress <= 15) return gif1;
+    if (progress <= 40) return gif2;
+    if (progress <= 60) return gif3;
+    if (progress <= 80) return gif4;
+    if (progress < 100) return gif5;
+    return gif6;
+  };
+
+  const getColorForValue = (value: number, type: string): string => {
+    if (value < 100) return 'var(--primary-1)';
+    if (type == 'Spending Limit' && value >= 100) return '#FF0000';
+    return '#46981d';
+  };
+
+  const getUpdates = () => {
+    if (goal.monthly_updates) {
+      const updatesData = JSON.parse(goal.monthly_updates);
+
+      updatesData.sort((a: { month: string }, b: { month: string }) => {
+        return new Date(a.month).getTime() - new Date(b.month).getTime();
       });
-      if (goalsList.length > 0) {
-        setHasGoals(true);
-      }
-      setGoals(sortGoals(goalsList, sortOption));
-    } catch (error) {
-      console.error('Error getting goals document:', error);
+
+      return updatesData.map((update: { month: string; amount: number }) => ({
+        month: update.month,
+        amount: update.amount.toFixed(2),
+      }));
+    }
+    return [];
+  };
+
+  const timeSinceLastUpdate = (lastUpdate: string): string => {
+    const now = new Date();
+    const lastUpdateDate = new Date(lastUpdate);
+
+    const diffInMilliseconds = now.getTime() - lastUpdateDate.getTime();
+
+    const diffInMinutes = Math.floor(diffInMilliseconds / (1000 * 60));
+    const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
+
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
+    } else if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
+    } else {
+      return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`;
     }
   };
 
-  const addGoalPopup = () => {
-    setIsGoalPopupOpen(!isGoalPopupOpen);
-    fetchGoals();
+  const calculateRemainingSavings = (goal: Goal): number => {
+    if (goal.target_amount != undefined && goal.current_amount != undefined) {
+      return goal.target_amount - goal.current_amount;
+    }
+    return 0;
   };
 
-  useEffect(() => {
-    fetchGoals();
-  }, [sortOption]);
-
-  const handleEditGoalPopup = (index: number) => {
-    setEditPopupOpen((prevState) => ({
-      ...prevState,
-      [index]: !prevState[index], // Toggle the popup for the clicked goal
-    }));
-    fetchGoals();
+  const calculateAverageSavings = (goal: Goal): number => {
+    if (goal.monthly_updates) {
+      const monthlyUpdates = JSON.parse(goal.monthly_updates);
+      const totalSaved = monthlyUpdates.reduce(
+        (sum: number, update: { amount: number }) => sum + update.amount,
+        0
+      );
+      return totalSaved / monthlyUpdates.length;
+    }
+    return 0;
   };
 
-  const handleUpdateGoalPopup = (index: number) => {
-    setUpdatePopupOpen((prevState) => ({
-      ...prevState,
-      [index]: !prevState[index], // Toggle the popup for the clicked goal
-    }));
-    fetchGoals();
+  const calculateSavingsPerMonth = (goal: Goal): number => {
+    if (
+      goal.target_amount != undefined &&
+      goal.current_amount != undefined &&
+      goal.target_date !== undefined
+    ) {
+      const months = Math.max(1, calculateMonthsLeft(goal.target_date));
+      return (goal.target_amount - goal.current_amount) / months;
+    }
+    return 0;
   };
+
+  const calculateMonthsLeft = (targetDate: string): number => {
+    const currentDate = new Date();
+    const target = new Date(targetDate);
+    const diffMonths =
+      (target.getFullYear() - currentDate.getFullYear()) * 12 +
+      (target.getMonth() - currentDate.getMonth());
+    return Math.max(diffMonths, 0);
+  };
+
+  const calculateAverageSpending = (goal: Goal): number => {
+    if (goal.monthly_updates) {
+      const monthlyUpdates = JSON.parse(goal.monthly_updates);
+      const totalSpent = monthlyUpdates.reduce(
+        (sum: number, update: { amount: number }) => sum + update.amount,
+        0
+      );
+      return totalSpent / monthlyUpdates.length;
+    }
+    return 0;
+  };
+
+  const calculateSpendingDifferencePercentage = (goal: Goal): number => {
+    const averageSpending = calculateAverageSpending(goal);
+    const monthlyLimit = goal.spending_limit || 0;
+    return ((averageSpending - monthlyLimit) / monthlyLimit) * 100;
+  };
+
+  const calculateBiggestExpense = (goal: Goal): Update => {
+    if (goal.updates) {
+      const updates = JSON.parse(goal.updates);
+      return updates.reduce((biggest: Update, current: Update) => {
+        return current.amount > biggest.amount ? current : biggest;
+      }, updates[0]);
+    }
+    return { amount: 0, date: '', description: '' };
+  };
+
+  const calculateBiggestExpenseMonth = (goal: Goal): string => {
+    const biggestExpense = calculateBiggestExpense(goal);
+    return new Date(biggestExpense.date).toLocaleString('default', {
+      month: 'long',
+      year: 'numeric',
+    });
+  };
+
+  const calculateBiggestExpensePercentage = (goal: Goal): number => {
+    const biggestExpense = calculateBiggestExpense(goal);
+    const monthlyLimit = goal.spending_limit || 1;
+    return (biggestExpense.amount / monthlyLimit) * 100;
+  };
+
+  const calculateRemainingDebt = (goal: Goal): number => {
+    if (goal.initial_amount && goal.current_amount) {
+      return goal.current_amount;
+    }
+    return 0;
+  };
+
+  const calculateAverageDebtPayments = (goal: Goal): number => {
+    if (goal.monthly_updates) {
+      const monthlyUpdates = JSON.parse(goal.monthly_updates);
+      const totalPaid = monthlyUpdates.reduce(
+        (sum: number, update: { amount: number }) => sum + update.amount,
+        0
+      );
+      return totalPaid / monthlyUpdates.length;
+    }
+    return 0;
+  };
+
+  return (
+    <div className="flex flex-col h-full overflow-y-hidden">
+      <div
+        className="flex flex-col lg:flex-row justify-center lg:justify-between w-full items-center container mx-auto pb-4"
+        style={{ borderBottom: '1px solid gray' }}
+      >
+        <div className="flex justify-between items-center w-full">
+          <h1 className="text-xl sm:text-2xl font-bold text-[var(--primary-1)] flex items-center mr-[0.5rem] lg:mr-[1rem]">
+            <span
+              className="material-symbols-outlined mr-[0.5rem] sm:mr-[1rem] text-[1.25rem] sm:text-[calc(1.5rem * var(--font-size-multiplier))] cursor-pointer"
+              onClick={onClose}
+            >
+              arrow_back
+            </span>
+            {goal.name}
+          </h1>
+
+          <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-4">
+            <div
+              className="h-full p-2 text-[var(--primary-1)] border-none cursor-pointer transition ease-in-out duration-300 rounded-md text-center font-bold hover:bg-[var(--block-background)]"
+              onClick={handleEditGoalPopup}
+            >
+              Edit Goal Details
+            </div>
+            <div
+              className="h-full p-2 bg-[var(--primary-1)] text-[var(--secondary-text)] cursor-pointer transition ease-in-out duration-300 rounded-md text-center font-bold hover:bg-[var(--block-background)] border border-[var(--primary-1)] hover:text-[var(--primary-1)]"
+              onClick={handleUpdateGoalPopup}
+            >
+              Add an Update
+            </div>
+          </div>
+        </div>
+      </div>
+      {!editPopupOpen && !updatePopupOpen && (
+        <div className="h-full overflow-y-auto overflow-x-hidden">
+          <div className="container mx-auto p-4">
+            <div className="flex flex-col lg:flex-row space-y-4 lg:space-x-4 lg:space-y-0 h-fit">
+              <div className="lg:w-1/2 flex flex-col items-center justify-between text-center bg-[var(--block-background)] rounded-lg shadow-md p-8 w-full">
+                <h2 className="text-xl font-semibold mb-4">Goal Details</h2>
+                <div className="flex flex-col space-y-2 h-full justify-center">
+                  <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                    <div className="font-bold whitespace-nowrap mr-[5rem]">
+                      Goal Type:
+                    </div>
+                    <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                      {goal.type}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                    <div className="font-bold whitespace-nowrap mr-[5rem]">
+                      Update Type:
+                    </div>
+                    <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                      {goal.update_type === 'automatic'
+                        ? 'Automatic'
+                        : 'Manual Only'}
+                    </div>
+                  </div>
+
+                  {goal.initial_amount !== undefined && (
+                    <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                      <div className="font-bold whitespace-nowrap">
+                        Initial Amount:
+                      </div>
+                      <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                        R {goal.initial_amount.toFixed(2)}
+                      </div>
+                    </div>
+                  )}
+
+                  {goal.current_amount !== undefined &&
+                    goal.type !== 'Spending Limit' && (
+                      <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                        <div className="font-bold whitespace-nowrap">
+                          Current Amount:
+                        </div>
+                        <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                          R {goal.current_amount.toFixed(2)}
+                        </div>
+                      </div>
+                    )}
+
+                  {goal.spending_limit !== undefined &&
+                    goal.type === 'Spending Limit' && (
+                      <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                        <div className="font-bold whitespace-nowrap">
+                          Monthly Limit:
+                        </div>
+                        <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                          R {goal.spending_limit.toFixed(2)}
+                        </div>
+                      </div>
+                    )}
+
+                  {goal.monthly_updates !== undefined &&
+                    goal.type === 'Spending Limit' && (
+                      <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                        <div className="font-bold whitespace-nowrap">
+                          Spent this Month:
+                        </div>
+                        <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                          R {monthlyBudgetSpent(goal).toFixed(2)}
+                        </div>
+                      </div>
+                    )}
+
+                  {goal.target_amount !== undefined && (
+                    <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                      <div className="font-bold whitespace-nowrap">
+                        Target Amount:
+                      </div>
+                      <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                        R {goal.target_amount.toFixed(2)}
+                      </div>
+                    </div>
+                  )}
+
+                  {goal.target_date !== undefined && (
+                    <>
+                      <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                        <div className="font-bold whitespace-nowrap">
+                          Target Date:
+                        </div>
+                        <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                          {goal.target_date}
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                        <div className="font-bold whitespace-nowrap">
+                          Days Left:
+                        </div>
+                        <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                          {calculateDaysLeft(goal.target_date) > 0
+                            ? `${calculateDaysLeft(goal.target_date)} days`
+                            : 'Date Passed'}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {goal.last_update !== undefined && (
+                    <div className="flex flex-wrap md:flex-nowrap justify-between items-center space-x-2">
+                      <div className="font-bold whitespace-nowrap">
+                        Last Update:
+                      </div>
+                      <div className="text-right md:text-left text-[var(--primary-1)] whitespace-nowrap">
+                        {timeSinceLastUpdate(goal.last_update)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="lg:w-1/4 flex flex-col items-center justify-between text-center bg-[var(--block-background)] rounded-lg shadow-md p-8 w-full">
+                <h2 className="text-xl font-semibold mb-4">
+                  {goal.type !== 'Spending Limit'
+                    ? 'Overall Goal Progress'
+                    : 'Spent This Month'}
+                </h2>
+                <div className="relative flex-grow flex justify-center items-center h-full w-full">
+                  <div className="w-[20vh] h-[20vh]">
+                    <CircularProgressbar
+                      value={calculateProgressPercentage(goal)}
+                      styles={buildStyles({
+                        pathColor: getColorForValue(
+                          calculateProgressPercentage(goal),
+                          goal.type
+                        ),
+                        trailColor: '#d6d6d6',
+                        strokeLinecap: 'round',
+                      })}
+                    />
+                    <div
+                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold"
+                      style={{
+                        color: getColorForValue(
+                          calculateProgressPercentage(goal),
+                          goal.type
+                        ),
+                      }}
+                    >
+                      {`${calculateProgressPercentage(goal).toFixed(2)}%`}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {goal.type !== 'Spending Limit' && (
+                <div className="lg:w-1/4 flex flex-col items-center justify-between text-center bg-[var(--block-background)] rounded-lg shadow-md p-8 w-full">
+                  <h2 className="text-xl font-semibold mb-4">Goal Wingman</h2>
+                  <div className="w-full flex items-center justify-center">
+                    <Image
+                      src={getGif(calculateProgressPercentage(goal))}
+                      alt="Goal GIF"
+                      className="object-contain w-full h-full"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="container mx-auto p-4">
+            <div className="flex flex-col justify-center items-center bg-[var(--block-background)] rounded-lg shadow-md p-8 w-full">
+              <h2 className="text-xl font-semibold mb-4">Insights</h2>
+              <div
+                className="justify-left items-left bg-grey w-full"
+                style={{
+                  fontSize: 'calc(1.2rem*var(--font-size-multiplier))',
+                }}
+              >
+                <div
+                  className="justify-left items-left bg-grey w-full"
+                  style={{
+                    fontSize: 'calc(1.2rem*var(--font-size-multiplier))',
+                  }}
+                >
+                  {goal.target_date &&
+                    calculateMonthsLeft(goal.target_date) <= 0 &&
+                    calculateDaysLeft(goal.target_date) <= 0 && (
+                      <>
+                        <p>This goal's target date has passed.</p>
+                        <br></br>
+                        <p>
+                          You can set a new date by clicking "Edit Details"
+                          above.
+                        </p>
+                      </>
+                    )}
+                  {goal.type === 'Savings' &&
+                    goal.target_amount &&
+                    goal.target_amount > goal.current_amount &&
+                    goal.target_date && (
+                      <>
+                        <div className="flex flex-wrap">
+                          <p>You still need to save</p>
+                          <p className="text-[var(--primary-1)] font-semibold ml-1">
+                            R{calculateRemainingSavings(goal).toFixed(2)}
+                          </p>
+                          <p>.</p>
+                        </div>
+                        <br></br>
+                        <div className="flex flex-wrap">
+                          <p>This means you need to save </p>
+                          <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
+                            R{calculateSavingsPerMonth(goal).toFixed(2)}
+                          </p>
+                          <p>per month in order to reach your goal in time.</p>
+                        </div>
+
+                        {goal.updates &&
+                          JSON.parse(goal.updates).length > 0 && (
+                            <>
+                              <br></br>
+                              <div className="flex flex-wrap">
+                                <p>
+                                  The average amount you have saved per month is
+                                </p>
+                                <p className="text-[var(--primary-1)] font-semibold ml-1">
+                                  R{calculateAverageSavings(goal).toFixed(2)}
+                                </p>
+                                <p>.</p>
+                                <br></br>
+                              </div>
+                            </>
+                          )}
+                      </>
+                    )}
+                  {goal.type === 'Savings' &&
+                    goal.target_amount &&
+                    goal.target_amount <= goal.current_amount && (
+                      <p>You've reached your goal!</p>
+                    )}
+                  {goal.type === 'Spending Limit' && goal.spending_limit && (
+                    <>
+                      {goal.spending_limit - monthlyBudgetSpent(goal) > 0 && (
+                        <>
+                          <div className="flex flex-wrap">
+                            <p>You still have</p>
+                            <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
+                              R
+                              {(
+                                goal.spending_limit - monthlyBudgetSpent(goal)
+                              ).toFixed(2)}
+                            </p>
+                            <p>in your limit this month.</p>
+                          </div>
+                          <br></br>
+                        </>
+                      )}
+                      {goal.spending_limit - monthlyBudgetSpent(goal) <= 0 && (
+                        <>
+                          <div className="flex flex-wrap">
+                            <p>You have exceeded this month's limit by</p>
+                            <p className="text-[var(--primary-1)] font-semibold ml-1">
+                              R
+                              {(
+                                -goal.spending_limit + monthlyBudgetSpent(goal)
+                              ).toFixed(2)}
+                            </p>
+                            <p>.</p>
+                          </div>
+                          <br></br>
+                        </>
+                      )}
+                      <div className="flex flex-wrap">
+                        <p>On average, you have spent</p>
+                        <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
+                          R{calculateAverageSpending(goal).toFixed(2)}
+                        </p>
+                        <p>per month.</p>
+                      </div>
+                      <br></br>
+                      <div className="flex flex-wrap">
+                        <p>Your average spending is</p>
+                        <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
+                          {Math.abs(
+                            calculateSpendingDifferencePercentage(goal)
+                          ).toFixed(2)}
+                          %
+                        </p>
+                        <p>
+                          {calculateSpendingDifferencePercentage(goal) > 0
+                            ? 'above'
+                            : 'below'}{' '}
+                          your monthly limit.
+                        </p>
+                      </div>
+
+                      {goal.updates && JSON.parse(goal.updates).length > 0 && (
+                        <>
+                          <br></br>
+                          <div className="flex flex-wrap">
+                            <p> Your biggest expense was "</p>
+                            <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
+                              {calculateBiggestExpense(goal).description}
+                            </p>
+                            <p>" in</p>
+                            <p className="text-[var(--primary-1)] font-semibold ml-1">
+                              {calculateBiggestExpenseMonth(goal)}
+                            </p>
+                            <p>, which used</p>
+                            <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
+                              {calculateBiggestExpensePercentage(goal).toFixed(
+                                2
+                              )}
+                              %
+                            </p>
+                            <p>of that month's limit.</p>
+                          </div>
+                        </>
+                      )}
+                    </>
+                  )}
+                  {goal.type === 'Debt Reduction' &&
+                    goal.target_date !== undefined &&
+                    goal.current_amount > 0 &&
+                    goal.target_date &&
+                    calculateMonthsLeft(goal.target_date) > 0 && (
+                      <>
+                        <div className="flex flex-wrap">
+                          <p>You still need to pay</p>
+                          <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
+                            R{calculateRemainingDebt(goal).toFixed(2)}{' '}
+                          </p>
+                          <p>towards this debt.</p>
+                        </div>
+                        <br></br>
+                        <div className="flex flex-wrap">
+                          <p>This means you need to pay</p>
+                          <p className="text-[var(--primary-1)] font-semibold ml-1 mr-1">
+                            R
+                            {(
+                              calculateRemainingDebt(goal) /
+                              calculateMonthsLeft(goal.target_date)
+                            ).toFixed(2)}
+                          </p>
+                          <p>per month in order to reach your goal in time.</p>
+                        </div>
+
+                        {goal.updates &&
+                          JSON.parse(goal.updates).length > 0 && (
+                            <>
+                              <br></br>
+                              <div className="flex flex-wrap">
+                                <p>Your average monthly payment is</p>
+                                <p className="text-[var(--primary-1)] font-semibold ml-1">
+                                  R
+                                  {calculateAverageDebtPayments(goal).toFixed(
+                                    2
+                                  )}
+                                </p>
+                                <p>.</p>
+                              </div>
+                            </>
+                          )}
+                      </>
+                    )}
+                  {goal.type === 'Debt Reduction' &&
+                    goal.current_amount <= 0 && (
+                      <p>You've reached your goal!</p>
+                    )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {goal.updates && JSON.parse(goal.updates).length > 0 && (
+            <>
+              <div className="container mx-auto p-4">
+                <div className="flex justify-between items-start gap-8">
+                  <div className="flex-1 flex flex-col justify-center text-center bg-[var(--block-background)] rounded-lg shadow-md p-8 pl-4 pr-4 h-[40vh]">
+                    <h2 className="text-xl font-semibold mb-10">
+                      {goal.type != 'Spending Limit'
+                        ? 'Goal Progress Over Time'
+                        : 'Spending by Month'}
+                    </h2>
+                    <ResponsiveContainer width="100%" height="80%">
+                      <BarChart
+                        data={getUpdates()}
+                        margin={{ top: 20, right: 30, left: 30, bottom: 20 }}
+                        startAngle={180}
+                      >
+                        <XAxis
+                          dataKey="month"
+                          stroke="var(--main-text)"
+                          tick={{ fill: 'var(--main-text)', fontSize: 12 }}
+                        />
+                        <YAxis
+                          tick={{ fill: 'var(--main-text)', fontSize: 12 }}
+                          stroke="var(--main-text)"
+                          width={50}
+                          allowDataOverflow={true}
+                          domain={['auto', 'auto']}
+                        >
+                          <Label
+                            value="Amount"
+                            angle={-90}
+                            position="insideLeft"
+                            style={{
+                              textAnchor: 'middle',
+                              fill: 'var(--main-text)',
+                              fontSize: '14px',
+                            }}
+                          />
+                        </YAxis>
+                        <Tooltip
+                          cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
+                          contentStyle={{
+                            backgroundColor: 'var(--main-background)',
+                            border: 'none',
+                            borderRadius: '8px',
+                            padding: '10px',
+                          }}
+                        />
+                        <CartesianGrid
+                          stroke="rgba(255, 255, 255, 0.1)"
+                          vertical={false}
+                        />
+                        <Bar
+                          dataKey="amount"
+                          fill="var(--primary-1)"
+                          barSize={40}
+                          stroke="var(--main-border)"
+                          strokeWidth={1}
+                        >
+                          {getUpdates().map(
+                            (entry: { amount: number }, index: any) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={
+                                  goal.type === 'Spending Limit' &&
+                                  goal.spending_limit
+                                    ? entry.amount > goal.spending_limit
+                                      ? 'red'
+                                      : 'var(--primary-1)'
+                                    : entry.amount < 0
+                                    ? 'var(--primary-2)'
+                                    : 'var(--primary-1)'
+                                }
+                              />
+                            )
+                          )}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+
+              {currentGoal.updates &&
+                JSON.parse(currentGoal.updates).length > 0 && (
+                  <div className="container mx-auto p-4 ">
+                    <div className="flex-1 flex flex-col justify-center text-center bg-[var(--block-background)] rounded-lg shadow-md p-8 pl-20 pr-20">
+                      <h2 className="text-xl font-semibold mb-10">Updates</h2>
+                      <UpdateTable
+                        goal={currentGoal}
+                        onUpdateGoal={handleGoalUpdate}
+                      />
+                    </div>
+                  </div>
+                )}
+            </>
+          )}
+        </div>
+      )}
+      {editPopupOpen && (
+        <EditGoalPopup
+          togglePopup={handleEditGoalPopup}
+          goal={goal}
+          toggleMainPopup={onClose}
+        />
+      )}
+      {updatePopupOpen && (
+        <UpdateGoalPopup togglePopup={handleUpdateGoalPopup} goal={goal} />
+      )}
+    </div>
+  );
+};
+
+export interface GoalsPageProps {}
+
+export function GoalsPage() {
+  const [Goals, setGoals] = useState<Goal[]>([]);
+  const [isGoalPopupOpen, setIsGoalPopupOpen] = useState(false);
+  const [sortOption, setSortOption] = useState('name');
+  const [hasGoals, setHasGoals] = useState(false);
+  const user = useContext(UserContext);
+  const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
+  const { data, setData, loading } = useDataContext();
 
   const monthlyBudgetSpent = (goal: Goal): number => {
     if (goal.monthly_updates !== undefined) {
@@ -672,28 +1046,382 @@ export function GoalsPage() {
     return 0;
   };
 
+  const calculateProgressPercentage = (goal: Goal): number => {
+    if (
+      goal.current_amount !== undefined &&
+      goal.initial_amount !== undefined &&
+      goal.type == 'Debt Reduction'
+    ) {
+      if (goal.initial_amount) {
+        return Math.min(
+          100,
+          ((goal.initial_amount - goal.current_amount) / goal.initial_amount) *
+            100
+        );
+      } else {
+        return Math.min(100, goal.current_amount * 100);
+      }
+    }
+
+    if (
+      goal.current_amount !== undefined &&
+      goal.target_amount !== undefined &&
+      goal.type == 'Savings'
+    ) {
+      return Math.min(100, (goal.current_amount / goal.target_amount) * 100);
+    }
+
+    if (
+      goal.spending_limit !== undefined &&
+      goal.monthly_updates !== undefined &&
+      goal.type == 'Spending Limit'
+    ) {
+      const amountForCurrentMonth = monthlyBudgetSpent(goal);
+      return (amountForCurrentMonth / goal.spending_limit) * 100;
+    }
+    return 0;
+  };
+
+  const handleGoalUpdate = (updatedGoal: Goal) => {
+    setGoals((prevGoals) =>
+      prevGoals.map((goal) => (goal.id === updatedGoal.id ? updatedGoal : goal))
+    );
+
+    if (selectedGoal?.id === updatedGoal.id) {
+      setSelectedGoal(updatedGoal);
+    }
+  };
+
+  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortOption(event.target.value);
+  };
+
+  const sortGoals = (goals: Goal[], option: string) => {
+    return [...goals].sort((a, b) => {
+      const aValue =
+        option === 'name'
+          ? a.name
+          : option === 'type'
+          ? a.type
+          : option === 'end_date'
+          ? new Date(a.target_date || '').getTime()
+          : option === 'progress'
+          ? calculateProgressPercentage(a)
+          : 0;
+
+      const bValue =
+        option === 'name'
+          ? b.name
+          : option === 'type'
+          ? b.type
+          : option === 'end_date'
+          ? new Date(b.target_date || '2100-01-01').getTime()
+          : option === 'progress'
+          ? calculateProgressPercentage(b)
+          : 0;
+
+      if (aValue < bValue) return -1;
+      if (aValue > bValue) return 1;
+      return 0;
+    });
+  };
+
+  const sortedGoals = sortGoals(Goals, sortOption);
+
+  const addGoalPopup = () => {
+    setIsGoalPopupOpen(!isGoalPopupOpen);
+  };
+
+  useEffect(() => {
+    if (user && data.goals.length > 0) {
+      setHasGoals(true);
+      setGoals(data.goals);
+      const updatedData = updateGoalsBasedOnTransactions();
+
+      if (JSON.stringify(updatedData.goals) !== JSON.stringify(data.goals)) {
+        updateDB(updatedData.goals);
+        setData(updatedData);
+
+        for (let i = 0; i < updatedData.goals.length; i++) {
+          if (selectedGoal && updatedData.goals[i].id == selectedGoal.id) {
+            setSelectedGoal(updatedData.goals[i]);
+            break;
+          }
+        }
+      }
+    }
+  }, [user, data.goals]);
+
+  const updateDB = async (goals: Goal[]) => {
+    for (const goal of goals) {
+      const goalRef = doc(db, 'goals', goal.id);
+      if (goal.updates !== undefined) {
+        if (goal.type == 'Savings') {
+          await updateDoc(goalRef, {
+            updates: goal.updates,
+            current_amount: goal.current_amount,
+            monthly_updates: goal.monthly_updates,
+          });
+        } else if (goal.type == 'Debt Reduction' && goal.initial_amount) {
+          await updateDoc(goalRef, {
+            updates: goal.updates,
+            current_amount: goal.initial_amount - goal.current_amount,
+            monthly_updates: goal.monthly_updates,
+          });
+        } else {
+          await updateDoc(goalRef, {
+            updates: goal.updates,
+            monthly_updates: goal.monthly_updates,
+          });
+        }
+      } else {
+        if (goal.type == 'Savings') {
+          await updateDoc(goalRef, {
+            current_amount: goal.current_amount,
+          });
+        } else if (goal.type == 'Debt Reduction' && goal.initial_amount) {
+          await updateDoc(goalRef, {
+            current_amount: goal.initial_amount - goal.current_amount,
+          });
+        }
+      }
+    }
+  };
+
+  function parseTransactionsByMonth(transaction: Transaction): any[] {
+    const monthFields: (keyof Transaction)[] = [
+      'january',
+      'february',
+      'march',
+      'april',
+      'may',
+      'june',
+      'july',
+      'august',
+      'september',
+      'october',
+      'november',
+      'december',
+    ];
+
+    let parsedTransactions: any[] = [];
+
+    monthFields.forEach((month) => {
+      if (transaction[month]) {
+        const transactionsForMonth = JSON.parse(transaction[month] as string);
+        transactionsForMonth.forEach((trans: any) => {
+          parsedTransactions.push({
+            ...trans,
+            account_number: transaction.account_number,
+            year: transaction.year,
+          });
+        });
+      }
+    });
+
+    return parsedTransactions;
+  }
+
+  function matchesCondition(
+    transaction: Transaction,
+    condition: Condition
+  ): boolean {
+    const matchesAccount = condition.accounts.includes(
+      transaction.account_number
+    );
+    const matchesKeyword =
+      condition.keywords.length === 0 ||
+      condition.keywords.some((keyword) =>
+        transaction.description.includes(keyword)
+      );
+    const matchesCategory =
+      condition.category === '' ||
+      condition.category === transaction.category ||
+      condition.category === 'Any';
+
+    return matchesAccount && matchesKeyword && matchesCategory;
+  }
+
+  function updateGoalsBasedOnTransactions() {
+    const updatedGoals = data.goals.map((goal) => {
+      if (goal.update_type === 'automatic') {
+        const conditions = JSON.parse(goal.conditions || '[]') as Condition[];
+
+        const allParsedTransactions = data.transactions.flatMap(
+          parseTransactionsByMonth
+        );
+
+        const filteredTransactions = allParsedTransactions.filter(
+          (transaction) =>
+            conditions.some((condition) =>
+              matchesCondition(transaction, condition)
+            )
+        );
+        const existingUpdates = goal.updates ? JSON.parse(goal.updates) : [];
+        const deletedUpdates = goal.deleted_updates
+          ? JSON.parse(goal.deleted_updates)
+          : [];
+
+        const newUpdates = filteredTransactions
+          .filter(
+            (transaction) =>
+              !existingUpdates.some(
+                (update: any) =>
+                  update.date === transaction.date &&
+                  update.amount ===
+                    (goal.type !== 'Savings'
+                      ? -transaction.amount
+                      : transaction.amount)
+              ) &&
+              !deletedUpdates.some(
+                (deleted: any) =>
+                  deleted.date === transaction.date &&
+                  deleted.amount ===
+                    (goal.type !== 'Savings'
+                      ? -transaction.amount
+                      : transaction.amount)
+              )
+          )
+          .map((transaction) => ({
+            date: transaction.date,
+            amount:
+              goal.type !== 'Savings'
+                ? -transaction.amount
+                : transaction.amount,
+            description: transaction.description,
+            category: transaction.category,
+          }));
+
+        let updateTime = new Date().toISOString();
+
+        if (newUpdates.length === 0) {
+          updateTime = goal.last_update || updateTime;
+        }
+
+        const updatedUpdates = [...existingUpdates, ...newUpdates].sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+
+        const currentAmount = updatedUpdates.reduce(
+          (sum, update) => sum + update.amount,
+          0
+        );
+        const monthlyUpdates = calculateMonthlyUpdates(updatedUpdates);
+        console.log(monthlyUpdates);
+
+        if (goal.type == 'Savings') {
+          return {
+            ...goal,
+            updates: JSON.stringify(updatedUpdates),
+            current_amount: currentAmount,
+            monthly_updates: JSON.stringify(monthlyUpdates),
+            last_update: updateTime,
+          };
+        } else if (goal.type == 'Debt Reduction' && goal.initial_amount) {
+          return {
+            ...goal,
+            updates: JSON.stringify(updatedUpdates),
+            current_amount: goal.initial_amount - currentAmount,
+            monthly_updates: JSON.stringify(monthlyUpdates),
+            last_update: updateTime,
+          };
+        } else {
+          return {
+            ...goal,
+            updates: JSON.stringify(updatedUpdates),
+            monthly_updates: JSON.stringify(monthlyUpdates),
+            last_update: updateTime,
+          };
+        }
+      } else {
+        if (goal.updates) {
+          const currentAmount = JSON.parse(goal.updates).reduce(
+            (sum: any, update: { amount: any }) => sum + update.amount,
+            0
+          );
+          const monthlyUpdates = calculateMonthlyUpdates(
+            JSON.parse(goal.updates)
+          );
+
+          if (goal.type == 'Savings') {
+            return {
+              ...goal,
+              current_amount: currentAmount,
+              monthly_updates: JSON.stringify(monthlyUpdates),
+            };
+          } else if (goal.type == 'Debt Reduction' && goal.initial_amount) {
+            return {
+              ...goal,
+              current_amount: goal.initial_amount - currentAmount,
+              monthly_updates: JSON.stringify(monthlyUpdates),
+            };
+          } else {
+            return {
+              ...goal,
+              monthly_updates: JSON.stringify(monthlyUpdates),
+            };
+          }
+        }
+        return goal;
+      }
+    });
+
+    return {
+      ...data,
+      goals: updatedGoals,
+    };
+  }
+
+  function calculateMonthlyUpdates(updates: any[]) {
+    const monthlyTotals: { [key: string]: number } = {};
+
+    updates.forEach((update) => {
+      const date = new Date(update.date);
+      const monthYear = `${date.toLocaleString('default', {
+        month: 'long',
+      })} ${date.getFullYear()}`;
+
+      if (!monthlyTotals[monthYear]) {
+        monthlyTotals[monthYear] = 0;
+      }
+
+      monthlyTotals[monthYear] += update.amount;
+    });
+
+    return Object.entries(monthlyTotals).map(([month, amount]) => ({
+      amount,
+      month,
+    }));
+  }
+
   return (
-    <div className={styles.mainPage}>
-      {!hasGoals ? (
-        <>
-          <div className={styles.noGoalScreen}> 
-              <div className={styles.noGoalText}>
-                Add your first goal:
-              </div>
-              <button className={styles.addGoalsButton} onClick={addGoalPopup}>
-              Add a Goal
-            </button>
-            {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
+    <>
+      {loading && (
+        <div className="flex-1 h-full w-full flex flex-col items-center justify-center bg-[var(--main-background)]">
+          <div className={styles.loaderContainer}>
+            <div className={styles.loader}></div>
           </div>
-        </>
-      ) : (
+          <div className={styles.loaderText}>Loading...</div>
+        </div>
+      )}
+      {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
+      {selectedGoal && (
         <>
-          <div className={styles.header}>
-            <button className={styles.addGoalsButton} onClick={addGoalPopup}>
-              Add a Goal
-            </button>
+          <GoalInfoPage
+            goal={selectedGoal}
+            onClose={() => setSelectedGoal(null)}
+            onUpdateGoal={handleGoalUpdate}
+          ></GoalInfoPage>
+        </>
+      )}      
+      {data.goals.length >0 && !isGoalPopupOpen && selectedGoal == null && (
+        <>
+          <div
+            className="flex justify-between bg-[var(--main-background)] text-[calc(1.2rem*var(--font-size-multiplier))] mb-4 pb-4 items-end"
+            style={{ borderBottom: '1px solid gray' }}
+          >
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <p className={styles.sortHeader}>Sort By:</p>
+              <p className="font-bold mr-4">Sort By:</p>
               <select
                 value={sortOption}
                 onChange={handleSortChange}
@@ -701,178 +1429,99 @@ export function GoalsPage() {
               >
                 <option value="name">Name</option>
                 <option value="type">Type</option>
-                <option value="start_date">Start Date</option>
                 <option value="end_date">Target Date</option>
                 <option value="progress">Progress</option>
               </select>
             </div>
-            {isGoalPopupOpen && <AddGoalPopup togglePopup={addGoalPopup} />}
+            <button className={styles.addAGoalButton} onClick={addGoalPopup}>
+              Add a Goal
+            </button>
           </div>
-          <div
-            style={{
-              width: '85vw',
-              backgroundColor: 'var(--main-background)',
-              marginBottom: 'calc((5rem * var(--font-size-multiplier)))',
-            }}
-          ></div>
-          <div className={styles.planningModalContainer}>
-            {Goals ? (
-              <>
-                {Goals.map((goal, index) => (
-                  <div key={goal.id || index}>
-                    <div className={styles.planningModalTitle}>
-                      {goal.name}
-                      <span
-                        className="material-symbols-outlined"
-                        style={{
-                          fontSize:
-                            'min(2.5rem, (calc(1.5rem * var(--font-size-multiplier))))',
-                          fontWeight: 500,
-                          color: 'var(--primary-text)',
-                          marginLeft: '1rem',
-                        }}
-                        onClick={() => handleEditGoalPopup(index)}
-                      >
-                        edit
-                      </span>
-                      {editPopupOpen[index] && (
-                        <EditGoalPopup
-                          togglePopup={() => handleEditGoalPopup(index)}
-                          goal={goal}
-                        />
-                      )}
-                    </div>
-                    <div className={styles.planningModal}>
-                      <div className={styles.goalsContainer}>
-                        <div className={styles.goalDisplay}>
-                          <div className={styles.goal}>
-                            <div className={styles.goalPair}>
-                              <div className={styles.goalLabel}>Goal Type:</div>
-                              <div className={styles.goalValue}>
-                                {goal.type === 'Savings' && <>Savings</>}
-                                {goal.type === 'Debt' && <>Debt Reduction</>}
-                                {goal.type === 'Spending' && (
-                                  <>Limiting Spending</>
-                                )}
-                              </div>
-                            </div>
-                            {goal.current_amount !== undefined &&
-                              goal.target_amount !== undefined && (
-                                <div>
-                                  {goal.initial_amount !== undefined && (
-                                    <div className={styles.goalPair}>
-                                      <div className={styles.goalLabel}>
-                                        Initial Amount:
-                                      </div>
-                                      <div className={styles.goalValue}>
-                                        R {goal.initial_amount.toFixed(2)}
-                                      </div>
-                                    </div>
-                                  )}
-                                  <div className={styles.goalPair}>
-                                    <div className={styles.goalLabel}>
-                                      Current Amount:
-                                    </div>
-                                    <div className={styles.goalValue}>
-                                      R {goal.current_amount.toFixed(2)}
-                                    </div>
-                                  </div>
-                                  <div className={styles.goalPair}>
-                                    <div className={styles.goalLabel}>
-                                      Target Amount:
-                                    </div>
-                                    <div className={styles.goalValue}>
-                                      R{goal.target_amount.toFixed(2)}
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            <div className={styles.goalPair}>
-                              <div className={styles.goalLabel}>
-                                Start Date:
-                              </div>
-                              <div className={styles.goalValue}>
-                                {goal.start_date}
-                              </div>
-                            </div>
-                            {goal.target_date && (
-                              <div>
-                                <div className={styles.goalPair}>
-                                  <div className={styles.goalLabel}>
-                                    Target Date:
-                                  </div>
-                                  <div className={styles.goalValue}>
-                                    {goal.target_date}
-                                  </div>
-                                </div>
-                                <div className={styles.goalPair}>
-                                  <div className={styles.goalLabel}>
-                                    Days Left:
-                                  </div>
-                                  <div className={styles.goalValue}>
-                                    {calculateDaysLeft(goal.target_date) > 0
-                                      ? ` ${calculateDaysLeft(
-                                          goal.target_date
-                                        )}`
-                                      : 'Target Date Passed'}
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                            {goal.spending_limit !== undefined && (
-                              <div className={styles.goalPair}>
-                                <div className={styles.goalLabel}>
-                                  Spending Limit:
-                                </div>
-                                <div className={styles.goalValue}>
-                                  R {goal.spending_limit.toFixed(2)}
-                                </div>
-                              </div>
-                            )}
-                            {goal.spending_limit !== undefined && (
-                              <div className={styles.goalPair}>
-                                <div className={styles.goalLabel}>
-                                  Spent this Month:
-                                </div>
-                                <div className={styles.goalValue}>
-                                  R {monthlyBudgetSpent(goal).toFixed(2)}
-                                </div>
-                              </div>
-                            )}
-                          </div>
+          <div className="w-full h-full text-[calc(1.5rem*var(--font-size-multiplier))] overflow-y-auto">
+            <table className="min-w-full table-auto border-collapse border border-gray-200">
+              <thead>
+                <tr
+                  style={{
+                    color: 'var(--secondary-text)',
+                    backgroundColor: 'var(--primary-1)',
+                  }}
+                >
+                  <th className="border border-gray-200 p-2 text-left">Name</th>
+                  <th className="border border-gray-200 p-2 text-left">Type</th>
+                  <th className="border border-gray-200 p-2 text-left">
+                    Target Date
+                  </th>
+                  <th className="border border-gray-200 p-2 text-left">
+                    Progress
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedGoals.map((goal, index) => (
+                  <tr
+                    key={index}
+                    className="cursor-pointer bg-[var(--block-background)] hover:bg-[var(--main-background)]"
+                    style={{
+                      fontSize: 'calc(1.2rem * var(--font-size-multiplier))',
+                    }}
+                    onClick={() => setSelectedGoal(goal)}
+                  >
+                    <td className="border border-gray-200 p-2">{goal.name}</td>
+                    <td className="border border-gray-200 p-2">{goal.type}</td>
+                    <td className="border border-gray-200 p-2">
+                      {goal.target_date}
+                    </td>
+                    <td className="border border-gray-200 p-2">
+                      <div className="flex items-center">
+                        <div
+                          className="relative w-full h-8 rounded"
+                          style={{
+                            backgroundColor: 'var(--main-background)',
+                          }}
+                        >
                           <div
-                            className={styles.updateViewButton}
-                            onClick={() => handleUpdateGoalPopup(index)}
-                          >
-                            Update Progress
-                          </div>
-                          {updatePopupOpen[index] && (
-                            <UpdateGoalPopup
-                              togglePopup={() => handleUpdateGoalPopup(index)}
-                              goal={goal}
-                            />
-                          )}
+                            className="absolute top-0 left-0 h-full rounded"
+                            style={{
+                              width:
+                                goal.current_amount < 0
+                                  ? 0
+                                  : `${Math.min(
+                                      100,
+                                      calculateProgressPercentage(goal)
+                                    )}%`,
+                              backgroundColor: 'var(--primary-2)',
+                            }}
+                          />
                         </div>
-
-                        {goal.current_amount !== undefined &&
-                          goal.target_amount !== undefined && (
-                            <GraphCarousel goal={goal} key={goal.id} />
-                          )}
-                        {goal.spending_limit !== undefined && (
-                          <GraphCarousel goal={goal} key={goal.id} />
-                        )}
+                        <span
+                          className="ml-3 text-sm"
+                          style={{ color: 'var(--main-text' }}
+                        >
+                          {calculateProgressPercentage(goal).toFixed(2)}%
+                        </span>
                       </div>
-                    </div>
-                  </div>
+                    </td>
+                  </tr>
                 ))}
-              </>
-            ) : (
-              <></>
-            )}
+              </tbody>
+            </table>
           </div>
         </>
       )}
-    </div>
+      {!hasGoals && (
+        <>
+          <div className="flex flex-col items-center justify-center bg-[var(--main-background)] h-full">
+            <div className="text-2xl">Add your first goal:</div>
+            <button
+              className="text-2xl mt-4 bg-BudgieBlue2 hover:bg-BudgieAccentHover transition-colors text-white p-4 rounded-2xl"
+              onClick={addGoalPopup}
+            >
+              Add Goal
+            </button>
+          </div>
+        </>
+      )}
+    </>
   );
 }
 

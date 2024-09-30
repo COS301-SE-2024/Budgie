@@ -1,7 +1,5 @@
 'use client';
 import React, { useState, useContext, useEffect } from 'react';
-import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
-import { collection, query, where, getDocs } from 'firebase/firestore';
 import AllTransactionsView from '../all-transactions-view/AllTransactionsView';
 import MonthlyTransactionsView from '../monthly-transactions-view/MonthlyTransactionsView';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
@@ -9,169 +7,125 @@ import { useThemeSettings } from '../../useThemes';
 
 import '../../root.css';
 import styles from './Dashboard.module.css';
+import { useDataContext } from '../data-context/DataContext';
 
 export interface DashboardProps {}
 
 export function Dashboard(props: DashboardProps) {
+  const { data, loading, refreshData } = useDataContext();
   const user = useContext(UserContext);
-  const [Data, setData] = useState<any>(null);
-
-  // Yearly or monthly view
   const [viewMode, setViewMode] = useState('monthly');
-
-  // Default year is the current year
-  const currentYear = new Date().getFullYear();
-
-  // Current user's available accounts
-  const [accountOptions, setAccountOptions] = useState<
-    { alias: string; accountNumber: string }[]
-  >([]);
-
-  // Alias and account number of the currently selected account
   const [selectedAlias, setSelectedAlias] = useState<string>('');
   const [currentAccountNumber, setCurrentAccountNumber] = useState<string>('');
+  const [yearsWithData, setYearsWithData] = useState<number[]>([]);
 
-  // Set of years for which user has transactions
-  const [yearsWithData, setYearsWithData] = useState<number[]>([0]);
-
-  const [hasAccount, setHasAccount] = useState('No');
   useThemeSettings();
-  useEffect(() => {
-    const fetchAccounts = async () => {
-      try {
-        const q = query(
-          collection(db, 'accounts'),
-          where('uid', '==', user.uid)
-        );
-        const querySnapshot = await getDocs(q);
-        const accountOptionsList = querySnapshot.docs.map((doc) => ({
-          alias: doc.data().alias,
-          accountNumber: doc.data().account_number,
-        }));
-        setAccountOptions(accountOptionsList);
 
-        if (accountOptionsList.length > 0) {
-          setSelectedAlias(accountOptionsList[0].alias);
-          setCurrentAccountNumber(accountOptionsList[0].accountNumber);
-          setHasAccount('Yes');
-        } else {
-          setHasAccount('No');
+  useEffect(() => {
+    refreshData();
+    const fetchAccounts = async () => {
+      if (user && user.uid) {
+        if (data.accounts.length > 0) {
+          setSelectedAlias(data.accounts[0].alias);
+          setCurrentAccountNumber(data.accounts[0].account_number);
         }
-      } catch (error) {
-        console.error('Error fetching aliases: ', error);
       }
     };
 
     fetchAccounts();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    const getYearlyTransactions = async () => {
-      try {
-        if (currentAccountNumber) {
-          const q = query(
-            collection(db, `transaction_data_${currentYear}`),
-            where('uid', '==', user.uid),
-            where('account_number', '==', currentAccountNumber)
-          );
-          const querySnapshot = await getDocs(q);
-          const transactionList = querySnapshot.docs.map((doc) => doc.data());
-          setData(transactionList[0]);
-        }
-      } catch (error) {
-        console.error('Error getting bank statement document:', error);
+    const calculateYearsWithData = () => {
+      if (data && data.transactions) {
+        const years = data.transactions
+          .filter(
+            (transaction) => transaction.account_number === currentAccountNumber
+          )
+          .map((transaction) => transaction.year);
+
+        const sortedYears = Array.from(new Set(years)).sort((a, b) => a - b);
+
+        setYearsWithData(sortedYears);
       }
     };
 
-    getYearlyTransactions();
-  }, [currentYear, currentAccountNumber, user.uid]);
-
-  useEffect(() => {
-    const fetchAvailableYears = async () => {
-      try {
-        const currentYear = new Date().getFullYear();
-        const years: number[] = [];
-
-        for (let year = 2000; year <= currentYear; year++) {
-          const q = query(
-            collection(db, `transaction_data_${year}`),
-            where('uid', '==', user.uid),
-            where('account_number', '==', currentAccountNumber)
-          );
-          const querySnapshot = await getDocs(q);
-
-          if (!querySnapshot.empty) {
-            years.push(year);
-          }
-        }
-        setYearsWithData(years);
-      } catch (error) {
-        console.error('Error fetching years with data:', error);
-      }
-    };
-
-    fetchAvailableYears();
-  }, [currentAccountNumber]);
+    calculateYearsWithData();
+  }, [data.transactions, currentAccountNumber]);
 
   const handleAccountDropdownChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const selected = event.target.value;
-    const selectedOption = accountOptions.find(
+    const selectedOption = data.accounts.find(
       (option) => option.alias === selected
     );
     if (selectedOption) {
       setSelectedAlias(selected);
-      setCurrentAccountNumber(selectedOption.accountNumber);
-      setData(null);
+      setCurrentAccountNumber(selectedOption.account_number);
     }
   };
 
-  return (
-    <div>
-      {hasAccount === 'No' ? (
-        <div className={styles.noAccountScreen}>
-          <div>
-            <div className={styles.noAccountText}>
-              You haven't added an account yet.
-            </div>
-            <div className={styles.noAccountText}>
-              Head to the Accounts page to add an account and upload a
-              transaction statement.
-            </div>
+  if (data.accounts.length == 0) {
+    return (
+      <div className={styles.noAccountScreen}>
+        <div>
+          <div className={styles.noAccountText}>
+            You haven't added an account yet.
+          </div>
+          <div className={styles.noAccountText}>
+            Head to the Accounts page to add an account and upload a transaction
+            statement.
           </div>
         </div>
-      ) : (
-        <div>
-          <div className={styles.topBar}>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mainPage">
+      <div className="w-full  flex flex-col items-center justify-center">
+        <div className="2xl:w-[85%] w-[100%] md:min-w-[44rem] sm:min-w-[35rem] min-w-[32rem]">
+          <div className="flex shadow-md !z-0 justify-between !bg-BudgieBlue2  rounded-t-2xl bg-[var(--block-background)] w-full sticky top-0">
             <div></div>
-            {/*spacing div*/}
-            <div>
-              <button
-                className={`${styles.button} ${
-                  viewMode === 'all' ? styles.activeButton : ''
-                }`}
-                onClick={() => setViewMode('all')}
-              >
-                Yearly
-              </button>
-
-              <button
-                className={`${styles.button} ${
-                  viewMode === 'monthly' ? styles.activeButton : ''
-                }`}
-                onClick={() => setViewMode('monthly')}
-              >
-                Monthly
-              </button>
-            </div>
-
+            <button
+              className={`rounded-sm px-5 hover:bg-opacity-75 text-BudgieWhite font-medium mr-16 cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
+                viewMode === 'all' ? 'border-b-4 border-BudgieWhite' : ''
+              }`}
+              onClick={() => setViewMode('all')}
+            >
+              Yearly
+            </button>
+            <button
+              className={`rounded-sm px-5 hover:bg-opacity-75 text-BudgieWhite font-medium cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
+                viewMode === 'monthly' ? 'border-b-4 border-BudgieWhite ' : ''
+              }`}
+              onClick={() => setViewMode('monthly')}
+            >
+              Monthly
+            </button>
             <select
-              className={styles.accountDropdown}
+              className="
+                bg-BudgieBlue2
+                text-BudgieWhite
+                pr-[2.5vw]
+                text-[calc(1.2rem*var(--font-size-multiplier))]
+                font-bold
+                mr-8
+                transition
+                duration-200
+                ease
+                border-0
+                justify-self-end
+                text-right
+                [text-align-last: right]
+                h-[calc(3rem*var(--font-size-multiplier))]
+                leading-[calc(2rem*var(--font-size-multiplier))]
+              "
               value={selectedAlias}
               onChange={handleAccountDropdownChange}
             >
-              {accountOptions.map((option, index) => (
+              {data.accounts.map((option, index) => (
                 <option key={index} value={option.alias}>
                   {option.alias}
                 </option>
@@ -179,29 +133,35 @@ export function Dashboard(props: DashboardProps) {
             </select>
           </div>
 
-          <div>
-            {viewMode === 'monthly' && Data && yearsWithData[0] !== 0 ? (
+          <div className="">
+            {loading ? (
+              <div className="w-full bg-[var(--main-background)] !z-0">
+                <div className="flex justify-between items-center !z-0 !sticky !top-12  bg-BudgieAccentHover py-2 px-4 shadow-md h-16 rounded-b-2xl"></div>
+                <div className="w-full flex flex-col items-center justify-center">
+                  <div className="text-black flex w-[98%] flex-col items-center justify-center gap-[10px] mt-4">
+                    <div className={styles.loadScreen}>
+                      <div className={styles.loaderContainer}>
+                        <div className={styles.loader}></div>
+                      </div>
+                      <div className={styles.loaderText}>Loading...</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : viewMode === 'monthly' ? (
               <MonthlyTransactionsView
-                account={currentAccountNumber}
-                data={Data}
-                availableYears={yearsWithData}
-              />
-            ) : viewMode === 'all' && Data && yearsWithData[0] !== 0 ? (
-              <AllTransactionsView
                 account={currentAccountNumber}
                 availableYears={yearsWithData}
               />
             ) : (
-              <div className={styles.loadScreen}>
-                <div className={styles.loaderContainer}>
-                  <div className={styles.loader}></div>
-                </div>
-                <div className={styles.loaderText}>Loading...</div>
-              </div>
+              <AllTransactionsView
+                account={currentAccountNumber}
+                availableYears={yearsWithData}
+              />
             )}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

@@ -65,8 +65,7 @@ export function OverviewPage(props: OverviewPageProps) {
   const [monthlyExpenses, setMonthlyExpenses] = useState([]);
   const [expenseByCategory, setExpenseByCategory] = useState([]);
   useThemeSettings();
-  
-  
+
   const formatTransactionValue = (value: number) => {
     const formatter = new Intl.NumberFormat('en-ZA', {
       style: 'decimal',
@@ -199,6 +198,68 @@ export function OverviewPage(props: OverviewPageProps) {
               >
                 {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
               </button>*/}
+              {/* Summary container */}
+              <div className={styles.gridContainer}>
+                <div className={styles.gridItem}>
+                  <div className={styles.chartTitleContainer}>
+                    <h3 className={styles.chartTitle}>Summary</h3>
+                  </div>
+                  <p>Net Worth: R245 754.48</p>
+                  <p>Average Daily Spend: R2 759.57</p>
+                  <h4>Top Three Categories:</h4>
+                  <div>
+                    <div className={styles.legendContainer}>
+                      {categoryData
+                        .sort((a, b) => b.value - a.value)
+                        .slice(0, 3)
+                        .map((category, index) => (
+                          <div
+                            key={category.name}
+                            className={styles.legendItem}
+                          >
+                            <div
+                              className={styles.legendBox}
+                              style={{
+                                backgroundColor: CATEGORY_COLORS[index],
+                              }}
+                            >
+                              <span className={styles.legendText}>
+                                {category.name}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.gridItem}>
+                  <div className={styles.chartTitleContainer}>
+                    <h3 className={styles.chartTitle}>Spending by Category</h3>
+                  </div>
+                  <PieChart width={500} height={300}>
+                    <Pie
+                      data={categoryData}
+                      cx={250}
+                      cy={95}
+                      labelLine={false}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {categoryData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </div>
+              </div>
+
               <div className={styles.fullWidthChart}>
                 <div className={styles.chartTitleContainer}>
                   <h3 className={styles.chartTitle}>Net Worth Over Time</h3>
@@ -216,72 +277,54 @@ export function OverviewPage(props: OverviewPageProps) {
                   onValueChange={(v) => console.log(v)}
                 />
               </div>
-              <div className={styles.fullWidthChart}>
-                <div className={styles.chartTitleContainer}>
-                  <h3 className={styles.chartTitle}>Spending by Category</h3>
-                </div>
-                <PieChart width={1000} height={300}>
-                  <Pie
-                    data={categoryData}
-                    cx={500}
-                    cy={150}
-                    labelLine={false}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {categoryData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </div>
-              <div className={styles.gridContainer}>
-                <div className={styles.gridItem}>
-                  <div className={styles.gridTitleContainer}>
-                    <FontAwesomeIcon
-                      icon={faMoneyBill}
-                      className={styles.icon}
-                    />
-                    <h2 className={styles.gridTitle}>Total Balance for Year</h2>
-                  </div>
-                  <p>Total Money in: R {formatTransactionValue(moneyIn)}</p>
-                  <p>Total Money out: R {formatTransactionValue(moneyOut)}</p>
-                </div>
 
+              <div className={styles.gridContainer}>
                 <div className={styles.gridItem}>
                   <div className={styles.gridTitleContainer}>
                     <FontAwesomeIcon icon={faHistory} className={styles.icon} />
                     <h2 className={styles.gridTitle}>Last Transaction</h2>
                   </div>
                   <p>Date: {lastTransaction.date}</p>
-                  <p>Amount: R {formatTransactionValue(lastTransaction.amount)}</p>
+                  <p>
+                    Amount: R {formatTransactionValue(lastTransaction.amount)}
+                  </p>
                   <p>Description: {lastTransaction.description}</p>
                   <p>Category: {lastTransaction.category}</p>
                 </div>
-                <div className={styles.gridItem}>
-                  <div className={styles.gridTitleContainer}>
-                    <FontAwesomeIcon
-                      icon={faCalendarAlt}
-                      className={styles.icon}
-                    />
-                    <h2 className={styles.gridTitle}>
-                      Upcoming Bills & Payments
-                    </h2>
-                  </div>
-                  Under Construction
-                </div>
+
                 <div className={styles.gridItem}>
                   <div className={styles.gridTitleContainer}>
                     <FontAwesomeIcon icon={faListUl} className={styles.icon} />
-                    <h2 className={styles.gridTitle}>Budget Status</h2>
+                    <h2 className={styles.gridTitle}>Financial Health Score</h2>
                   </div>
-                  Under Construction
+                  Bracket Comparison summary and link to page
+                </div>
+              </div>
+              <div className={styles.fullWidthChart}>
+                <div className={styles.chartTitleContainer}>
+                  <h3 className={styles.chartTitle}>Upcoming Payments</h3>
+                </div>
+                <div className={styles.paymentContainer}>
+                  <div className={styles.paymentBox}>
+                    <span className={styles.paymentDate}>2024/12/15</span>
+                    <span className={styles.paymentName}>Netflix</span>
+                    <span className={styles.paymentAmount}>-R175.4</span>
+                  </div>
+                  <div className={styles.paymentBox}>
+                    <span className={styles.paymentDate}>2024/12/20</span>
+                    <span className={styles.paymentName}>Spotify</span>
+                    <span className={styles.paymentAmount}>-R99.9</span>
+                  </div>
+                  <div className={styles.paymentBox}>
+                    <span className={styles.paymentDate}>2024/12/25</span>
+                    <span className={styles.paymentName}>Electricity</span>
+                    <span className={styles.paymentAmount}>-R350.0</span>
+                  </div>
+                  <div className={styles.paymentBox}>
+                    <span className={styles.paymentDate}>2024/12/30</span>
+                    <span className={styles.paymentName}>Internet</span>
+                    <span className={styles.paymentAmount}>-R250.0</span>
+                  </div>
                 </div>
               </div>
             </div>

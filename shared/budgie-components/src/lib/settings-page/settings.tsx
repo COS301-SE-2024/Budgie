@@ -29,7 +29,7 @@ export function Settings(props: SettingsProps) {
         >
           <p className={styles.settingTitle}>Account Settings</p>
           <p className={styles.settingDescription}>
-            Change your password, or delete your account
+            Change your password or delete your account.
           </p>
         </div>
         <div
@@ -41,6 +41,7 @@ export function Settings(props: SettingsProps) {
             Change the website’s font size, colour, and background.
           </p>
         </div>
+        {/* 
         <div
           className={styles.settingsOption}
           onClick={() => setCurrentOverlay('Notification')}
@@ -51,6 +52,7 @@ export function Settings(props: SettingsProps) {
             warnings.
           </p>
         </div>
+        */}
         <div
           className={styles.settingsOption}
           onClick={() => setCurrentOverlay('Support')}

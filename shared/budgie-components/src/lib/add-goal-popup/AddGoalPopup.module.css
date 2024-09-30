@@ -1,66 +1,36 @@
-.addGoalPopup {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+.goalInfo {
+  align-content: center;
+  justify-items: center;
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  z-index: 15;
   align-items: center;
-  width: 85vw;
-  font-size: calc(1.2rem*var(--font-size-multiplier));
+  width: 80%;
 }
 
-.popupContent {
-  background: var(--block-background);
-  padding: 20px;
-  border-bottom-right-radius: 5px;
-  border-bottom-left-radius: 5px;
-  text-align: center;
-  z-index: 2;
-  width: calc(35vw * var(--font-size-multiplier));
-  border-top: 4px solid var(--primary-1);
+.updateGoalInfo {
+  height: calc(36vh * var(--font-size-multiplier));
+  align-content: center;
+  text-align: left;
+  width: fit-content;
 }
 
-.tabs {
-  display: flex;
-  justify-content: space-between;
-}
-
-.tabs button {
-  padding: 10px 20px;
-  border: none;
-  background-color: var(--block-background);
-  cursor: pointer;
-  border-top-right-radius: 5px;
-  border-top-left-radius: 5px;
-  width: 32%;
-}
-
-.tabs button.active {
-  background-color: var(--primary-1);
-  color: white;
-}
-
-.tabs button:hover {
-  filter: brightness(0.9);
-  transition: 0.3s ease;
-}
-
-.tabs button.active:hover {
-  filter: brightness(1);
+.checkBoxContainer {
+  margin-top: 1rem;
+  width: fit-content;
+  text-align: left;
 }
 
 .goalForm {
   margin: 0 auto;
   text-align: left;
+  width: 100%;
 }
 
 .goalForm .formGroup {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 2rem;
   align-items: center;
   position: relative;
 }
@@ -84,6 +54,15 @@
   color: black;
   font-weight: 100;
   line-height: calc(1.2rem * var(--font-size-multiplier));
+  width: 100%;
+}
+
+.goalForm select {
+  flex: 1;
+  padding: 5px;
+  color: black;
+  font-weight: 100;
+  line-height: calc(1.2rem * var(--font-size-multiplier));
 }
 
 .goalForm button {
@@ -101,28 +80,110 @@
   filter: brightness(1.1);
 }
 
+.goalForm .formGroup {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
 .cancelButton {
   padding: 10px;
-  background-color: var(--main-background);
-  color: var(--main-text);
+  color: var(--primary-1);
   border: none;
   cursor: pointer;
-  width: 100%;
-  margin-top: 0.5rem;
+  width: 55%;
   transition: 0.3s ease;
-  margin-top: 1rem;
-  border: 1px solid var(--main-background);
+  font-weight: bold;
+  border-radius: 5px;
+  text-align: left;
+}
+
+.nextButton {
+  padding: 10px;
+  color: var(--secondary-text);
+  border: none;
+  cursor: pointer;
+  width: 20%;
+  transition: 0.3s ease;
+  font-weight: bold;
+  background-color: var(--primary-1);
+  border-radius: 5px;
+}
+
+.prevButton {
+  padding: 10px;
+  color: var(--primary-1);
+  border: 1px solid var(--primary-1);
+  cursor: pointer;
+  width: 20%;
+  transition: 0.3s ease;
+  font-weight: bold;
+  border-radius: 5px;
 }
 
 .cancelButton:hover {
   filter: brightness(1.05);
 }
 
+.buttonContainer {
+  display: flex;
+  justify-content: space-between;
+  align-self: center;
+  width: 100%;
+}
+
+.goalTypeButton {
+  padding: 10px;
+  color: var(--main-text);
+  background-color: var(--main-background);
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  transition: 0.3s ease;
+  margin-bottom: 0.5rem;
+}
+
+.goalTypeButton:hover {
+  background-color: var(--block-background);
+}
+
+.selected {
+  border: 1px solid var(--primary-1);
+  background-color: var(--block-background);
+}
+
+.selected:hover {
+  border: 1px solid var(--block-background);
+}
+
+.checkOption {
+  margin-bottom: 0.5rem;
+}
+
+.goalHeading {
+  color: var(--main-text);
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.goalTitle {
+  color: var(--primary-1);
+  text-align: left;
+  font-weight: 800;
+}
+
 .goalDescription {
   color: var(--main-text);
-  margin-bottom: 2rem;
   text-align: left;
-  font-weight: 100;
+  font-size: calc(1.2rem * var(--font-size-multiplier));
+}
+
+.goalDescriptions {
+  color: var(--main-text);
+  text-align: left;
+  font-size: calc(1rem * var(--font-size-multiplier));
 }
 
 .popupText {
@@ -134,13 +195,130 @@
   padding: 1rem;
   z-index: 1000000;
   position: fixed;
-  transform: translateX(calc(35vw * var(--font-size-multiplier)));
+  transform: translateX(calc(2rem * var(--font-size-multiplier)));
   opacity: 0;
   transition: opacity 0.3s;
   font-weight: 200;
 }
 
-.icon:hover + .popupText {
+.noAccountPopupText {
+  visibility: hidden;
+  background-color: var(--main-background);
+  color: var(--main-text);
+  text-align: center;
+  border-radius: 5px;
+  padding: 1rem;
+  z-index: 1000000;
+  position: fixed;
+  transform: translateX(calc(2vw * var(--font-size-multiplier)));
+  transform: translateY(-5vh);
+  transform: translate(calc(2vw * var(--font-size-multiplier)), -5vh);
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-weight: 200;
+}
+
+.icon:hover+.popupText {
+  cursor: pointer;
   visibility: visible;
   opacity: 1;
+}
+
+.icon:hover+.noAccountPopupText {
+  cursor: pointer;
+  visibility: visible;
+  opacity: 1;
+}
+
+.categoryDropdown {
+  border: 1px solid #ccc;
+  padding: 5px;
+  border-radius: 10px;
+  width: fit-content;
+  box-sizing: border-box;
+  font-weight: bold;
+  font-size: calc(16px * var(--font-size-multiplier));
+  text-align: center;
+  text-align-last: center;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: var(--main-background);
+  border: none;
+  background-image: none;
+  margin-bottom: 1rem;
+}
+
+.categoryDropdown option {
+  text-align: left;
+  background-color: var(--main-background);
+  color: var(--main-text);
+}
+
+.buttonContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.income {
+  background-color: #76ee92;
+  border: none;
+}
+
+.transport {
+  background-color: #4eb5ff;
+  border: none;
+}
+
+.eatingOut {
+  background-color: #ffcd4e;
+  border: none;
+}
+
+.groceries {
+  background-color: #a98dfb;
+  border: none;
+}
+
+.entertainment {
+  background-color: #fd7575;
+  border: none;
+}
+
+.shopping {
+  background-color: #fb94f1;
+  border: none;
+}
+
+.insurance {
+  background-color: #72f1e2;
+  border: none;
+}
+
+.utilities {
+  background-color: #fdad73;
+  border: none;
+}
+
+.medicalAid {
+  background-color: #9a9a9a;
+  border: none;
+}
+
+.other {
+  background-color: #d6d6d6;
+  color: rgb(0, 0, 0);
+  border: none;
+}
+
+.transfer {
+  background-color: #000000;
+  color: white;
+  border: none;
+}
+
+.default {
+  background-color: var(--main-background);
+  color: black;
 }

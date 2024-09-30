@@ -1,127 +1,133 @@
 .settingsOptionsContainer {
-    margin-top: 0.6rem;
-  }
+  margin-top: 0.6rem;
+}
 
-  .settingsOption { 
-    width: 100%;
-    padding: calc(0.6rem * var(--font-size-multiplier));
-    background-color: var(--block-background);
-    border-radius: 0.2rem;
-    margin-bottom: calc(0.5rem * var(--font-size-multiplier));
-    transition:  0.2s ease;
-    cursor: pointer;
-  }
+.settingsOption {
+  width: 100%;
+  padding: calc(0.6rem * var(--font-size-multiplier) + 0.8rem);
+  background-color: var(--block-background);
+  border-radius: 1.5rem;
+  margin-bottom: calc(0.5rem * var(--font-size-multiplier));
+  transition: 0.2s ease;
+  cursor: pointer;
+}
 
-  .settingTitle {
-    font-size: calc(1rem * var(--font-size-multiplier));
-    font-weight: bold;
-    color: var(--accent-colour);
-    margin-bottom: calc(0.5rem * var(--font-size-multiplier));
-  }
+.settingTitle {
+  font-size: calc(1rem * var(--font-size-multiplier));
+  font-weight: bold;
+  color: var(--accent-colour);
+  margin-bottom: calc(0.5rem * var(--font-size-multiplier));
+}
 
-  .settingDescription {
-    font-size: calc(0.8rem * var(--font-size-multiplier));
-    color: var(--greyed-text);
-    margin-top: calc(0.6rem * var(--font-size-multiplier));
-  }
+.settingDescription {
+  font-size: calc(0.8rem * var(--font-size-multiplier));
+  color: var(--greyed-text);
+  margin-top: calc(0.6rem * var(--font-size-multiplier));
+}
 
-  .optionContainer {
-    display: flex;
-  }
+.optionContainer {
+  display: flex;
+}
 
-  .lightThemeOption {
-    background-color: #E1E1E1;
-    color: #293652;
-    border: 3px solid #293652;
-    margin-right: calc(1rem * var(--font-size-multiplier));
-  }
+.lightThemeOption {
+  background-color: #e1e1e1;
+  color: #293652;
+  border: 3px solid #293652;
+  margin-right: calc(1rem * var(--font-size-multiplier));
+}
 
-  .darkThemeOption {
-    background-color: #293652;
-    color: #F8F8F8;
-    border: 3px solid #F8F8F8;
-  }
+.darkThemeOption {
+  background-color: #293652;
+  color: #f8f8f8;
+  border: 3px solid #f8f8f8;
+}
 
-  .lightThemeOption, .darkThemeOption {
-    height: 6rem;
-    width: 20rem;
-    border-radius: 0.3rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-  }
+.lightThemeOption,
+.darkThemeOption {
+  height: 6rem;
+  width: 20rem;
+  border-radius: 0.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
 
-  .selected {
-    border: 5px solid var(--primary-1);
-  }
+.selected {
+  border: 5px solid var(--primary-1);
+}
 
-  .circleContainer {
-    display: flex;
-  }
+.circleContainer {
+  display: flex;
+}
 
-  .blueCircle, .yellowCircle, .pinkCircle, .purpleCircle, .orangeCircle, .greenCircle {
-    width: calc(3rem * var(--font-size-multiplier));
-    height: calc(3rem * var(--font-size-multiplier));
-    margin-right: calc(3rem * var(--font-size-multiplier));
-    border-radius: calc(1.5rem * var(--font-size-multiplier));
-    transition:  0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--secondary-text);
-    font-size: calc(1.5rem * var(--font-size-multiplier));
-  }
+.blueCircle,
+.yellowCircle,
+.pinkCircle,
+.purpleCircle,
+.orangeCircle,
+.greenCircle {
+  width: calc(3rem * var(--font-size-multiplier));
+  height: calc(3rem * var(--font-size-multiplier));
+  margin-right: calc(3rem * var(--font-size-multiplier));
+  border-radius: calc(1.5rem * var(--font-size-multiplier));
+  transition: 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--secondary-text);
+  font-size: calc(1.5rem * var(--font-size-multiplier));
+}
 
-  .blueCircle {
-    background-color: var(--blue);
-  }
+.blueCircle {
+  background-color: var(--blue);
+}
 
-  .yellowCircle {
-    background-color: var(--yellow);
-  }
+.yellowCircle {
+  background-color: var(--yellow);
+}
 
-  .pinkCircle {
-    background-color: var(--pink);
-  }
+.pinkCircle {
+  background-color: var(--pink);
+}
 
-  .purpleCircle {
-    background-color: var(--purple);
-  }
+.purpleCircle {
+  background-color: var(--purple);
+}
 
-  .orangeCircle {
-    background-color: var(--orange);
-  }
+.orangeCircle {
+  background-color: var(--orange);
+}
 
-  .greenCircle {
-    background-color: var(--green);
-  }
+.greenCircle {
+  background-color: var(--green);
+}
 
-  .blueCircle:hover {
-    background-color: var(--blue-h);
-  }
+.blueCircle:hover {
+  background-color: var(--blue-h);
+}
 
-  .yellowCircle:hover {
-    background-color: var(--yellow-h);
-  }
+.yellowCircle:hover {
+  background-color: var(--yellow-h);
+}
 
-  .pinkCircle:hover {
-    background-color: var(--pink-h);
-  }
+.pinkCircle:hover {
+  background-color: var(--pink-h);
+}
 
-  .purpleCircle:hover {
-    background-color: var(--purple-h);
-  }
+.purpleCircle:hover {
+  background-color: var(--purple-h);
+}
 
-  .orangeCircle:hover {
-    background-color: var(--orange-h);
-  }
+.orangeCircle:hover {
+  background-color: var(--orange-h);
+}
 
-  .greenCircle:hover {
-    background-color: var(--green-h);
-  }
+.greenCircle:hover {
+  background-color: var(--green-h);
+}
 
-  .slider {
-    width: 15rem;
-    background: var(--primary-1);
-  }
+.slider {
+  width: 15rem;
+  background: var(--primary-1);
+}

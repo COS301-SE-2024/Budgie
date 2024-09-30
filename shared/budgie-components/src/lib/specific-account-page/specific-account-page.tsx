@@ -8,7 +8,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import styles from './specific-account-page.module.css';
 import { AreaChart, Color } from '@tremor/react';
 import { useRouter } from 'next/navigation';
 import { UserContext } from '@capstone-repo/shared/budgie-components';
@@ -25,6 +24,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import { useDataContext } from '../data-context/DataContext';
 
 /* eslint-disable-next-line */
 export interface SpecificAccountPageProps {
@@ -61,6 +61,7 @@ interface InfoSectionProps {
   setShowSuccess: Dispatch<SetStateAction<boolean>>;
   refreshGraph: boolean;
   setRefreshGraph: Dispatch<SetStateAction<boolean>>;
+  setError: Dispatch<SetStateAction<string>>;
 }
 
 interface AreYouSureProps {
@@ -74,6 +75,10 @@ interface EditAliasModalProps {
   setShow: Dispatch<SetStateAction<boolean>>;
   setSpinner: Dispatch<SetStateAction<boolean>>;
   setAccount: Dispatch<SetStateAction<AccountInfo>>;
+}
+
+interface ErrorModalProps {
+  error: string;
 }
 //helpers
 
@@ -162,7 +167,9 @@ export function getSeparateYearMonthsAsTransactionObjects(
   return linesByYearMonth;
 }
 
-export function getUniqueYearMonths(DataLines: string[]): Record<string, string[]> {
+export function getUniqueYearMonths(
+  DataLines: string[]
+): Record<string, string[]> {
   const yearMonthsRecord: Record<string, Set<string>> = {};
 
   for (const line of DataLines) {
@@ -222,6 +229,33 @@ export function isDuplicate(
   );
 }
 
+async function updateYears(year: string, user: any) {
+  if (user && user.uid) {
+    const q = query(
+      collection(db, 'years_uploaded'),
+      where('uid', '==', user.uid)
+    );
+
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+      await addDoc(collection(db, 'years_uploaded'), {
+        uid: user.uid,
+        years: JSON.stringify([year]),
+      });
+    } else {
+      let doc = querySnapshot.docs[0];
+      const data = doc.data();
+      let years: string[] = JSON.parse(data.years).map(String);
+      if (!years.includes(year)) {
+        years.push(year);
+      }
+      await updateDoc(doc.ref, {
+        years: JSON.stringify(years),
+      });
+    }
+  }
+}
+
 async function MergeTransactions(
   YearMonthLinesRecord: Record<string, Transaction[]>,
   UniqueYearMonths: Record<string, string[]>,
@@ -230,6 +264,7 @@ async function MergeTransactions(
 ) {
   //determine merged record
   for (const Year in UniqueYearMonths) {
+    updateYears(Year, user);
     let Merged: Record<string, Transaction[]> = {};
     const YearMonths: string[] = UniqueYearMonths[Year];
     //check if exists
@@ -459,6 +494,7 @@ function GraphSection(props: GraphSectionProps) {
   const router = useRouter();
   const [graphX, setGraphX] = useState<string[]>([]);
   const [graphY, setGraphY] = useState<number[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -486,7 +522,9 @@ function GraphSection(props: GraphSectionProps) {
       };
       await fetchGraphData();
     };
-    fetchData();
+    fetchData().then(() => {
+      setDataLoading(false);
+    });
   }, [props.refresh]);
 
   let dataset = [];
@@ -494,13 +532,24 @@ function GraphSection(props: GraphSectionProps) {
   for (let i = 0; i < 12; i++) {
     dataset.push({ monthyear: graphX[i], Balance: graphY[i] });
   }
+
+  if (dataLoading) {
+    return (
+      <div
+        className="w-full h-[40%] min-h-80 animate-pulse [animation-duration:1s] mt-[1rem] shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center"
+        style={{ backgroundColor: 'var(--block-background)' }}
+      ></div>
+    );
+  }
+
   return (
     graphX.length != 0 &&
     graphY.length != 0 && (
-      <>
-        <span className="font-TripSans font-medium text-3xl">
-          Account Balance
-        </span>
+      <div
+        className="w-full h-[40%] min-h-80 mt-[1rem] shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center"
+        style={{ backgroundColor: 'var(--block-background)' }}
+      >
+        <span className="font-TripSans  lg:text-2xl">Account Balance</span>
         <AreaChart
           className=" w-[90%] h-[80%] "
           data={dataset}
@@ -512,7 +561,7 @@ function GraphSection(props: GraphSectionProps) {
           showLegend={true}
           showAnimation={true}
         />
-      </>
+      </div>
     )
   );
 }
@@ -527,62 +576,66 @@ function InfoSection(props: InfoSectionProps) {
   }
 
   async function SetUploadDate(accountNo: string) {
-    if (accountNo.length == 0) {
-      return;
-    }
-    const getCurrentDateString = () => {
-      const date = new Date();
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}/${month}/${day}`;
-    };
+    if (user && user.uid) {
+      if (accountNo.length == 0) {
+        return;
+      }
+      const getCurrentDateString = () => {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}/${month}/${day}`;
+      };
 
-    const q = query(
-      collection(db, 'upload_dates'),
-      where('uid', '==', user.uid),
-      where('account_number', '==', accountNo)
-    );
+      const q = query(
+        collection(db, 'upload_dates'),
+        where('uid', '==', user.uid),
+        where('account_number', '==', accountNo)
+      );
 
-    let currentDate = getCurrentDateString();
+      let currentDate = getCurrentDateString();
 
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      let doc = querySnapshot.docs[0];
-      let docRef = doc.ref;
-      await updateDoc(docRef, {
-        date: currentDate,
-      });
-    } else {
-      await addDoc(collection(db, 'upload_dates'), {
-        uid: user.uid,
-        account_number: accountNo,
-        date: currentDate,
-      });
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        let doc = querySnapshot.docs[0];
+        let docRef = doc.ref;
+        await updateDoc(docRef, {
+          date: currentDate,
+        });
+      } else {
+        await addDoc(collection(db, 'upload_dates'), {
+          uid: user.uid,
+          account_number: accountNo,
+          date: currentDate,
+        });
+      }
     }
   }
 
   const handleTypeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    if (e.target.value == props.account.type) {
-      return;
-    }
+    if (user && user.uid) {
+      if (e.target.value == props.account.type) {
+        return;
+      }
 
-    const q = query(
-      collection(db, 'accounts'),
-      where('uid', '==', user.uid),
-      where('account_number', '==', props.account.number)
-    );
-    const querySnapshot = await getDocs(q);
-    const doc = querySnapshot.docs[0];
-    await updateDoc(doc.ref, {
-      type: e.target.value,
-    });
-    props.setAccount({
-      name: props.account.name,
-      alias: props.account.alias,
-      type: e.target.value,
-      number: props.account.number,
-    });
+      const q = query(
+        collection(db, 'accounts'),
+        where('uid', '==', user.uid),
+        where('account_number', '==', props.account.number)
+      );
+      const querySnapshot = await getDocs(q);
+      const doc = querySnapshot.docs[0];
+      await updateDoc(doc.ref, {
+        type: e.target.value,
+      });
+      props.setAccount({
+        name: props.account.name,
+        alias: props.account.alias,
+        type: e.target.value,
+        number: props.account.number,
+      });
+    }
   };
 
   const handleButtonClick = () => {
@@ -614,10 +667,10 @@ function InfoSection(props: InfoSectionProps) {
       if (InfoLine) {
         const InfoLineArray = InfoLine.split(',').map((item) => item.trim());
         if (InfoLineArray[1] == props.account.number) {
-          UploadTransactions(file, props.account.number, user).then(
+          await UploadTransactions(file, props.account.number, user).then(
             async () => {
-              props.setUploadLoading(false);
               await SetUploadDate(props.account.number);
+              props.setUploadLoading(false);
               props.setShowSuccess(true);
               setTimeout(() => {
                 props.setShowSuccess(false);
@@ -626,10 +679,18 @@ function InfoSection(props: InfoSectionProps) {
             }
           );
         } else {
-          alert('error incorrect account');
+          props.setUploadLoading(false);
+          props.setError('account');
+          setTimeout(() => {
+            props.setError('');
+          }, 1000);
         }
       } else {
-        alert('error incorrect csv format');
+        props.setUploadLoading(false);
+        props.setError('csv');
+        setTimeout(() => {
+          props.setError('');
+        }, 1000);
       }
     };
     reader.readAsText(file);
@@ -637,71 +698,64 @@ function InfoSection(props: InfoSectionProps) {
 
   return (
     <div
-      className="w-[25%] h-full flex flex-col items-center justify-center shadow-md bg-BudgieWhite rounded-[2rem]"
+      className="w-full flex lg:flex-row flex-col lg:items-start justify-around shadow-md bg-BudgieWhite rounded-[2rem] p-5"
       style={{ backgroundColor: 'var(--block-background)' }}
     >
-      <div className="w-full flex flex-col items-center justify-start">
-        <span className="font-TripSans w-full font-medium px-5 text-3xl text-center">
+      <div className="flex flex-col items-center md:p-4">
+        <span className="font-TripSans  lg:text-2xl text-center mb-4">
           Account:
         </span>
-        <div className="flex w-full mt-7 flex-col items-center justify-center">
-          <span className=" px-2 py-1 font-TripSans font-normal text-xl shadow-md rounded-lg bg-BudgieBlue2 text-BudgieWhite">
-            {props.account.name}
+        <span className="text-center px-2 py-1 font-TripSans font-normal xl:text-xl shadow-md rounded-lg bg-BudgieBlue2 text-BudgieWhite">
+          {props.account.name}
+        </span>
+        <span className="text-center px-2 py-1 mt-3 font-TripSans font-normal xl:text-xl shadow-md rounded-lg bg-BudgieBlue2 text-BudgieWhite">
+          {props.account.number}
+        </span>
+      </div>
+      <div className="flex flex-col items-center md:p-4">
+        <span className="font-TripSans  lg:text-2xl text-center mb-4">
+          Alias:
+        </span>
+        <div className="flex items-center">
+          <span className="text-center px-2 py-1 font-TripSans font-normal xl:text-xl shadow-md rounded-lg bg-BudgieBlue2 text-BudgieWhite">
+            {props.account.alias}
           </span>
-          <span className="px-2 py-1 mt-3 font-TripSans font-normal text-xl shadow-md rounded-lg bg-BudgieBlue2 text-BudgieWhite">
-            {props.account.number}
+          <span
+            onClick={() => {
+              props.setShowEditAlias(true);
+            }}
+            aria-label="edit"
+            className=" cursor-pointer material-symbols-outlined ml-1 transition-all bg-gray-200 p-1.5 hover:bg-gray-300 rounded-lg text-BudgieBlue2"
+            style={{ fontSize: '1.5rem' }}
+          >
+            edit
           </span>
-          <span className="flex mt-5 font-TripSans items-center text-3xl font-medium justify-center rounded-lg">
-            Alias:
-          </span>
-          <div className="flex mt-3 items-center justify-center">
-            <span className="px-2 py-1 font-TripSans font-normal text-xl shadow-md rounded-lg bg-BudgieBlue2 text-BudgieWhite">
-              {props.account.alias}
-            </span>
-            <span
-              onClick={() => {
-                props.setShowEditAlias(true);
-              }}
-              aria-label="edit"
-              className="material-symbols-outlined ml-1 transition-all bg-gray-200 p-1.5 hover:bg-gray-300 rounded-lg text-BudgieBlue2"
-              style={{
-                fontSize: '1.5rem',
-              }}
-            >
-              edit
-            </span>
-          </div>
-          <span className="flex mt-3 font-TripSans items-center text-3xl font-medium justify-center rounded-lg">
-            Type:
-          </span>
-          <div className="flex items-center mt-3 justify-center">
-            <select
-              className="font-TripSans font-normal text-xl shadow-md bg-BudgieBlue2 cursor-pointer text-BudgieWhite appearance-none border-none focus:border-none focus:outline-none outline-none rounded-xl py-1"
-              onChange={handleTypeChange}
-              style={{ color: 'white' }}
-            >
-              <option
-                selected={props.account.type == 'current'}
-                value="current"
-              >
-                Current
-              </option>
-              <option
-                selected={props.account.type == 'savings'}
-                value="savings"
-              >
-                Savings
-              </option>
-              <option selected={props.account.type == 'custom'} value="custom">
-                Custom
-              </option>
-            </select>
-          </div>
         </div>
+      </div>
+      <div className="flex flex-col items-center md:p-4">
+        <span className="font-TripSans  lg:text-2xl text-center mb-4">
+          Type:
+        </span>
+        <select
+          className="font-TripSans font-normal xl:text-xl text-center  shadow-md bg-BudgieBlue2 cursor-pointer text-BudgieWhite appearance-none border-none focus:border-none focus:outline-none rounded-xl py-1"
+          onChange={handleTypeChange}
+          style={{ color: 'white' }}
+        >
+          <option selected={props.account.type == 'current'} value="current">
+            Current
+          </option>
+          <option selected={props.account.type == 'savings'} value="savings">
+            Savings
+          </option>
+          <option selected={props.account.type == 'custom'} value="custom">
+            Custom
+          </option>
+        </select>
+      </div>
+      <div className="flex flex-col items-center md:p-4 lg:mt-0 mt-2">
         <button
           onClick={handleButtonClick}
-          className="font-TripSans py-2 px-7 mt-10 shadow-md font-medium text-xl text-BudgieGreen3 bg-BudgieGreen1 bg-opacity-30 hover:text-BudgieWhite hover:bg-BudgieGreen1 hover:bg-opacity-100 transition-all ease-in duration-150 rounded-2xl"
-          // className="font-TripSans shadow-md font-medium text-xl text-BudgieBlue bg-BudgieAccentHover transition-all ease-in duration-200 hover:text-BudgieWhite hover:bg-BudgieAccentHover bg-opacity-60 p-2 rounded-2xl"
+          className="font-TripSans py-2 px-7 shadow-md font-medium xl:text-xl text-BudgieGreen3 bg-BudgieGreen1 bg-opacity-30 hover:text-BudgieWhite hover:bg-BudgieGreen1 hover:bg-opacity-100 transition-all ease-in duration-150 rounded-2xl mb-4"
         >
           Upload Data
         </button>
@@ -714,7 +768,7 @@ function InfoSection(props: InfoSectionProps) {
         />
         <button
           onClick={handleDelete}
-          className="font-TripSans mb-5 py-2 px-4 mt-10 shadow-md font-medium text-xl hover:bg-red-400 hover:text-BudgieWhite transition-all ease-in duration-150 text-red-600 bg-red-200 rounded-2xl"
+          className="font-TripSans py-2 px-4 shadow-md font-medium xl:text-xl hover:bg-red-400 hover:text-BudgieWhite transition-all ease-in duration-150 text-red-600 bg-red-200 rounded-2xl"
         >
           Delete Account
         </button>
@@ -734,11 +788,10 @@ function SpinnerLoader() {
   return (
     <div
       onClick={handleExit}
-      className={styles.mainPageBlurModal}
-      style={{ backgroundColor: 'var(--block-background)' }}
+      className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
     >
       <div
-        className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
+        className="flex flex-col items-center justify-center rounded-[2rem] md:w-96 md:h-96 w-44 h-44 bg-BudgieWhite "
         onClick={(e) => handleChildElementClick(e)}
       >
         <div role="status">
@@ -765,6 +818,34 @@ function SpinnerLoader() {
   );
 }
 
+function ErrorModal(props: ErrorModalProps) {
+  const handleExit = () => {};
+
+  const handleChildElementClick = (e: { stopPropagation: () => void }) => {
+    //ignore clicks
+    e.stopPropagation();
+  };
+
+  return (
+    <div
+      onClick={handleExit}
+      className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
+    >
+      <div
+        className="flex flex-col items-center justify-center rounded-[2rem] md:w-96 md:h-96 w-44 h-44 bg-BudgieWhite "
+        onClick={(e) => handleChildElementClick(e)}
+      >
+        <span className="text-center md:text-3xl font-TripSans font-bold">
+          {props.error == 'csv' ? 'Problem with CSV format' : 'Wrong Account'}
+        </span>
+        <span className="mt-6 text-red-400 material-symbols-outlined md:!text-[9rem] !text-[3rem]">
+          close
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function SuccessModal() {
   const handleExit = () => {};
 
@@ -774,20 +855,18 @@ function SuccessModal() {
   };
 
   return (
-    <div onClick={handleExit} className={styles.mainPageBlurModal}>
+    <div
+      onClick={handleExit}
+      className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
+    >
       <div
-        className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-96 bg-BudgieWhite "
+        className="flex flex-col items-center justify-center rounded-[2rem] md:w-96 md:h-96 w-44 h-44 bg-BudgieWhite "
         onClick={(e) => handleChildElementClick(e)}
       >
-        <span className="text-center text-3xl font-TripSans font-bold">
+        <span className="text-center md:text-3xl font-TripSans font-bold">
           Financial data added
         </span>
-        <span
-          className="mt-6 text-BudgieGreen1 material-symbols-outlined"
-          style={{
-            fontSize: '9rem',
-          }}
-        >
+        <span className="mt-6 text-BudgieGreen1 material-symbols-outlined md:!text-[9rem] !text-[3rem]">
           verified
         </span>
       </div>
@@ -815,39 +894,44 @@ function EditAliasModal(props: EditAliasModalProps) {
   };
 
   const submitAlias = async () => {
-    if (inputValue == '') {
-      setAliasError(true);
-      return;
-    }
-    props.setShow(false);
-    props.setSpinner(true);
+    if (user && user.uid) {
+      if (inputValue == '') {
+        setAliasError(true);
+        return;
+      }
+      props.setShow(false);
+      props.setSpinner(true);
 
-    const q = query(
-      collection(db, 'accounts'),
-      where('uid', '==', user.uid),
-      where('account_number', '==', props.account.number)
-    );
-    const querySnapshot = await getDocs(q);
-    const doc = querySnapshot.docs[0];
-    await updateDoc(doc.ref, {
-      alias: inputValue,
-    });
-    props.setAccount({
-      name: props.account.name,
-      alias: inputValue,
-      type: props.account.type,
-      number: props.account.number,
-    });
-    props.setSpinner(false);
+      const q = query(
+        collection(db, 'accounts'),
+        where('uid', '==', user.uid),
+        where('account_number', '==', props.account.number)
+      );
+      const querySnapshot = await getDocs(q);
+      const doc = querySnapshot.docs[0];
+      await updateDoc(doc.ref, {
+        alias: inputValue,
+      });
+      props.setAccount({
+        name: props.account.name,
+        alias: inputValue,
+        type: props.account.type,
+        number: props.account.number,
+      });
+      props.setSpinner(false);
+    }
   };
 
   return (
-    <div onClick={handleExit} className={styles.mainPageBlurModal}>
+    <div
+      onClick={handleExit}
+      className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
+    >
       <div
-        className="flex flex-col items-center justify-around rounded-[2rem] w-96 h-56 bg-BudgieWhite "
+        className="md:mx-0 mx-4 flex flex-col items-center justify-around rounded-[2rem] w-96 h-56 bg-BudgieWhite "
         onClick={(e) => handleChildElementClick(e)}
       >
-        <span className="text-center text-3xl font-TripSans font-medium">
+        <span className="text-center md:text-2xl font-TripSans font-medium">
           Edit Alias:
         </span>
         <input
@@ -885,33 +969,73 @@ function AreYouSure(props: AreYouSureProps) {
   };
 
   async function handleDeleteConfirm() {
-    props.setShow(false);
-    props.setSpinner(true);
-    const accRef = collection(db, 'accounts');
-    const q = query(
-      accRef,
-      where('uid', '==', user.uid),
-      where('account_number', '==', props.account.number)
-    );
-    const querySnapshot = await getDocs(q);
-    const doc = querySnapshot.docs[0].ref;
-    await deleteDoc(doc).then(() => {
-      router.push('/accounts');
-    });
-    // TODO delete finance info potentially not, to allow account persistence if re-tracked
+    if (user && user.uid) {
+      props.setShow(false);
+      props.setSpinner(true);
+      const accRef = collection(db, 'accounts');
+      const q = query(
+        accRef,
+        where('uid', '==', user.uid),
+        where('account_number', '==', props.account.number)
+      );
+      const querySnapshot = await getDocs(q);
+      const doc = querySnapshot.docs[0].ref;
+
+      //delete finance info
+      const yearRef = collection(db, 'years_uploaded');
+      const qYear = query(yearRef, where('uid', '==', user.uid));
+      const queryYearSnapshot = await getDocs(qYear);
+      const docYear = queryYearSnapshot.docs[0];
+      const uploadedYearData: string[] = JSON.parse(docYear.data().years);
+
+      for (const year of uploadedYearData) {
+        const collectionRef = collection(db, `transaction_data_${year}`);
+        const q = query(
+          collectionRef,
+          where('uid', '==', user.uid),
+          where('account_number', '==', props.account.number)
+        );
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach(async (doc) => {
+            await deleteDoc(doc.ref);
+          });
+        }
+      }
+      //delete upload_dates
+      const uploadDateRef = collection(db, 'upload_dates');
+      const qDates = query(
+        uploadDateRef,
+        where('uid', '==', user.uid),
+        where('account_number', '==', props.account.number)
+      );
+      const queryDatesSnapshot = await getDocs(qDates);
+      if (!queryDatesSnapshot.empty) {
+        queryDatesSnapshot.forEach(async (doc) => {
+          await deleteDoc(doc.ref);
+        });
+      }
+
+      await deleteDoc(doc).then(() => {
+        router.push('/accounts');
+      });
+    }
   }
 
   return (
-    <div onClick={handleExit} className={styles.mainPageBlurModal}>
+    <div
+      onClick={handleExit}
+      className="bg-black/70 w-[calc(100%-5rem)] md:w-[calc(100%-15rem)] h-full fixed right-0 top-0 flex justify-center items-center"
+    >
       <div
-        className="flex flex-col items-center justify-center rounded-[2rem] w-96 h-56 bg-BudgieWhite "
+        className="md:mx-0 mx-4 flex flex-col items-center justify-center rounded-[2rem] w-96 h-56 bg-BudgieWhite "
         onClick={(e) => handleChildElementClick(e)}
         style={{ backgroundColor: 'var(--block-background)' }}
       >
-        <span className="text-center text-2xl font-TripSans font-medium">
+        <span className="text-center md:text-2xl font-TripSans font-medium">
           Are you sure you would <br /> like to remove this account permanently?
         </span>
-        <div className="mt-10">
+        <div className="md:w-full mt-10 md:flex md:justify-around md:flex-row flex flex-col">
           <button
             className=" hover:bg-gray-400 px-10 hover:text-BudgieWhite p-1 transition-all rounded-xl text-gray-600 bg-gray-200"
             onClick={handleExit}
@@ -919,7 +1043,7 @@ function AreYouSure(props: AreYouSureProps) {
             No
           </button>
           <button
-            className=" ml-8 hover:bg-red-400 px-10 hover:text-BudgieWhite p-1 transition-all rounded-xl text-red-600 bg-red-200"
+            className="md:mt-0 mt-2 hover:bg-red-400 px-10  hover:text-BudgieWhite p-1 transition-all rounded-xl text-red-600 bg-red-200"
             onClick={handleDeleteConfirm}
           >
             Yes
@@ -942,85 +1066,135 @@ export function SpecificAccountPage(props: SpecificAccountPageProps) {
     type: '',
     number: '',
   });
+  const { refreshData, loading } = useDataContext();
 
   const router = useRouter();
   const user = useContext(UserContext);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
-      const getInfoData = async () => {
-        const accRef = collection(db, 'accounts');
-        const q = query(
-          accRef,
-          where('uid', '==', user.uid),
-          where('account_number', '==', props.number)
-        );
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) {
-          const doc = querySnapshot.docs[0];
-          const data = doc.data();
-          const account: AccountInfo = {
-            name: data.name,
-            alias: data.alias,
-            type: data.type,
-            number: data.account_number,
-          };
-          setAccount(account);
-        } else {
-          alert('problem fetching account');
-        }
-      };
-      getInfoData();
+      if (user && user.uid) {
+        const getInfoData = async () => {
+          const accRef = collection(db, 'accounts');
+          const q = query(
+            accRef,
+            where('uid', '==', user.uid),
+            where('account_number', '==', props.number)
+          );
+          const querySnapshot = await getDocs(q);
+          if (!querySnapshot.empty) {
+            const doc = querySnapshot.docs[0];
+            const data = doc.data();
+            const account: AccountInfo = {
+              name: data.name,
+              alias: data.alias,
+              type: data.type,
+              number: data.account_number,
+            };
+            setAccount(account);
+          } else {
+            alert('problem fetching account');
+          }
+        };
+        getInfoData().then(() => {
+          setDataLoading(false);
+        });
+      }
     };
 
     fetchData();
   }, []);
 
-  return (
-    <>
+  if (dataLoading || loading) {
+    return (
       <div className="mainPage">
-        <div className="w-full h-full flex flex-col items-center">
-          <div className="bg-BudgieWhite shadow-md font-TripSans font-medium text-3xl w-full h-20 text-center rounded-2xl flex flex-col items-center justify-center">
-            {account.alias}
-          </div>
-          <div className="w-full flex grow my-5">
-            <InfoSection
-              account={account}
-              setShowAreYouSure={setShowAreYouSureModal}
-              setShowEditAlias={setEditAliasModal}
-              setAccount={setAccount}
-              setUploadLoading={setUploadLoading}
-              setShowSuccess={setSuccessModal}
-              refreshGraph={refreshGraph}
-              setRefreshGraph={setRefreshGraph}
-            ></InfoSection>
-            <div className="bg-BudgieWhite grow shadow-md ml-5 rounded-3xl flex flex-col items-center justify-center">
-              <GraphSection
-                accNo={props.number}
-                account={account}
-                refresh={refreshGraph}
-              ></GraphSection>
+        <div className="w-full h-full flex flex-col items-center justify-center">
+          <div className="md:w-[85%] w-[100%] h-full min-w-60">
+            <div
+              className="w-full animate-pulse [animation-duration:1s] h-[10%] mt-8 min-h-20 flex items-center justify-center shadow-md bg-BudgieWhite rounded-[2rem] relative"
+              style={{ backgroundColor: 'var(--block-background)' }}
+            ></div>
+            <div
+              className="w-full h-[40%] animate-pulse [animation-duration:1s] min-h-80 mt-[1rem] shadow-md bg-BudgieWhite rounded-[2rem] flex flex-col items-center justify-center"
+              style={{ backgroundColor: 'var(--block-background)' }}
+            ></div>
+            <div className="mt-4">
+              <div
+                className="w-full flex animate-pulse lg:min-h-52 min-h-96 [animation-duration:1s] lg:flex-row flex-col lg:items-start justify-around shadow-md bg-BudgieWhite rounded-[2rem] p-5"
+                style={{ backgroundColor: 'var(--block-background)' }}
+              ></div>
             </div>
           </div>
         </div>
       </div>
-      {uploadLoading && <SpinnerLoader></SpinnerLoader>}
-      {successModal && <SuccessModal></SuccessModal>}
-      {areYouSureModal && (
-        <AreYouSure
-          account={account}
-          setShow={setShowAreYouSureModal}
-          setSpinner={setUploadLoading}
-        ></AreYouSure>
-      )}
-      {editAliasModal && (
-        <EditAliasModal
-          setAccount={setAccount}
-          account={account}
-          setShow={setEditAliasModal}
-          setSpinner={setUploadLoading}
-        ></EditAliasModal>
-      )}
+    );
+  }
+
+  return (
+    <>
+      <div className="mainPage">
+        <div className="w-full h-full flex flex-col items-center justify-center">
+          <div className="md:w-[85%] w-[100%] h-full min-w-60">
+            <div
+              className="w-full h-[10%] mt-8 min-h-20 flex items-center justify-center shadow-md bg-BudgieWhite rounded-[2rem] relative"
+              style={{ backgroundColor: 'var(--block-background)' }}
+            >
+              <span
+                onClick={() => {
+                  router.back();
+                  refreshData();
+                }}
+                aria-label="back"
+                className="cursor-pointer material-symbols-outlined absolute left-4 transition-all bg-gray-200 p-1.5 hover:bg-gray-300 rounded-lg text-BudgieBlue2"
+                style={{ fontSize: '1.5rem' }}
+              >
+                arrow_back
+              </span>
+              <span className="font-TripSans font-bold lg:text-3xl">
+                {account.alias}
+              </span>
+            </div>
+            <GraphSection
+              accNo={props.number}
+              account={account}
+              refresh={refreshGraph}
+            ></GraphSection>
+            <div className="mt-4">
+              <InfoSection
+                setError={setError}
+                account={account}
+                setShowAreYouSure={setShowAreYouSureModal}
+                setShowEditAlias={setEditAliasModal}
+                setAccount={setAccount}
+                setUploadLoading={setUploadLoading}
+                setShowSuccess={setSuccessModal}
+                refreshGraph={refreshGraph}
+                setRefreshGraph={setRefreshGraph}
+              ></InfoSection>
+            </div>
+          </div>
+        </div>
+        {areYouSureModal && (
+          <AreYouSure
+            account={account}
+            setShow={setShowAreYouSureModal}
+            setSpinner={setUploadLoading}
+          ></AreYouSure>
+        )}
+        {editAliasModal && (
+          <EditAliasModal
+            setAccount={setAccount}
+            account={account}
+            setShow={setEditAliasModal}
+            setSpinner={setUploadLoading}
+          ></EditAliasModal>
+        )}
+        {uploadLoading && <SpinnerLoader></SpinnerLoader>}
+        {successModal && <SuccessModal></SuccessModal>}
+        {error != '' && <ErrorModal error={error}></ErrorModal>}
+      </div>
     </>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
-import styles from './page.module.css';
 import React, { useContext, useEffect, useState } from 'react';
 import {
+  OverviewPageRevised,
   OverviewPage,
   UserContext,
 } from '@capstone-repo/shared/budgie-components';
@@ -15,11 +15,11 @@ export default function overview() {
 
   useEffect(() => {
     if (!user) {
-      router.push('/');
+      return router.push('/');
     } else {
       setLoading(false);
     }
   }, [user]);
 
-  return <>{!loading && <OverviewPage></OverviewPage>}</>;
+  return <>{!loading && <OverviewPageRevised></OverviewPageRevised>}</>;
 }

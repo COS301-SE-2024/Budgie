@@ -8,24 +8,35 @@
   justify-content: center;
   z-index: 15;
   align-items: center;
-  width: 85vw;
+  width: 100%;
   font-size: calc(1.2rem*var(--font-size-multiplier));
+}
+
+.goalHeading {
+  color: var(--main-text);
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: bold;
 }
 
 .popupContent {
   background: var(--block-background);
   padding: 20px;
-  border-bottom-right-radius: 5px;
-  border-bottom-left-radius: 5px;
+  border-radius: 5px;
   text-align: center;
   z-index: 2;
   width: calc(35vw * var(--font-size-multiplier));
-  border-top: 4px solid var(--primary-1);
 }
 
 .goalForm {
   margin: 0 auto;
   text-align: left;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-content: space-between;
 }
 
 .goalForm .formGroup {
@@ -71,7 +82,6 @@
 .goalForm button:hover {
   filter: brightness(1.1);
 }
-
 .cancelButton {
   padding: 10px;
   background-color: var(--main-background);
@@ -115,7 +125,7 @@
   font-weight: 200;
 }
 
-.icon:hover + .popupText {
+.icon:hover+.popupText {
   visibility: visible;
   opacity: 1;
 }
@@ -138,12 +148,13 @@
 }
 
 .progressInfo div {
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 .progressInfo p {
   color: var(--primary-1);
   font-weight: bold;
+  margin-bottom: 1rem;
 }
 
 .target {

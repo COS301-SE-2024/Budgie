@@ -11,7 +11,7 @@ export interface LearnMoreProps {
 const LearnMore: React.FC<LearnMoreProps> = ({ onClose }) => {
   return (
     <>
-      <div className="bg-BudgieBlue w-[794px] h-[530px] rounded-[61px] p-8 ">
+      <div className="bg-BudgieBlue w-[397px] md:w-[794px] md:h-[530px] rounded-[61px] p-8 shadow-2xl">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-6 text-center text-white">
             Learn More About Budgie
@@ -43,7 +43,7 @@ const LearnMore: React.FC<LearnMoreProps> = ({ onClose }) => {
             <h3 className="text-xl font-semibold mb-4 text-white">
               How It Works
             </h3>
-            <p className="mb-2 text-BudgieGreen3 text-white text-sm">
+            <p className="mb-2  text-white text-sm">
               Follow these simple steps to get started:
             </p>
             <ol className="list-decimal list-inside ml-4 text-white text-sm">

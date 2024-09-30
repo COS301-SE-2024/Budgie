@@ -1,4 +1,18 @@
 @import url(https://db.onlinewebfonts.com/c/076abc8ba1bb38a0713dec3b63b880e4?family=Trip+Sans);
+@font-face {
+  font-family: 'Trip Sans';
+  src: url('https://db.onlinewebfonts.com/t/076abc8ba1bb38a0713dec3b63b880e4.eot');
+  src: url('https://db.onlinewebfonts.com/t/076abc8ba1bb38a0713dec3b63b880e4.eot?#iefix')
+      format('embedded-opentype'),
+    url('https://db.onlinewebfonts.com/t/076abc8ba1bb38a0713dec3b63b880e4.woff2')
+      format('woff2'),
+    url('https://db.onlinewebfonts.com/t/076abc8ba1bb38a0713dec3b63b880e4.woff')
+      format('woff'),
+    url('https://db.onlinewebfonts.com/t/076abc8ba1bb38a0713dec3b63b880e4.ttf')
+      format('truetype'),
+    url('https://db.onlinewebfonts.com/t/076abc8ba1bb38a0713dec3b63b880e4.svg#Trip Sans')
+      format('svg');
+}
 
 * {
   font-family: 'Trip Sans', sans-serif;
@@ -163,15 +177,7 @@ body {
   --complementary: #f91880;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=swap');
-
-.material-symbols-outlined {
-  font-family: 'Material Symbols Outlined';
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  cursor: pointer;
-}
-
-.mainPage {
+/* .mainPage {
   background-color: var(--main-background);
   width: 85vw;
   height: 100vh;
@@ -182,6 +188,15 @@ body {
   position: fixed;
   right: 0;
   top: 0;
+} */
+
+.mainPage {
+  background-color: var(--main-background);
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 1rem;
+  overflow-y: auto;
+  flex-grow: 1;
 }
 
 .pageTitle {

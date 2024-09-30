@@ -4,10 +4,10 @@
 
 .settingsOption {
   width: 100%;
-  padding: calc(0.6rem * var(--font-size-multiplier));
+  padding: calc(0.6rem * var(--font-size-multiplier) + 1rem);
   background-color: var(--block-background);
-  border-radius: 0.2rem;
-  margin-bottom: calc(0.5rem * var(--font-size-multiplier));
+  border-radius: 1.5rem;
+  margin-bottom: calc(0.5rem * var(--font-size-multiplier) + 1rem);
   transition: 0.2s ease;
 }
 
@@ -22,21 +22,20 @@
   color: var(--greyed-text);
 }
 
-.deleteButton {
-  background-color: #e62828;
-  color: white;
-  margin-top: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.4rem;
-  margin-bottom: 0.5rem;
-  transition: 0.2s ease;
-  padding: 0.5rem 1rem;
+.actionButton {
+  padding: 10px;
+  color: var(--primary-1);
+  border: 1px solid var(--primary-1);
+  cursor: pointer;
+  width: 20%;
+  transition: 0.3s ease;
+  font-weight: bold;
+  border-radius: 5px;
+  margin-top: 1rem;
 }
 
-.deleteButton:hover {
-  background-color: #b92b2b;
+.actionButton:hover {
+  filter: brightness(1.05);
 }
 
 .popupOverlay {
@@ -66,7 +65,7 @@
 .popupContent {
   background-color: white;
   padding: 2rem;
-  border-radius: 0.4rem;
+  border-radius: 1.5rem;
   text-align: center;
 }
 
