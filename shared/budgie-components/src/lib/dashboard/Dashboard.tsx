@@ -85,7 +85,7 @@ export function Dashboard(props: DashboardProps) {
   return (
     <div className="mainPage">
       <div className="w-full  flex flex-col items-center justify-center">
-        <div className="2xl:w-[85%] w-[100%]  min-w-60">
+        <div className="2xl:w-[85%] w-[100%] md:min-w-[44rem] sm:min-w-[35rem] min-w-[32rem]">
           <div className="flex shadow-md !z-0 justify-between !bg-BudgieBlue2  rounded-t-2xl bg-[var(--block-background)] w-full sticky top-0">
             <div></div>
             <button
@@ -135,13 +135,6 @@ export function Dashboard(props: DashboardProps) {
 
           <div className="">
             {loading ? (
-              // <div className={styles.loadScreen}>
-              //   <div className={styles.loaderContainer}>
-              //     <div className={styles.loader}></div>
-              //   </div>
-              //   <div className={styles.loaderText}>Loading...</div>
-              // </div>
-
               <div className="w-full bg-[var(--main-background)] !z-0">
                 <div className="flex justify-between items-center !z-0 !sticky !top-12  bg-BudgieAccentHover py-2 px-4 shadow-md h-16 rounded-b-2xl"></div>
                 <div className="w-full flex flex-col items-center justify-center">
