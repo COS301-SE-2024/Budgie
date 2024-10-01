@@ -69,7 +69,7 @@ export function HelpModal(props: HelpModalProps) {
               credentials.Alternatively login using your google account
               credentials.
             </p>
-            <div className="mt-4 h-[642px] w-[535px]">
+            <div className="mt-4 h-[600px] w-[535px]">
               <Image src={signin} width={642} height={535} alt="signin" />
             </div>
             <p className="text-s text-gray-500">
@@ -77,8 +77,8 @@ export function HelpModal(props: HelpModalProps) {
               a new account by entering your email and password. Click sign up.
               Alternatively login using your google account credentials.
             </p>
-            <div className="mt-4 h-[642px] w-[535px]">
-              <Image src={signup} width={642} height={535} alt="signup" />
+            <div className="mt-4 h-[800px] w-[535px]">
+              <Image src={signup} width={800} height={535} alt="signup" />
             </div>
           </div>
         );
