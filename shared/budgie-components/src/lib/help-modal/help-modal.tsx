@@ -62,7 +62,7 @@ export function HelpModal(props: HelpModalProps) {
       case 'Account Setup:':
         return (
           <div className="w-full max-h-[80vh] overflow-y-auto overflow-hidden break-words">
-            <h2 className="text-lg font-bold text-blue-500">Account Setup</h2>
+            <h2 className="text-lg font-bold text-blue-500">Login/Logout</h2>
             <p className="text-s text-gray-500">
               <strong>Sign In:</strong> Enter your email and password and click
               login. Alternatively login using yout google
@@ -315,7 +315,7 @@ export function HelpModal(props: HelpModalProps) {
                   className="!text-BudgieBlue2"
                   onClick={() => setSelectedSection('Account Setup:')}
                 >
-                  Account SetUp
+                  Login/Logout
                 </li>
                 <li
                   className="!text-BudgieBlue2"
