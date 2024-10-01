@@ -17,6 +17,7 @@ import comparison2 from '../../../public/images/comparisons2.png';
 import comparison3 from '../../../public/images/comparisons3.png';
 import insights1 from '../../../public/images/insights1.png';
 import overview from '../../../public/images/overview.png';
+import overview1 from '../../../public/images/overview1.png';
 import transactions from '../../../public/images/transactions.png';
 import styles from './help-modal.module.css';
 
@@ -46,7 +47,7 @@ export function HelpModal(props: HelpModalProps) {
         );
       case 'Overview':
         return (
-          <div className="max-w-full">
+          <div className="w-full max-h-[80vh] overflow-y-auto overflow-hidden break-words">
             <h2 className="text-lg font-bold text-blue-500">Overview</h2>
             <p className="text-s text-gray-500">
               The overview page provides a summary of the bank account
@@ -54,9 +55,12 @@ export function HelpModal(props: HelpModalProps) {
               provided a quick glimpse at information such as the last
               transaction, your average spending and spending by category.
             </p>
-            <div className="mt-4 h-[642px] w-[535px]">
-              <Image src={overview} width={642} height={535} alt="overview" />
-            </div>
+            <Image src={overview} width={642} height={535} alt="overview" />
+            <p className="text-s text-gray-500">
+              Click the upload button next to an account to upload a csv to the
+              account
+            </p>
+            <Image src={overview1} width={642} height={535} alt="overview1" />
           </div>
         );
       case 'Account Setup:':
