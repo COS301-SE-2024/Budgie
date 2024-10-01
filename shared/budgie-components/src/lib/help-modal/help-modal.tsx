@@ -98,26 +98,6 @@ export function HelpModal(props: HelpModalProps) {
             <Image src={account4} width={642} height={535} alt="account4" />
           </div>
         );
-      case 'settings':
-        return (
-          <div className="max-w-full">
-            <h2 className="text-lg font-bold text-blue-500">
-              Settings and Customization
-            </h2>
-            <p className="text-s text-gray-500">
-              <strong>Display:</strong> Set the theme by toggling between light
-              and dark mode. Change the font size and color of the text.
-            </p>
-            <p className="text-s text-gray-500">
-              <strong>Account Setting:</strong> Change the password of your
-              account or delete the account entirely.
-            </p>
-            <p className="text-s text-gray-500">
-              <strong>Support:</strong> Access to frequently asked questions as
-              well as contact details for additional support.
-            </p>
-          </div>
-        );
       case 'Transactions':
         return (
           <div className="w-full max-h-[80vh] overflow-y-auto overflow-hidden break-words">
@@ -350,24 +330,6 @@ export function HelpModal(props: HelpModalProps) {
                   onClick={() => setSelectedSection('Insights')}
                 >
                   Insights
-                </li>
-                <li
-                  className="!text-BudgieBlue2"
-                  onClick={() => setSelectedSection('settings')}
-                >
-                  Settings
-                </li>
-                <li
-                  className="!text-BudgieBlue2"
-                  onClick={() => setSelectedSection('troubleshooting')}
-                >
-                  Troubleshooting
-                </li>
-                <li
-                  className="!text-BudgieBlue2"
-                  onClick={() => setSelectedSection('support')}
-                >
-                  Contact Support
                 </li>
                 <li
                   className="!text-BudgieBlue2"
