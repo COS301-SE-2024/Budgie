@@ -41,18 +41,18 @@ export function Settings(props: SettingsProps) {
             Change the website’s font size, colour, and background.
           </p>
         </div>
-        {/* 
-        <div
-          className={styles.settingsOption}
-          onClick={() => setCurrentOverlay('Notification')}
-        >
-          <p className={styles.settingTitle}>Notification Settings</p>
-          <p className={styles.settingDescription}>
-            Manage email alerts for budget updates, goal progress, and spending
-            warnings.
-          </p>
-        </div>
-        */}
+        {
+          <div
+            className={styles.settingsOption}
+            onClick={() => setCurrentOverlay('Notification')}
+          >
+            <p className={styles.settingTitle}>Notification Settings</p>
+            <p className={styles.settingDescription}>
+              Manage email alerts for budget updates, goal progress, and
+              spending warnings.
+            </p>
+          </div>
+        }
         <div
           className={styles.settingsOption}
           onClick={() => setCurrentOverlay('Support')}

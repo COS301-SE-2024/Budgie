@@ -10,6 +10,7 @@ import {
   where,
   doc,
 } from 'firebase/firestore';
+import axios from 'axios';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from 'firebase/auth';
 import '../../root.css';
@@ -118,6 +119,46 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     'november',
     'december',
   ];
+
+  const sendEmail = async (
+    UserId: string,
+    Email: string,
+    thresh: number,
+    percentage: number
+  ) => {
+    try {
+      await axios.post(
+        'https://us-central1-budgieapp-70251.cloudfunctions.net/sendEmailNotification',
+        {
+          userId: UserId,
+          userEmail: Email,
+          threshold: thresh,
+          spentPercentage: percentage,
+        }
+      );
+      console.log(`Email sent for over ${percentage}%`);
+    } catch (error) {
+      console.error('Error sending email:', error);
+      const accountKey = `incomeProgress_${props.account}`;
+      const storedProgress = JSON.parse(localStorage.getItem(accountKey));
+      if (thresh === 25) {
+        storedProgress.reached25 = false;
+        localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+      }
+      if (thresh === 50) {
+        storedProgress.reached50 = false;
+        localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+      }
+      if (thresh === 75) {
+        storedProgress.reached75 = false;
+        localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+      }
+      if (thresh === 100) {
+        storedProgress.reached100 = false;
+        localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+      }
+    }
+  };
 
   const handleAddToGoal = async () => {
     if (!selectedGoal || !selectedTransaction) {
@@ -273,6 +314,76 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
 
       setMoneyIn(moneyInTotal);
       setMoneyOut(Math.abs(moneyOutTotal)); // money out should be positive for display
+      let progressPercentage;
+      if (moneyInTotal === 0) {
+        progressPercentage = (Math.abs(moneyOutTotal) / 1) * 100;
+      } else {
+        progressPercentage = (Math.abs(moneyOutTotal) / moneyInTotal) * 100;
+      }
+      const isSpendingEnabled = localStorage.getItem('spending') === 'true';
+      if (isSpendingEnabled) {
+        const accountKey = `incomeProgress_${props.account}`;
+        const storedProgress = JSON.parse(localStorage.getItem(accountKey)) || {
+          reached25: false,
+          reached50: false,
+          reached75: false,
+          reached100: false,
+        };
+        const user = getAuth().currentUser;
+        let userEmail = user?.email;
+        if (!userEmail && user.providerData.length > 0) {
+          userEmail = user.providerData[0].email;
+        }
+        if (
+          progressPercentage >= 25 &&
+          !storedProgress.reached25 &&
+          progressPercentage < 50
+        ) {
+          storedProgress.reached25 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+          await sendEmail(user.uid, userEmail, 25, progressPercentage);
+        } else if (progressPercentage >= 50 && !storedProgress.reached25) {
+          storedProgress.reached25 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+        }
+
+        if (
+          progressPercentage >= 50 &&
+          !storedProgress.reached50 &&
+          progressPercentage < 75
+        ) {
+          storedProgress.reached50 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+          console.log('bool: ' + storedProgress);
+          console.log('prog: ' + progressPercentage);
+          await sendEmail(user.uid, userEmail, 50, progressPercentage);
+        } else if (progressPercentage >= 75 && !storedProgress.reached50) {
+          storedProgress.reached50 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+        }
+
+        if (
+          progressPercentage >= 75 &&
+          !storedProgress.reached75 &&
+          progressPercentage < 100
+        ) {
+          storedProgress.reached75 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+          console.log('bool: ' + storedProgress);
+          console.log('prog: ' + progressPercentage);
+          await sendEmail(user.uid, userEmail, 75, progressPercentage);
+        } else if (progressPercentage >= 100 && !storedProgress.reached75) {
+          storedProgress.reached75 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+        }
+        if (progressPercentage >= 100 && !storedProgress.reached100) {
+          storedProgress.reached100 = true;
+          localStorage.setItem(accountKey, JSON.stringify(storedProgress));
+          console.log('bool: ' + storedProgress);
+          console.log('prog: ' + progressPercentage);
+          await sendEmail(user.uid, userEmail, 100, progressPercentage);
+        }
+      }
     } else {
       setTransactions([]);
       setBalance(0);

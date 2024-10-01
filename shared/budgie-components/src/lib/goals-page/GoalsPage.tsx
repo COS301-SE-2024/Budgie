@@ -12,6 +12,8 @@ import {
   CartesianGrid,
   Cell,
 } from 'recharts';
+import { getAuth } from 'firebase/auth';
+import axios from 'axios';
 import {
   collection,
   doc,
@@ -1026,6 +1028,9 @@ export function GoalsPage() {
   const [sortOption, setSortOption] = useState('name');
   const [hasGoals, setHasGoals] = useState(false);
   const user = useContext(UserContext);
+  const [previousProgressMap, setPreviousProgressMap] = useState<
+    Record<string, number>
+  >({});
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
   const { data, setData, loading } = useDataContext();
 
@@ -1081,6 +1086,89 @@ export function GoalsPage() {
     }
     return 0;
   };
+  const sendGoalProgressEmail = async (progress: number, t: string) => {
+    const user = getAuth().currentUser;
+    let email = user?.email;
+    if (!email && user.providerData.length > 0) {
+      email = user?.providerData[0].email;
+    }
+    try {
+      await axios.post(
+        'https://us-central1-budgieapp-70251.cloudfunctions.net/sendGoalProgressEmail',
+        {
+          uid: user?.uid,
+          userEmail: email,
+          userName: user?.displayName,
+          title: t,
+          progress,
+        }
+      );
+      console.log(`Email sent for ${progress}% progress.`);
+    } catch (error) {
+      console.error('Error sending email:', error);
+    }
+  };
+
+  useEffect(() => {
+    const populateAndProcessGoals = async () => {
+      const storedProgressMap = localStorage.getItem('previousProgressMap');
+      let progressMap = {};
+
+      if (storedProgressMap) {
+        progressMap = JSON.parse(storedProgressMap);
+        if (
+          JSON.stringify(progressMap) !== JSON.stringify(previousProgressMap)
+        ) {
+          setPreviousProgressMap(progressMap);
+        }
+      }
+      const isGoalEnabled = localStorage.getItem('goal') === 'true';
+      if (isGoalEnabled && Goals.length > 0) {
+        const updatedMap = { ...progressMap };
+
+        Goals.forEach((goal) => {
+          const progress = calculateProgressPercentage(goal);
+          const previousProgress = updatedMap[goal.id] || 0;
+
+          if (
+            progress >= 100 &&
+            previousProgress < 100 &&
+            progress != previousProgress
+          ) {
+            sendGoalProgressEmail(100, goal.name);
+          } else if (
+            progress >= 75 &&
+            previousProgress < 75 &&
+            progress < 100 &&
+            progress != previousProgress
+          ) {
+            sendGoalProgressEmail(75, goal.name);
+          } else if (
+            progress >= 50 &&
+            previousProgress < 50 &&
+            progress < 75 &&
+            progress != previousProgress
+          ) {
+            sendGoalProgressEmail(50, goal.name);
+          }
+          updatedMap[goal.id] = progress;
+        });
+
+        if (
+          JSON.stringify(updatedMap) !== JSON.stringify(previousProgressMap)
+        ) {
+          setPreviousProgressMap(updatedMap);
+          localStorage.setItem(
+            'previousProgressMap',
+            JSON.stringify(updatedMap)
+          );
+        }
+      }
+    };
+    if (Goals.length > 0) {
+      populateAndProcessGoals();
+    }
+  }, [Goals, previousProgressMap]);
 
   const handleGoalUpdate = (updatedGoal: Goal) => {
     setGoals((prevGoals) =>
@@ -1413,8 +1501,8 @@ export function GoalsPage() {
             onUpdateGoal={handleGoalUpdate}
           ></GoalInfoPage>
         </>
-      )}      
-      {data.goals.length >0 && !isGoalPopupOpen && selectedGoal == null && (
+      )}
+      {data.goals.length > 0 && !isGoalPopupOpen && selectedGoal == null && (
         <>
           <div
             className="flex justify-between bg-[var(--main-background)] text-[calc(1.2rem*var(--font-size-multiplier))] mb-4 pb-4 items-end"
