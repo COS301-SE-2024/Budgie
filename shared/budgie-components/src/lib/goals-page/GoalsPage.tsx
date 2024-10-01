@@ -1087,10 +1087,10 @@ export function GoalsPage() {
     return 0;
   };
   const sendGoalProgressEmail = async (progress: number, t: string) => {
-    const user = getAuth().currentUser;
-    let email = user?.email;
-    if (!email && user.providerData.length > 0) {
-      email = user?.providerData[0].email;
+    const user = getAuth().currentUser || null;
+    let email = user?.email || '';
+    if (!email && user != null && user?.providerData.length > 0) {
+      email = user?.providerData[0].email || '';
     }
     try {
       await axios.post(
@@ -1124,12 +1124,11 @@ export function GoalsPage() {
       }
       const isGoalEnabled = localStorage.getItem('goal') === 'true';
       if (isGoalEnabled && Goals.length > 0) {
-        const updatedMap = { ...progressMap };
+        const updatedMap: { [key: string]: number } = { ...progressMap };
 
         Goals.forEach((goal) => {
           const progress = calculateProgressPercentage(goal);
           const previousProgress = updatedMap[goal.id] || 0;
-
           if (
             progress >= 100 &&
             previousProgress < 100 &&
