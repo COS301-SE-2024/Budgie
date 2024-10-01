@@ -6,6 +6,7 @@
 ## Technocrats - Budgie - Project Description
 Budgie is a financial management tool designed to help users take control of their spending. Users can import bank statements, categorize their spending, and set financial goals. By predicting upcoming costs and sharing financial management insights, Budgie provides a comprehensive view how users can achieve monetary freedom.
 
+
 ## Documentation
 
 [![.github/workflows/build_app.yml](https://github.com/COS301-SE-2024/Budgie/actions/workflows/build_app.yml/badge.svg)](https://github.com/COS301-SE-2024/Budgie/actions/workflows/build_app.yml)
