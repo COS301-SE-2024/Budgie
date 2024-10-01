@@ -200,13 +200,6 @@ export function FaqModal(props: FaqModalProps) {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
 
-        <h1 className="text-2xl font-bold text-gray-900">Open Questions</h1>
-        <button
-          onClick={() => setOpen(!showOpen)}
-          className="bg-blue-500 text-white rounded p-2 mt-4"
-        >
-          View Open Questions
-        </button>
         {showOpen && <OpenQuestions onClose={handleCloseQ} />}
 
         {loading ? (
