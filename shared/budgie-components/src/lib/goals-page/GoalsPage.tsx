@@ -1086,7 +1086,7 @@ export function GoalsPage() {
     }
     return 0;
   };
-  const sendGoalProgressEmail = async (progress: number) => {
+  const sendGoalProgressEmail = async (progress: number, t: string) => {
     const user = getAuth().currentUser;
     let email = user?.email;
     if (!email && user.providerData.length > 0) {
@@ -1099,7 +1099,7 @@ export function GoalsPage() {
           uid: user?.uid,
           userEmail: email,
           userName: user?.displayName,
-          title: '',
+          title: t,
           progress,
         }
       );
@@ -1135,21 +1135,21 @@ export function GoalsPage() {
             previousProgress < 100 &&
             progress != previousProgress
           ) {
-            sendGoalProgressEmail(100);
+            sendGoalProgressEmail(100, goal.name);
           } else if (
             progress >= 75 &&
             previousProgress < 75 &&
             progress < 100 &&
             progress != previousProgress
           ) {
-            sendGoalProgressEmail(75);
+            sendGoalProgressEmail(75, goal.name);
           } else if (
             progress >= 50 &&
             previousProgress < 50 &&
             progress < 75 &&
             progress != previousProgress
           ) {
-            sendGoalProgressEmail(50);
+            sendGoalProgressEmail(50, goal.name);
           }
           updatedMap[goal.id] = progress;
         });
