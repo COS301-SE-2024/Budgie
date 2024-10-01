@@ -314,7 +314,12 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
 
       setMoneyIn(moneyInTotal);
       setMoneyOut(Math.abs(moneyOutTotal)); // money out should be positive for display
-      const progressPercentage = (Math.abs(moneyOutTotal) / moneyInTotal) * 100;
+      let progressPercentage;
+      if (moneyInTotal === 0) {
+        progressPercentage = (Math.abs(moneyOutTotal) / 1) * 100;
+      } else {
+        progressPercentage = (Math.abs(moneyOutTotal) / moneyInTotal) * 100;
+      }
       const isSpendingEnabled = localStorage.getItem('spending') === 'true';
       if (isSpendingEnabled) {
         const accountKey = `incomeProgress_${props.account}`;
