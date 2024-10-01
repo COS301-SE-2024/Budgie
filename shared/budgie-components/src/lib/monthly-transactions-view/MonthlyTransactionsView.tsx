@@ -126,17 +126,12 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
     thresh: number,
     percentage: number
   ) => {
-    const user = getAuth().currentUser;
-    let email = user?.email;
-    if (!email && user.providerData.length > 0) {
-      email = user?.providerData[0].email;
-    }
     try {
       await axios.post(
         'https://us-central1-budgieapp-70251.cloudfunctions.net/sendEmailNotification',
         {
           userId: UserId,
-          email,
+          userEmail: Email,
           threshold: thresh,
           spentPercentage: percentage,
         }
