@@ -18,11 +18,13 @@ Budgie is a financial management tool designed to help users take control of the
 - [Technocrats-Demo2](https://drive.google.com/file/d/1vhJ2rwcY46LOmcU3YBV_-yX7N15ZLOqE/view?usp=sharing)
 
 ### Specifications
-- [Requirement Specification](https://drive.google.com/file/d/1c8KiYQ4rGeXMgiGAoB6dJNJZhVxJcHcF/view?usp=drive_link)
-- [Architectural Design Specification](https://drive.google.com/file/d/14BpinMCzyAtm_FGOfL2Y8Tbz3XRQ6Oe0/view?usp=drive_link)
+- [Requirement Specification](https://drive.google.com/file/d/1eaG79c_L_7QwNtMiHDFRumf0koO-meAB/view?usp=drive_link)
+- [Architectural Design Specification](https://drive.google.com/file/d/19dZ5Gr16MHXaQLlGt27ZvskRGZtQ-rJb/view?usp=drive_link)
+- [Testing Specification](https://drive.google.com/file/d/1mvU6KP3jLUMfNutcE-sZ1TK6GT65vYpM/view?usp=drive_link)
+- [Deployment Model](https://drive.google.com/file/d/1o6pFPrwrnUUIYLTnA8iEqccsS5Kyi2Vi/view?usp=drive_link)
 
 <!-- - [Database Specification]()
-- [Testing Specification]()
+
 - [GitHub Specifications]()
 - [CI/CD]() -->
 
@@ -31,7 +33,7 @@ Budgie is a financial management tool designed to help users take control of the
 - [Technical Installation Manual](https://drive.google.com/file/d/1a1KIRG9aLB77wbKvydsLzZf70r1MS1VE/view?usp=drive_link)
   
 ### Coding Standards
-- [Coding Standards](https://drive.google.com/file/d/1PPR6qOugaXNz273XWx4K8XcoZCQzrfXg/view?usp=drive_link)
+- [Coding Standards](https://drive.google.com/file/d/1WoG13KqkNtGk3GNpD_I53iyPxJmutGh-/view?usp=drive_link)
 
 ### Project Board
 - [Budgie Project Board](https://github.com/orgs/COS301-SE-2024/projects/108)
