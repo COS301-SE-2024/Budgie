@@ -10,14 +10,26 @@ import {
   getDoc,
 } from 'firebase/firestore';
 
+// Define interfaces for Question and user votes
+export interface Question {
+  id: string;
+  question: string;
+  likes: number;
+  dislikes: number;
+  isOpen: boolean;
+  answer?: string; // Optional field if you store answers
+}
+
 export interface OpenQuestionsProps {
   onClose: () => void;
 }
 
 export function OpenQuestions(props: OpenQuestionsProps) {
-  const [openQuestions, setOpenQuestions] = useState([]);
-  const [userVotes, setUserVotes] = useState({}); // State to track user votes
-  const [newQuestion, setNewQuestion] = useState(''); // State for new question input
+  const [openQuestions, setOpenQuestions] = useState<Question[]>([]); // Specify the type of open questions
+  const [userVotes, setUserVotes] = useState<{
+    [key: string]: 'upvote' | 'downvote' | undefined;
+  }>({}); // Track user votes
+  const [newQuestion, setNewQuestion] = useState<string>(''); // State for new question input
   const db = getFirestore();
   const questionsCollectionRef = collection(db, 'questions');
 
@@ -26,7 +38,7 @@ export function OpenQuestions(props: OpenQuestionsProps) {
       const questions = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-      }));
+      })) as Question[]; // Ensure correct typing of Firestore data
 
       // Filter only open questions
       const filteredOpenQuestions = questions.filter((q) => q.isOpen);
@@ -36,13 +48,16 @@ export function OpenQuestions(props: OpenQuestionsProps) {
     return () => unsubscribe(); // Cleanup listener on unmount
   }, []);
 
-  const voteQuestion = async (questionId, type) => {
+  const voteQuestion = async (
+    questionId: string,
+    type: 'upvote' | 'downvote'
+  ) => {
     const questionRef = doc(db, 'questions', questionId);
     const questionDoc = await getDoc(questionRef);
 
     // Update likes or dislikes based on the vote type
     if (questionDoc.exists()) {
-      const question = questionDoc.data();
+      const question = questionDoc.data() as Question; // Cast to Question type
       if (type === 'upvote') {
         await updateDoc(questionRef, { likes: (question.likes || 0) + 1 });
         setUserVotes((prev) => ({ ...prev, [questionId]: 'upvote' }));
@@ -55,7 +70,7 @@ export function OpenQuestions(props: OpenQuestionsProps) {
     }
   };
 
-  const answerQuestion = async (questionId, answer) => {
+  const answerQuestion = async (questionId: string, answer: string) => {
     const questionRef = doc(db, 'questions', questionId);
     await updateDoc(questionRef, {
       answer: answer, // Assuming you're storing the answer in the same document
@@ -63,11 +78,12 @@ export function OpenQuestions(props: OpenQuestionsProps) {
     });
   };
 
-  const handleAddQuestion = async (e) => {
+  const handleAddQuestion = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (newQuestion.trim()) {
       // Add the new question to Firestore
-      const newQuestionData = {
+      const newQuestionData: Question = {
+        id: '', // Placeholder; will be updated with actual ID after adding to Firestore
         question: newQuestion,
         isOpen: true,
         likes: 0,
@@ -76,6 +92,7 @@ export function OpenQuestions(props: OpenQuestionsProps) {
       };
 
       const docRef = await addDoc(questionsCollectionRef, newQuestionData);
+      newQuestionData.id = docRef.id; // Update the id with the Firestore document ID
       console.log('New question added with ID:', docRef.id); // Optional: log the new question ID
       setNewQuestion(''); // Clear input field
     }
@@ -159,8 +176,9 @@ export function OpenQuestions(props: OpenQuestionsProps) {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                answerQuestion(question.id, e.target.answer.value);
-                e.target.answer.value = ''; // Clear input after submitting
+                const answer = e.currentTarget.answer.value;
+                answerQuestion(question.id, answer);
+                e.currentTarget.answer.value = ''; // Clear input after submitting
               }}
               className="mt-4"
             >
