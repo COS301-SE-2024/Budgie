@@ -154,13 +154,13 @@ export function NotificationSettings(props: NotificationSettingsProps) {
           </div>
           <div className="border-t px-6 py-4 flex justify-between items-center">
             <button
-              className="bg-black text-white px-4 py-2 rounded"
+              className=" bg-slate-400 text-white px-4 py-2 rounded"
               onClick={uncheckAll}
             >
               Clear
             </button>
             <button
-              className="bg-black text-white px-4 py-2 rounded"
+              className=" bg-green-500 text-white px-4 py-2 rounded"
               onClick={saveSettings}
             >
               Save
