@@ -7,6 +7,7 @@ import account1 from '../../../public/images/account1.png';
 import account2 from '../../../public/images/account2.png';
 import account3 from '../../../public/images/account3.png';
 import account4 from '../../../public/images/account4.png';
+import account5 from '../../../public/images/account5.png';
 import goals1 from '../../../public/images/goals1.png';
 import goals2 from '../../../public/images/goals2.png';
 import goals3 from '../../../public/images/goals3.png';
@@ -92,10 +93,25 @@ export function HelpModal(props: HelpModalProps) {
               account you just added to make it distinct. Click on the "Add
               Account" button and now the account is being tracked.
             </p>
+            <p className="text-s text-gray-500">Click on "Add Account"</p>
             <Image src={account1} width={642} height={535} alt="account1" />
+            <p className="text-s text-gray-500">
+              Choose the appropriate account type you wish to add
+            </p>
             <Image src={account2} width={642} height={535} alt="account2" />
+            <p className="text-s text-gray-500">
+              Click on the Icon of the bank your account belongs to
+            </p>
             <Image src={account3} width={642} height={535} alt="account3" />
+            <p className="text-s text-gray-500">
+              Browse your device and choose the csv that belongs to your account
+              then double click on the file.
+            </p>
             <Image src={account4} width={642} height={535} alt="account4" />
+            <p className="text-s text-gray-500">
+              Add an alias for the account and then click "Add Account" button
+            </p>
+            <Image src={account5} width={642} height={535} alt="account5" />
           </div>
         );
       case 'Transactions':
