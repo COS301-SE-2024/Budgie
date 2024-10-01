@@ -16,12 +16,27 @@ export interface FaqModalProps {
   onClose: () => void;
 }
 
+// Interface for a Question object
+interface Question {
+  id: string;
+  question: string;
+  answer?: string;
+  likes: number;
+  dislikes: number;
+  isOpen: boolean;
+}
+
+// Interface for storing user votes
+interface UserVotes {
+  [questionId: string]: 'upvote' | 'downvote';
+}
+
 export function FaqModal(props: FaqModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [userQuestions, setUserQuestions] = useState([]); // Holds the top ranked questions
-  const [allQuestions, setAllQuestions] = useState([]); // Holds all questions
-  const [openQuestions, setOpenQuestions] = useState([]);
-  const [userVotes, setUserVotes] = useState({});
+  const [userQuestions, setUserQuestions] = useState<Question[]>([]); // Holds the top ranked questions
+  const [allQuestions, setAllQuestions] = useState<Question[]>([]); // Holds all questions
+  const [openQuestions, setOpenQuestions] = useState<Question[]>([]);
+  const [userVotes, setUserVotes] = useState<UserVotes>({});
   const [showOpen, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState(true); // Loading state
 
@@ -32,20 +47,22 @@ export function FaqModal(props: FaqModalProps) {
   const db = getFirestore();
   const questionsCollectionRef = collection(db, 'questions');
 
-  // Simulate a user ID (replace this with actual user identification logic)
-  const user = getAuth();
-  const userId = user.currentUser.uid; // This should be replaced with actual user ID from authentication
+  const user = getAuth()?.currentUser;
+  const userId = user?.uid || ''; // Ensure userId is a string, fallback to empty string if user is not authenticated
 
   useEffect(() => {
     const unsubscribe = onSnapshot(questionsCollectionRef, (snapshot) => {
-      const questions = snapshot.docs.map((doc) => ({
+      const questions: Question[] = snapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data(),
+        question: doc.data().question,
+        answer: doc.data().answer,
+        likes: doc.data().likes || 0,
+        dislikes: doc.data().dislikes || 0,
+        isOpen: doc.data().isOpen,
       }));
 
-      // Calculate the ratio of likes to dislikes for ranking
       const rankedQuestions = questions
-        .map((q) => ({
+        .map((q: Question) => ({
           ...q,
           ratio:
             (q.likes || 0) /
@@ -54,7 +71,6 @@ export function FaqModal(props: FaqModalProps) {
         .sort((a, b) => b.ratio - a.ratio) // Sort by ratio in descending order
         .slice(0, 5); // Get only the top 5 questions
 
-      // Separate open and answered questions
       const openQuestions = rankedQuestions.filter((q) => q.isOpen);
       setUserQuestions(rankedQuestions);
       setAllQuestions(questions); // Store all questions for filtering
@@ -63,11 +79,11 @@ export function FaqModal(props: FaqModalProps) {
     });
 
     return () => unsubscribe(); // Cleanup listener on unmount
-  }, []);
+  }, [questionsCollectionRef]);
 
-  // Fetch user votes from Firestore
   useEffect(() => {
     const fetchUserVotes = async () => {
+      if (!userId) return; // If no user is authenticated, return early
       const userVotesRef = doc(db, 'userVotes', userId);
       const userVotesDoc = await getDoc(userVotesRef);
       if (userVotesDoc.exists()) {
@@ -75,9 +91,9 @@ export function FaqModal(props: FaqModalProps) {
       }
     };
     fetchUserVotes();
-  }, []);
+  }, [userId, db]);
 
-  const answerQuestion = async (id, answer) => {
+  const answerQuestion = async (id: string, answer: string) => {
     const questionRef = doc(db, 'questions', id);
     await updateDoc(questionRef, {
       answer: answer,
@@ -85,40 +101,37 @@ export function FaqModal(props: FaqModalProps) {
     });
   };
 
-  const voteQuestion = async (id, type) => {
+  const voteQuestion = async (id: string, type: 'upvote' | 'downvote') => {
     const questionRef = doc(db, 'questions', id);
 
-    // Retrieve current likes, dislikes, and user's vote
     const questionDoc = await getDoc(questionRef);
-    const currentLikes = questionDoc.exists() ? questionDoc.data().likes : 0;
+    const currentLikes = questionDoc.exists()
+      ? questionDoc.data().likes || 0
+      : 0;
     const currentDislikes = questionDoc.exists()
-      ? questionDoc.data().dislikes
+      ? questionDoc.data().dislikes || 0
       : 0;
     const userVote = userVotes[id];
 
     let newLikes = currentLikes;
     let newDislikes = currentDislikes;
 
-    // Check if the user is changing their vote
     if (userVote === 'upvote' && type === 'downvote') {
-      newLikes -= 1; // Remove upvote
-      newDislikes += 1; // Add downvote
+      newLikes -= 1;
+      newDislikes += 1;
     } else if (userVote === 'downvote' && type === 'upvote') {
-      newLikes += 1; // Add upvote
-      newDislikes -= 1; // Remove downvote
+      newLikes += 1;
+      newDislikes -= 1;
     } else if (userVote === type) {
-      // If the user is voting the same way, do nothing
       return;
     } else if (userVote === undefined) {
-      // User is voting for the first time
       if (type === 'upvote') {
-        newLikes += 1; // Increment likes
+        newLikes += 1;
       } else {
-        newDislikes += 1; // Increment dislikes
+        newDislikes += 1;
       }
     }
 
-    // Update likes, dislikes, and user votes in Firestore
     await updateDoc(questionRef, {
       likes: newLikes,
       dislikes: newDislikes,
@@ -130,39 +143,34 @@ export function FaqModal(props: FaqModalProps) {
       {
         votes: {
           ...userVotes,
-          [id]: type, // Store the vote type (upvote or downvote)
+          [id]: type,
         },
       },
       { merge: true }
     );
 
-    // Update local userVotes state
     setUserVotes((prevVotes) => ({ ...prevVotes, [id]: type }));
   };
 
-  // Filter questions based on the search query for partial matches when there's input text
   const filteredQuestions = [
     ...openQuestions,
     ...userQuestions,
     ...allQuestions,
   ]
-    .filter(
-      (question) =>
-        searchQuery.trim() !== '' // Only filter if there's text in the input
-          ? question.question.toLowerCase().includes(searchQuery.toLowerCase())
-          : true // If no text, include all questions
+    .filter((question) =>
+      searchQuery.trim() !== ''
+        ? question.question.toLowerCase().includes(searchQuery.toLowerCase())
+        : true
     )
-    .reduce((acc, question) => {
-      // Use Set to filter out duplicates based on question ID
+    .reduce<Question[]>((acc, question) => {
       const questionIds = new Set(acc.map((q) => q.id));
       if (!questionIds.has(question.id)) {
         acc.push(question);
       }
       return acc;
-    }, []); // Initialize with an empty array
+    }, []);
 
-  // Sort the filtered questions if needed
-  filteredQuestions.sort((a, b) => b.likes - a.likes); // Sort by likes (or any other criteria)
+  filteredQuestions.sort((a, b) => b.likes - a.likes);
 
   return (
     <div
@@ -184,35 +192,29 @@ export function FaqModal(props: FaqModalProps) {
           Frequently Asked Questions
         </h1>
 
-        {/* Search Bar */}
         <input
           type="text"
           placeholder="Search..."
-          className="p-2 border rounded mb-4 w-full text-gray-900 bg-white" // Updated styles
+          className="p-2 border rounded mb-4 w-full text-gray-900 bg-white"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        {/* Button to navigate to Open Questions page */}
+
         <h1 className="text-2xl font-bold text-gray-900">Open Questions</h1>
         <button
-          onClick={() => {
-            setOpen(!showOpen);
-          }}
+          onClick={() => setOpen(!showOpen)}
           className="bg-blue-500 text-white rounded p-2 mt-4"
         >
           View Open Questions
         </button>
         {showOpen && <OpenQuestions onClose={handleCloseQ} />}
 
-        {/* Loading Indicator */}
         {loading ? (
           <div className="text-center py-4">
             <p>Loading questions...</p>
-            {/* You can add a spinner here */}
           </div>
         ) : (
           <>
-            {/* Display filtered questions */}
             <h1 className="text-2xl font-bold text-gray-900">
               Answered Questions
             </h1>
@@ -222,50 +224,36 @@ export function FaqModal(props: FaqModalProps) {
                   key={question.id}
                   className="p-6 bg-white shadow-lg rounded-lg mb-4"
                 >
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-bold text-green-600 mb-2">
                     {question.question}
                   </h3>
-                  {question.isOpen ? null : (
-                    <p className="text-gray-800">{question.answer}</p>
+                  {question.answer && (
+                    <p className="text-gray-900 mb-4">{question.answer}</p>
                   )}
-                  <div className="flex items-center space-x-2 mt-2">
-                    <button
+                  <div className="flex items-center">
+                    <span
+                      className="material-symbols-outlined cursor-pointer mr-2"
                       onClick={() => voteQuestion(question.id, 'upvote')}
-                      disabled={userVotes[question.id] === 'downvote'} // Disable if already downvoted
-                      className={`flex items-center ${
-                        userVotes[question.id] === 'upvote'
-                          ? 'text-green-600'
-                          : 'text-gray-600'
-                      }`}
+                      style={{ fontSize: '24px' }}
                     >
-                      <span className="material-symbols-outlined">
-                        thumb_up
-                      </span>
-                      Upvote
-                    </button>
-                    <span className="text-gray-800">{question.likes || 0}</span>
-                    <button
-                      onClick={() => voteQuestion(question.id, 'downvote')}
-                      disabled={userVotes[question.id] === 'upvote'} // Disable if already upvoted
-                      className={`flex items-center ${
-                        userVotes[question.id] === 'downvote'
-                          ? 'text-red-600'
-                          : 'text-gray-600'
-                      }`}
-                    >
-                      <span className="material-symbols-outlined">
-                        thumb_down
-                      </span>
-                      Downvote
-                    </button>
-                    <span className="text-gray-800">
-                      {question.dislikes || 0}
+                      thumb_up
                     </span>
+                    <span>{question.likes}</span>
+                    <span
+                      className="material-symbols-outlined cursor-pointer ml-4 mr-2"
+                      onClick={() => voteQuestion(question.id, 'downvote')}
+                      style={{ fontSize: '24px' }}
+                    >
+                      thumb_down
+                    </span>
+                    <span>{question.dislikes}</span>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-gray-700">No questions found.</p>
+              <div className="text-center py-4">
+                <p>No questions found.</p>
+              </div>
             )}
           </>
         )}
