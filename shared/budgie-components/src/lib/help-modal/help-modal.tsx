@@ -10,6 +10,7 @@ import account4 from '../../../public/images/account4.png';
 import goals1 from '../../../public/images/goals1.png';
 import goals2 from '../../../public/images/goals2.png';
 import goals3 from '../../../public/images/goals3.png';
+import goals4 from '../../../public/images/goals4.png';
 import comparison1 from '../../../public/images/comparisons1.png';
 import comparison2 from '../../../public/images/comparisons2.png';
 import comparison3 from '../../../public/images/comparisons3.png';
@@ -152,8 +153,24 @@ export function HelpModal(props: HelpModalProps) {
               such as only a specific category od transactions being noticed.
             </p>
             <Image src={goals1} width={642} height={535} alt="goals1" />
+            <p className="text-s text-gray-500">
+              Enter the goal name, target amount and date you wish to accomplish
+              the goal. Click Next button to proceed.
+            </p>
             <Image src={goals2} width={642} height={535} alt="goals2" />
+            <p className="text-s text-gray-500">
+              Choose whether you want to add some conditions under which the
+              goal should have. If no then click "Confirm" button otherwise
+              Click "Add Condition".
+            </p>
             <Image src={goals3} width={642} height={535} alt="goals3" />
+            <p className="text-s text-gray-500">
+              Choose whether you want some key word in your transactions to be
+              the condition by entering it in the textbox and clicking the Add
+              button. Optionallly you can click on a account to have it's
+              transactions considered.
+            </p>
+            <Image src={goals4} width={642} height={535} alt="goals4" />
           </div>
         );
       case 'Insights':
