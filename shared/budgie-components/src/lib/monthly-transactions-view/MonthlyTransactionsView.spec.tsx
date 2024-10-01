@@ -44,12 +44,22 @@ describe('MonthlyTransactionsView', () => {
       <UserContext.Provider value={mockUserContextValue}>
         <MonthlyTransactionsView
           account="test-account"
-          data={{ january: JSON.stringify([{ date: '2024/01/15', amount: 100, balance: 1000, description: 'Sample transaction', category: 'Income' }]) }}
+          data={{
+            january: JSON.stringify([
+              {
+                date: '2024/01/15',
+                amount: 100,
+                balance: 1000,
+                description: 'Sample transaction',
+                category: 'Income',
+              },
+            ]),
+          }}
           availableYears={[2023, 2024]}
         />
       </UserContext.Provider>
     );
-  
+
     await waitFor(() => {
       expect(screen.getByText(/Balance:/)).toBeInTheDocument();
       expect(screen.getByText(/Money In:/)).toBeInTheDocument();
@@ -62,13 +72,25 @@ describe('MonthlyTransactionsView', () => {
       <UserContext.Provider value={mockUserContextValue}>
         <MonthlyTransactionsView
           account="test-account"
-          data={{ january: JSON.stringify([{ date: '2024/01/15', amount: 100, balance: 1000, description: 'Sample transaction', category: 'Income' }]) }}
+          data={{
+            january: JSON.stringify([
+              {
+                date: '2024/01/15',
+                amount: 100,
+                balance: 1000,
+                description: 'Sample transaction',
+                category: 'Income',
+              },
+            ]),
+          }}
           availableYears={[2023, 2024]}
         />
       </UserContext.Provider>
     );
 
-    const nextMonthButton = screen.getByRole('button', { name: /arrow_forward_ios/i });
+    const nextMonthButton = screen.getByRole('button', {
+      name: /arrow_forward_ios/i,
+    });
     fireEvent.click(nextMonthButton);
 
     await waitFor(() => {

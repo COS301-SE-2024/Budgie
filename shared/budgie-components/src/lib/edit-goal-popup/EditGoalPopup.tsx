@@ -451,16 +451,16 @@ const ConditionsTab: React.FC<ConditionsTabProps> = ({
       {step === 1 && (
         <div
           style={{
-            height: '100%',
+            height: 'fit',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
           }}
         >
-          <div className="flex flex-col items-center w-full max-h-[40vh]">
+          <div className="flex flex-col items-center w-full max-h-[35vh] overflow-y-auto">
             <p
               className={styles.goalDescription}
-              style={{ textAlign: 'center' }}
+              style={{ textAlign: 'center', fontSize:'1rem' }}
             >
               Set the conditions for the transactions you want to be associated
               with this goal. Transactions meeting any of the conditions you set

@@ -68,7 +68,6 @@ export function ForgotPassword(props: ForgotPasswordProps) {
     try {
       console.log(`Attempting to send reset email to: ${email}`);
       await sendPasswordResetEmail(auth, email);
-      // alert('Password reset email sent successfully');
       setSent(true);
       setError(false);
       setErrorMessage('');
