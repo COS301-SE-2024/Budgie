@@ -81,15 +81,15 @@ export function ComparisonPage(props: ComparisonPage) {
     const handleCloseForm = () => setShowForm(false);
 
     const data = [
-        { category: 'Groceries', average: averageCategory[0], you: Math.round(yourCategory[0] * 100) / 100, color: '#ff6f61' },
-        { category: 'Utilities', average: averageCategory[1], you: Math.round(yourCategory[1] * 100) / 100, color: '#ffcc00' },
-        { category: 'Entertainment', average: averageCategory[2], you: Math.round(yourCategory[2] * 100) / 100, color: '#00bfae' },
-        { category: 'Transport', average: averageCategory[3], you: Math.round(yourCategory[3] * 100) / 100, color: '#e74c3c' },
-        { category: 'Insurance', average: averageCategory[4], you: Math.round(yourCategory[4] * 100) / 100, color: '#e67e22' },
-        { category: 'Medical Aid', average: averageCategory[5], you: Math.round(yourCategory[5] * 100) / 100, color: '#2ecc71' },
-        { category: 'Eating Out', average: averageCategory[6], you: Math.round(yourCategory[6] * 100) / 100, color: '#3498db' },
-        { category: 'Shopping', average: averageCategory[7], you: Math.round(yourCategory[7] * 100) / 100, color: '#8e44ad' },
-        { category: 'Other', average: averageCategory[8], you: Math.round(yourCategory[8] * 100) / 100, color: '#9b59b6' }        
+        { category: 'Groceries', average: averageCategory[0], you: Math.round(yourCategory[0] * 100) / 100, color: '#a98dfb' },
+        { category: 'Utilities', average: averageCategory[1], you: Math.round(yourCategory[1] * 100) / 100, color: '#fdad73' },
+        { category: 'Entertainment', average: averageCategory[2], you: Math.round(yourCategory[2] * 100) / 100, color: '#fd7575' },
+        { category: 'Transport', average: averageCategory[3], you: Math.round(yourCategory[3] * 100) / 100, color: '#4eb5ff' },
+        { category: 'Insurance', average: averageCategory[4], you: Math.round(yourCategory[4] * 100) / 100, color: '#72f1e2' },
+        { category: 'Medical Aid', average: averageCategory[5], you: Math.round(yourCategory[5] * 100) / 100, color: '#9a9a9a' },
+        { category: 'Eating Out', average: averageCategory[6], you: Math.round(yourCategory[6] * 100) / 100, color: '#ffcd4e' },
+        { category: 'Shopping', average: averageCategory[7], you: Math.round(yourCategory[7] * 100) / 100, color: '#fb94f1' },
+        { category: 'Other', average: averageCategory[8], you: Math.round(yourCategory[8] * 100) / 100, color: '#000000' }        
     ];
 
     const positionData = [
@@ -345,14 +345,14 @@ export function ComparisonPage(props: ComparisonPage) {
                             <div className={styles.gridItem}>
                                 <div className={styles.gridTitleContainer}>
                                     <h3 className={styles.gridTitle}>
-                                        AVERAGE SPENDING BY CATEGORY COMPARED TO YOU
+                                        Average Spending by Category
                                     </h3>
                                 </div>
-                                <ComposedChart
-                                    width={1600} // Increased width for better spacing
-                                    height={325}
+                                <ResponsiveContainer width="100%" height={300}>
+                                <ComposedChart className='w-full'
+                                    
                                     data={data}
-                                    margin={{ top: 20, right: 70, left: 80, bottom: 80 }} // Adjust margins
+                                    margin={{ top: 20, right: 70, left: 80, bottom: 40 }} // Adjust margins
                                 >
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="category">
@@ -376,6 +376,7 @@ export function ComparisonPage(props: ComparisonPage) {
                                         dot={true}
                                     />
                                 </ComposedChart>
+                                </ResponsiveContainer>
                             </div>
                             <br/>
                             <div className={styles.gridContainer}>
@@ -383,7 +384,7 @@ export function ComparisonPage(props: ComparisonPage) {
                                 {/* Position Grid */}
                                 <div className={styles.gridItem}>
                                     <div className={styles.gridTitleContainer}>
-                                        <h3 className={styles.gridTitle}>Monthly income according to Position</h3>
+                                        <h3 className={styles.gridTitle}>Monthly Income by Job Position</h3>
                                     </div>
                                     <div className={styles.comparisonContainer}>
                                         <h3 className={styles.centeredTitle}>{jobPosition}</h3>
@@ -406,7 +407,7 @@ export function ComparisonPage(props: ComparisonPage) {
                                 {/* Industry Grid */}
                                 <div className={styles.gridItem}>
                                     <div className={styles.gridTitleContainer}>
-                                        <h3 className={styles.gridTitle}>Monthly income According to Industry</h3>
+                                        <h3 className={styles.gridTitle}>Monthly Income by Industry</h3>
                                     </div>
                                     <div className={styles.comparisonContainer}>
                                         <h3 className={styles.centeredTitle}>{industry}</h3>
@@ -435,8 +436,6 @@ export function ComparisonPage(props: ComparisonPage) {
                 </>
             ) : (
                 <div className={styles.noAccountsMessage}>
-                    <p>You have no accounts. <br />
-                        Head to the accounts section to create new accounts.</p>
                 </div>
             )}
         </div>

@@ -502,10 +502,10 @@ const GoalInfoPage = ({
   return (
     <div className="flex flex-col h-full overflow-y-hidden">
       <div
-        className="flex flex-col lg:flex-row justify-center lg:justify-between w-full items-center container mx-auto pb-4"
+        className="flex flex-col lg:flex-row justify-center lg:justify-between w-full items-center container mx-auto pb-4 "
         style={{ borderBottom: '1px solid gray' }}
       >
-        <div className="flex justify-between items-center w-full">
+        <div className="flex justify-between items-center w-full ">
           <h1 className="text-xl sm:text-2xl font-bold text-[var(--primary-1)] flex items-center mr-[0.5rem] lg:mr-[1rem]">
             <span
               className="material-symbols-outlined mr-[0.5rem] sm:mr-[1rem] text-[1.25rem] sm:text-[calc(1.5rem * var(--font-size-multiplier))] cursor-pointer"
@@ -524,7 +524,7 @@ const GoalInfoPage = ({
               Edit Goal Details
             </div>
             <div
-              className="h-full p-2 bg-[var(--primary-1)] text-[var(--secondary-text)] cursor-pointer transition ease-in-out duration-300 rounded-md text-center font-bold hover:bg-[var(--block-background)] border border-[var(--primary-1)] hover:text-[var(--primary-1)]"
+              className="h-full p-2 bg-[var(--primary-2)] text-black cursor-pointer transition ease-in-out duration-300 rounded-md text-center font-bold hover:bg-[var(--block-background)] border border-[var(--primary-2)] hover:text-[var(--primary-1)]"
               onClick={handleUpdateGoalPopup}
             >
               Add an Update
@@ -533,7 +533,7 @@ const GoalInfoPage = ({
         </div>
       </div>
       {!editPopupOpen && !updatePopupOpen && (
-        <div className="h-full overflow-y-auto overflow-x-hidden">
+        <div className="h-[80vh] overflow-x-hidden overflow-y-auto">
           <div className="container mx-auto p-4">
             <div className="flex flex-col lg:flex-row space-y-4 lg:space-x-4 lg:space-y-0 h-fit">
               <div className="lg:w-1/2 flex flex-col items-center justify-between text-center bg-[var(--block-background)] rounded-lg shadow-md p-8 w-full">
@@ -1499,14 +1499,14 @@ export function GoalsPage() {
           ></GoalInfoPage>
         </>
       )}
-      {data.goals.length > 0 && !isGoalPopupOpen && selectedGoal == null && (
+      {data.goals.length > 0 && !isGoalPopupOpen && selectedGoal == null &&!loading && (
         <>
           <div
             className="flex justify-between bg-[var(--main-background)] text-[calc(1.2rem*var(--font-size-multiplier))] mb-4 pb-4 items-end"
             style={{ borderBottom: '1px solid gray' }}
           >
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <p className="font-bold mr-4">Sort By:</p>
+              <p className="font-bold mr-4 text-lg">Sort By:</p>
               <select
                 value={sortOption}
                 onChange={handleSortChange}
@@ -1518,17 +1518,17 @@ export function GoalsPage() {
                 <option value="progress">Progress</option>
               </select>
             </div>
-            <button className={styles.addAGoalButton} onClick={addGoalPopup}>
+            <button className="px-4 h-[calc(3rem_*_var(--font-size-multiplier))] text-black bg-[var(--primary-2)] font-bold rounded-lg transition duration-300 ease" onClick={addGoalPopup}>
               Add a Goal
             </button>
           </div>
-          <div className="w-full h-full text-[calc(1.5rem*var(--font-size-multiplier))] overflow-y-auto">
+          <div className="w-full h-full text-[calc(1rem*var(--font-size-multiplier))] overflow-y-auto">
             <table className="min-w-full table-auto border-collapse border border-gray-200">
               <thead>
                 <tr
                   style={{
                     color: 'var(--secondary-text)',
-                    backgroundColor: 'var(--primary-1)',
+                    backgroundColor: 'var(--primary-2)',
                   }}
                 >
                   <th className="border border-gray-200 p-2 text-left">Name</th>
@@ -1547,7 +1547,7 @@ export function GoalsPage() {
                     key={index}
                     className="cursor-pointer bg-[var(--block-background)] hover:bg-[var(--main-background)]"
                     style={{
-                      fontSize: 'calc(1.2rem * var(--font-size-multiplier))',
+                      fontSize: 'calc(1rem * var(--font-size-multiplier))',
                     }}
                     onClick={() => setSelectedGoal(goal)}
                   >
@@ -1593,7 +1593,7 @@ export function GoalsPage() {
           </div>
         </>
       )}
-      {!hasGoals && (
+      {!hasGoals && !loading && (
         <>
           <div className="flex flex-col items-center justify-center bg-[var(--main-background)] h-full">
             <div className="text-2xl">Add your first goal:</div>

@@ -48,7 +48,7 @@
 
 /* Title box for grid items */
 .gridItemTitleBox {
-    background-color: #dcdcdc;
+    background-color: var(--primary-2);
     padding: 8px;
     border-radius: 4px;
     margin-bottom: 16px;
@@ -127,6 +127,10 @@
 .arrow {
     font-size: 1.5em;
     margin: 0 16px;
+}
+
+.arrow:hover{
+    cursor: pointer;
 }
 
 .bankInfo {

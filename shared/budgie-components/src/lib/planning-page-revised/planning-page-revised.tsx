@@ -33,7 +33,7 @@ export function PlanningPageRevised(props: PlanningPageRevisedProps) {
   }, []);
 
   //if no accounts
-  if (noAccounts) {
+  if (noAccounts && viewMode == 'comparisons') {
     return (
       <div className="mainPage">
         <div className="w-full text-xl text-center h-full flex flex-col items-center justify-center ">
@@ -56,27 +56,27 @@ export function PlanningPageRevised(props: PlanningPageRevisedProps) {
   }
 
   return (
-    <div className="mainPage flex flex-col h-screen items-center overflow-hidden">
-      <div className="flex shadow-lg z-2 justify-center rounded-2xl bg-[var(--block-background)] p-2 w-[98%] m-6">
+    <div className="bg-[var(--main-background)] pl-6 pr-6 pt-4 flex-grow portrait:fixed portrait:w-full portrait:pt-[12vh] portrait:pl-2 portrait:pr-2 font-medium overflow-y-hidden">
+      <div className="flex flex-wrap shadow-md !z-100 justify-around rounded-2xl bg-[var(--primary-1)] landscape:h-[calc(3rem*var(--font-size-multiplier))] w-full sticky top-0 text-[var(--secondary-text)] portrait:flex-col portrait:items-center ">
         <button
-          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-[var(--primary-2)] hover:text-BudgieWhite font-medium mr-16 cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
-            viewMode === 'goals' ? 'border-b-4 border-[var(--primary-1)]' : ''
+          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-[var(--primary-2)] hover:text-BudgieWhite cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
+            viewMode === 'goals' ? 'border-b-4 border-white text-white' : ''
           }`}
           onClick={() => setViewMode('goals')}
         >
           Goals
         </button>
         <button
-          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-[var(--primary-2)] hover:text-BudgieWhite font-medium cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
-            viewMode === 'comparisons' ? 'border-b-4 border-[var(--primary-1)]' : ''
+          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-[var(--primary-2)] hover:text-BudgieWhite cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
+            viewMode === 'comparisons' ? 'border-b-4 border-white' : ''
           }`}
           onClick={() => setViewMode('comparisons')}
         >
           Comparisons
         </button>
         <button
-          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-[var(--primary-2)] hover:text-BudgieWhite font-medium ml-16 cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
-            viewMode === 'insight' ? 'border-b-4 border-[var(--primary-1)]' : ''
+          className={`rounded-sm px-5 hover:bg-opacity-75 hover:bg-[var(--primary-2)] hover:text-BudgieWhite cursor-pointer text-[calc(1.4rem*var(--font-size-multiplier))] ${
+            viewMode === 'insight' ? 'border-b-4 border-white' : ''
           }`}
           onClick={() => setViewMode('insight')}
         >
@@ -84,7 +84,7 @@ export function PlanningPageRevised(props: PlanningPageRevisedProps) {
         </button>
       </div>
 
-      <div className="flex-grow w-[98%] m-6 mt-0 overflow-y-hidden">
+      <div className="flex-grow w-full mt-4 overflow-y-hidden">
         {viewMode === 'goals' ? (
           <GoalsPage />
         ) : viewMode === 'comparisons' ? (

@@ -371,7 +371,7 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
 
   return (
     <div className="w-full bg-[var(--main-background)] !z-0 min-h-full h-full portrait:h-[100vh]">
-      <div className="flex justify-between items-center !z-0 Landscape:!sticky !top-12 bg-[var(--primary-2)] py-2 px-4 shadow-md portrait:flex-col text-white rounded-b-2xl">
+      <div className="flex justify-between items-center !z-0 landscape:!sticky !top-12 bg-[var(--primary-2)] py-2 px-4 shadow-md portrait:flex-col text-white rounded-b-2xl">
         <div className="flex items-center">
           <button className={styles.navButton} onClick={handlePrevYear}>
             <span

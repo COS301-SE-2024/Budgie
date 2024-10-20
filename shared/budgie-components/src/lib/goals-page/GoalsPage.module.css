@@ -72,12 +72,3 @@
   color: black;
 }
 
-.addAGoalButton {
-  width: calc(10rem * var(--font-size-multiplier));
-  height: calc(3rem * var(--font-size-multiplier));
-  color: white;
-  background-color: var(--primary-1);
-  font-weight: bold;
-  border-radius: 10px;
-  transition: 0.3s ease;
-}

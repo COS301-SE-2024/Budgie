@@ -31,7 +31,7 @@
 }
 
 .userInfoButton {
-    background-color: #003366;
+    background-color: var(--primary-2);
     /* Dark Blue */
     color: white;
     border: none;
@@ -103,7 +103,6 @@
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    width: 100%;
     min-height: 400px;
     /* Ensures all grid items are at least 300px tall */
     height: auto;
@@ -113,7 +112,7 @@
 .gridTitleContainer {
     display: flex;
     align-items: center;
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--primary-2);
     /* Shaded background for title */
     padding: 10px;
     border-radius: 5px;
