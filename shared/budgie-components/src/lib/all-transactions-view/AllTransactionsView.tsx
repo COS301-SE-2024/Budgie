@@ -370,8 +370,8 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
   };
 
   return (
-    <div className="w-full bg-[var(--main-background)] !z-0">
-      <div className="flex justify-between items-center !z-0 !sticky !top-12  bg-BudgieAccentHover py-2 px-4 shadow-md  rounded-b-2xl">
+    <div className="w-full bg-[var(--main-background)] !z-0 min-h-full h-full portrait:h-[100vh]">
+      <div className="flex justify-between items-center !z-0 !sticky !top-12 bg-[var(--primary-2)] py-2 px-4 shadow-md portrait:flex-col text-white rounded-b-2xl">
         <div className="flex items-center">
           <button className={styles.navButton} onClick={handlePrevYear}>
             <span
@@ -380,13 +380,12 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
                 fontSize: 'calc(1.4rem * var(--font-size-multiplier))',
                 alignContent: 'center',
                 display: 'flex',
-                color: 'white',
               }}
             >
               arrow_back_ios
             </span>
           </button>
-          <span className={styles.yearDisplay}>
+          <span className="font-bold mx-3 text-center text-xl w-[calc(12rem_*_var(--font-size-multiplier))]">
             <select
               className={styles.dateDropdown}
               value={currentYear}
@@ -406,7 +405,6 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
                 fontSize: 'calc(1.4rem * var(--font-size-multiplier))',
                 alignContent: 'center',
                 display: 'flex',
-                color: 'white',
               }}
             >
               arrow_forward_ios
@@ -416,15 +414,16 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
         <div className="font-bold text-2xl flex text-BudgieWhite justify-center items-center">
           Balance: {formatCurrency(balance)}
           <div className="ml-8">
-            <p className="text-green-300 font-bold text-base">
+            <p className="text-[var(--primary-1)] font-bold text-base">
               Money In: {formatCurrency(moneyIn)}
             </p>
-            <p className="text-red-300 font-bold text-base">
+            <p className="text-[var(--primary-1)] font-bold text-base">
               Money Out: {formatCurrency(moneyOut)}
             </p>
           </div>
         </div>
       </div>
+
       {balance !== null && transactions.length > 0 && (
         <div className="w-full flex flex-col items-center justify-center">
           <div className="text-black flex w-[98%] flex-col items-center justify-center gap-[10px] mt-4">

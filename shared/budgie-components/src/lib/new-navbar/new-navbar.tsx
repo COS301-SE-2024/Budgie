@@ -37,7 +37,6 @@ export function NewNavbar(props: NavbarProps) {
     }
   }, [pathname]);
 
-
   // Function to generate class names for nav items
   function getNavItemClasses(itemName: string) {
     const baseClasses =
@@ -48,8 +47,32 @@ export function NewNavbar(props: NavbarProps) {
   }
 
   return (
-    <div className=" w-[5rem] min-w-[5rem] md:w-[15rem] md:min-w-[15rem] bg-[var(--block-background)] h-full [box-shadow:0_0_10px_rgba(0,0,0,0.5)] pt-6 z-[100]">
-      <ul className="mr-4 ml-4">
+    <div
+      className="
+    w-[5rem] 
+    min-w-[5rem] 
+    md:w-[15rem] 
+    md:min-w-[15rem] 
+    bg-[var(--block-background)] 
+    h-full 
+    [box-shadow:0_0_10px_rgba(0,0,0,0.5)] 
+    pt-6 
+    z-[100]
+    flex 
+    flex-col
+    md:flex-col
+    justify-between
+    portrait:flex-row
+    portrait:top-0
+    portrait:h-[10vh]
+    portrait:w-full
+    portrait:min-w-full
+    portrait:pt-1
+    portrait:pb-2
+    portrait:ml-auto
+  "
+    >
+      <ul className="mr-4 ml-4 flex flex-col md:flex-col portrait:flex-row ">
         {/* Overview item */}
         <Link href={'/overview'}>
           <li
@@ -112,10 +135,10 @@ export function NewNavbar(props: NavbarProps) {
         </Link>
         {/* Logout item */}
         <li
-          className="fixed bottom-4 w-[13vw] font-medium [font-family:'Trip Sans',_sans-serif] flex items-center rounded-[0.4rem] h-8 cursor-pointer text-[var(--main-text)] p-[calc(0.2rem_*_var(--font-size-multiplier))] text-[min(2rem,calc(1.2rem_*_var(--font-size-multiplier)))] hover:bg-[var(--hover)] transition duration-300 ease"
+          className="landscape:fixed landscape:bottom-4 landscape:w-[13vw] font-medium landscape:flex landscape:items-center rounded-[0.4rem] h-8 cursor-pointer text-[var(--main-text)] p-[calc(0.2rem_*_var(--font-size-multiplier))] text-[min(2rem,calc(1.2rem_*_var(--font-size-multiplier)))] hover:bg-[var(--hover)] transition duration-300 ease portrait:mt-4"
           onClick={signout}
         >
-          <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] text-[min(2rem,calc(1.2rem_*_var(--font-size-multiplier)))]">
+          <span className="material-symbols-outlined mr-[0.3rem] ml-[0.3rem] mb-[0.2rem] text-[min(2rem,calc(1.2rem_*_var(--font-size-multiplier)))] portrait:fixed portrait:right-4">
             logout
           </span>
           <span className="hidden md:inline">Logout</span>

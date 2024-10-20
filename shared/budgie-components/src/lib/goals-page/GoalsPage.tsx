@@ -1103,7 +1103,6 @@ export function GoalsPage() {
           progress,
         }
       );
-      console.log(`Email sent for ${progress}% progress.`);
     } catch (error) {
       console.error('Error sending email:', error);
     }
@@ -1394,7 +1393,6 @@ export function GoalsPage() {
           0
         );
         const monthlyUpdates = calculateMonthlyUpdates(updatedUpdates);
-        console.log(monthlyUpdates);
 
         if (goal.type == 'Savings') {
           return {

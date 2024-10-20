@@ -40,11 +40,11 @@
 }
 
 .leftNavButton:hover {
-  color: var(--primary-2);
+  color: var(--primary-1);
 }
 
 .greyedleftNavButton {
-  color: gray;
+  color: var(--primary-2);
   border: none;
   transition: 0.3s ease;
 }
@@ -57,11 +57,11 @@
 }
 
 .rightNavButton:hover {
-  color: var(--primary-2);
+  color: var(--primary-1);
 }
 
 .greyedrightNavButton {
-  color: gray;
+  color: var(--primary-2);
   border: none;
   transition: 0.3s ease;
 }
@@ -244,17 +244,9 @@
   padding: 5px;
 }
 
-.monthDisplay {
-  font-size: calc(1.4rem * var(--font-size-multiplier));
-  font-weight: bold;
-  margin: 0 12px;
-  width: calc(12rem * var(--font-size-multiplier));
-  text-align: center;
-}
 
 .dateDropdown {
   background-color: transparent;
-  color: white;
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
@@ -272,7 +264,7 @@
 }
 
 .dateDropdown:hover {
-  color: var(--primary-2);
+  color: var(--primary-1);
   cursor: pointer;
 }
 

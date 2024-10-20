@@ -14,7 +14,7 @@ import axios from 'axios';
 import { db } from '../../../../../apps/budgie-app/firebase/clientApp';
 import { getAuth } from 'firebase/auth';
 import '../../root.css';
-import { useDataContext } from '../data-context/DataContext';
+import { useDataContext, UserData } from '../data-context/DataContext';
 
 export interface MonthlyTransactionsViewProps {
   account: string;
@@ -39,7 +39,7 @@ interface Goal {
 }
 
 export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
-  const { data, setData } = useDataContext();
+  const { data, setData, refreshData } = useDataContext();
   const [balance, setBalance] = useState(0);
   const [moneyIn, setMoneyIn] = useState(1);
   const [moneyOut, setMoneyOut] = useState(0);
@@ -136,7 +136,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
           spentPercentage: percentage,
         }
       );
-      console.log(`Email sent for over ${percentage}%`);
     } catch (error) {
       console.error('Error sending email:', error);
       const accountKey = `incomeProgress_${props.account}`;
@@ -263,7 +262,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   useEffect(() => {
     getYearlyTransactions();
     display();
-  }, [currentYear, props.account]);
+  }, [currentYear, props.account, currentMonth]);
 
   useEffect(() => {
     if (Data) {
@@ -365,8 +364,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
           ) {
             storedProgress.reached50 = true;
             localStorage.setItem(accountKey, JSON.stringify(storedProgress));
-            console.log('bool: ' + storedProgress);
-            console.log('prog: ' + progressPercentage);
             await sendEmail(user.uid, userEmail, 50, progressPercentage);
           } else if (progressPercentage >= 75 && !storedProgress.reached50) {
             storedProgress.reached50 = true;
@@ -380,8 +377,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
           ) {
             storedProgress.reached75 = true;
             localStorage.setItem(accountKey, JSON.stringify(storedProgress));
-            console.log('bool: ' + storedProgress);
-            console.log('prog: ' + progressPercentage);
             await sendEmail(user.uid, userEmail, 75, progressPercentage);
           } else if (progressPercentage >= 100 && !storedProgress.reached75) {
             storedProgress.reached75 = true;
@@ -390,8 +385,6 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
           if (progressPercentage >= 100 && !storedProgress.reached100) {
             storedProgress.reached100 = true;
             localStorage.setItem(accountKey, JSON.stringify(storedProgress));
-            console.log('bool: ' + storedProgress);
-            console.log('prog: ' + progressPercentage);
             await sendEmail(user.uid, userEmail, 100, progressPercentage);
           }
         }
@@ -435,21 +428,28 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         }
         setTransactions(updatedTransactions);
 
-        setData({
-          ...data,
-          transactions: data.transactions.map((transaction) => {
-            if (transaction.year === currentYear) {
-              return {
-                ...transaction,
-                [currentMonth.getMonth()]: JSON.stringify(updatedTransactions),
-              };
-            }
-            return transaction;
-          }),
+        const updatedTransactionsa = data.transactions.map((transaction) => {
+          if (transaction.account_number === props.account) {
+            return {
+              ...transaction,
+              [monthNames[currentMonth.getMonth()]]: JSON.stringify(updatedTransactions),
+            };
+          }
+          return transaction;
         });
+  
+        const newData: UserData = {
+          ...data, 
+          transactions: updatedTransactionsa, 
+        };
+  
+        setData(newData);
       }
     }
   };
+
+  useEffect(() => {
+  }, [data.transactions]);
 
   const getCategoryStyle = (category: string) => {
     switch (category) {
@@ -574,8 +574,8 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
   }
 
   return (
-    <div className="w-full bg-[var(--main-background)] !z-0">
-      <div className="flex justify-between items-center !z-0 !sticky !top-12  bg-BudgieAccentHover py-2 px-4 shadow-md  rounded-b-2xl">
+    <div className="w-full bg-[var(--main-background)] !z-0 min-h-full h-full portrait:h-[100vh]">
+      <div className="flex justify-between items-center !z-0 !sticky !top-12 bg-[var(--primary-2)] py-2 px-4 shadow-md portrait:flex-col text-white rounded-b-2xl">
         <div className="flex items-center">
           <button
             className={`${getLeftArrowStyle()}`}
@@ -592,7 +592,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
               arrow_back_ios
             </span>
           </button>
-          <span className={styles.monthDisplay}>
+          <span className='font-bold mx-3 text-center text-xl w-[calc(12rem_*_var(--font-size-multiplier))]'>
             <select
               ref={dropdownRef}
               className={styles.dateDropdown}
@@ -637,10 +637,10 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         <div className="font-bold text-2xl flex text-BudgieWhite justify-center items-center">
           Balance: {formatCurrency(balance)}
           <div className="ml-8">
-            <p className="text-green-300 font-bold text-base">
+            <p className="text-[var(--primary-1)] font-bold text-base">
               Money In: {formatCurrency(moneyIn)}
             </p>
-            <p className="text-red-300 font-bold text-base">
+            <p className="text-[var(--primary-1)] font-bold text-base">
               Money Out: {formatCurrency(moneyOut)}
             </p>
           </div>
