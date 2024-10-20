@@ -188,9 +188,6 @@ export function FaqModal(props: FaqModalProps) {
         FAQs
       </div>
       <div className="p-4 bg-gray-200 rounded-lg">
-        <h1 className="text-2xl font-bold text-green-600 mb-6">
-          Frequently Asked Questions
-        </h1>
 
         <input
           type="text"
@@ -205,25 +202,22 @@ export function FaqModal(props: FaqModalProps) {
         {loading ? (
           <div className="text-center py-4">
             <p>Loading questions...</p>
-          </div>
+          </div >
         ) : (
-          <>
-            <h1 className="text-2xl font-bold text-gray-900">
-              Answered Questions
-            </h1>
+          <div className='h-[80vh] overflow-y-scroll'>
             {filteredQuestions.length > 0 ? (
               filteredQuestions.map((question) => (
                 <div
                   key={question.id}
                   className="p-6 bg-white shadow-lg rounded-lg mb-4"
                 >
-                  <h3 className="text-lg font-bold text-green-600 mb-2">
+                  <h3 className="text-lg font-bold text-[var(--primary-1)] mb-2">
                     {question.question}
                   </h3>
                   {question.answer && (
                     <p className="text-gray-900 mb-4">{question.answer}</p>
                   )}
-                  <div className="flex items-center">
+                 {/*} <div className="flex items-center">
                     <span
                       className="material-symbols-outlined cursor-pointer mr-2"
                       onClick={() => voteQuestion(question.id, 'upvote')}
@@ -240,7 +234,7 @@ export function FaqModal(props: FaqModalProps) {
                       thumb_down
                     </span>
                     <span>{question.dislikes}</span>
-                  </div>
+                  </div>*/}
                 </div>
               ))
             ) : (
@@ -248,7 +242,7 @@ export function FaqModal(props: FaqModalProps) {
                 <p>No questions found.</p>
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>

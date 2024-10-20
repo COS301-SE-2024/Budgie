@@ -64,7 +64,7 @@ export function Landing(props: LandingProps) {
           className="text-blue-950 font-semibold flex items-center justify-center mx-auto"
         >
           <span className="text-xl font-TripSans font-bold ml-4 animate-bounce">
-            Learn More &darr;
+            Learn More 
           </span>
         </button>
       </div>

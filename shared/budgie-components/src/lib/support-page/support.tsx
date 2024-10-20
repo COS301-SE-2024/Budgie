@@ -51,7 +51,7 @@ export function Support(props: SupportProps) {
                 Get your account set up in just a few simple steps.
               </p>
               <button
-                className=" bg-blue-950 BudgieBlue spx-4 py-2 rounded-full shadow-lg text-white"
+                className=" bg-[var(--primary-1)] BudgieBlue spx-4 py-2 rounded-full shadow-lg text-white p-3"
                 onClick={() => {
                   setHelpModal(!showHelpModal);
                 }}
@@ -75,7 +75,7 @@ export function Support(props: SupportProps) {
                 Frequently asked questions from users of the website
               </p>
               <button
-                className=" bg-blue-950 BudgieBlue px-4 py-2 rounded-full shadow-lg text-white"
+                className=" bg-[var(--primary-1)] BudgieBlue px-4 py-2 rounded-full shadow-lg text-white"
                 onClick={() => {
                   setFaqModal(!showFaqModal);
                 }}
@@ -99,14 +99,14 @@ export function Support(props: SupportProps) {
                   onClick={() => {
                     setShowContact(!showContact);
                   }}
-                  className=" bg-blue-950 BudgieBlue px-4 py-2 rounded-full shadow-lg"
+                  className=" bg-[var(--primary-1)] BudgieBlue px-4 py-2 rounded-full shadow-lg text-white"
                 >
                   Contact
                 </button>
               )}
               {showContact && (
                 <>
-                  <p className=" text-BudgieGreen1">
+                  <p className=" text-[var(--primary-1)] ">
                     email: Technocrats.301@gmail.com
                   </p>
                 </>

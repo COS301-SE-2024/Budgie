@@ -66,7 +66,7 @@ export function EditGoalPopup(props: EditGoalPopupProps) {
   const [activeTab, setActiveTab] = useState('details');
 
   return (
-    <div className="text-sm md:text-lg lg:text-xl w-full h-full flex justify-center items-center flex-col bg-black bg-opacity-50">
+    <div className="text-sm md:text-lg lg:text-xl w-full h-[85vh] flex justify-center items-center flex-col bg-black bg-opacity-50">
       <div className="relative w-[50vw] h-[60vh] flex flex-col items-center">
         {props.goal.update_type == 'automatic' && (
           <div className="flex w-full absolute top-0">

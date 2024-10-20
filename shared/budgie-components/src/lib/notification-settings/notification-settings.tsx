@@ -70,7 +70,7 @@ export function NotificationSettings(props: NotificationSettingsProps) {
   return (
     <>
       <div
-        className="flex flex-col shadow-lg z-10 fixed top-0 right-0  z-10  bg-[var(--main-background)] p-8 h-full"
+        className="flex flex-col shadow-lg z-10 fixed top-0 right-0  bg-[var(--main-background)] p-8 h-full"
         style={{ width: '85vw' }}
       >
         <div className="pageTitle">
@@ -83,16 +83,16 @@ export function NotificationSettings(props: NotificationSettingsProps) {
           </span>
           Notification Settings
         </div>
-        <div className="flex flex-col bg-white rounded-lg shadow-lg w-full">
+        <div className="flex flex-col bg-white rounded-lg shadow-lg w-full mt-4">
           <div className="p-6 space-y-6">
             <div>
-              <div className="mt-3 space-y-3">
+              <div className="mt-2 space-y-3">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-sm font-medium text-gray-800">
+                    <p className="text-md font-medium text-gray-800">
                       Goal progress
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm text-gray-500">
                       Updates and alerts directly to your email about your
                       progress towards your goal.
                     </p>
@@ -110,10 +110,10 @@ export function NotificationSettings(props: NotificationSettingsProps) {
                 </div>
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-sm font-medium text-gray-800">
+                    <p className="text-md font-medium text-gray-800">
                       Spending warnings
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm text-gray-500">
                       Updates and alerts via email about your spending.
                     </p>
                   </div>
@@ -130,10 +130,10 @@ export function NotificationSettings(props: NotificationSettingsProps) {
                 </div>
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-sm font-medium text-gray-800">
-                      CSV remainder
+                    <p className="text-md font-medium text-gray-800">
+                      CSV reminder
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm text-gray-500">
                       Alert to upload a CSV to ensure the app is up to date with
                       your spending.
                     </p>

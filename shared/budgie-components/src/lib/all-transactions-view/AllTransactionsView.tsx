@@ -485,7 +485,6 @@ export function AllTransactionsView(props: AllTransactionsViewProps) {
 
       {showPopup && selectedTransaction && (
         <div
-          onClick={() => setShowPopup(false)}
           className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center z-50000 w-[85vw] portrait:w-full p-2 text-sm md:text-lg lg:text-xl"
         >
           <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-full max-w-lg ">

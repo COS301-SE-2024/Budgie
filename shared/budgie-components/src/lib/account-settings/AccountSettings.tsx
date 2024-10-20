@@ -11,7 +11,6 @@ import {
   deleteUser,
   updatePassword,
 } from 'firebase/auth';
-import { UserContext } from '@capstone-repo/shared/budgie-components';
 import { FirebaseError } from 'firebase/app';
 
 /* eslint-disable-next-line */

@@ -22,7 +22,7 @@
 .settingTitle {
   font-size: calc(1rem * var(--font-size-multiplier));
   font-weight: bold;
-  color: var(--accent-colour);
+  color: var(--primary-1);
 }
 
 .settingDescription {

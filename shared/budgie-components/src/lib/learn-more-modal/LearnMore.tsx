@@ -22,23 +22,14 @@ const LearnMore: React.FC<LearnMoreProps> = ({ onClose }) => {
               Features & Benefits
             </h3>
             <ul className="list-disc list-inside text-white">
-              <li>Feature 1: Allow tracking of spending patterns.</li>
+              <li>Track your finances and better understand your spending patterns.</li>
               <li>
-                Feature 2: Predictive analytics for future spending based on
-                past patterns.
+                Set goals to acheive financial freedom.
               </li>
+              <li>Learn more about the economy and how you are doing financially.</li>
             </ul>
           </div>
 
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold mb-4 text-white">
-              What Our Customers Say
-            </h3>
-            <p className="italic text-white text-sm">
-              "Budgie has transformed the way we manage our finances. Highly
-              recommended!" - Happy Customer
-            </p>
-          </div>
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-4 text-white">
               How It Works
@@ -48,8 +39,7 @@ const LearnMore: React.FC<LearnMoreProps> = ({ onClose }) => {
             </p>
             <ol className="list-decimal list-inside ml-4 text-white text-sm">
               <li>Sign up for an account.</li>
-              <li>Link your financial accounts.</li>
-              <li>Add CSV files of your bank statements.</li>
+              <li>Add CSV files of your bank account transaction histories.</li>
               <li>Start managing your finances with ease.</li>
             </ol>
           </div>

@@ -56,7 +56,7 @@ export function UpdateGoalProgressPopup(props: UpdateGoalProgressPopupProps) {
   useThemeSettings();
   const p = props.goal.type;
   return (
-    <div className="text-sm md:text-lg lg:text-xl w-full h-full flex justify-center items-center flex-col bg-black bg-opacity-50">
+    <div className="text-sm md:text-lg lg:text-xl w-full h-[85vh] flex justify-center items-center flex-col bg-black bg-opacity-50">
       <div className="relative w-[90vw] md:w-[60vw] lg:w-[50vw] h-[80vh] md:h-[70vh] lg:h-[60vh] flex flex-col items-center overflow-y-auto">
         <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-full h-full flex flex-col justify-between items-center h-auto">
           <GoalForm

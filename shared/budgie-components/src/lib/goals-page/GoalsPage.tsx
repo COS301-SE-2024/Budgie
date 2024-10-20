@@ -931,9 +931,9 @@ const GoalInfoPage = ({
                         <YAxis
                           tick={{ fill: 'var(--main-text)', fontSize: 12 }}
                           stroke="var(--main-text)"
-                          width={50}
+                          width={50} 
                           allowDataOverflow={true}
-                          domain={['auto', 'auto']}
+                          domain={[0, 'auto']}
                         >
                           <Label
                             value="Amount"
@@ -1499,110 +1499,128 @@ export function GoalsPage() {
           ></GoalInfoPage>
         </>
       )}
-      {data.goals.length > 0 && !isGoalPopupOpen && selectedGoal == null &&!loading && (
-        <>
-          <div
-            className="flex justify-between bg-[var(--main-background)] text-[calc(1.2rem*var(--font-size-multiplier))] mb-4 pb-4 items-end"
-            style={{ borderBottom: '1px solid gray' }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <p className="font-bold mr-4 text-lg">Sort By:</p>
-              <select
-                value={sortOption}
-                onChange={handleSortChange}
-                className={styles.sortDropdown}
-              >
-                <option value="name">Name</option>
-                <option value="type">Type</option>
-                <option value="end_date">Target Date</option>
-                <option value="progress">Progress</option>
-              </select>
-            </div>
-            <button className="px-4 h-[calc(3rem_*_var(--font-size-multiplier))] text-black bg-[var(--primary-2)] font-bold rounded-lg transition duration-300 ease" onClick={addGoalPopup}>
-              Add a Goal
-            </button>
-          </div>
-          <div className="w-full h-full text-[calc(1rem*var(--font-size-multiplier))] overflow-y-auto">
-            <table className="min-w-full table-auto border-collapse border border-gray-200">
-              <thead>
-                <tr
-                  style={{
-                    color: 'var(--secondary-text)',
-                    backgroundColor: 'var(--primary-2)',
-                  }}
+      {data.goals.length > 0 &&
+        !isGoalPopupOpen &&
+        selectedGoal == null &&
+        !loading && (
+          <>
+            <div
+              className="flex justify-between bg-[var(--main-background)] text-[calc(1.2rem*var(--font-size-multiplier))] mb-4 pb-4 items-end"
+              style={{ borderBottom: '1px solid gray' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <p className="font-bold mr-4 text-lg">Sort By:</p>
+                <select
+                  value={sortOption}
+                  onChange={handleSortChange}
+                  className={styles.sortDropdown}
                 >
-                  <th className="border border-gray-200 p-2 text-left">Name</th>
-                  <th className="border border-gray-200 p-2 text-left">Type</th>
-                  <th className="border border-gray-200 p-2 text-left">
-                    Target Date
-                  </th>
-                  <th className="border border-gray-200 p-2 text-left">
-                    Progress
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedGoals.map((goal, index) => (
+                  <option value="name">Name</option>
+                  <option value="type">Type</option>
+                  <option value="end_date">Target Date</option>
+                  <option value="progress">Progress</option>
+                </select>
+              </div>
+              <button
+                className="px-4 h-[calc(3rem_*_var(--font-size-multiplier))] text-black bg-[var(--primary-2)] font-bold rounded-lg transition duration-300 ease"
+                onClick={addGoalPopup}
+              >
+                Add a Goal
+              </button>
+            </div>
+            <div className="w-full h-full text-[calc(1rem*var(--font-size-multiplier))] overflow-y-auto">
+              <table className="min-w-full table-auto border-collapse border border-gray-200">
+                <thead>
                   <tr
-                    key={index}
-                    className="cursor-pointer bg-[var(--block-background)] hover:bg-[var(--main-background)]"
                     style={{
-                      fontSize: 'calc(1rem * var(--font-size-multiplier))',
+                      color: 'var(--secondary-text)',
+                      backgroundColor: 'var(--primary-2)',
                     }}
-                    onClick={() => setSelectedGoal(goal)}
                   >
-                    <td className="border border-gray-200 p-2">{goal.name}</td>
-                    <td className="border border-gray-200 p-2">{goal.type}</td>
-                    <td className="border border-gray-200 p-2">
-                      {goal.target_date}
-                    </td>
-                    <td className="border border-gray-200 p-2">
-                      <div className="flex items-center">
-                        <div
-                          className="relative w-full h-8 rounded"
-                          style={{
-                            backgroundColor: 'var(--main-background)',
-                          }}
-                        >
-                          <div
-                            className="absolute top-0 left-0 h-full rounded"
-                            style={{
-                              width:
-                                goal.current_amount < 0
-                                  ? 0
-                                  : `${Math.min(
-                                      100,
-                                      calculateProgressPercentage(goal)
-                                    )}%`,
-                              backgroundColor: 'var(--primary-2)',
-                            }}
-                          />
-                        </div>
-                        <span
-                          className="ml-3 text-sm"
-                          style={{ color: 'var(--main-text' }}
-                        >
-                          {calculateProgressPercentage(goal).toFixed(2)}%
-                        </span>
-                      </div>
-                    </td>
+                    <th className="border border-gray-200 p-2 text-left">
+                      Name
+                    </th>
+                    <th className="border border-gray-200 p-2 text-left">
+                      Type
+                    </th>
+                    <th className="border border-gray-200 p-2 text-left">
+                      Target Date
+                    </th>
+                    <th className="border border-gray-200 p-2 text-left">
+                      Progress
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
+                </thead>
+                <tbody>
+                  {sortedGoals.map((goal, index) => (
+                    <tr
+                      key={index}
+                      className="cursor-pointer bg-[var(--block-background)] hover:bg-[var(--main-background)]"
+                      style={{
+                        fontSize: 'calc(1rem * var(--font-size-multiplier))',
+                      }}
+                      onClick={() => setSelectedGoal(goal)}
+                    >
+                      <td className="border border-gray-200 p-2">
+                        {goal.name}
+                      </td>
+                      <td className="border border-gray-200 p-2">
+                        {goal.type}
+                      </td>
+                      <td className="border border-gray-200 p-2">
+                        {goal.target_date}
+                      </td>
+                      <td className="border border-gray-200 p-2">
+                        <div className="flex items-center">
+                          <div
+                            className="relative w-full h-8 rounded"
+                            style={{
+                              backgroundColor: 'var(--main-background)',
+                            }}
+                          >
+                            <div
+                              className="absolute top-0 left-0 h-full rounded"
+                              style={{
+                                width:
+                                  goal.current_amount < 0
+                                    ? 0
+                                    : `${Math.min(
+                                        100,
+                                        calculateProgressPercentage(goal)
+                                      )}%`,
+                                backgroundColor: 'var(--primary-2)',
+                              }}
+                            />
+                          </div>
+                          <span
+                            className="ml-3 text-sm"
+                            style={{ color: 'var(--main-text' }}
+                          >
+                            {calculateProgressPercentage(goal).toFixed(2)}%
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       {!hasGoals && !loading && (
         <>
-          <div className="flex flex-col items-center justify-center bg-[var(--main-background)] h-full">
-            <div className="text-2xl">Add your first goal:</div>
-            <button
-              className="text-2xl mt-4 bg-BudgieBlue2 hover:bg-BudgieAccentHover transition-colors text-white p-4 rounded-2xl"
-              onClick={addGoalPopup}
-            >
-              Add Goal
-            </button>
+          <div className="flex flex-col items-center justify-center bg-[var(--main-background)] h-[85vh] ">
+            {!isGoalPopupOpen && (
+              <>
+                <div className="text-2xl">Add your first goal:</div>
+                <button
+                  className="text-2xl mt-4 bg-BudgieBlue2 hover:bg-BudgieAccentHover transition-colors text-white p-4 rounded-2xl"
+                  onClick={addGoalPopup}
+                >
+                  Add Goal
+                </button>
+              </>
+            )}
           </div>
         </>
       )}
