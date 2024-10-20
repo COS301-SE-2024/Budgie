@@ -86,7 +86,7 @@ export function Dashboard(props: DashboardProps) {
     <div className="bg-[var(--main-background)] pl-6 pr-6 pt-4 overflow-y-auto flex-grow portrait:fixed portrait:w-full portrait:pt-[12vh] portrait:pl-2 portrait:pr-2">
       <div className="w-full flex flex-col items-center justify-center ">
         <div className="w-full 2xl:w-5/6 md:min-w-[44rem] sm:min-w-[35rem] min-w-full">
-          <div className="flex flex-wrap shadow-md !z-0 justify-between rounded-t-2xl bg-[var(--primary-1)] landscape:h-[calc(3rem*var(--font-size-multiplier))] w-full sticky top-0 text-[var(--secondary-text)]">
+          <div className="flex flex-wrap shadow-md !z-0 justify-between rounded-t-2xl bg-[var(--primary-1)] landscape:h-[calc(3rem*var(--font-size-multiplier))] w-full landscape:sticky top-0 text-[var(--secondary-text)]">
             <div className="flex flex-wrap items-center w-full justify-between portrait:mt-2 text-xl">
               <div></div>
               <button
@@ -142,7 +142,7 @@ export function Dashboard(props: DashboardProps) {
           <div className="">
             {loading ? (
               <div className="w-full bg-[var(--main-background)] !z-0">
-                <div className="flex justify-between items-center !z-0 !sticky !top-12  bg-BudgieAccentHover py-2 px-4 shadow-md h-16 rounded-b-2xl"></div>
+                <div className="flex justify-between items-center !z-0 landscape:!sticky !top-12  bg-[var(--primary-2)] py-2 px-4 shadow-md h-16 rounded-b-2xl"></div>
                 <div className="w-full flex flex-col items-center justify-center">
                   <div className="text-black flex w-[98%] flex-col items-center justify-center gap-[10px] mt-4">
                     <div className={styles.loadScreen}>

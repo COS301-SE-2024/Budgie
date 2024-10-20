@@ -89,18 +89,6 @@
   color: black;
 }
 
-.transactionCard {
-  background-color: var(--block-background);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.2s ease-in-out;
-  display: flex;
-  align-items: center;
-  height: calc(6vh * var(--font-size-multiplier));
-  width: 100%;
-}
-
 .transactionCard:hover {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
@@ -128,6 +116,7 @@
   font-weight: bold;
   margin-left: auto;
   color: var(--main-text);
+  margin-right: 2rem;
 }
 
 .transactionDescription {
@@ -139,11 +128,10 @@
   border: 1px solid #ccc;
   padding: 5px;
   border-radius: 10px;
-  width: calc(9vw * var(--font-size-multiplier));
+  width: fit-content;
   box-sizing: border-box;
   font-weight: bold;
   font-size: calc(16px * var(--font-size-multiplier));
-  margin-left: 2rem;
   text-align: center;
   text-align-last: center;
   appearance: none;

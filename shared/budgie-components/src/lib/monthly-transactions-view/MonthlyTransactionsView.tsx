@@ -575,7 +575,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
 
   return (
     <div className="w-full bg-[var(--main-background)] !z-0 min-h-full h-full portrait:h-[100vh]">
-      <div className="flex justify-between items-center !z-0 !sticky !top-12 bg-[var(--primary-2)] py-2 px-4 shadow-md portrait:flex-col text-white rounded-b-2xl">
+      <div className="flex justify-between items-center !z-0 landscape:!sticky !top-12 bg-[var(--primary-2)] py-2 px-4 shadow-md portrait:flex-col text-white rounded-b-2xl">
         <div className="flex items-center">
           <button
             className={`${getLeftArrowStyle()}`}
@@ -652,11 +652,11 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
         </div>
       ) : (
         <div className="w-full flex flex-col items-center justify-center">
-          <div className="text-black flex w-[98%] flex-col items-center justify-center gap-[10px] mt-4">
+          <div className="text-black flex w-[98%] flex-col items-center justify-center gap-[10px] mt-4 mb-[50vh]">
             {transactions.map((transaction, index) => (
               <div
                 key={index}
-                className={styles.transactionCard}
+                className="bg-[var(--block-background)] p-2 rounded-lg shadow-md transition-shadow duration-200 ease-in-out flex items-center h-fit w-full"
                 style={{
                   borderLeft:
                     transaction.amount >= 0
@@ -664,7 +664,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
                       : '15px solid var(--primary-1)',
                 }}
               >
-                <div className={styles.transactionContent}>
+                <div className="w-[100%] flex items-center portrait:flex-col portrait:justify-start portrait:items-start">
                   <div className={styles.transactionDate}>
                     {transaction.date}
                   </div>
@@ -709,7 +709,7 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
       <div></div>
 
       {showPopup && selectedTransaction && (
-        <div className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center z-50000 w-[85vw] text-sm md:text-lg lg:text-xl">
+        <div onClick={() => setShowPopup(false)} className="fixed top-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center z-50000 w-[85vw] portrait:w-full p-2 text-sm md:text-lg lg:text-xl">
           <div className="bg-[var(--block-background)] p-5 rounded text-center z-2 w-full max-w-lg ">
             <div className="mb-4">
               <p
@@ -722,20 +722,20 @@ export function MonthlyTransactionsView(props: MonthlyTransactionsViewProps) {
               </p>
             </div>
             <div
-              className="flex flex-col items-center"
+              className="flex flex-col items-center portrait:items-start"
               style={{ fontSize: 'calc(1rem * var(--font-size-multiplier))' }}
             >
-              <div className="flex justify-between w-[50%]">
+              <div className="flex justify-between w-[50%] portrait:w-full">
                 <div className="font-semibold">Date:</div>
                 <div>{selectedTransaction.date}</div>
               </div>
 
-              <div className="flex justify-between w-[50%]">
+              <div className="flex justify-between w-[50%] portrait:w-full">
                 <div className="font-semibold">Description:</div>
                 <div>{selectedTransaction.description}</div>
               </div>
 
-              <div className="flex justify-between w-[50%]">
+              <div className="flex justify-between w-[50%] portrait:w-full">
                 <div className="font-semibold">Amount:</div>
                 <div>{formatTransactionValue(selectedTransaction.amount)}</div>
               </div>
